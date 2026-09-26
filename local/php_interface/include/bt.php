@@ -178,7 +178,7 @@ function bt_catalog_data(): array
 
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y'], false, false,
         ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'DETAIL_PAGE_URL', 'PREVIEW_PICTURE', 'IBLOCK_SECTION_ID']);
-    while ($o = $r->GetNextElement(true, false)) {
+    while ($o = $r->GetNextElement(false, false)) { // сырые значения: экранирует bt_card()
         $f = $o->GetFields();
         $pr = $o->GetProperties();
         $pl = $prices[$f['ID']] ?? [['kg' => 1, 'p' => 0]];

@@ -147,6 +147,22 @@ bt_ensure_props($catId, [
     'RECOMMEND' => ['Рекомендуем к товару', 'E', $multi],
 ], $apply, $say, $fail);
 
+// свойства с SMART_FILTER должны быть привязаны к корню ИБ, иначе умный фильтр их не видит
+if ($catId) {
+    $links = [];
+    foreach (CIBlockSectionPropertyLink::GetArray($catId, 0) as $l) {
+        $links[$l['PROPERTY_ID']] = $l['SMART_FILTER'];
+    }
+    $filterCodes = ['NET_WEIGHT', 'COUNTRY', 'TEA_KIND', 'TASTE', 'EFFECT', 'PACKING', 'ROAST', 'PROCESSING', 'BADGES'];
+    $r = CIBlockProperty::GetList([], ['IBLOCK_ID' => $catId]);
+    while ($p = $r->Fetch()) {
+        if (in_array($p['CODE'], $filterCodes, true) && ($links[$p['ID']] ?? '') !== 'Y') {
+            $say("  умный фильтр: {$p['CODE']}");
+            $apply and CIBlockSectionPropertyLink::Set(0, $p['ID'], ['SMART_FILTER' => 'Y', 'IBLOCK_ID' => $catId]);
+        }
+    }
+}
+
 if ($catId && !CCatalog::GetByID($catId)) {
     $say("ИБ $catId → торговый каталог");
     $apply and (CCatalog::Add(['IBLOCK_ID' => $catId, 'YANDEX_EXPORT' => 'Y']) or $fail('catalog add'));
