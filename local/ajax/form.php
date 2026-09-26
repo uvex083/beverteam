@@ -40,6 +40,10 @@ $d = [
     'topic' => $v('topic', 150) ?: 'Заявка с сайта', 'page' => preg_match('~^/[^\s]*$~', (string)$req->getPost('page')) ? mb_substr((string)$req->getPost('page'), 0, 255) : '',
     'message' => mb_substr(trim((string)$req->getPost('message')), 0, 2000),
 ];
+// модель кофемашины (ремонт, аренда) — первой строкой сообщения
+if ($model = $v('model', 150)) {
+    $d['message'] = 'Модель: ' . $model . ($d['message'] !== '' ? "\n" . $d['message'] : '');
+}
 
 // ловушка для ботов: поле скрыто от людей — делаем вид, что всё хорошо
 if ((string)$req->getPost('website') !== '') {

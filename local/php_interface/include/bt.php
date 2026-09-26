@@ -311,7 +311,7 @@ function bt_catalog_data(): array
         ['ID', 'NAME', 'CODE', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG']);
     while ($f = $r->Fetch()) {
         $data['rent'][] = [
-            'id' => 'r' . $f['ID'], 'code' => $f['CODE'], 'url' => '/arenda-kofemashin/', 'img' => $img($f['PREVIEW_PICTURE']),
+            'id' => 'r' . $f['ID'], 'code' => $f['CODE'], 'url' => '/arenda-kofemashin/#calc', 'img' => $img($f['PREVIEW_PICTURE']),
             'n' => $f['NAME'], 'p' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'unit' => 'в месяц', 'rent' => 1, 'stock' => 1,
             'par' => implode(' · ', array_filter([$f['PROPERTY_AUDIENCE_VALUE'], $f['PROPERTY_CUPS_PER_DAY_VALUE'] ? 'до ' . $f['PROPERTY_CUPS_PER_DAY_VALUE'] . ' чашек/день' : '', $f['PROPERTY_FREE_FROM_KG_VALUE'] ? 'бесплатно от ' . $f['PROPERTY_FREE_FROM_KG_VALUE'] . ' кг кофе' : ''])),
         ];
@@ -325,21 +325,30 @@ function bt_catalog_data(): array
 // Блок страницы из одноэлементного инфоблока (главная, «О компании»): поля по коду свойства в нижнем регистре
 function bt_block(string $code): array
 {
+    return bt_blocks($code, 1)[0] ?? [];
+}
+
+// Элементы инфоблока в формате bt_block + название и HTML анонса: карточки со своими полями, вопросы и ответы
+function bt_blocks(string $code, int $limit = 0): array
+{
     $ibId = bt_iblock($code);
     if (!$ibId) {
         return [];
     }
     $cache = \Bitrix\Main\Data\Cache::createInstance();
-    if ($cache->initCache(86400, 'bt_block_' . $code, '/bt/blocks')) {
+    if ($cache->initCache(86400, 'bt_blocks_' . $code . '_' . $limit, '/bt/blocks')) {
         return $cache->getVars();
     }
     $cache->startDataCache();
     $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
-    $b = [];
-    $el = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, ['nTopCount' => 1], ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_PICTURE'])->GetNextElement();
-    if ($el) {
+    $list = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, $limit ? ['nTopCount' => $limit] : false,
+        ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'PREVIEW_PICTURE', 'PREVIEW_TEXT', 'PREVIEW_TEXT_TYPE']);
+    while ($el = $r->GetNextElement()) {
         $f = $el->GetFields();
+        $b = ['id' => (int)$f['ID'], 'name' => $f['~NAME'], 'code' => (string)$f['CODE'],
+            'html' => $f['PREVIEW_TEXT_TYPE'] === 'html' ? trim((string)$f['~PREVIEW_TEXT']) : nl2br(htmlspecialcharsbx(trim((string)$f['~PREVIEW_TEXT'])), false)];
         $b['pic'] = $f['PREVIEW_PICTURE'] ? \CFile::GetPath($f['PREVIEW_PICTURE']) : '';
         $b['pic_id'] = (int)$f['PREVIEW_PICTURE'];
         foreach ($el->GetProperties() as $pc => $p) {
@@ -357,10 +366,11 @@ function bt_block(string $code): array
                 $b[$k] = trim((string)$p['~VALUE']);
             }
         }
+        $list[] = $b;
     }
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
-    $cache->endDataCache($b);
-    return $b;
+    $cache->endDataCache($list);
+    return $list;
 }
 
 // Карточки спискового инфоблока: название, текст анонса, картинка, иконка
@@ -510,6 +520,7 @@ function bt_rent_models(): array
     while ($f = $r->Fetch()) {
         $m = $f['PROPERTY_MACHINE_VALUE'] ? bt_product((string)$f['PROPERTY_MACHINE_VALUE']) : null;
         $list[] = [
+            'id' => 'r' . $f['ID'], 'name' => $f['NAME'], 'url' => $m['url'] ?? '', 'buy' => $m['p'] ?? 0,
             'model' => trim(preg_replace('/^Кофемашина\s+|\s+Аренда$/u', '', $m['n'] ?? $f['NAME'])),
             'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'],
             'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'],

@@ -84,11 +84,11 @@ if (!$kgId && $apply) {
 // оптовая сетка известна только для Эфиопии Оромия (beverteam-context.md, раздел 8)
 $bulk = ['botanica-efiopiya-oromiya' => [[1, 4, 2687], [5, 9, 2203], [10, 19, 2090], [20, 29, 1990], [30, null, 1940]]];
 
-// аренда: условия из beverteam-context.md (бесплатно от N кг кофе, для кого)
+// аренда: условия из beverteam-context.md (бесплатно от N кг кофе, для кого), название — H1 старого сайта
 $rentMeta = [
-    'jl-05-arenda' => ['machine' => 'jetinno-jl-05', 'kg' => 3, 'aud' => 'Дом и малый офис', 'sort' => 10],
-    'jl-15-viva-arenda' => ['machine' => 'jetinno-jl-15-viva', 'kg' => 6, 'aud' => 'Офис', 'sort' => 20],
-    'jl-36-arenda' => ['machine' => 'jetinno-jl36', 'kg' => 9, 'aud' => 'Кафе и HoReCa', 'sort' => 30],
+    'jl-05-arenda' => ['machine' => 'jetinno-jl-05', 'kg' => 3, 'aud' => 'Дом и малый офис', 'sort' => 10, 'name' => 'Аренда кофемашины Jetinno Jl 05'],
+    'jl-15-viva-arenda' => ['machine' => 'jetinno-jl-15-viva', 'kg' => 6, 'aud' => 'Офис', 'sort' => 20, 'name' => 'Аренда кофемашины Jetinno Jl 15 (VIVA)'],
+    'jl-36-arenda' => ['machine' => 'jetinno-jl36', 'kg' => 9, 'aud' => 'Кафе и HoReCa', 'sort' => 30, 'name' => 'Аренда кофемашины Jetinno JL 36'],
 ];
 
 // характеристики кофе BOTANICA — из описаний товаров на старом сайте (свойствами там не заведены)
@@ -169,7 +169,7 @@ foreach ($products as $p) {
         $props['SHORT_DESC'] = implode(' · ', array_filter([$c['country'] ?? $c['mix'] ?? '', $c['proc'] ?? '', isset($c['q']) ? 'Q ' . $c['q'] : '', $c['notes']]));
     }
     $fields = [
-        'IBLOCK_ID' => $ibId, 'NAME' => $p['name'], 'CODE' => $code, 'XML_ID' => (string)$p['sku'], 'ACTIVE' => 'Y',
+        'IBLOCK_ID' => $ibId, 'NAME' => $isRent ? $rentMeta[$code]['name'] : $p['name'], 'CODE' => $code, 'XML_ID' => (string)$p['sku'], 'ACTIVE' => 'Y',
         'SORT' => $isRent ? $rentMeta[$code]['sort'] : $sort,
         'DETAIL_TEXT' => $p['description_html'] ?? '', 'DETAIL_TEXT_TYPE' => 'html',
     ];
