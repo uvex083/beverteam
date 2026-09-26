@@ -1215,3 +1215,31 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:900px){.cartp .cartl{grid-template-columns:1fr}.cartp .sum{position:static}.cartp .ci{grid-template-columns:70px 1fr}
   .cartp .ci__ph{height:70px}.cartp .ci__ph img{max-height:56px}
   .cartp .ci__r{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}}
+
+/* ---------- оформление заказа (checkout.html) ---------- */
+.cop .co{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+.cop .blk{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;margin-bottom:16px}
+.cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.cop .blk h2 b{width:26px;height:26px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-family:'JetBrains Mono';font-size:12px}
+.cop .opts{display:grid;gap:10px}
+.cop .dtabs{margin-bottom:14px}
+.cop .pill-tabs button[aria-disabled=true]{opacity:.4;cursor:not-allowed}
+.cop .city{position:relative}
+.cop .city ul{position:absolute;left:0;right:0;top:calc(100% - 20px);background:var(--white);border:1px solid var(--line);border-radius:12px;list-style:none;margin:4px 0 0;padding:6px;z-index:5;display:none;box-shadow:0 12px 30px rgba(0,0,0,.1);max-height:320px;overflow:auto}
+.cop .city ul.open{display:block}
+.cop .city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+.cop .city li:hover{background:var(--paper)}
+.cop .city li small{color:var(--gray);margin-left:6px}
+.cop .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
+.cop .sum .it{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.cop .sum .it img{width:44px;height:44px;object-fit:contain;background:var(--paper);border-radius:8px;padding:4px;mix-blend-mode:multiply}
+.cop .sum .it b{margin-left:auto;white-space:nowrap;font-family:'JetBrains Mono';font-size:13px}
+.cop .sum .l{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px;color:#3A3A34}
+.cop .sum .l span:last-child{text-align:right}
+.cop .sum .l.t{border-top:1px solid var(--line);margin-top:8px;padding-top:14px;font-weight:800;font-size:18px;color:var(--ink);font-family:Unbounded}
+.cop .eta{font-size:12.5px;color:var(--gray);margin-top:10px}
+.cop .left{font-size:12.5px;color:var(--gray);margin:12px 0 14px;min-height:2.8em}
+.cop .err-form{color:var(--err);font-size:12.5px;margin:8px 0 0;min-height:1.2em}
+.cop .err-form:empty{min-height:0;margin:0}
+@media(max-width:900px){.cop .co{grid-template-columns:1fr}.cop .sum{position:static}}
+@media(max-width:600px){.cop .blk{padding:18px}.cop .pill-tabs{display:flex;width:100%}.cop .pill-tabs button{flex:1;padding:8px 10px}}
