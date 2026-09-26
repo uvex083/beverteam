@@ -1078,6 +1078,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     BT_cmpUpdate(); BT_favUpdate();
   }));
   document.querySelectorAll('[data-ymap]').forEach(el=>BT_mapWidget(el));
+  /* плитка разделов главной — слайдер, как в макете */
+  BT_slider(document.getElementById('tiles'),{min:5,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3},1200:{slidesPerView:5,spaceBetween:14}}}});
   /* 404: поиск открывает общий поиск по сайту с введённым запросом */
   document.querySelectorAll('[data-nf-search]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();
     const q=f.elements.q.value; BT_search(); setTimeout(()=>{const s=document.getElementById('sq'); s.value=q; s.dispatchEvent(new Event('input'));},80);}));
