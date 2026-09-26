@@ -503,8 +503,6 @@ function footer(){
 }
 /* Полноэкранный поиск: пустое состояние с подсказками и промо, живые результаты при вводе */
 const SRCH_HINTS=['Эфиопия Оромия','кофе для офиса','аренда кофемашины','Jetinno JL15','чай Эрл Грей','ремонт кофемашины','кофе оптом','дрип-пакеты'];
-const SRCH_SECS=[['Кофе BOTANICA','/magazin/','catCoffee'],['Чай','/magazin/','catTea'],['Кофемашины Jetinno','/magazin/','catMach'],
-  ['Аренда кофемашин','/arenda-kofemashin/','jl15'],['Кофе по подписке','/podpiska/','oromia'],['Ремонт и сервис','/servis/','drawing']];
 function searchPanel(){
   return `<div class="srch" id="srch" role="dialog" aria-modal="true" aria-label="Поиск по сайту">
     <div class="srch__top"><div class="wrap srch__in">
@@ -765,6 +763,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const closeSearch=()=>{ sp.classList.remove('open'); lock();
     if(sLast){sLast.focus();sLast=null;} };
 
+  // картинки промо — фото товаров каталога по символьному коду (не со старого сайта)
+  const byCode=code=>Object.values(BT_PRODUCTS).flat().find(x=>x.code===code);
   function paintEmpty(){
     const rec=recent();
     sinner.innerHTML=`<div class="srch__grid">
@@ -773,16 +773,16 @@ document.addEventListener('DOMContentLoaded',()=>{
         <h4>Часто ищут</h4>
         <div class="srch__chips">${SRCH_HINTS.map(q=>`<button data-q="${q}">${q}</button>`).join('')}</div>
         <h4>Разделы</h4>
-        <div class="srch__secs">${SRCH_SECS.map(x=>`<a href="${x[1]}"><img src="${IMG[x[2]]}" alt="" loading="lazy">${x[0]}</a>`).join('')}</div>
+        <div class="srch__secs">${CATS.map(c=>`<a href="${c.h}">${c.promo?`<img src="${c.promo.img}" alt="" loading="lazy">`:''}${c.t}</a>`).join('')}</div>
       </div>
       <div class="srch__promo">
         <h4>Предложения</h4>
         <a class="spromo spromo--lime" href="/podpiska/">
           <span class="k">Подписка</span><b>Кофемашина бесплатно</b><span>При заказе от 3 кг кофе в месяц. Обслуживание и ремонт наши.</span>
-          <img src="${IMG.jl05}" alt="" loading="lazy"></a>
-        <a class="spromo spromo--esp" href="/magazin/">
+          ${byCode('jetinno-jl-05')?`<img src="${byCode('jetinno-jl-05').img}" alt="" loading="lazy">`:''}</a>
+        <a class="spromo spromo--esp" href="${byCode('botanica-efiopiya-oromiya')?.url||'/magazin/kofe/'}">
           <span class="k">Зерно месяца</span><b>Эфиопия Оромия, Q 82,5</b><span>2 687 ₽ за кг, от 30 кг — 1 940 ₽</span>
-          <img src="${IMG.oromia}" alt="" loading="lazy"></a>
+          ${byCode('botanica-efiopiya-oromiya')?`<img src="${byCode('botanica-efiopiya-oromiya').img}" alt="" loading="lazy">`:''}</a>
         <a class="spromo spromo--dark" href="/arenda-kofemashin/#calc">
           <span class="k">Калькулятор</span><b>Подберём машину под нагрузку</b><span>Ответьте на 4 вопроса и увидите цену аренды</span></a>
       </div>
