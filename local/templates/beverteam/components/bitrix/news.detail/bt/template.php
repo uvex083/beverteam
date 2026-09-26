@@ -17,9 +17,9 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
 $pic = $arResult['DETAIL_PICTURE']['SRC'] ?? ($arResult['PREVIEW_PICTURE']['SRC'] ?? '');
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
-  <meta itemprop="datePublished" content="<?= $e($iso) ?>"><meta itemprop="articleSection" content="<?= $e($cat) ?>">
-  <span itemprop="author" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="BEVERTEAM"></span>
   <div>
+    <meta itemprop="datePublished" content="<?= $e($iso) ?>"><meta itemprop="articleSection" content="<?= $e($cat) ?>">
+    <div hidden itemprop="author" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="BEVERTEAM"></div>
     <h1 class="display h1" itemprop="headline"><?= $e($arResult['~NAME']) ?></h1>
     <div class="post__meta">
       <span class="tag"><?= $e($cat) ?></span>

@@ -19,7 +19,7 @@ $revs = bt_list('reviews');
       <div class="facts"><?php foreach ($intro['items'] as [$v, $d]): ?><div><b><?= $e($v) ?></b><span><?= $e($d) ?></span></div><?php endforeach ?></div>
       <?php endif ?>
     </div>
-    <div class="intro__ph"><?php if (!empty($intro['pic'])): ?><img src="<?= $e($intro['pic']) ?>" alt="Чай и кофе BEVERTEAM"><?php else: ?><div class="ph">Фото компании<br><small>нужен файл от клиента</small></div><?php endif ?></div>
+    <div class="intro__ph"><?php if (!empty($intro['pic'])): ?><img src="<?= $e($intro['pic']) ?>" alt="Чай и кофе BEVERTEAM"><?php else: ?><div class="ph"><span>Фото компании<br><small>нужен файл от клиента</small></span></div><?php endif ?></div>
   </div>
 
   <section class="sec"><div class="grid g2" style="gap:40px">
@@ -38,7 +38,7 @@ $revs = bt_list('reviews');
   <?php if ($cert): ?>
   <section class="sec sec--t0"><div class="cert">
     <div><div class="mono" style="color:var(--lime)"><?= $e($cert['caption'] ?? '') ?></div><h2 class="display h2" style="margin:14px 0"><?= $e($cert['title'] ?? '') ?></h2><p style="color:#A8A8A0;margin:0;max-width:40ch"><?= $e($cert['subtitle'] ?? '') ?></p></div>
-    <?php if (!empty($cert['pic'])): ?><img class="cert__img" src="<?= $e($cert['pic']) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"><?php else: ?><div class="ph">Скан сертификата авторизации<br><small>нужен файл от клиента</small></div><?php endif ?>
+    <?php if (!empty($cert['pic'])): ?><img class="cert__img" src="<?= $e($cert['pic']) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"><?php else: ?><div class="ph"><span>Скан сертификата авторизации<br><small>нужен файл от клиента</small></span></div><?php endif ?>
   </div></section>
   <?php endif ?>
 
