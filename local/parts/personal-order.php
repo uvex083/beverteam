@@ -50,10 +50,10 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 ?>
 <div class="card">
   <?php if ($order->isCanceled()): ?>
-  <div class="alert alert--err">Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</div>
+  <div class="alert alert--err"><span>Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
-  <div class="alert alert--info">Сроки и трек-номер сообщит менеджер. Изменить заказ можно до отправки — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</div>
+  <div class="alert alert--info"><span>Сроки и трек-номер сообщит менеджер. Изменить заказ можно до отправки — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php endif ?>
 </div>
 
@@ -81,7 +81,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <?php if ($dCode === 'bt_pickup'): ?><dt>Адрес склада</dt><dd><?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?></dd>
     <?php elseif (($props['PVZ'] ?? '') !== ''): ?><dt>Пункт выдачи</dt><dd><?= $e(($city ? $city . ', ' : '') . $props['PVZ']) ?></dd>
     <?php else: ?><dt>Адрес</dt><dd><?= $e(trim(($city ? $city . ', ' : '') . ($props['ADDRESS'] ?? ''), ', ') ?: '—') ?></dd><?php endif ?>
-    <dt>Получатель</dt><dd><?= $e(trim($name . ($phone ? ', ' . $phone : ''), ', ') ?: '—') ?></dd>
+    <dt>Получатель</dt><dd><?= $e($name ?: ($phone ? '' : '—')) ?><?= $phone ? ($name ? ', ' : '') . '<span style="white-space:nowrap">' . $e($phone) . '</span>' : '' ?></dd>
     <?php if ($order->getField('USER_DESCRIPTION')): ?><dt>Комментарий</dt><dd><?= $e($order->getField('USER_DESCRIPTION')) ?></dd><?php endif ?>
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">

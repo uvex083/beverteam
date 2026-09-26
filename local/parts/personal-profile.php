@@ -42,7 +42,7 @@ bt_acc_start('profile', '<h1 class="display h1">Личный кабинет</h1>
     <div class="field"><label>Имя *</label><input name="name" value="<?= $e($u['NAME']) ?>" maxlength="50" autocomplete="given-name"></div>
     <div class="field"><label>Фамилия</label><input name="last_name" value="<?= $e($u['LAST_NAME']) ?>" maxlength="50" autocomplete="family-name"></div>
     <div class="field"><label>Телефон</label><input name="phone" value="<?= $e($phone ? bt_phone_fmt($phone) : '') ?>" placeholder="+7 (___) ___-__-__"></div>
-    <div class="field"><label>E‑mail</label><input value="<?= $e($u['EMAIL']) ?>" readonly><span class="hint">Для входа и писем о заказах. Сменить — через менеджера</span></div>
+    <div class="field"><label>E‑mail</label><input value="<?= $e($u['EMAIL']) ?>" readonly><span class="hint">Для входа и писем о заказах</span></div>
   </div>
   <button class="btn" type="submit">Сохранить</button>
 </form>

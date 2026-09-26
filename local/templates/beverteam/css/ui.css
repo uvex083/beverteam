@@ -1543,7 +1543,7 @@ form[data-form]{position:relative}
 .accp .empty p{margin:0 0 20px}
 /* юрлица и адреса списком: название, строка деталей, действия справа */
 .accp .li{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;padding:16px 20px;margin-bottom:12px}
-.accp .li > div:first-child{min-width:0;flex:1}
+.accp .li > div:first-child{min-width:0;flex:1 1 240px}
 .accp .li b{display:block;margin-bottom:4px}
 .accp .li p{margin:0;color:var(--gray);font-size:14px;overflow-wrap:anywhere}
 .accp .li .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
