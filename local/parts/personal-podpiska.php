@@ -31,7 +31,7 @@ if ($reqs): ?>
 <div class="reorder" style="margin-bottom:18px">
   <div><span class="mono" style="color:var(--lime)">Заявка у менеджера</span>
     <h2 style="margin:10px 0 8px">Подписку оформляет менеджер</h2>
-    <p>Он свяжется, согласует сорт, объём и график доставки, пришлёт договор. Изменить состав или поставить паузу — тоже через менеджера: <?= $e($co['phone1'] ?? '') ?>.</p></div>
+    <p>Он свяжется и согласует сорт, объём и график доставки. Изменить состав или поставить паузу — тоже через менеджера: <?= $e($co['phone1'] ?? '') ?>.</p></div>
   <div style="display:grid;gap:10px"><a class="btn" href="/podpiska/">Новая заявка</a>
     <a class="btn btn--line" style="color:#fff;border-color:#fff" href="<?= $e($co['phone1_href'] ?? '') ?>">Позвонить</a></div>
 </div>
