@@ -149,6 +149,10 @@ bt_ensure_props($catId, [
 
 // свойства с SMART_FILTER должны быть привязаны к корню ИБ, иначе умный фильтр их не видит
 if ($catId) {
+    if (CIBlock::GetArrayByID($catId, 'SECTION_PROPERTY') !== 'Y') {
+        $say('  ИБ каталога: включить настройки свойств по разделам (SECTION_PROPERTY)');
+        $apply and (new CIBlock())->Update($catId, ['SECTION_PROPERTY' => 'Y']);
+    }
     $links = [];
     foreach (CIBlockSectionPropertyLink::GetArray($catId, 0) as $l) {
         $links[$l['PROPERTY_ID']] = $l['SMART_FILTER'];
