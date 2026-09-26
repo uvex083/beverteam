@@ -1,7 +1,8 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetPageProperty("title", "Оплата и доставка | Beverteam");
-$APPLICATION->SetPageProperty("description", "Условия оплаты и доставки — компания Beverteam. Кофемашины в аренду в Екатеринбурге для офиса, кафе, ресторана и мероприятий");
+$APPLICATION->SetPageProperty("description", "Условия оплаты и доставки  — компания Beverteam. Кофемашины в аренду в Екатеринбурге для офиса, кафе, ресторана и мероприятий");
+$APPLICATION->SetPageProperty("keywords", "Оплата и доставка");
 $APPLICATION->SetTitle("Оплата и доставка");
 ?>
 <div class="infop__cards">

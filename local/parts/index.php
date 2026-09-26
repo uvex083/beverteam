@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Главная по макету index.html: тексты — из инфоблоков типа «Главная», данные — из каталога, аренды, отзывов и журнала
+// Главная по макету index.html; H1 — заголовок блока «О магазине», как на старом сайте (SetTitle в /index.php). Тексты — из инфоблоков типа «Главная», данные — из каталога, аренды, отзывов и журнала
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $co = bt_contacts();
@@ -16,6 +16,9 @@ $steps = bt_block('main_steps');
 $revB = bt_block('main_reviews');
 $sub = bt_block('main_sub');
 $about = bt_block('main_about');
+if (!empty($about['title'])) {
+    $APPLICATION->SetTitle($about['title']);
+}
 $jour = bt_block('main_journal');
 $seo = bt_block('main_seo');
 $rent = bt_rent_models();
@@ -50,7 +53,7 @@ $c0 = $chips[$cur] ?? null;
 <section class="hero"><div class="wrap hero__grid">
   <div class="hero-in">
     <?php if (!empty($hero['caption'])): ?><div class="eyebrow mono"><i></i><?= $e($hero['caption']) ?></div><?php endif ?>
-    <h1 class="display"><?= bt_title($hero['title'] ?? '', $hero['highlight'] ?? '') ?></h1>
+    <p class="display hero__title"><?= bt_title($hero['title'] ?? '', $hero['highlight'] ?? '') ?></p>
     <?php if (!empty($hero['subtitle'])): ?><p class="hero__sub"><?= $e($hero['subtitle']) ?></p><?php endif ?>
     <div class="hero__cta">
       <?= bt_btn($hero['btn_text'] ?? '', $hero['btn_link'] ?? '') ?>
@@ -199,7 +202,7 @@ if ($bp):
 <section class="sec sec--t0" id="form"><div class="wrap">
   <div class="wr">
     <div>
-      <h2 class="display h2"><?= $e($about['title'] ?? '') ?></h2>
+      <h1 class="display h2"><?php $APPLICATION->ShowTitle(false) ?></h1>
       <div class="home__about"><?= $about['text'] ?? '' ?></div>
       <div class="row" style="margin-top:24px"><?= bt_btn($about['btn_text'] ?? '', $about['btn_link'] ?? '', 'btn btn--line') ?><?= bt_btn($about['btn2_text'] ?? '', $about['btn2_link'] ?? '', 'btn btn--line') ?></div>
     </div>

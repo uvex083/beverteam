@@ -1,0 +1,43 @@
+<?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
+/** @var array $arResult */
+/** @global CMain $APPLICATION */
+// Лента журнала: первая страница — крупная карточка и три заголовка сбоку, дальше сетка; «Показать ещё» — следующая страница
+
+$posts = [];
+foreach ($arResult['ITEMS'] as $it) {
+    $kind = $it['PROPERTIES']['KIND']['VALUE_XML_ID'] ?? 'article';
+    $date = $it['ACTIVE_FROM'] ?: $it['DATE_CREATE'];
+    $posts[] = [
+        'kind' => $kind ?: 'article', 'cat' => ($it['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'),
+        'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $it['~NAME'], 'lead' => trim(strip_tags((string)$it['~PREVIEW_TEXT'])),
+        'url' => $it['~DETAIL_PAGE_URL'], 'img' => $it['PREVIEW_PICTURE']['SRC'] ?? '',
+    ];
+}
+$nav = $arResult['NAV_RESULT'] ?? null;
+$page = $nav ? (int)$nav->NavPageNomer : 1;
+$e = fn($s) => htmlspecialcharsbx((string)$s);
+
+if (!$posts): ?>
+  <p class="muted">Материалов пока нет.</p>
+<?php return; endif;
+
+if ($page === 1):
+    $lead = array_shift($posts);
+    $side = array_splice($posts, 0, 3);
+?>
+<div class="jlead">
+  <?= bt_post_card($lead) ?>
+  <?php if ($side): ?><div class="jside"><?php foreach ($side as $p): ?><a href="<?= $e($p['url']) ?>"><span class="ncard__m"><span class="tag"><?= $e($p['cat']) ?></span><time datetime="<?= $e($p['d']) ?>"><?= bt_date_ru($p['d']) ?></time></span><b><?= $e($p['t']) ?></b></a><?php endforeach ?></div><?php endif ?>
+</div>
+<?php endif ?>
+<?php if ($posts): ?><div class="news"><?php foreach ($posts as $p) echo bt_post_card($p) ?></div><?php endif ?>
+<?php if ($nav && $nav->NavPageCount > 1):
+    $shown = min($nav->NavRecordCount, $page * $nav->NavPageSize);
+    $next = $page < $nav->NavPageCount ? $APPLICATION->GetCurPageParam('PAGEN_' . $nav->NavNum . '=' . ($page + 1), ['PAGEN_' . $nav->NavNum]) : '';
+?>
+<div class="jmore">
+  <span class="cnt">Показано <?= $shown ?> из <?= (int)$nav->NavRecordCount ?></span>
+  <span class="bar"><i style="width:<?= round($shown / max(1, $nav->NavRecordCount) * 100) ?>%"></i></span>
+  <?php if ($next): ?><a class="btn btn--line" href="<?= $e($next) ?>">Показать ещё</a><?php endif ?>
+</div>
+<?php endif;

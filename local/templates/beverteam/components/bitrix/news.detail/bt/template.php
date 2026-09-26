@@ -1,0 +1,45 @@
+<?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
+/** @var array $arResult */
+// Статья: заголовкам текста проставляются якоря, из них — оглавление сбоку (если заголовков два и больше)
+
+$e = fn($s) => htmlspecialcharsbx((string)$s);
+$kind = $arResult['PROPERTIES']['KIND']['VALUE_XML_ID'] ?? 'article';
+$cat = ($arResult['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи');
+$min = (int)($arResult['PROPERTIES']['READ_TIME']['VALUE'] ?? 0);
+$date = $arResult['ACTIVE_FROM'] ?: $arResult['DATE_CREATE'];
+$iso = $date ? date('Y-m-d', MakeTimeStamp($date)) : '';
+$toc = [];
+$body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) use (&$toc) {
+    $id = 'h' . (count($toc) + 1);
+    $toc[] = [$id, trim(strip_tags($m[3]))];
+    return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
+}, (string)$arResult['~DETAIL_TEXT']);
+$pic = $arResult['DETAIL_PICTURE']['SRC'] ?? ($arResult['PREVIEW_PICTURE']['SRC'] ?? '');
+?>
+<article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
+  <meta itemprop="datePublished" content="<?= $e($iso) ?>"><meta itemprop="articleSection" content="<?= $e($cat) ?>">
+  <span itemprop="author" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="BEVERTEAM"></span>
+  <div>
+    <h1 class="display h1" itemprop="headline"><?= $e($arResult['~NAME']) ?></h1>
+    <div class="post__meta">
+      <span class="tag"><?= $e($cat) ?></span>
+      <?php if ($iso): ?><time datetime="<?= $e($iso) ?>"><?= bt_date_ru($iso) ?></time><?php endif ?>
+      <?php if ($min): ?><span>·</span><span><?= $min ?> мин чтения</span><?php endif ?>
+      <span>·</span><span>BEVERTEAM</span>
+    </div>
+    <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>" itemprop="image"></figure><?php endif ?>
+    <div class="post__body" itemprop="articleBody"><?= $body ?></div>
+    <div class="row" style="margin-top:32px;gap:12px">
+      <a class="btn" href="/magazin/kofe/">Выбрать зерно</a>
+      <a class="btn btn--line" href="/podbor-kofe/">Подобрать кофе за минуту</a>
+    </div>
+  </div>
+  <?php if (count($toc) >= 2): ?>
+  <aside>
+    <nav class="post__toc" aria-label="Содержание">
+      <b>В статье</b>
+      <?php foreach ($toc as [$id, $t]): ?><a href="#<?= $id ?>"><?= $e($t) ?></a><?php endforeach ?>
+    </nav>
+  </aside>
+  <?php endif ?>
+</article>
