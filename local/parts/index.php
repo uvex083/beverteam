@@ -2,7 +2,8 @@
 /** @global CMain $APPLICATION */
 // Главная по макету index.html; H1 — заголовок блока «О магазине», как на старом сайте (SetTitle в /index.php). Тексты — из инфоблоков типа «Главная», данные — из каталога, аренды, отзывов и журнала
 
-$e = fn($s) => htmlspecialcharsbx((string)$s);
+// неразрывные пробелы в числах и перед ₽: «3 000 ₽» не рвётся по строкам
+$e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $co = bt_contacts();
 $hero = bt_block('main_hero');
 $cfg = bt_block('main_config');
