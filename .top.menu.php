@@ -1,46 +1,33 @@
-<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
-$aMenuLinks = Array(
-	Array(
-		"Как купить", 
-		"about/howto/", 
-		Array(), 
-		Array(), 
-		"" 
-	),
-	Array(
-		"Доставка", 
-		"about/delivery/", 
-		Array(), 
-		Array(), 
-		"" 
-	),
-	Array(
-		"О магазине", 
-		"about/", 
-		Array(), 
-		Array(), 
-		"" 
-	),	
-	Array(
-		"Гарантия", 
-		"about/guaranty/", 
-		Array(), 
-		Array(), 
-		"" 
-	),
-	Array(
-		"Контакты",
-		"about/contacts/",
-		Array(),
-		Array(),
-		""
-	),
-	Array(
-		"Мой кабинет",
-		"personal/",
-		Array(),
-		Array(),
-		"\$USER->IsAuthorized()"
-	),
-);
-?>
+<?php
+// Верхнее меню шапки: DEPTH_LEVEL 2 — пункты выпадающего списка
+$sub = ['DEPTH_LEVEL' => 2];
+$aMenuLinks = [
+    ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Отзывы о нас', '/otzyvy-o-nas/', [], $sub, ''],
+    ['Написать нам', '/kontakty/#form', [], $sub, ''],
+    ['Магазин', '/magazin/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Кофе', '/magazin/kofe/', [], $sub, ''],
+    ['Чай', '/magazin/chay/', [], $sub, ''],
+    ['Кофемашины', '/magazin/professionalnye-kofemashiny/', [], $sub, ''],
+    ['Аксессуары', '/magazin/aksessuary/', [], $sub, ''],
+    ['Аренда кофемашин', '/arenda-kofemashin/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Для офиса', '/arenda-kofemashin/', [], $sub, ''],
+    ['Для кафе и HoReCa', '/arenda-kofemashin/', [], $sub, ''],
+    ['На мероприятие', '/arenda-kofemashin/#event', [], $sub, ''],
+    ['Кофе по подписке', '/podpiska/', [], $sub, ''],
+    ['Сервис', '/servis/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
+    ['Плановое ТО и чистка', '/servis/#price', [], $sub, ''],
+    ['Продажа оборудования', '/servis/', [], $sub, ''],
+    ['Вызвать инженера', '/servis/remont-kofemashin/#form', [], $sub, ''],
+    ['Журнал', '/news/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Статьи', '/news/', [], $sub, ''],
+    ['Новости', '/news/', [], $sub, ''],
+    ['Подбор кофе за минуту', '/podbor-kofe/', [], $sub, ''],
+    ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
+    ['Возврат и обмен', '/vozvrat-i-obmen/', [], $sub, ''],
+    ['О компании', '/o-kompanii/', [], $sub, ''],
+    ['Контакты', '/kontakty/', [], $sub, ''],
+    ['Карта сайта', '/sitemap/', [], $sub, ''],
+];

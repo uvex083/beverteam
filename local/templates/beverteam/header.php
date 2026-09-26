@@ -1,0 +1,77 @@
+<?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
+
+use Bitrix\Main\Page\Asset;
+
+/** @global CMain $APPLICATION */
+$co = bt_contacts();
+$asset = Asset::getInstance();
+$asset->addCss(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.css');
+$asset->addCss(SITE_TEMPLATE_PATH . '/css/ui.css');
+$asset->addJs(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.js');
+$asset->addJs(SITE_TEMPLATE_PATH . '/js/ui.js');
+
+$msgr = function (string $cls = '') {
+    $html = '';
+    foreach (bt_messengers() as [$code, $name, $href]) {
+        $html .= '<a href="' . htmlspecialcharsbx($href ?: '#') . '" title="' . $name . '" aria-label="' . $name . '" rel="nofollow noopener" target="_blank">' . bt_icon($code) . '</a>';
+    }
+    return '<div class="msgr ' . $cls . '">' . $html . '</div>';
+};
+$logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>';
+?><!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0E0E0C">
+<title><?php $APPLICATION->ShowTitle() ?></title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/favicon.svg">
+<?php $APPLICATION->ShowHead() ?>
+</head>
+<body>
+<?php $APPLICATION->ShowPanel() ?>
+<div id="app">
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__top">
+    <button class="burger" id="burger" aria-label="Меню"><?= bt_icon('burger') ?></button>
+    <a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><?= $logo ?></a>
+    <button class="catbtn" id="catbtn" aria-expanded="false" aria-controls="mega"><span class="catbtn__i"><?= bt_icon('cat') . bt_icon('close') ?></span><span class="lbl">Каталог</span></button>
+    <div class="hdr__msgr"><?= $msgr() ?></div>
+    <div class="hdr__acts">
+      <a class="hdr__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
+      <button class="hact" id="srchBtn" aria-label="Поиск по сайту" aria-haspopup="dialog"><?= bt_icon('search') ?><span>Поиск</span></button>
+      <a class="hact" href="/personal/"><?= bt_icon('user') ?><span>Кабинет</span></a>
+      <a class="hact" href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span></a>
+      <a class="hact hact--cmp" href="/magazin/compare/" aria-label="Сравнение товаров"><?= bt_icon('compare') ?><span class="cnt" hidden>0</span><span>Сравнение</span></a>
+      <a class="hact" href="/personal/cart/" aria-label="Корзина"><?= bt_icon('cart') ?><span class="cnt">0</span><span>Корзина</span></a>
+    </div>
+  </div>
+  <div class="wrap hdr__nav">
+    <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_top', [
+        'ROOT_MENU_TYPE' => 'top', 'MAX_LEVEL' => 2, 'CHILD_MENU_TYPE' => 'top', 'USE_EXT' => 'Y',
+        'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
+    ], false, ['HIDE_ICONS' => 'Y']) ?>
+    <span class="r"><b><?= $co['city'] ?? '' ?></b>, <?= $co['street'] ?? '' ?> · <?= $co['hours'] ?? '' ?></span>
+  </div>
+  <div class="mega" id="mega"><div class="wrap mega__in">
+    <div class="mega__cats" id="megaCats"></div>
+    <div class="mega__panel" id="megaPanel"></div>
+  </div></div>
+</header>
+<div class="drawer" id="drawer">
+  <div class="drawer__bg" data-close></div>
+  <div class="drawer__p">
+    <div class="drawer__hd"><a class="brand" href="/"><?= $logo ?></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
+    <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px"><?= bt_icon('search') ?> Поиск по каталогу</button></div>
+    <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_drawer', [
+        'ROOT_MENU_TYPE' => 'drawer', 'MAX_LEVEL' => 2, 'CHILD_MENU_TYPE' => 'drawer', 'USE_EXT' => 'Y',
+        'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
+    ], false, ['HIDE_ICONS' => 'Y']) ?>
+    <div class="drawer__ft">
+      <a class="tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
+      <a class="tel" href="<?= $co['phone2_href'] ?? '' ?>" style="font-size:14px"><?= $co['phone2'] ?? '' ?></a>
+      <a href="mailto:<?= $co['email'] ?? '' ?>" style="font-size:13.5px;font-weight:600"><?= $co['email'] ?? '' ?></a>
+      <span class="muted" style="font-size:12.5px"><?= $co['zip'] ?? '' ?>, <?= $co['city'] ?? '' ?>, <?= $co['street'] ?? '' ?> · <?= $co['hours'] ?? '' ?></span>
+      <?= $msgr('msgr--lg') ?>
+      <a class="btn btn--block" href="/kontakty/#form">Оставить заявку</a>
+    </div>
+  </div>
+</div>
