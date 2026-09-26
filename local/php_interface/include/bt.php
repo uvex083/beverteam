@@ -754,3 +754,31 @@ function bt_acc_end(): void
 {
     echo '</div></div></div>';
 }
+
+// Open Graph: заголовок и описание страницы берутся после выполнения страницы (вызывается через AddBufferContent)
+function bt_og(): string
+{
+    global $APPLICATION;
+    $e = fn($s) => htmlspecialcharsbx(trim(strip_tags((string)$s)));
+    $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
+    $url = 'https://beverteam.ru' . $APPLICATION->GetCurPage(false);
+    return '<meta property="og:type" content="website"><meta property="og:site_name" content="BEVERTEAM">'
+        . '<meta property="og:title" content="' . $e($title) . '">'
+        . '<meta property="og:description" content="' . $e($APPLICATION->GetPageProperty('description')) . '">'
+        . '<meta property="og:url" content="' . $e($url) . '"><meta property="og:image" content="https://beverteam.ru/local/templates/beverteam/images/og-logo.png">';
+}
+
+// Яндекс.Метрика — счётчик старого сайта, только на боевом домене: заходы с dev не портят статистику клиента
+function bt_metrika(): string
+{
+    if (!preg_match('/^(www\.)?beverteam\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
+        return '';
+    }
+    return <<<'HTML'
+<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();
+for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+ym(110309111,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,ecommerce:"dataLayer"});</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/110309111" style="position:absolute;left:-9999px" alt=""></div></noscript>
+HTML;
+}

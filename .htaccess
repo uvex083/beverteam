@@ -4,6 +4,27 @@ ErrorDocument 404 /404.php
 <IfModule mod_rewrite.c>
   Options +FollowSymLinks
   RewriteEngine On
+
+  # один адрес сайта: без www
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+  # адреса старого сайта (конструктор) → новые, чтобы не потерять позиции в поиске
+  RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/magazin/aksessuary/$1/ [R=301,L]
+  RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/magazin/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
+  RewriteRule ^magazin/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
+  RewriteRule ^magazin/product/(jl-05-arenda|jl-15-viva-arenda|jl-36-arenda)/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
+  RewriteRule ^news/view/([^/]+)/?$ https://%{HTTP_HOST}/news/$1/ [R=301,L]
+  RewriteRule ^napishite-nam/?$ https://%{HTTP_HOST}/kontakty/#form [R=301,NE,L]
+  RewriteRule ^registraciya/?$ https://%{HTTP_HOST}/personal/ [R=301,L]
+
+  # старые адреса были без слеша на конце — страницам сайта добавляем слеш
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{REQUEST_URI} !^/(bitrix|local|upload)/
+  RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{1,5}$
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.+[^/])$ https://%{HTTP_HOST}/$1/ [R=301,L]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteCond %{REQUEST_FILENAME} !-d

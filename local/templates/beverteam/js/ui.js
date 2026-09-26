@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     clearTimeout(sTimer);
     sTimer=setTimeout(()=>{ q.length<2?paintEmpty():paintResults(q); },200);   /* дебаунс 200 мс */
   });
-  sq && sq.addEventListener('keydown',e=>{ if(e.key==='Enter'&&sq.value.trim().length>1){ pushRecent(sq.value.trim()); }});
+  sq && sq.addEventListener('keydown',e=>{ if(e.key==='Enter'&&sq.value.trim().length>1){ pushRecent(sq.value.trim()); location.href='/search/?q='+encodeURIComponent(sq.value.trim()); }});
   sclr && sclr.addEventListener('click',()=>{sq.value='';sclr.classList.remove('show');paintEmpty();sq.focus();});
   document.getElementById('sx').addEventListener('click',closeSearch);
   sinner.addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;
