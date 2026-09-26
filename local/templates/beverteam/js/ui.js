@@ -291,13 +291,13 @@ const ALL = () => [].concat(BT_PRODUCTS.coffee,BT_PRODUCTS.tea,BT_PRODUCTS.machi
 window.BT_find = id => ALL().find(x=>x.id===id);
 let CART;
 try{ CART = JSON.parse(localStorage.getItem('bt_cart')||'null'); }catch(e){ CART=null; }
-if(!CART) CART = {oromia:2, earl:1};              /* демо-наполнение при первом заходе */
+if(!CART) CART = {};
 window.BT_CART = CART;
 const cartSave = () => { try{ localStorage.setItem('bt_cart',JSON.stringify(CART)); }catch(e){} };
 
 /* ---------- сравнение: список id в localStorage, общий для всех страниц ---------- */
 let CMP; try{ CMP=JSON.parse(localStorage.getItem('bt_cmp')||'null'); }catch(e){ CMP=null; }
-if(!Array.isArray(CMP)) CMP=['earl','assam','chabrec','taiga','ivan','masala','sencha','milkoolong','puer','matcha','oromia','brazil','milk','smes'];  /* демо-наполнение */
+if(!Array.isArray(CMP)) CMP=[];
 window.BT_CMP = CMP;
 const cmpSave = () => { try{ localStorage.setItem('bt_cmp',JSON.stringify(CMP)); }catch(e){} };
 window.BT_cmpHas = id => CMP.indexOf(id)>=0;
