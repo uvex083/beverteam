@@ -766,7 +766,9 @@ input,textarea{caret-color:var(--ink)}
   .filters .fbtn{grid-row:3;margin:0;border-radius:0;padding:17px 16px calc(17px + env(safe-area-inset-bottom));
     font-size:15px;border-left:0;border-right:0;box-shadow:0 -6px 18px rgba(0,0,0,.07)}
 }
-@media(min-width:1051px){.filters__hd{display:none}}
+@media(min-width:1051px){.filters__hd{display:none}.filters .fbtn{display:none}}
+/* фильтр применяется на лету: недоступное при текущем выборе значение гаснет, но остаётся на месте */
+.filters .opt:has(input:disabled){opacity:.4;pointer-events:none}
 
 @media(max-width:1050px){
   .g4{grid-template-columns:repeat(3,1fr)}

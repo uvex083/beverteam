@@ -58,7 +58,7 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
         } ?>
       <details<?= $open ? ' open' : '' ?>><summary><?= $e($item['NAME']) ?></summary>
       <?php foreach ($values as $v): $off = !empty($v['DISABLED']) && empty($v['CHECKED']); ?>
-        <label class="opt"<?= $off ? ' style="opacity:.4;pointer-events:none"' : '' ?>><input type="checkbox" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>><?= $e($v['VALUE']) ?><span class="n"><?= $off ? 0 : (int)($v['ELEMENT_COUNT'] ?? 0) ?></span></label>
+        <label class="opt"><input type="checkbox" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>><?= $e($v['VALUE']) ?><span class="n"><?= $off ? 0 : (int)($v['ELEMENT_COUNT'] ?? 0) ?></span></label>
       <?php endforeach ?>
       </details>
     <?php endforeach ?>
@@ -69,7 +69,7 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
   const filters=document.getElementById('filters'), form=filters.querySelector('form'), fb=document.querySelector('.mob-f'),
-    fx=document.getElementById('fClose'), fa=document.getElementById('fApply'), desk=matchMedia('(min-width:1051px)');
+    fx=document.getElementById('fClose'), fa=document.getElementById('fApply');
   /* мобильная шторка фильтра: блокировка фона, Esc, закрытие по кнопке */
   const openF=()=>{filters.classList.add('open');BT_lock();setTimeout(()=>fx.focus(),40);};
   const closeF=()=>{filters.classList.remove('open');BT_lock();fb&&fb.focus();};
@@ -77,8 +77,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   fx.addEventListener('click',closeF);
   fa.addEventListener('click',closeF);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&filters.classList.contains('open'))closeF();});
-  /* на десктопе кнопка не нужна — фильтр применяется сразу */
-  const btnMode=()=>{fa.style.display=desk.matches?'none':'';}; btnMode(); desk.addEventListener('change',btnMode);
 
   /* ---- применение на лету: фоновая загрузка той же страницы с фильтром и подмена списка ---- */
   const buildUrl=()=>{
@@ -99,8 +97,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         /* числа и доступность значений — без перерисовки фильтра: раскрытые группы и фокус остаются */
         d.querySelectorAll('#filters input[name]').forEach(n=>{
           const o=form.querySelector(`input[name="${CSS.escape(n.name)}"]`); if(!o) return;
-          if(o.type==='checkbox'){ o.disabled=n.disabled; const l=o.closest('.opt'), nl=n.closest('.opt');
-            l.style.cssText=nl.style.cssText; l.querySelector('.n').textContent=nl.querySelector('.n').textContent; }
+          if(o.type==='checkbox'){ o.disabled=n.disabled; o.closest('.opt').querySelector('.n').textContent=n.closest('.opt').querySelector('.n').textContent; }
           else o.placeholder=n.placeholder;
         });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
