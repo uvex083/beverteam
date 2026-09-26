@@ -565,3 +565,10 @@ function bt_form_tail(string $btn = 'Отправить заявку'): string
         . '<label class="check check--top" style="margin-bottom:16px"><input type="checkbox" name="agree" value="Y"> <span>Я ознакомлен(а) с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">политикой конфиденциальности</a></span></label>'
         . '<button class="btn btn--block" type="submit">' . htmlspecialcharsbx($btn) . '</button>';
 }
+
+// Хлебные крошки страницы: выводятся в конце сборки, когда цепочка уже полная
+function bt_crumbs(): void
+{
+    global $APPLICATION;
+    $APPLICATION->AddBufferContent([$APPLICATION, 'GetNavChain'], false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false);
+}

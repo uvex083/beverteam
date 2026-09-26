@@ -1078,6 +1078,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     BT_cmpUpdate(); BT_favUpdate();
   }));
   document.querySelectorAll('[data-ymap]').forEach(el=>BT_mapWidget(el));
+  /* 404: поиск открывает общий поиск по сайту с введённым запросом */
+  document.querySelectorAll('[data-nf-search]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();
+    const q=f.elements.q.value; BT_search(); setTimeout(()=>{const s=document.getElementById('sq'); s.value=q; s.dispatchEvent(new Event('input'));},80);}));
   BT_phFit();
 
   /* BreadcrumbList — из хлебных крошек любой страницы */

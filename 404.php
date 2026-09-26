@@ -1,73 +1,29 @@
-<?
-include_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/urlrewrite.php');
-
-CHTTP::SetStatus("404 Not Found");
-@define("ERROR_404","Y");
-define("HIDE_SIDEBAR", true);
-
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-
-$APPLICATION->SetTitle("Страница не найдена");?>
-
-	<div class="bx-404-container">
-		<div class="bx-404-block"><img src="<?=SITE_DIR?>images/404.png" alt=""></div>
-		<div class="bx-404-text-block">Неправильно набран адрес, <br>или такой страницы на сайте больше не существует.</div>
-		<div class="">Вернитесь на <a href="<?=SITE_DIR?>">главную</a> или воспользуйтесь картой сайта.</div>
-	</div>
-	<div class="map-columns row">
-		<div class="col-sm-10 col-sm-offset-1">
-			<div class="bx-maps-title">Карта сайта:</div>
-		</div>
-	</div>
-
-	<div class="col-sm-offset-2 col-sm-4">
-		<div class="bx-map-title"><i class="fa fa-leanpub"></i> Каталог</div>
-		<?$APPLICATION->IncludeComponent(
-			"bitrix:catalog.section.list",
-			"tree",
-			array(
-				"COMPONENT_TEMPLATE" => "tree",
-				"IBLOCK_TYPE" => "catalog",
-				"IBLOCK_ID" => "2",
-				"SECTION_ID" => $_REQUEST["SECTION_ID"],
-				"SECTION_CODE" => "",
-				"COUNT_ELEMENTS" => "Y",
-				"TOP_DEPTH" => "2",
-				"SECTION_FIELDS" => array(
-					0 => "",
-					1 => "",
-				),
-				"SECTION_USER_FIELDS" => array(
-					0 => "",
-					1 => "",
-				),
-				"SECTION_URL" => "",
-				"CACHE_TYPE" => "A",
-				"CACHE_TIME" => "36000000",
-				"CACHE_GROUPS" => "Y",
-				"ADD_SECTIONS_CHAIN" => "Y"
-			),
-			false
-		);
-		?>
-	</div>
-
-	<div class="col-sm-offset-1 col-sm-4">
-		<div class="bx-map-title"><i class="fa fa-info-circle"></i> О магазине</div>
-		<?
-		$APPLICATION->IncludeComponent(
-			"bitrix:main.map",
-			".default",
-			array(
-				"CACHE_TYPE" => "A",
-				"CACHE_TIME" => "36000000",
-				"SET_TITLE" => "N",
-				"LEVEL" => "3",
-				"COL_NUM" => "2",
-				"SHOW_DESCRIPTION" => "Y",
-				"COMPONENT_TEMPLATE" => ".default"
-			),
-			false
-		);?>
-	</div>
-<?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+<?php
+include_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/urlrewrite.php';
+CHTTP::SetStatus('404 Not Found');
+@define('ERROR_404', 'Y');
+require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
+/** @global CMain $APPLICATION */
+$APPLICATION->SetPageProperty('title', 'Страница не найдена — BEVERTEAM');
+$APPLICATION->SetPageProperty('robots', 'noindex, follow');
+$APPLICATION->SetTitle('Страница не найдена');
+?>
+<div class="wrap nfp">
+  <div class="nf">
+    <div>
+      <div class="code" aria-hidden="true">404</div>
+      <h1 class="display h2" style="margin-top:14px">Такой страницы нет</h1>
+      <p>Возможно, товар закончился, раздел переехал или в адресе опечатка. Кофе от этого не хуже.</p>
+      <form class="search nf__s" data-nf-search role="search"><input name="q" placeholder="Поиск по каталогу" aria-label="Поиск по каталогу"><button type="submit" aria-label="Найти"><?= bt_icon('search') ?></button></form>
+      <a class="btn" href="/">На главную</a>
+    </div>
+    <div class="links">
+      <a href="/magazin/">Каталог чая и кофе <span>→</span></a>
+      <a href="/arenda-kofemashin/">Аренда кофемашин <span>→</span></a>
+      <a href="/servis/">Ремонт и обслуживание <span>→</span></a>
+      <a href="/oplata-i-dostavka/">Оплата и доставка <span>→</span></a>
+      <a href="/kontakty/">Контакты <span>→</span></a>
+    </div>
+  </div>
+</div>
+<?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

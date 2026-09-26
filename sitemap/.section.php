@@ -1,0 +1,2 @@
+<?php
+$sSectionName = 'Карта сайта';
