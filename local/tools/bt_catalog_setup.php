@@ -235,4 +235,15 @@ if (is_file($sectionsFile)) {
     }
 }
 
+// фасетный индекс умного фильтра — пересобираем при каждом apply (63 товара, секунды)
+if ($apply && $catId) {
+    $idx = \Bitrix\Iblock\PropertyIndex\Manager::createIndexer($catId);
+    $idx->startIndex();
+    $idx->continueIndex(0);
+    $idx->endIndex();
+    \Bitrix\Iblock\PropertyIndex\Manager::checkAdminNotification();
+    CIBlock::clearIblockTagCache($catId);
+    echo "фасетный индекс пересобран\n";
+}
+
 echo "done\n";
