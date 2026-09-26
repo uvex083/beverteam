@@ -117,9 +117,8 @@ window.BT_authPost = data => { const fd=new FormData(); Object.entries(data).for
   fd.append('sessid',window.BX&&BX.bitrix_sessid?BX.bitrix_sessid():'');
   return fetch('/local/ajax/auth.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
 window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
-window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ USER=null; window.BT_USER=null;
-  document.dispatchEvent(new CustomEvent('bt:auth',{detail:null}));
-  location.href=location.pathname.startsWith('/personal/')&&!/^\/personal\/(cart|favorites)\//.test(location.pathname)?'/':location.href; });
+/* выход: из кабинета — на главную, с остальных страниц — та же страница уже гостем */
+window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ if(document.querySelector('.accp')) location.href='/'; else location.reload(); });
 window.BT_authUpdate = () => {
   const a=document.querySelector('.hact[href="/personal/"]'); if(!a) return;
   const l=a.querySelector('span:not(.cnt)');
