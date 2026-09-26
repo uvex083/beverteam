@@ -187,18 +187,9 @@ if (!$userId) {
     if ($found) {
         $userId = (int)$found['ID'];
     } else {
-        $pass = \Bitrix\Main\Security\Random::getStringByAlphabet(12, \Bitrix\Main\Security\Random::ALPHABET_ALPHALOWER | \Bitrix\Main\Security\Random::ALPHABET_ALPHAUPPER | \Bitrix\Main\Security\Random::ALPHABET_NUM)
-            . \Bitrix\Main\Security\Random::getStringByAlphabet(4, \Bitrix\Main\Security\Random::ALPHABET_SPECIAL);
-        $login = $f['email'];
-        while (\Bitrix\Main\UserTable::getList(['filter' => ['=LOGIN' => $login], 'select' => ['ID']])->fetch()) {
-            $login = $f['email'] . '_' . random_int(100, 999);
-        }
-        $groups = array_filter(array_map('intval', explode(',', COption::GetOptionString('main', 'new_user_registration_def_group', ''))));
-        $u = new CUser();
-        $userId = (int)$u->Add(['LOGIN' => $login, 'EMAIL' => $f['email'], 'NAME' => $f['name'], 'PERSONAL_PHONE' => '+' . $phone,
-            'PASSWORD' => $pass, 'CONFIRM_PASSWORD' => $pass, 'ACTIVE' => 'Y', 'LID' => SITE_ID, 'GROUP_ID' => $groups ?: [2]]);
-        if (!$userId) {
-            $out(['ok' => false, 'errors' => ['email' => 'Не получилось сохранить покупателя: ' . strip_tags($u->LAST_ERROR)]]);
+        $userId = bt_user_create($f['email'], $f['name'], $phone);
+        if (!is_int($userId)) {
+            $out(['ok' => false, 'errors' => ['email' => 'Не получилось сохранить покупателя: ' . $userId]]);
         }
     }
 }

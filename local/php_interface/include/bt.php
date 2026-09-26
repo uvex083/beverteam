@@ -583,3 +583,174 @@ function bt_crumbs(): void
     global $APPLICATION;
     $APPLICATION->AddBufferContent([$APPLICATION, 'GetNavChain'], false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false);
 }
+
+// ---------- покупатель и личный кабинет ----------
+
+// Телефон → 11 цифр с 7 в начале, иначе пустая строка
+function bt_phone_digits(string $s): string
+{
+    $d = preg_replace('/\D/', '', $s);
+    if (strlen($d) === 10) {
+        $d = '7' . $d;
+    } elseif (strlen($d) === 11 && $d[0] === '8') {
+        $d = '7' . substr($d, 1);
+    }
+    return strlen($d) === 11 && $d[0] === '7' ? $d : '';
+}
+
+// +7 (904) 384-13-88 — как маска полей телефона
+function bt_phone_fmt(string $s): string
+{
+    $d = bt_phone_digits($s);
+    return $d ? '+7 (' . substr($d, 1, 3) . ') ' . substr($d, 4, 3) . '-' . substr($d, 7, 2) . '-' . substr($d, 9, 2) : $s;
+}
+
+// Покупатель по телефону: в профилях номера записаны по-разному — сравниваем цифры
+function bt_user_by_phone(string $digits): ?array
+{
+    $r = \Bitrix\Main\UserTable::getList([
+        'filter' => [['LOGIC' => 'OR', '%PERSONAL_PHONE' => substr($digits, -2), '%PERSONAL_MOBILE' => substr($digits, -2)]],
+        'select' => ['ID', 'EMAIL', 'ACTIVE', 'PERSONAL_PHONE', 'PERSONAL_MOBILE'], 'order' => ['ID' => 'ASC'],
+    ]);
+    while ($u = $r->fetch()) {
+        if (in_array($digits, [bt_phone_digits((string)$u['PERSONAL_PHONE']), bt_phone_digits((string)$u['PERSONAL_MOBILE'])], true)) {
+            return $u;
+        }
+    }
+    return null;
+}
+
+// Новый покупатель (логин = e-mail, пароль случайный — входят по коду). Возвращает ID или текст ошибки
+function bt_user_create(string $email, string $name, string $phone = ''): int|string
+{
+    $rnd = \Bitrix\Main\Security\Random::class;
+    $pass = $rnd::getStringByAlphabet(12, $rnd::ALPHABET_ALPHALOWER | $rnd::ALPHABET_ALPHAUPPER | $rnd::ALPHABET_NUM) . $rnd::getStringByAlphabet(4, $rnd::ALPHABET_SPECIAL);
+    $login = $email;
+    while (\Bitrix\Main\UserTable::getList(['filter' => ['=LOGIN' => $login], 'select' => ['ID']])->fetch()) {
+        $login = $email . '_' . random_int(100, 999);
+    }
+    $groups = array_filter(array_map('intval', explode(',', COption::GetOptionString('main', 'new_user_registration_def_group', ''))));
+    [$first, $last] = array_pad(preg_split('/\s+/u', trim($name), 2), 2, '');
+    $d = bt_phone_digits($phone);
+    $u = new CUser();
+    $id = (int)$u->Add(['LOGIN' => $login, 'EMAIL' => $email, 'NAME' => $first, 'LAST_NAME' => $last, 'PERSONAL_PHONE' => $d ? '+' . $d : '',
+        'PASSWORD' => $pass, 'CONFIRM_PASSWORD' => $pass, 'ACTIVE' => 'Y', 'LID' => SITE_ID, 'GROUP_ID' => $groups ?: [2]]);
+    return $id ?: strip_tags((string)$u->LAST_ERROR);
+}
+
+// Текущий покупатель для ui.js (window.BT_USER), гостю — null
+function bt_user_js(): ?array
+{
+    global $USER;
+    if (!is_object($USER) || !$USER->IsAuthorized()) {
+        return null;
+    }
+    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN']])->fetch();
+    return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN'])] : null;
+}
+
+// Профили покупателя (реквизиты юрлиц — UR, адреса доставки — FIZ): [id, name, v => значения по коду свойства]
+function bt_profiles(int $userId, string $ptCode): array
+{
+    \Bitrix\Main\Loader::includeModule('sale');
+    $pt = (int)(\Bitrix\Sale\Internals\PersonTypeTable::getList(['filter' => ['=CODE' => $ptCode, '=LID' => SITE_ID], 'select' => ['ID']])->fetch()['ID'] ?? 0);
+    $list = [];
+    $r = \Bitrix\Sale\Internals\UserPropsTable::getList(['filter' => ['=USER_ID' => $userId, '=PERSON_TYPE_ID' => $pt], 'select' => ['ID', 'NAME'], 'order' => ['ID' => 'ASC']]);
+    while ($p = $r->fetch()) {
+        $list[(int)$p['ID']] = ['id' => (int)$p['ID'], 'name' => $p['NAME'], 'v' => []];
+    }
+    if ($list) {
+        $r = \Bitrix\Sale\Internals\UserPropsValueTable::getList(['filter' => ['@USER_PROPS_ID' => array_keys($list)],
+            'select' => ['USER_PROPS_ID', 'VALUE', 'CODE' => 'PROPERTY.CODE']]);
+        while ($v = $r->fetch()) {
+            $list[(int)$v['USER_PROPS_ID']]['v'][$v['CODE']] = (string)$v['VALUE'];
+        }
+    }
+    return array_values($list);
+}
+
+// Название местоположения по коду: «Екатеринбург» и область для подсказки
+function bt_loc(string $code): array
+{
+    if ($code === '' || !\Bitrix\Main\Loader::includeModule('sale')) {
+        return ['n' => '', 'r' => ''];
+    }
+    $l = \Bitrix\Sale\Location\LocationTable::getList(['filter' => ['=CODE' => $code, '=NAME.LANGUAGE_ID' => 'ru', '=PARENT.NAME.LANGUAGE_ID' => 'ru'],
+        'select' => ['N' => 'NAME.NAME', 'R' => 'PARENT.NAME.NAME', 'RT' => 'PARENT.TYPE.CODE']])->fetch();
+    return $l ? ['n' => $l['N'], 'r' => in_array($l['RT'], ['REGION', 'SUBREGION']) ? $l['R'] : ''] : ['n' => '', 'r' => ''];
+}
+
+// Адреса доставки покупателя: основной — первым
+function bt_addresses(int $userId): array
+{
+    $main = (int)CUserOptions::GetOption('bt', 'main_addr', 0, $userId);
+    $list = [];
+    foreach (bt_profiles($userId, 'FIZ') as $p) {
+        $v = $p['v'];
+        $list[] = ['id' => $p['id'], 'tag' => $p['name'], 'loc' => $v['LOCATION'] ?? '', 'city' => bt_loc($v['LOCATION'] ?? '')['n'], 'street' => $v['ADDRESS'] ?? '',
+            'flat' => $v['FLAT'] ?? '', 'entr' => $v['ENTRANCE'] ?? '', 'who' => $v['FIO'] ?? '', 'tel' => $v['PHONE'] ?? '', 'main' => $p['id'] === $main];
+    }
+    if ($list && !array_filter(array_column($list, 'main'))) {
+        $list[0]['main'] = true;
+    }
+    usort($list, fn($a, $b) => $b['main'] <=> $a['main']);
+    return $list;
+}
+
+// Статус заказа для кабинета: [текст, css-класс]; текст — название статуса из настроек магазина до запятой
+function bt_order_status(array $o): array
+{
+    static $names = null;
+    if ($names === null) {
+        $names = [];
+        foreach (\Bitrix\Sale\Internals\StatusLangTable::getList(['filter' => ['=LID' => LANGUAGE_ID]])->fetchAll() as $s) {
+            $names[$s['STATUS_ID']] = trim(explode(',', $s['NAME'])[0]);
+        }
+    }
+    if ($o['CANCELED'] === 'Y') {
+        return ['Отменён', 'st-cancel'];
+    }
+    $st = $o['STATUS_ID'];
+    $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
+    return [$names[$st] ?? $st, $cls];
+}
+
+// Кабинет: гостю — приглашение войти (окно входа откроется само); true — можно выводить страницу
+function bt_acc_guard(): bool
+{
+    global $USER;
+    if ($USER->IsAuthorized()) {
+        return true;
+    }
+    echo '<div class="wrap accp"><div class="cmp__empty acc-guest" data-auth-open>'
+        . '<p class="display h3" style="margin:0 0 10px">Войдите в личный кабинет</p>'
+        . '<p class="muted" style="margin:0 0 20px">Здесь заказы, адреса доставки и реквизиты компании. Пароль не нужен — пришлём код на e-mail.</p>'
+        . '<button class="btn" type="button" data-auth>Войти или зарегистрироваться</button></div></div>';
+    return false;
+}
+
+// Кабинет: крошки, заголовок и меню разделов; $head — готовый HTML заголовка
+function bt_acc_start(string $cur, string $head, string $sub = ''): void
+{
+    global $USER;
+    $u = bt_user_js() ?? ['name' => '', 'email' => ''];
+    $e = fn($s) => htmlspecialcharsbx((string)$s);
+    \Bitrix\Main\Loader::includeModule('sale');
+    $cnt = \Bitrix\Sale\Internals\OrderTable::getCount(['=USER_ID' => (int)$USER->GetID(), '=LID' => SITE_ID]);
+    $nav = [['profile', '/personal/', 'Профиль', ''], ['orders', '/personal/orders/', 'Заказы', $cnt ? '<span class="cnt">' . $cnt . '</span>' : ''],
+        ['addr', '/personal/addresses/', 'Адреса доставки', ''], ['docs', '/personal/docs/', 'Счета и документы', ''],
+        ['sub', '/personal/podpiska/', 'Подписка на кофе', ''], ['fav', '/personal/favorites/', 'Избранное', '']];
+    echo '<div class="wrap accp">';
+    bt_crumbs();
+    echo '<div class="pagehead">' . $head . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . '</div><div class="acc-l"><aside class="acc-nav">'
+        . '<div class="u"><i>' . $e(mb_strtoupper(mb_substr($u['name'] ?: $u['email'], 0, 1))) . '</i><div><b>' . $e(explode(' ', $u['name'])[0] ?: 'Покупатель') . '</b><small>' . $e($u['email']) . '</small></div></div>';
+    foreach ($nav as [$code, $href, $text, $extra]) {
+        echo '<a href="' . $href . '"' . ($code === $cur ? ' class="cur" aria-current="page"' : '') . '>' . $text . ' ' . $extra . '</a>';
+    }
+    echo '<button class="out" type="button" data-logout>Выйти</button></aside><div class="acc-c">';
+}
+
+function bt_acc_end(): void
+{
+    echo '</div></div></div>';
+}

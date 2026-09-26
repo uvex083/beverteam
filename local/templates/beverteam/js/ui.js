@@ -26,18 +26,6 @@ const I = {
 I.box='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5Z"/><path d="M12 11.5v8.5M4 8.5l8 3 8-3"/></svg>';
 I.truck='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>';
 I.home='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>';
-/* Провайдеры входа. Монограммы в фирменных цветах — в продакшене ставятся официальные SVG
-   из брендбуков Яндекс ID / VK ID / T-Bank ID / Сбер ID / Альфа ID. */
-const IDP=[
-  {id:'ya',   t:'Яндекс ID',  m:'Я', cls:'i-ya'},
-  {id:'vk',   t:'VK ID',      m:'VK',cls:'i-vk'},
-  {id:'tb',   t:'T-Bank ID',  m:'Т', cls:'i-tb'},
-  {id:'sber', t:'Сбер ID',    m:'С', cls:'i-sber'},
-  {id:'alfa', t:'Альфа ID',   m:'А', cls:'i-alfa'},
-  {id:'mail', t:'По почте',   m:'',  cls:'i-mail', ic:'mail'}
-];
-window.BT_IDP=IDP;
-
 /* ---------- Журнал: новости и статьи в одном инфоблоке, рубрика решает раздел ---------- */
 // материалы журнала отдаёт сервер (header.php → bt_posts)
 window.BT_POSTS=window.BT_POSTS||[];
@@ -120,32 +108,22 @@ window.BT_rating = id => { const R=BT_REVIEWS[id]||[]; if(!R.length) return null
 window.BT_stars = (n,size) => `<span class="stars" style="${size?'font-size:'+size+'px':''}" aria-label="Оценка ${n} из 5">${'★'.repeat(Math.round(n))}${'☆'.repeat(5-Math.round(n))}</span>`;
 I.phone='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h4l1.5 4-2.4 1.6a12 12 0 0 0 5.8 5.8L17 12l4 1.5v4a2 2 0 0 1-2.2 2C10.4 18.8 5.2 13.6 4.5 5.2A2 2 0 0 1 6.5 3Z"/></svg>';
 I.mail='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>';
-window.BT_idpHtml = (label) => `<div class="idp--row">${label?`<b>${label}</b>`:''}<div class="idp">${IDP.map(p=>
-  `<button type="button" class="${p.cls}" data-idp="${p.id}" title="${p.t}" aria-label="Войти через ${p.t}">${p.ic?I[p.ic]:p.m}</button>`).join('')}</div></div>`;
 
-/* Текущий пользователь прототипа */
-let USER=null; try{ USER=JSON.parse(localStorage.getItem('bt_user')||'null'); }catch(e){}
+/* Текущий покупатель — с сервера (header.php → BT_USER), вход и выход — local/ajax/auth.php */
+let USER=window.BT_USER||null;
+try{ localStorage.removeItem('bt_user'); }catch(e){}
 window.BT_user = () => USER;
-window.BT_login = u => { USER=u; try{localStorage.setItem('bt_user',JSON.stringify(u));}catch(e){}
-  document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
-window.BT_logout = () => { USER=null; try{localStorage.removeItem('bt_user');}catch(e){}
-  document.dispatchEvent(new CustomEvent('bt:auth',{detail:null})); BT_authUpdate(); };
-window.BT_accNav = cur => {
-  const u=USER||{name:'Гость'};
-  const it=[['profile','/personal/','Профиль',''],['orders','/personal/orders/','Заказы','<span class="cnt">4</span>'],
-    ['sub','/personal/podpiska/','Подписка на кофе','<span class="badge badge--ok">активна</span>'],
-    ['addr','/personal/addresses/','Адреса доставки',''],['docs','/personal/docs/','Счета и документы','']];
-  return `<aside class="acc-nav">
-    <div class="u"><i>${(u.name||'?')[0]}</i><div><b>${(u.name||'Гость').split(' ')[0]}</b><small>${u.email||u.phone||''}</small></div></div>
-    ${it.map(x=>`<a href="${x[1]}" class="${x[0]===cur?'cur':''}">${x[2]} ${x[3]}</a>`).join('')}
-    <a href="#" onclick="BT_toast('Избранное — в прототипе не реализовано');return false">Избранное</a>
-    <a class="out" href="/" onclick="BT_logout()">Выйти</a>
-  </aside>`;
-};
+window.BT_authPost = data => { const fd=new FormData(); Object.entries(data).forEach(([k,v])=>fd.append(k,v));
+  fd.append('sessid',window.BX&&BX.bitrix_sessid?BX.bitrix_sessid():'');
+  return fetch('/local/ajax/auth.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
+window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
+window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ USER=null; window.BT_USER=null;
+  document.dispatchEvent(new CustomEvent('bt:auth',{detail:null}));
+  location.href=location.pathname.startsWith('/personal/')&&!/^\/personal\/(cart|favorites)\//.test(location.pathname)?'/':location.href; });
 window.BT_authUpdate = () => {
   const a=document.querySelector('.hact[href="/personal/"]'); if(!a) return;
   const l=a.querySelector('span:not(.cnt)');
-  if(USER){ a.classList.add('is-auth'); if(l) l.textContent=(USER.name||'').split(' ')[0]||'Кабинет'; a.title=USER.email||USER.phone||''; }
+  if(USER){ a.classList.add('is-auth'); if(l) l.textContent=(USER.name||'').split(' ')[0]||'Кабинет'; a.title=USER.email||''; }
   else { a.classList.remove('is-auth'); if(l) l.textContent='Кабинет'; a.removeAttribute('title'); }
 };
 I.repeat='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 20v-4h4"/></svg>';
@@ -495,47 +473,46 @@ function authModal(){
   <div class="modal__p">
     <button class="modal__x" data-close aria-label="Закрыть">×</button>
 
-    <!-- шаг 1: выбор способа -->
-    <div data-step="pick">
+    <!-- шаг 1: e-mail или телефон -->
+    <form data-step="pick" novalidate>
       <h3 class="display" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</h3>
-      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: войдите через сервис или получите код.</p>
-      ${BT_idpHtml('')}
-      <div class="or">или получить код</div>
-      <div class="field"><label for="aLogin" id="aLabel">E-mail</label>
-        <input id="aLogin" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
+      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: пришлём код на почту.</p>
+      <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
+        <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
-      <button class="btn btn--block" id="aSend">Продолжить</button>
+      <div class="alert alert--info auth__note" id="aNote" hidden></div>
+      <button class="btn btn--block" id="aSend" type="submit">Продолжить</button>
       <p class="muted" style="margin:14px 0 0;font-size:12px;line-height:1.5">Продолжая, вы принимаете <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a>.</p>
-    </div>
+    </form>
 
     <!-- шаг 2: код -->
     <div data-step="code" hidden>
       <button class="authback" id="aBack" type="button">← Изменить</button>
       <h3 class="display" style="font-size:20px;margin-bottom:6px">Введите код</h3>
-      <p class="muted" style="margin:0 0 16px;font-size:14px">Отправили на <b id="aTo"></b></p>
+      <p class="muted" style="margin:0 0 16px;font-size:14px">Отправили на <b id="aTo"></b>. Код действует 10 минут.</p>
       <div class="code4" id="aCode">
         <input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Цифра 1">
         <input inputmode="numeric" maxlength="1" aria-label="Цифра 2">
         <input inputmode="numeric" maxlength="1" aria-label="Цифра 3">
         <input inputmode="numeric" maxlength="1" aria-label="Цифра 4">
       </div>
+      <p class="err-form auth__err" id="aCodeErr" role="alert"></p>
       <p class="resend" id="aResend"></p>
-      <p class="muted" style="font-size:12.5px;margin:10px 0 0">Демо: код <b>1234</b></p>
     </div>
 
     <!-- шаг 3: имя для нового аккаунта -->
-    <div data-step="name" hidden>
+    <form data-step="name" hidden novalidate>
       <h3 class="display" style="font-size:20px;margin-bottom:6px">Как к вам обращаться</h3>
-      <p class="muted" style="margin:0 0 16px;font-size:14px">Подставим в заказы и документы.</p>
-      <div class="field"><label for="aName">Имя и фамилия</label><input id="aName" autocomplete="name" placeholder="Сергей Гаврилов"></div>
-      <button class="btn btn--block" id="aFinish">Готово</button>
-    </div>
+      <p class="muted" style="margin:0 0 16px;font-size:14px">Аккаунта с этим e-mail ещё нет — создадим. Имя подставим в заказы.</p>
+      <div class="field"><label for="aName">Имя и фамилия *</label><input id="aName" name="name" autocomplete="name" maxlength="100"></div>
+      <button class="btn btn--block" id="aFinish" type="submit">Готово</button>
+    </form>
 
     <!-- шаг 4: вошли -->
     <div data-step="done" hidden>
       <div class="authu"><i id="aAv"></i><span><b id="aUName"></b><br><span class="muted" style="font-size:13px" id="aUId"></span></span></div>
       <a class="btn btn--block" href="/personal/">Личный кабинет</a>
-      <button class="btn btn--block btn--ghost" style="margin-top:10px" id="aOut">Выйти</button>
+      <button class="btn btn--block btn--ghost" style="margin-top:10px" id="aOut" type="button">Выйти</button>
     </div>
   </div></div>`;
 }
@@ -819,40 +796,55 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   if(location.hash==='#search') BT_search();
 
-  /* ---------- авторизация: провайдеры + код, единый поток ---------- */
+  /* ---------- авторизация: e-mail или телефон → код на почту → вход; новый e-mail — ещё имя ---------- */
   const au=document.getElementById('auth');watch(au,'input,button');
+  const $a=s=>au.querySelector(s);
   const step = n => { au.querySelectorAll('[data-step]').forEach(x=>x.hidden=x.dataset.step!==n);
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
-  const KNOWN={'sergey@example.ru':'Сергей Гаврилов','test@beverteam.ru':'Василий Чичиланов','+79043841388':'Василий Чичиланов'};
-  let pending=null, timer=null;
+  let pending=null, timer=null, busy=false;
 
   window.BT_auth=()=>{ au.classList.add('open'); step(USER?'done':'pick'); if(USER) fillDone(); };
   au.addEventListener('click',e=>{if(e.target.closest('[data-close]'))au.classList.remove('open');});
 
   function fillDone(){ if(!USER)return;
-    au.querySelector('#aAv').textContent=(USER.name||'?').trim()[0].toUpperCase();
-    au.querySelector('#aUName').textContent=USER.name||'Без имени';
-    au.querySelector('#aUId').textContent=(USER.email||USER.phone||'')+(USER.via?' · через '+USER.via:''); }
-
-  /* нормализация логина: телефон или почта */
-  const norm = v => { v=v.trim(); if(v.includes('@')) return {type:'mail',id:v.toLowerCase()};
-    const d=v.replace(/\D/g,''); if(d.length>=10) return {type:'tel',id:'+7'+d.slice(-10)}; return null; };
-
-  function startCode(id,via){
-    pending={id,via};
-    au.querySelector('#aTo').textContent=id;
-    au.querySelectorAll('#aCode input').forEach(i=>i.value='');
-    step('code'); tick(59);
+    $a('#aAv').textContent=((USER.name||USER.email||'?').trim()[0]||'?').toUpperCase();
+    $a('#aUName').textContent=USER.name||'Без имени';
+    $a('#aUId').textContent=USER.email||''; }
+  /* вошли: страницы кабинета и оформления перерисовывает сервер под покупателя */
+  function done(r,msg){
+    if(r.sessid&&window.BX&&BX.message) BX.message({bitrix_sessid:r.sessid});
+    BT_login(r.user); clearInterval(timer);
+    if(location.pathname.startsWith('/personal/')){ location.reload(); return; }
+    fillDone(); step('done'); BT_toast(msg);
   }
-  function tick(sec){ const el=au.querySelector('#aResend'); clearInterval(timer);
+  const loginErr = msg => fieldErr($a('#aLogin'),msg);
+  const note = msg => { const n=$a('#aNote'); n.hidden=!msg; n.textContent=msg||''; };
+
+  function tick(sec){ const el=$a('#aResend'); clearInterval(timer);
     const run=()=>{ if(sec<=0){ clearInterval(timer); el.innerHTML='<a class="link" href="#" id="aAgain">Отправить код ещё раз</a>';
-        el.querySelector('#aAgain').onclick=ev=>{ev.preventDefault();tick(59);BT_toast('Код отправлен повторно');}; return; }
+        el.querySelector('#aAgain').onclick=ev=>{ev.preventDefault();send(pending.login,true);}; return; }
       el.textContent='Отправить код ещё раз можно через '+sec+' с'; sec--; };
     run(); timer=setInterval(run,1000); }
 
+  function send(login,again){
+    if(busy) return; busy=true; $a('#aSend').disabled=true;
+    BT_authPost({action:'send',login}).then(r=>{
+      if(r.ok){
+        pending={login,to:r.to}; $a('#aTo').textContent=r.to; $a('#aCodeErr').textContent='';
+        cells.forEach(i=>i.value=''); step('code'); tick(r.wait||59);
+        if(again) BT_toast('Код отправлен повторно'); return;
+      }
+      if(r.wait&&pending&&pending.login===login){ step('code'); tick(r.wait); return; }
+      if(again){ $a('#aCodeErr').textContent=r.message||'Не получилось отправить код'; return; }
+      if(r.need==='email'){ const i=$a('#aLogin'); i.value=''; i.dispatchEvent(new Event('input')); note(r.message); i.focus(); return; }
+      if(r.errors&&r.errors.login) loginErr(r.errors.login); else loginErr(r.message||'Не получилось отправить код');
+    }).catch(()=>loginErr('Нет связи с сервером — попробуйте ещё раз'))
+      .finally(()=>{busy=false;$a('#aSend').disabled=false;});
+  }
+
   /* поле само понимает, что вводят: цифры → телефон с маской +7, иначе e-mail */
   (function(){
-    const inp=au.querySelector('#aLogin'), lab=au.querySelector('#aLabel'), hint=au.querySelector('#aHint');
+    const inp=$a('#aLogin'), lab=$a('#aLabel'), hint=$a('#aHint');
     const telFmt = v => { let d=v.replace(/\D/g,''); if(!d) return '';
       if(d[0]==='8') d='7'+d.slice(1); if(d[0]!=='7') d='7'+d; d=d.slice(0,11);
       let r='+7'; if(d.length>1)r+=' ('+d.slice(1,4); if(d.length>=5)r+=') '+d.slice(4,7);
@@ -860,38 +852,26 @@ document.addEventListener('DOMContentLoaded',()=>{
     const setMode = m => {
       if(inp.dataset.mode===m) return; inp.dataset.mode=m;
       if(m==='tel'){ inp.type='tel'; inp.inputMode='tel'; inp.autocomplete='tel';
-        lab.textContent='Телефон'; hint.textContent='Пришлём код в SMS'; }
+        lab.textContent='Телефон'; hint.textContent='SMS не подключены — код придёт на e-mail, привязанный к номеру'; }
       else { inp.type='email'; inp.inputMode='email'; inp.autocomplete='email';
         lab.textContent='E-mail'; hint.textContent='Пришлём код на почту — пароль не нужен'; }
     };
     inp.addEventListener('input',()=>{
       const v=inp.value;
       if(/^[\d+ ()-]*$/.test(v) && /\d/.test(v)){ setMode('tel'); const f=telFmt(v); if(f!==v) inp.value=f; }
-      else if(!v){ setMode('mail'); }
-      else { setMode('mail'); }
+      else setMode('mail');
     });
     inp.addEventListener('blur',()=>{ if(inp.dataset.mode==='tel' && inp.value.replace(/\D/g,'').length<=1) inp.value=''; });
     setMode('mail');
   })();
 
-  au.querySelector('#aSend').addEventListener('click',()=>{
-    const inp=au.querySelector('#aLogin');
-    const n=norm(inp.value);
-    if(!n){ inp.closest('.field').classList.add('is-err'); if(!inp.closest('.field').querySelector('.err'))
-        inp.closest('.field').insertAdjacentHTML('beforeend','<span class="err">Введите e-mail или телефон полностью</span>'); inp.focus(); return; }
-    inp.closest('.field').classList.remove('is-err');
-    startCode(n.id,null);
+  $a('[data-step="pick"]').addEventListener('submit',e=>{
+    const bad=e.defaultPrevented; e.preventDefault(); if(bad) return;
+    const inp=$a('#aLogin'), v=inp.value.trim();
+    if(!v){ loginErr('Введите e-mail или телефон'); inp.focus(); return; }
+    note(''); send(v,false);
   });
-  au.querySelector('#aBack').addEventListener('click',()=>{clearInterval(timer);step('pick');});
-
-  /* вход через провайдера: в прототипе сразу возвращает профиль, в бою — OAuth-редирект */
-  au.addEventListener('click',e=>{ const b=e.target.closest('[data-idp]'); if(!b) return;
-    const p=IDP.find(x=>x.id===b.dataset.idp);
-    if(p.id==='mail'){ const inp=au.querySelector('#aLogin'); inp.focus(); return; }
-    BT_toast('Переход в '+p.t+'…');
-    setTimeout(()=>{ BT_login({name:'Сергей Гаврилов',email:'uvex083@yandex.ru',via:p.t}); fillDone(); step('done');
-      BT_toast('Вы вошли через '+p.t); },500);
-  });
+  $a('#aBack').addEventListener('click',()=>{clearInterval(timer);step('pick');});
 
   /* 4 ячейки кода: только цифры, автопереход, Backspace назад, вставка из буфера */
   const cells=[...au.querySelectorAll('#aCode input')];
@@ -905,28 +885,38 @@ document.addEventListener('DOMContentLoaded',()=>{
       cells[Math.min(d.length,3)].focus(); if(d.length===4) submitCode(); });
   });
   function submitCode(){
-    const code=cells.map(c=>c.value).join('');
-    if(code!=='1234'){ const w=au.querySelector('#aCode'); w.classList.add('is-err');
-      setTimeout(()=>{w.classList.remove('is-err');cells.forEach(c=>c.value='');cells[0].focus();},420); return; }
-    clearInterval(timer);
-    const known=KNOWN[pending.id];
-    if(known){ BT_login({name:known, [pending.id.includes('@')?'email':'phone']:pending.id}); fillDone(); step('done'); BT_toast('С возвращением, '+known.split(' ')[0]); }
-    else step('name');
+    if(busy) return; busy=true;
+    const w=$a('#aCode'), err=$a('#aCodeErr');
+    BT_authPost({action:'verify',code:cells.map(c=>c.value).join('')}).then(r=>{
+      if(r.ok&&r.user) return done(r,'С возвращением, '+((r.user.name||'').split(' ')[0]||r.user.email));
+      if(r.ok&&r.need==='name'){ clearInterval(timer); step('name'); return; }
+      err.textContent=r.message||'Неверный код';
+      w.classList.add('is-err');
+      setTimeout(()=>{w.classList.remove('is-err');cells.forEach(c=>{c.value='';c.disabled=!!r.expired;});if(!r.expired)cells[0].focus();},420);
+      if(r.expired){ clearInterval(timer); $a('#aResend').innerHTML='<a class="link" href="#" id="aAgain">Отправить новый код</a>';
+        $a('#aAgain').onclick=ev=>{ev.preventDefault();cells.forEach(c=>c.disabled=false);send(pending.login,true);}; }
+    }).catch(()=>{err.textContent='Нет связи с сервером — попробуйте ещё раз';})
+      .finally(()=>{busy=false;});
   }
-  au.querySelector('#aFinish').addEventListener('click',()=>{
-    const n=au.querySelector('#aName');
-    if(n.value.trim().length<2){ n.closest('.field').classList.add('is-err'); n.focus(); return; }
-    BT_login({name:n.value.trim(), [pending.id.includes('@')?'email':'phone']:pending.id});
-    fillDone(); step('done'); BT_toast('Аккаунт создан');
+  $a('[data-step="name"]').addEventListener('submit',e=>{
+    const bad=e.defaultPrevented; e.preventDefault(); if(bad||busy) return;
+    const n=$a('#aName'); busy=true; $a('#aFinish').disabled=true;
+    BT_authPost({action:'register',name:n.value.trim()}).then(r=>{
+      if(r.ok) return done(r,'Аккаунт создан');
+      if(r.errors&&r.errors.name) fieldErr(n,r.errors.name);
+      else { BT_toast(r.message||'Не получилось создать аккаунт'); if(r.expired) step('pick'); }
+    }).catch(()=>BT_toast('Нет связи с сервером — попробуйте ещё раз'))
+      .finally(()=>{busy=false;$a('#aFinish').disabled=false;});
   });
-  au.querySelector('#aOut').addEventListener('click',()=>{BT_logout();step('pick');BT_toast('Вы вышли');});
+  $a('#aOut').addEventListener('click',()=>BT_logout());
+  document.addEventListener('click',e=>{ if(e.target.closest('[data-logout]')){ e.preventDefault(); BT_logout(); } });
 
   BT_authUpdate();
-  if(location.hash==='#auth') BT_auth();
-  document.querySelectorAll('[data-auth]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();BT_auth();}));
-  /* «Кабинет» в шапке: гостя ведём в модалку, авторизованного — на страницу */
+  if(location.hash==='#auth'||document.querySelector('[data-auth-open]')) BT_auth();
+  document.addEventListener('click',e=>{ const b=e.target.closest('[data-auth]'); if(!b) return; e.preventDefault(); BT_auth(); });
+  /* «Кабинет» в шапке и меню: гостя ведём в окно входа, покупателя — в кабинет */
   document.querySelectorAll('.hact[href="/personal/"],.drawer__l[href="/personal/"]').forEach(a=>
-    a.addEventListener('click',e=>{ if(!USER){ e.preventDefault(); BT_auth(); } }));
+    a.addEventListener('click',e=>{ if(!USER){ e.preventDefault(); document.getElementById('drawer')?.classList.remove('open'); BT_auth(); } }));
 
   /* toast + add to cart */
   const t=document.getElementById('toast');let tm;

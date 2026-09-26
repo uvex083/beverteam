@@ -93,7 +93,7 @@ $id = (int)$el->Add([
     'IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_FROM' => ConvertTimeStamp(time(), 'FULL'),
     'NAME' => $d['topic'] . ' — ' . ($d['name'] ?: $d['email']),
     'PROPERTY_VALUES' => ['CLIENT_NAME' => $d['name'], 'PHONE' => $d['phone'], 'EMAIL' => $d['email'], 'TOPIC' => $d['topic'],
-        'MESSAGE' => $d['message'], 'PAGE' => $d['page'], 'IP' => $ip],
+        'MESSAGE' => $d['message'], 'PAGE' => $d['page'], 'IP' => $ip, 'USER_ID' => $USER->IsAuthorized() ? (int)$USER->GetID() : ''],
 ]);
 if (!$id) {
     $out(500, ['ok' => false, 'error' => 'save']);

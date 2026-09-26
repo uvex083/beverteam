@@ -477,19 +477,6 @@ input,textarea{caret-color:var(--ink)}
 .dship b{font-variant-numeric:tabular-nums}
 @media(max-width:720px){.tl3{grid-template-columns:1fr}.tl3 div{border-right:0;border-bottom:1px solid var(--line)}.tl3 div:last-child{border-bottom:0}}
 
-/* — вход через провайдеров (ЕСИА-подобные кнопки), монограммы в фирменных цветах — */
-.idp{display:flex;gap:8px;flex-wrap:wrap}
-.idp button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--white);
-  display:grid;place-items:center;font-family:Unbounded;font-weight:800;font-size:15px;line-height:1;
-  transition:border-color .15s,transform .15s}
-.idp button:hover{border-color:var(--ink);transform:translateY(-1px)}
-.idp button:active{transform:scale(.96)}
-.idp button svg{width:20px;height:20px}
-.idp .i-ya{color:#FC3F1D}.idp .i-vk{color:#0077FF}.idp .i-tb{color:#FFDD2D;background:#333}
-.idp .i-sber{color:#21A038}.idp .i-alfa{color:#EF3124}.idp .i-tel,.idp .i-mail{color:var(--ink)}
-.idp--row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.idp--row b{font-size:13.5px;font-weight:600;white-space:nowrap}
-
 /* — код из письма: 4 отдельные ячейки — */
 .code4{display:flex;gap:10px;margin:4px 0 10px}
 .code4 input{width:56px;height:62px;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:24px;
@@ -1226,12 +1213,12 @@ input,textarea{caret-color:var(--ink)}
 .cop .opts{display:grid;gap:10px}
 .cop .dtabs{margin-bottom:14px}
 .cop .pill-tabs button[aria-disabled=true]{opacity:.4;cursor:not-allowed}
-.cop .city{position:relative}
-.cop .city ul{position:absolute;left:0;right:0;top:calc(100% - 20px);background:var(--white);border:1px solid var(--line);border-radius:12px;list-style:none;margin:4px 0 0;padding:6px;z-index:5;display:none;box-shadow:0 12px 30px rgba(0,0,0,.1);max-height:320px;overflow:auto}
-.cop .city ul.open{display:block}
-.cop .city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px}
-.cop .city li:hover{background:var(--paper)}
-.cop .city li small{color:var(--gray);margin-left:6px}
+.cop .city,#addrModal .city{position:relative}
+.cop .city ul,#addrModal .city ul{position:absolute;left:0;right:0;top:calc(100% - 20px);background:var(--white);border:1px solid var(--line);border-radius:12px;list-style:none;margin:4px 0 0;padding:6px;z-index:5;display:none;box-shadow:0 12px 30px rgba(0,0,0,.1);max-height:320px;overflow:auto}
+.cop .city ul.open,#addrModal .city ul.open{display:block}
+.cop .city li,#addrModal .city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+.cop .city li:hover,#addrModal .city li:hover{background:var(--paper)}
+.cop .city li small,#addrModal .city li small{color:var(--gray);margin-left:6px}
 .cop .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
 .cop .sum .it{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .cop .sum .it img{width:44px;height:44px;object-fit:contain;background:var(--paper);border-radius:8px;padding:4px;mix-blend-mode:multiply}
@@ -1534,3 +1521,81 @@ form[data-form]{position:relative}
 .subp .subhow{grid-template-columns:1fr 1fr}
 @media(max-width:1000px){.subp .subcard{order:-1}}
 @media(max-width:640px){.subp .subhow{grid-template-columns:1fr}}
+
+/* ---------- вход по коду (окно #auth) ---------- */
+#auth .auth__note{margin:-4px 0 16px;font-size:13.5px}
+#auth .auth__err{color:var(--err);font-size:12.5px;margin:0 0 6px;min-height:1.2em}
+#auth .code4 input:disabled{background:var(--paper);color:var(--gray)}
+
+/* ---------- личный кабинет (account-*.html) ---------- */
+.accp{padding-bottom:var(--pad)}
+.accp .acc-c{min-width:0}
+.accp .acc-nav .out{display:flex;width:100%;padding:14px 12px 10px;margin-top:6px;border:0;border-top:1px solid var(--line);background:none;
+  font:inherit;font-weight:600;font-size:14px;color:var(--err);text-align:left;cursor:pointer}
+.accp .acc-nav .out:hover{background:var(--paper)}
+.accp .acc-guest{margin:30px 0 0}
+.accp .grid.g3 .card{padding:18px 20px}
+.accp .kpi{display:block;font-family:Unbounded;font-size:18px;margin:8px 0 6px}
+.accp .card h2.h3{margin-bottom:18px}
+.accp .card > .muted:first-of-type{font-size:14px}
+.accp .empty{text-align:center;padding:40px 20px}
+.accp .empty .display{margin:0 0 10px}
+.accp .empty p{margin:0 0 20px}
+/* юрлица и адреса списком: название, строка деталей, действия справа */
+.accp .li{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;padding:16px 20px;margin-bottom:12px}
+.accp .li > div:first-child{min-width:0;flex:1}
+.accp .li b{display:block;margin-bottom:4px}
+.accp .li p{margin:0;color:var(--gray);font-size:14px;overflow-wrap:anywhere}
+.accp .li .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.accp .orgf{padding:18px 20px;margin-bottom:14px}
+.accp .orgf[hidden]{display:none}
+/* заказы */
+.accp .ftabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.accp .ftabs button{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:600;color:var(--gray);cursor:pointer}
+.accp .ftabs button[aria-pressed=true]{background:var(--ink);color:var(--lime);border-color:var(--ink)}
+.accp .ord{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:14px;margin-bottom:12px;transition:border-color .15s}
+.accp .ord:hover{border-color:var(--ink)}
+.accp .ord[hidden]{display:none}
+.accp .ord .hd{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.accp .ord .n{font-family:Unbounded;font-weight:700;font-size:15px}
+.accp .ord .dt{color:var(--gray);font-size:13px}
+.accp .ord .items{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.accp .ord .items img{width:44px;height:44px;object-fit:contain;background:var(--paper);border-radius:8px;padding:4px;mix-blend-mode:multiply}
+.accp .ord .items span{font-size:13px;color:var(--gray)}
+.accp .ord .r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.accp .ord .sum{font-family:Unbounded;font-weight:700;font-size:17px;white-space:nowrap}
+.accp .reorder .it span{color:#fff}
+/* детальная заказа */
+.accp .pagehead .row{gap:16px}
+.accp .track{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 20px}
+.accp .track div{position:relative;padding:22px 8px 0;font-size:12.5px;color:var(--gray);text-align:center}
+.accp .track div::before{content:"";position:absolute;top:6px;left:0;right:0;height:2px;background:var(--line)}
+.accp .track div::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--white);border:2px solid var(--line)}
+.accp .track div.done{color:var(--ink);font-weight:600}.accp .track div.done::before{background:var(--lime)}.accp .track div.done::after{background:var(--lime);border-color:var(--lime)}
+.accp .track div.cur::after{background:var(--ink);border-color:var(--ink)}
+.accp .track div:first-child::before{left:50%}.accp .track div:last-child::before{right:50%}
+.accp .track small{display:block;font-weight:400;color:var(--gray);font-size:11.5px;margin-top:2px}
+.accp .oit{display:grid;grid-template-columns:64px 1fr auto auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.accp .oit img,.accp .oit .ph{width:64px;height:64px;object-fit:contain;background:var(--paper);border-radius:10px;padding:6px;mix-blend-mode:multiply}
+.accp .oit b{display:block;font-size:14.5px}.accp .oit .q{color:var(--gray);font-family:'JetBrains Mono';font-size:12.5px;white-space:nowrap}
+.accp .oit .p{font-family:Unbounded;font-weight:700;white-space:nowrap}
+.accp .tot{display:grid;gap:6px;max-width:320px;margin-left:auto;margin-top:14px;font-size:14px}
+.accp .tot div{display:flex;justify-content:space-between;gap:16px}
+.accp .tot .t{border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-family:Unbounded;font-weight:700;font-size:17px}
+.accp .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.accp .two .dl{grid-template-columns:110px 1fr}
+.accp .two .dl dd{overflow-wrap:anywhere}
+/* документы */
+.accp .docs-w{overflow-x:auto;border-radius:var(--rad-s)}
+.accp .docs td{vertical-align:middle}
+/* окно адреса: карта слева (только с ключом Яндекс Карт), поля справа */
+#addrModal .modal__p{width:min(640px,100%);padding:26px 28px 28px}
+#addrModal.has-map .modal__p{width:min(980px,100%)}
+#addrModal .amap{display:grid;grid-template-columns:1fr;gap:24px;align-items:start}
+#addrModal.has-map .amap{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+#addrModal .amap__box{position:relative;height:360px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--line);background:var(--paper)}
+@media(max-width:860px){#addrModal.has-map .amap{grid-template-columns:1fr}#addrModal .amap__box{height:260px}}
+@media(max-width:800px){.accp .two{grid-template-columns:1fr}.accp .track{grid-template-columns:repeat(2,1fr);row-gap:14px}
+  .accp .oit{grid-template-columns:52px 1fr}.accp .oit img,.accp .oit .ph{width:52px;height:52px}.accp .oit .q,.accp .oit .p{grid-column:2}}
+@media(max-width:700px){.accp .ord{grid-template-columns:1fr;padding:18px}.accp .ord .r{align-items:flex-start;text-align:left}
+  .accp .li .acts{justify-content:flex-start}.accp .two .dl{grid-template-columns:1fr;gap:2px}.accp .two .dl dd{margin-bottom:8px}}
