@@ -126,25 +126,29 @@ $cdek = bt_delivery(['XML_ID' => 'bt_cdek', 'NAME' => 'СДЭК', 'ACTIVE' => 'Y
 bt_delivery_only_city($courier, $ekb, $apply, $say);
 bt_delivery_only_city($pickup, $ekb, $apply, $say);
 
-// бесплатная доставка курьером от 3 000 ₽ — наценка/скидка на доставку через правило корзины
+// бесплатная доставка курьером от 3 000 ₽ за товары (без доставки) — как в пресете Битрикса «Скидка на доставку»
 $ruleName = 'Бесплатная доставка курьером от 3 000 ₽';
-if (!\Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=NAME' => $ruleName]])->fetch()) {
+$conds = ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND', 'True' => 'True'], 'CHILDREN' => [
+    ['CLASS_ID' => 'CondBsktAmtGroup', 'DATA' => ['logic' => 'EqGr', 'Value' => 3000, 'All' => 'AND'], 'CHILDREN' => []],
+    ['CLASS_ID' => 'CondSaleDelivery', 'DATA' => ['logic' => 'Equal', 'value' => [$courier]]],
+]];
+$acts = ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND'], 'CHILDREN' => [
+    ['CLASS_ID' => 'ActSaleDelivery', 'DATA' => ['Type' => 'Discount', 'Value' => 100, 'Unit' => 'Perc']],
+]];
+$rule = \Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=NAME' => $ruleName], 'select' => ['ID', 'CONDITIONS_LIST']])->fetch();
+if (!$rule) {
     $say("правило корзины «{$ruleName}»");
     if ($apply && $courier) {
         // CSaleDiscount::Add сам собирает условия и действия в исполняемый код правила
-        $id = CSaleDiscount::Add([
-            'LID' => 's1', 'NAME' => $ruleName, 'ACTIVE' => 'Y', 'SORT' => 100, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N', 'CURRENCY' => 'RUB',
-            'USER_GROUPS' => [2],
-            'CONDITIONS' => ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND', 'True' => 'True'], 'CHILDREN' => [
-                ['CLASS_ID' => 'CondSaleOrderSumm', 'DATA' => ['logic' => 'EqGr', 'value' => 3000]],
-                ['CLASS_ID' => 'CondSaleDelivery', 'DATA' => ['logic' => 'Equal', 'value' => [$courier]]],
-            ]],
-            'ACTIONS' => ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND'], 'CHILDREN' => [
-                ['CLASS_ID' => 'ActSaleDelivery', 'DATA' => ['Type' => 'Discount', 'Value' => 100, 'Unit' => 'Perc']],
-            ]],
-        ]);
+        $id = CSaleDiscount::Add(['LID' => 's1', 'NAME' => $ruleName, 'ACTIVE' => 'Y', 'SORT' => 100, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N',
+            'CURRENCY' => 'RUB', 'USER_GROUPS' => [2], 'CONDITIONS' => $conds, 'ACTIONS' => $acts]);
         $id or $fail('discount: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? ''));
     }
+} elseif (!str_contains(serialize($rule['CONDITIONS_LIST']), 'CondBsktAmtGroup')) {
+    // сумма заказа в условии включает доставку: 2 700 ₽ + 350 ₽ давали бесплатную доставку
+    $say("правило корзины {$rule['ID']}: условие — сумма товаров, а не заказа");
+    $apply and (CSaleDiscount::Update($rule['ID'], ['CONDITIONS' => $conds, 'ACTIONS' => $acts, 'USER_GROUPS' => [2]])
+        or $fail('discount update: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? '')));
 }
 
 // ---------- оплаты ----------
