@@ -1555,6 +1555,9 @@ form[data-form]{position:relative}
 .accp .ftabs button[aria-pressed=true]{background:var(--ink);color:var(--lime);border-color:var(--ink)}
 .accp .ord{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:14px;margin-bottom:12px;transition:border-color .15s}
 .accp .ord:hover{border-color:var(--ink)}
+.accp .ord{position:relative}
+.accp .ord__lnk{position:absolute;inset:0;z-index:1;border-radius:inherit}
+.accp .ord .btn{position:relative;z-index:2}
 .accp .ord[hidden]{display:none}
 .accp .ord .hd{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .accp .ord .n{font-family:Unbounded;font-weight:700;font-size:15px}

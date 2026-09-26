@@ -1198,6 +1198,99 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   BT_phFit();
 
+  /* ---------- личный кабинет: профиль, юрлица, адреса, повтор заказа → local/ajax/account.php ---------- */
+  const accPost=data=>{ const fd=data instanceof FormData?data:new FormData();
+    if(!(data instanceof FormData)) Object.entries(data).forEach(([k,v])=>fd.append(k,v));
+    fd.append('sessid',BX.bitrix_sessid());
+    return fetch('/local/ajax/account.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
+  /* после сохранения страницу перерисовывает сервер, сообщение показываем уже на новой */
+  try{ const m=sessionStorage.getItem('bt_toast'); if(m){ sessionStorage.removeItem('bt_toast'); setTimeout(()=>BT_toast(m),200); } }catch(e){}
+  const reloadWith=msg=>{ try{sessionStorage.setItem('bt_toast',msg);}catch(e){} location.reload(); };
+  const accFail=(f,r)=>{
+    if(!r.errors){ BT_toast(r.message||'Не получилось сохранить — попробуйте ещё раз'); return; }
+    let first=null;
+    Object.entries(r.errors).forEach(([k,m])=>{ const el=f.elements[k]; if(el){ fieldErr(el,m); first=first||el; } });
+    if(first) first.focus(); BT_toast('Проверьте выделенные поля');
+  };
+  const accForm=(f,action,ok)=>f&&f.addEventListener('submit',e=>{
+    const bad=e.defaultPrevented; e.preventDefault(); if(bad||f.dataset.busy) return;
+    const fd=new FormData(f), btn=f.querySelector('[type=submit]'); fd.append('action',action); f.dataset.busy='1'; if(btn) btn.disabled=true;
+    accPost(fd).then(r=>r.ok?ok(r):accFail(f,r)).catch(()=>BT_toast('Нет связи с сервером — попробуйте ещё раз'))
+      .finally(()=>{ delete f.dataset.busy; if(btn) btn.disabled=false; });
+  });
+  const fill=(f,d)=>Object.entries(d).forEach(([k,v])=>{ const el=f.elements[k]; if(!el||el.type==='checkbox') return; el.value=v??''; if(el.type!=='hidden') fieldErr(el,''); });
+  accForm(document.getElementById('accProfile'),'profile',()=>reloadWith('Данные сохранены'));
+
+  /* юрлица: одна форма на добавление и правку */
+  const org=document.getElementById('orgForm');
+  if(org){
+    const add=document.getElementById('orgAdd');
+    const open=d=>{ fill(org,{id:d.id||0,company:d.company,inn:d.inn,kpp:d.kpp,company_adr:d.company_adr}); org.hidden=false; add.hidden=true;
+      org.scrollIntoView({behavior:'smooth',block:'center'}); if(innerWidth>768) setTimeout(()=>org.elements.company.focus({preventScroll:true}),60); };
+    add.addEventListener('click',()=>open({}));
+    org.querySelector('[data-org-cancel]').addEventListener('click',()=>{ org.hidden=true; add.hidden=false; });
+    accForm(org,'company_save',()=>reloadWith('Реквизиты сохранены'));
+    document.addEventListener('click',e=>{ const b=e.target.closest('[data-org-edit],[data-org-del]'); if(!b) return;
+      const d=JSON.parse(b.closest('[data-org]').dataset.org);
+      if(b.matches('[data-org-edit]')) return open(d);
+      b.disabled=true;
+      accPost({action:'company_del',id:d.id}).then(r=>r.ok?reloadWith('Юрлицо удалено'):BT_toast(r.message||'Не получилось удалить')).finally(()=>b.disabled=false);
+    });
+  }
+
+  /* адреса: окно с полями; город — из местоположений Битрикса (как в оформлении заказа) */
+  const am=document.getElementById('addrModal');
+  if(am){
+    const f=am.querySelector('form'), D=JSON.parse(am.dataset.ekb), ci=f.elements.city, ul=f.querySelector('.city ul'), box=document.getElementById('adrMap');
+    let mapOn=false, cityT=0, cityN=0;
+    const cityPost=q=>{ const fd=new FormData(); fd.append('action','city'); fd.append('q',q); fd.append('sessid',BX.bitrix_sessid());
+      return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
+    const showCities=list=>{ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      ul.innerHTML=list.map(c=>`<li role="option" data-code="${esc(c.code)}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`).join('');
+      ul.classList.toggle('open',list.length>0); ci.setAttribute('aria-expanded',list.length>0); };
+    const open=a=>{
+      fill(f,{id:a.id||0,tag:a.tag,loc:a.loc,city:a.city,street:a.street,flat:a.flat,entr:a.entr,who:a.who,tel:a.tel});
+      f.elements.main.checked=!!a.main;
+      am.querySelector('#adrTitle').textContent=a.id?'Изменить адрес':'Новый адрес';
+      am.classList.add('open');
+      if(window.BT_YMAPS_KEY&&!mapOn){ mapOn=true; am.classList.add('has-map'); box.hidden=false;
+        BT_mapPicker(box,r=>{ if(r.street){ f.elements.street.value=r.street; fieldErr(f.elements.street,''); }
+          if(r.city&&r.city!==ci.value) cityPost(r.city).then(x=>{ const c=(x.list||[])[0]; if(c){ ci.value=c.n; f.elements.loc.value=c.code; fieldErr(ci,''); } }); }); }
+      if(innerWidth>768) setTimeout(()=>f.elements.tag.focus(),60);
+    };
+    document.getElementById('addrAdd').addEventListener('click',()=>open({loc:D.loc,city:D.city,who:D.who}));
+    am.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) am.classList.remove('open'); });
+    document.addEventListener('click',e=>{ const b=e.target.closest('[data-addr-edit],[data-addr-del],[data-addr-main]'); if(!b) return;
+      const a=JSON.parse(b.closest('[data-addr]').dataset.addr);
+      if(b.matches('[data-addr-edit]')) return open(a);
+      const del=b.matches('[data-addr-del]'); b.disabled=true;
+      accPost({action:del?'addr_del':'addr_main',id:a.id}).then(r=>r.ok?reloadWith(del?'Адрес удалён':'Адрес сделан основным'):BT_toast(r.message||'Не получилось'))
+        .finally(()=>b.disabled=false);
+    });
+    ci.addEventListener('input',()=>{ f.elements.loc.value=''; clearTimeout(cityT); const v=ci.value.trim();
+      if(v.length<2){ showCities([]); return; }
+      const n=++cityN; cityT=setTimeout(()=>cityPost(v).then(r=>{ if(n===cityN&&document.activeElement===ci) showCities(r.list||[]); }),200); });
+    ul.addEventListener('mousedown',e=>e.preventDefault());
+    ul.addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li) return;
+      ci.value=li.dataset.n; f.elements.loc.value=li.dataset.code; showCities([]); fieldErr(ci,''); });
+    ci.addEventListener('blur',()=>{ showCities([]); if(ci.value.trim()&&!f.elements.loc.value) setTimeout(()=>fieldErr(ci,'Выберите город из списка'),0); });
+    ci.addEventListener('keydown',e=>{ if(e.key==='Enter'&&ul.classList.contains('open')){ e.preventDefault(); ul.querySelector('li')?.click(); } });
+    accForm(f,'addr_save',r=>reloadWith(f.elements.id.value>0?'Адрес сохранён':'Адрес добавлен'));
+  }
+
+  /* заказы: фильтр по статусу и повтор заказа — позиции уходят в корзину Битрикса */
+  document.querySelectorAll('[data-ftabs]').forEach(t=>t.addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return;
+    t.querySelectorAll('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    document.querySelectorAll('.ord[data-g]').forEach(o=>o.hidden=!!b.dataset.f&&o.dataset.g!==b.dataset.f); }));
+  document.addEventListener('click',e=>{ const b=e.target.closest('[data-reorder]'); if(!b||b.disabled) return; b.disabled=true;
+    accPost({action:'reorder',id:b.dataset.reorder}).then(r=>{
+      if(!r.ok){ BT_toast(r.message||'Не получилось повторить заказ'); return; }
+      Object.keys(BT_CART).forEach(k=>delete BT_CART[k]); Object.assign(BT_CART,r.items); cartSave();
+      window.BT_BASKET={items:r.items,sum:r.sum}; BT_cartUpdate(true);
+      BT_toast(r.added?'Товары из заказа в корзине'+(r.skipped?' (кроме '+r.skipped+' — их нет в каталоге)':'')+' · <a href="/personal/cart/">Оформить</a>':'Этих товаров больше нет в каталоге');
+    }).catch(()=>BT_toast('Нет связи с сервером — попробуйте ещё раз')).finally(()=>b.disabled=false);
+  });
+
   /* BreadcrumbList — из хлебных крошек любой страницы */
   const cr=document.querySelector('.crumbs');
   if(cr){

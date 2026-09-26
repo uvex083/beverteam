@@ -40,6 +40,13 @@ $u = ['name' => '', 'email' => '', 'phone' => ''];
 if ($USER->IsAuthorized()) {
     $cu = CUser::GetByID($USER->GetID())->Fetch() ?: [];
     $u = ['name' => trim(($cu['NAME'] ?? '') . ' ' . ($cu['LAST_NAME'] ?? '')), 'email' => $cu['EMAIL'] ?? '', 'phone' => $cu['PERSONAL_PHONE'] ?: ($cu['PERSONAL_MOBILE'] ?? '')];
+    // основной адрес и первые реквизиты из кабинета
+    $a = bt_addresses((int)$USER->GetID())[0] ?? null;
+    $u += $a ? ['street' => $a['street'], 'flat' => $a['flat'], 'entrance' => $a['entr']] : [];
+    $u += bt_profiles((int)$USER->GetID(), 'UR')[0]['v'] ?? [];
+    if ($a && $a['loc'] !== '' && $a['city'] !== '') {
+        $popular = array_merge([['code' => $a['loc'], 'n' => $a['city'], 'r' => '']], array_values(array_filter($popular, fn($c) => $c['code'] !== $a['loc'])));
+    }
 }
 $co = bt_contacts();
 ?>
@@ -56,10 +63,10 @@ $co = bt_contacts();
         <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="false" data-t="UR">Юрлицо или ИП</button></div>
         <div id="urFields" hidden style="margin-top:18px">
           <div class="f2">
-            <div class="field"><label for="coCompany">Название организации *</label><input id="coCompany" name="company" placeholder="ООО «Ромашка»" autocomplete="organization"></div>
-            <div class="field"><label for="coInn">ИНН *</label><input id="coInn" name="inn" placeholder="10 или 12 цифр" inputmode="numeric" maxlength="12"></div>
-            <div class="field"><label for="coKpp">КПП</label><input id="coKpp" name="kpp" placeholder="9 цифр, если есть" inputmode="numeric" maxlength="9"></div>
-            <div class="field"><label for="coAdr">Юридический адрес</label><input id="coAdr" name="company_adr"></div>
+            <div class="field"><label for="coCompany">Название организации *</label><input id="coCompany" name="company" placeholder="ООО «Ромашка»" autocomplete="organization" value="<?= $e($u['COMPANY'] ?? '') ?>"></div>
+            <div class="field"><label for="coInn">ИНН *</label><input id="coInn" name="inn" placeholder="10 или 12 цифр" inputmode="numeric" maxlength="12" value="<?= $e($u['INN'] ?? '') ?>"></div>
+            <div class="field"><label for="coKpp">КПП</label><input id="coKpp" name="kpp" placeholder="9 цифр, если есть" inputmode="numeric" maxlength="9" value="<?= $e($u['KPP'] ?? '') ?>"></div>
+            <div class="field"><label for="coAdr">Юридический адрес</label><input id="coAdr" name="company_adr" value="<?= $e($u['COMPANY_ADR'] ?? '') ?>"></div>
           </div>
           <div class="alert alert--info" style="margin-bottom:18px">Выставим счёт, после оплаты — УПД. Отсрочка платежа для постоянных клиентов — по договорённости.</div>
         </div>
@@ -85,8 +92,8 @@ $co = bt_contacts();
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
         <div class="opts" id="deliv"></div>
         <div id="addr" hidden style="margin-top:18px">
-          <div class="f2"><div class="field" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" placeholder="ул. Ленина, 10" autocomplete="street-address"></div>
-            <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance"></div></div>
+          <div class="f2"><div class="field" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" placeholder="ул. Ленина, 10" autocomplete="street-address" value="<?= $e($u['street'] ?? '') ?>"></div>
+            <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <div id="pvz" hidden style="margin-top:18px">
           <div class="field"><label for="coPvz">Адрес пункта выдачи СДЭК *</label><input id="coPvz" name="pvz" placeholder="Например: ул. Малышева, 51"><span class="hint muted">Удобный пункт можно найти на cdek.ru — менеджер сверит адрес при звонке</span></div>
