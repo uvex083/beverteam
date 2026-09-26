@@ -71,7 +71,7 @@ switch ((string)$req->getPost('action')) {
             $found = bt_user_by_phone($phone);
             if (!$found || !check_email((string)$found['EMAIL'], true)) {
                 $_SESSION['BT_AUTH'] = ['phone' => $phone, 'sent' => (int)($A['sent'] ?? 0)];
-                $out(['ok' => false, 'need' => 'email', 'message' => 'Этот номер не привязан к аккаунту. Вход по SMS пока недоступен — введите e-mail, код придёт на почту.']);
+                $out(['ok' => false, 'need' => 'email', 'message' => 'Этот номер не привязан к аккаунту. Вход по SMS пока недоступен — введите e‑mail, код придёт на почту.']);
             }
             $email = mb_strtolower($found['EMAIL']);
             $hint = mb_substr($email, 0, 1) . '***' . mb_substr($email, mb_strpos($email, '@'));
