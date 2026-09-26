@@ -1,0 +1,143 @@
+<?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die(); ?>
+<script>
+// Страница товара: скрипт из product.html, обобщённый на любой товар — данные из BT_PAGE и BT_find()
+document.addEventListener('DOMContentLoaded',()=>{
+  const P=window.BT_PAGE, PID=P.id, PM=BT_find(PID)||{p:0}, U=P.unit;
+  const qty=document.getElementById('qty'), pTotal=document.getElementById('pTotal'), pPer=document.getElementById('pPer'),
+    pPacks=document.getElementById('pPacks'), pAdd=document.getElementById('pAdd'), tiers=document.getElementById('tiers');
+
+  /* ---- галерея ---- */
+  if(P.photos){
+    const swThumbs=new Swiper('#thumbs',{
+      direction:'vertical', slidesPerView:'auto', spaceBetween:10, freeMode:true, watchSlidesProgress:true,
+      slideToClickedSlide:true, mousewheel:{forceToAxis:true},
+      navigation:{prevEl:'#thUp',nextEl:'#thDn'},
+      breakpoints:{0:{direction:'horizontal',slidesPerView:'auto',spaceBetween:8},900:{direction:'vertical',spaceBetween:10}}
+    });
+    new Swiper('#galBig',{
+      slidesPerView:1, spaceBetween:20, speed:380, keyboard:{enabled:true},
+      thumbs:{swiper:swThumbs}, a11y:{prevSlideMessage:'Предыдущее фото',nextSlideMessage:'Следующее фото'},
+      on:{slideChange(){ galN.textContent=(this.activeIndex+1)+' / '+P.photos; }}
+    });
+  }
+
+  /* ---- количество, объём и корзина: один источник истины ---- */
+  const price = q => PM.bulk ? BT_tier(PM,q).p : PM.p;
+  function sync(from){
+    const q=Math.max(1,parseInt(qty.value,10)||1);
+    if(String(q)!==qty.value) qty.value=q;
+    const pr=price(q);
+    if(PM.p){ pTotal.textContent=BT_fmt(pr*q); pPer.textContent = q>1 ? `${BT_fmt(pr)} × ${q} ${U}` : `за 1 ${U}`; }
+    if(tiers) [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',pr===+r.cells[1].textContent.replace(/\D/g,'')));
+    pPacks.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.kg===q));
+    const inCart=BT_CART[PID]||0;
+    if(inCart){
+      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} ${U} → оформить</a>`;
+    } else {
+      pAdd.innerHTML=`<button class="btn" id="pBuy" type="button">В корзину</button>`;
+      document.getElementById('pBuy').addEventListener('click',()=>{
+        BT_cartSet(PID,Math.max(1,parseInt(qty.value,10)||1));
+        sync('cart');
+        BT_toast(`${qty.value} ${U} в корзине · <a href="/personal/cart/">Оформить</a>`);
+      });
+    }
+    /* если товар уже в корзине, степпер правит корзину */
+    if(inCart && from==='qty' && inCart!==q){ BT_cartSet(PID,q); sync('cart'); }
+  }
+  if(PM.bulk){
+    pPacks.innerHTML=BT_packs(PM,true);
+    pPacks.querySelectorAll('button').forEach(b=>b.addEventListener('click',e=>{
+      e.stopPropagation(); // общий обработчик [data-packs] кладёт в корзину сразу — на странице товара выбор объёма только меняет количество
+      const kg=+b.dataset.kg; qty.value=kg;
+      if(BT_CART[PID]) BT_cartSet(PID,kg);
+      sync('packs');
+      const t=BT_tier(PM,kg),pct=BT_tierPct(PM,t);
+      BT_toast(`${kg} кг · ${BT_fmt(t.p)} за кг${pct?` · выгода ${pct}%`:''}`);
+    }));
+  }
+  if(BT_CART[PID]) qty.value=BT_CART[PID];
+  qty.addEventListener('change',()=>sync('qty'));
+  /* «−» на единице: убираем товар из корзины и возвращаем кнопку «В корзину» */
+  qty.addEventListener('bt:qtyzero',()=>{ if(BT_CART[PID]){ BT_cartSet(PID,0); BT_toast('Товар убран из корзины'); } sync('cart'); });
+  qty.addEventListener('input',()=>{ if(/^\d+$/.test(qty.value)) sync('qty'); });
+  document.addEventListener('bt:cart',e=>{ if(e.detail&&e.detail.id===PID) sync('ext'); });
+  sync('init');
+
+  const dd=BT_dates(); dship.innerHTML=`${BT_ICONS.truck}<span>Екатеринбург — <b>${dd.relDeliver?dd.relDeliver+', ':''}${BT_fmtDate(dd.deliver)}</b><br><small class="muted">По России — СДЭК, 2–7 дней</small></span>`;
+  ptabs.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;[...ptabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.pane').forEach(p=>p.hidden=p.dataset.pane!==b.dataset.p);});
+  const rec=document.getElementById('rec');
+  if(rec){ BT_cmpUpdate(); BT_slider(rec,{min:5}); }
+
+  /* ---- загрузка фото к отзыву: превью, удаление, лимит 5 ---- */
+  (function(){
+    const inp=document.getElementById('rFiles'), zone=document.getElementById('drop'), box=document.getElementById('rThumbs');
+    if(!inp) return;
+    let files=[];
+    const paint=()=>{
+      box.innerHTML=files.map((f,i)=>`<figure><img src="${window.URL.createObjectURL(f)}" alt="">
+        <button type="button" data-i="${i}" aria-label="Удалить ${f.name}">×</button>
+        <figcaption>${f.name}</figcaption></figure>`).join('');
+      zone.querySelector('.drop__t small').textContent = files.length
+        ? `Добавлено ${files.length} из 5 — можно добавить ещё` : 'или нажмите, чтобы выбрать — до 5 файлов, JPG или PNG';
+    };
+    const add=list=>{
+      [...list].forEach(f=>{
+        if(files.length>=5) return BT_toast('Можно приложить не больше 5 фото');
+        if(!/^image\/(png|jpeg)$/.test(f.type)) return BT_toast(`${f.name}: подойдёт только JPG или PNG`);
+        if(f.size>10*1024*1024) return BT_toast(`${f.name}: файл больше 10 МБ`);
+        if(files.some(x=>x.name===f.name&&x.size===f.size)) return;
+        files.push(f);
+      });
+      paint();
+    };
+    inp.addEventListener('change',()=>{add(inp.files);inp.value='';});
+    box.addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return; files.splice(+b.dataset.i,1); paint();});
+    ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('is-over');}));
+    ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('is-over');}));
+    zone.addEventListener('drop',e=>add(e.dataTransfer.files));
+    paint();
+  })();
+
+  /* ---- отзывы: сводка, распределение оценок, карточки ---- */
+  const RV=P.reviews||[], n=RV.length;
+  if(n){
+    const avg=Math.round(RV.reduce((a,x)=>a+x.r,0)/n*10)/10, w=n===1?'отзыв':n<5?'отзыва':'отзывов';
+    rTop.innerHTML=`${BT_stars(avg)}<b style="font-size:14px">${String(avg).replace('.',',')}</b><span class="muted" style="font-size:13px">${n} ${w}</span>`;
+    const dist=[5,4,3,2,1].map(k=>({k,n:RV.filter(r=>r.r===k).length}));
+    rating.innerHTML=`<div class="rating__n"><b>${String(avg).replace('.',',')}</b>${BT_stars(avg,18)}
+        <p class="muted" style="font-size:13px;margin:8px 0 14px">${n} ${w}<br>от покупателей</p>
+        <a class="btn btn--sm btn--line" href="#revform">Оставить отзыв</a></div>
+      <div class="rating__bars">${dist.map(d=>`<div><span style="width:14px">${d.k}</span>${BT_ICONS.star}
+        <i style="--p:${d.n/n*100}%"></i><span class="muted" style="width:24px;text-align:right">${d.n}</span></div>`).join('')}</div>`;
+    const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    revList.innerHTML=RV.map(r=>`<article class="rev">
+      <div class="rev__h"><span class="rev__av">${esc(r.a[0])}</span><b>${esc(r.a)}</b>${BT_stars(r.r)}
+        <time class="muted" style="font-size:12.5px" datetime="${r.d}">${BT_postDate(r.d)}</time>
+        ${r.ok?'<span class="rev__ok">Покупка подтверждена</span>':''}</div>
+      <p>${esc(r.t)}</p></article>`).join('');
+    /* разметка отзывов — только для реальных отзывов */
+    const ld=document.createElement('script');ld.type='application/ld+json';
+    ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:P.name,
+      aggregateRating:{'@type':'AggregateRating',ratingValue:String(avg),reviewCount:String(n),bestRating:'5'},
+      review:RV.map(r=>({'@type':'Review',author:{'@type':'Person',name:r.a},datePublished:r.d,
+        reviewRating:{'@type':'Rating',ratingValue:String(r.r),bestRating:'5'},reviewBody:r.t}))});
+    document.head.appendChild(ld);
+  }
+  document.getElementById('rPick').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;
+    [...b.parentNode.children].forEach(x=>x.className='btn btn--ghost btn--xs');b.className='btn btn--xs';});
+  rTop.addEventListener('click',e=>{e.preventDefault();document.getElementById('tabRev').click();
+    document.querySelector('.tabsblock').scrollIntoView({behavior:'smooth',block:'start'});});
+  document.getElementById('rSend').addEventListener('click',()=>BT_toast('Приём отзывов подключается — скоро заработает'));
+
+  bShare.addEventListener('click',()=>{
+    if(navigator.share){navigator.share({title:document.title,url:location.href}).catch(()=>{});}
+    else if(navigator.clipboard){navigator.clipboard.writeText(location.href).then(()=>BT_toast('Ссылка на товар скопирована'));}});
+  /* сравнение — общий список BT_CMP, как у карточек в каталоге */
+  bCmp.setAttribute('aria-pressed',BT_cmpHas(PID));
+  bCmp.addEventListener('click',()=>{BT_cmpToggle(PID);const on=BT_cmpHas(PID);
+    bCmp.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен к сравнению':'Товар убран из сравнения');});
+  bFav.addEventListener('click',()=>{const on=bFav.getAttribute('aria-pressed')!=='true';
+    bFav.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен в избранное':'Товар убран из избранного');});
+});
+</script>

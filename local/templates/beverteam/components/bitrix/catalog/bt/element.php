@@ -16,3 +16,5 @@ $APPLICATION->IncludeComponent('bitrix:catalog.element', 'bt', [
     'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['element'],
     'COMPATIBLE_MODE' => 'N', 'HIDE_NOT_AVAILABLE' => 'N', 'CHECK_SECTION_ID_VARIABLE' => 'N',
 ], $component, ['HIDE_ICONS' => 'Y']);
+// крошки после компонента — в цепочке уже есть разделы и товар
+$APPLICATION->AddViewContent('bt_crumbs', $APPLICATION->GetNavChain(false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false));
