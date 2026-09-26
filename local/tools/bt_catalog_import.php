@@ -89,6 +89,16 @@ $rentMeta = [
     'jl-36-arenda' => ['machine' => 'jetinno-jl36', 'kg' => 9, 'aud' => 'Кафе и HoReCa', 'sort' => 30],
 ];
 
+// характеристики кофе BOTANICA — из описаний товаров на старом сайте (свойствами там не заведены)
+$coffee = [
+    'botanica-efiopiya-oromiya' => ['country' => 'Эфиопия', 'region' => 'Оромия', 'q' => '82,5', 'notes' => 'чёрный чай, сухофрукты, лимон, шоколад'],
+    'botanica-efiopiya-sidamo-1' => ['country' => 'Эфиопия', 'region' => 'Сидамо', 'proc' => 'Мытая', 'q' => '83', 'notes' => 'чёрный чай, цветы, лайм'],
+    'botanica-braziliya-santos' => ['country' => 'Бразилия', 'proc' => 'Натуральная', 'notes' => 'шоколад, орехи, какао'],
+    'botanica-espresso-smes' => ['mix' => 'Бразилия 80% + робуста 20%', 'notes' => 'шоколад, орехи'],
+    'botanica-milk' => ['mix' => 'Арабика 90% + робуста 10%', 'notes' => 'сухофрукты, шоколад, табак'],
+    'botanica-vending' => ['mix' => 'Бразилия 50% + робуста 50%', 'notes' => 'какао, шоколад'],
+];
+
 $stat = ['new' => 0, 'upd' => 0, 'rent' => 0];
 $notes = [];
 $sort = 0;
@@ -145,6 +155,17 @@ foreach ($products as $p) {
     }
 
     $secCode = basename($p['sections'][0]);
+    if (isset($coffee[$code])) {
+        $c = $coffee[$code];
+        $props['ROAST'] = bt_enum($catId, 'ROAST', $secCode === 'filtr-kofe' ? 'Под фильтр' : 'Под эспрессо', $apply);
+        $props['COUNTRY'] = isset($c['country']) ? bt_enum($catId, 'COUNTRY', $c['country'], $apply) : '';
+        $props['PROCESSING'] = isset($c['proc']) ? bt_enum($catId, 'PROCESSING', $c['proc'], $apply) : '';
+        $props['REGION'] = $c['region'] ?? '';
+        $props['MIX'] = $c['mix'] ?? '';
+        $props['Q_SCORE'] = $c['q'] ?? '';
+        $props['NOTES'] = $c['notes'];
+        $props['SHORT_DESC'] = implode(' · ', array_filter([$c['country'] ?? $c['mix'] ?? '', $c['proc'] ?? '', isset($c['q']) ? 'Q ' . $c['q'] : '', $c['notes']]));
+    }
     $fields = [
         'IBLOCK_ID' => $ibId, 'NAME' => $p['name'], 'CODE' => $code, 'XML_ID' => (string)$p['sku'], 'ACTIVE' => 'Y',
         'SORT' => $isRent ? $rentMeta[$code]['sort'] : $sort,
