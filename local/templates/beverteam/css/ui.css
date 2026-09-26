@@ -1451,3 +1451,4 @@ form[data-form]{position:relative}
 .journalp .post__body h2{scroll-margin-top:130px}
 .journalp .post__body ol{padding-left:22px;margin:0 0 16px}.journalp .post__body ol li{margin-bottom:7px}
 .journalp .post h1{overflow-wrap:anywhere;hyphens:auto}
+.nfp .nf__s{display:flex}
