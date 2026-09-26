@@ -209,7 +209,7 @@ $pay = (int)$req->getPost('pay');
 $order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay);
 $order->setField('USER_DESCRIPTION', mb_substr($f['comment'], 0, 2000));
 $addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
-$values = ['EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $f['pvz'] : '']
+$values = ['ZIP' => '', 'EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $f['pvz'] : '']
     + ($pt === 'UR'
         ? ['CONTACT_PERSON' => $f['name'], 'COMPANY' => $f['company'], 'INN' => $f['inn'], 'KPP' => $f['kpp'], 'COMPANY_ADR' => $f['company_adr']]
         : ['FIO' => $f['name']]);
