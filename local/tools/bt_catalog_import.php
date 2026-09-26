@@ -22,6 +22,8 @@ $apply = ($argv[1] ?? 'show') === 'apply';
 $dir = rtrim($argv[2] ?? '', '/') . '/';
 is_file($dir . 'products.json') or die("нет {$dir}products.json\n");
 $products = json_decode(file_get_contents($dir . 'products.json'), true);
+// H1 товаров с живого старого сайта: сеошник правил их отдельно от названий
+$h1Live = is_file($dir . 'h1_live.json') ? json_decode(file_get_contents($dir . 'h1_live.json'), true) : [];
 $fail = fn(string $s) => die("ERROR: $s\n");
 
 $catId = bt_iblock('catalog') ?: $fail('нет ИБ catalog');
@@ -201,7 +203,9 @@ foreach ($products as $p) {
     CIBlockElement::SetPropertyValuesEx($id, $ibId, $props);
 
     // SEO со старого сайта
-    $seo = array_filter(['ELEMENT_META_TITLE' => $p['seo_title'] ?? '', 'ELEMENT_META_DESCRIPTION' => $p['meta_description'] ?? '', 'ELEMENT_META_KEYWORDS' => $p['meta_keywords'] ?? '']);
+    $h1 = $h1Live[$code] ?? '';
+    $seo = array_filter(['ELEMENT_META_TITLE' => $p['seo_title'] ?? '', 'ELEMENT_META_DESCRIPTION' => $p['meta_description'] ?? '', 'ELEMENT_META_KEYWORDS' => $p['meta_keywords'] ?? '',
+        'ELEMENT_PAGE_TITLE' => $h1 !== $p['name'] ? $h1 : '']);
     if ($seo) {
         (new ElementTemplates($ibId, $id))->set($seo);
     }

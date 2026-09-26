@@ -6,6 +6,7 @@ use Bitrix\Main\Web\Json;
 $m = $arResult['BT'];
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $name = $arResult['~NAME'];
+$h1 = $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'] ?: $name; // H1 из SEO-настроек товара, если задан
 $photos = $arResult['BT_PHOTOS'];
 $bulk = $m['bulk'] ?? null;
 $unit = $bulk ? 'кг' : 'шт';
@@ -42,7 +43,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
     </div>
     <div>
       <?php if ($section): ?><div class="mono muted" style="margin-bottom:12px"><?= $e($section['~NAME']) ?></div><?php endif ?>
-      <h1 class="display h1"><?= $e($name) ?></h1>
+      <h1 class="display h1"><?= $e($h1) ?></h1>
       <div class="pmeta">
         <a href="#reviews" id="rTop" class="row" style="gap:8px;text-decoration:none"></a>
         <span class="pc__stock" style="margin:0">В наличии</span>
