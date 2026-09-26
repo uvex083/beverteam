@@ -741,11 +741,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   let cur=1; mp.innerHTML=megaPanel(cur);
   const mcats=document.getElementById('megaCats');
   if(!mcats.children.length) mcats.innerHTML=CATS.map((c,i)=>`<button aria-selected="${i===cur}" data-i="${i}">${c.t}</button>`).join('');
-  cb.addEventListener('click',()=>{const o=mega.classList.toggle('open');
+  let mHoverAt=0;
+  cb.addEventListener('click',()=>{
+    // меню только что открылось наведением — клик по той же кнопке не должен его сразу закрыть
+    if(mega.classList.contains('open') && Date.now()-mHoverAt<600) return;
+    const o=mega.classList.toggle('open');
     document.getElementById('hdr').classList.toggle('mega-on',o);cb.setAttribute('aria-expanded',o);});
   let mHide;
   const hdrEl2=document.getElementById('hdr');
-  const mOpen=()=>{clearTimeout(mHide);mega.classList.add('open');hdrEl2.classList.add('mega-on');cb.setAttribute('aria-expanded',true);};
+  const mOpen=()=>{clearTimeout(mHide);if(!mega.classList.contains('open'))mHoverAt=Date.now();mega.classList.add('open');hdrEl2.classList.add('mega-on');cb.setAttribute('aria-expanded',true);};
   const mClose=()=>{mHide=setTimeout(()=>{mega.classList.remove('open');hdrEl2.classList.remove('mega-on');cb.setAttribute('aria-expanded',false);},260);};
   cb.addEventListener('mouseenter',mOpen);cb.addEventListener('mouseleave',mClose);
   mega.addEventListener('mouseenter',()=>clearTimeout(mHide));mega.addEventListener('mouseleave',mClose);
