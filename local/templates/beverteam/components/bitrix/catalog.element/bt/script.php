@@ -137,7 +137,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   bCmp.setAttribute('aria-pressed',BT_cmpHas(PID));
   bCmp.addEventListener('click',()=>{BT_cmpToggle(PID);const on=BT_cmpHas(PID);
     bCmp.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен к сравнению':'Товар убран из сравнения');});
-  bFav.addEventListener('click',()=>{const on=bFav.getAttribute('aria-pressed')!=='true';
-    bFav.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен в избранное':'Товар убран из избранного');});
+  bFav.setAttribute('aria-pressed',BT_favHas(PID));
+  bFav.addEventListener('click',()=>{const on=BT_favToggle(PID);
+    bFav.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен в <a href="/personal/favorites/">избранное</a>':'Товар убран из избранного');});
 });
 </script>

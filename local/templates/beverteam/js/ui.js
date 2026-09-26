@@ -277,6 +277,20 @@ window.BT_cmpRemove = id => { const i=CMP.indexOf(id); if(i>=0){ CMP.splice(i,1)
   document.dispatchEvent(new CustomEvent('bt:cmp',{detail:{id,on:false}})); } };
 window.BT_cmpClear = ids => { (ids||CMP.slice()).forEach(id=>{const i=CMP.indexOf(id);if(i>=0)CMP.splice(i,1);});
   cmpSave(); BT_cmpUpdate(); document.dispatchEvent(new CustomEvent('bt:cmp',{detail:{}})); };
+/* ---------- избранное: список id в localStorage, общий для всех страниц ---------- */
+let FAV; try{ FAV=JSON.parse(localStorage.getItem('bt_fav')||'null'); }catch(e){ FAV=null; }
+if(!Array.isArray(FAV)) FAV=[];
+window.BT_FAV = FAV;
+window.BT_favHas = id => FAV.indexOf(String(id))>=0;
+window.BT_favToggle = id => { id=String(id); const i=FAV.indexOf(id); if(i<0) FAV.push(id); else FAV.splice(i,1);
+  try{ localStorage.setItem('bt_fav',JSON.stringify(FAV)); }catch(e){} BT_favUpdate(); return i<0; };
+window.BT_favUpdate = () => {
+  document.querySelectorAll('.pc__fav').forEach(b=>{ const pc=b.closest('[data-pc]');
+    if(pc) b.setAttribute('aria-pressed', BT_favHas(pc.dataset.pc)?'true':'false'); });
+  const a=document.querySelector('.hact[href="/personal/favorites/"]'); if(!a) return;
+  let c=a.querySelector('.cnt'); if(!c){ c=document.createElement('span'); c.className='cnt'; a.insertBefore(c,a.lastElementChild); }
+  c.textContent=FAV.length; c.hidden=!FAV.length;
+};
 window.BT_cmpUpdate = () => {
   document.querySelectorAll('.hact--cmp .cnt').forEach(c=>{ c.textContent=CMP.length; c.hidden=!CMP.length; });
   document.querySelectorAll('.pc__cmpi').forEach(b=>{ const pc=b.closest('[data-pc]');
@@ -990,8 +1004,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     const id=b.closest('.addq').dataset.id, q=(CART[id]||0)+(b.dataset.q==='-'?-1:1);
     BT_cartSet(id,q); if(b.closest('.pc')) rerender(id);});
   document.addEventListener('click',e=>{const f=e.target.closest('.pc__fav');if(!f)return;
-    const on=f.getAttribute('aria-pressed')!=='true';f.setAttribute('aria-pressed',on);
-    BT_toast(on?'Добавлено в избранное':'Убрано из избранного');});
+    const pc=f.closest('[data-pc]'); if(!pc) return;
+    const on=BT_favToggle(pc.dataset.pc);
+    BT_toast(on?'Добавлено в <a href="/personal/favorites/">избранное</a>':'Убрано из избранного');});
+  BT_favUpdate();
   document.addEventListener('click',e=>{const c=e.target.closest('.pc__cmpi');if(!c)return;
     const pc=c.closest('[data-pc]'); if(!pc) return;
     const on=BT_cmpToggle(pc.dataset.pc);
