@@ -46,7 +46,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
   </div>
   <div class="wrap hdr__nav">
     <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_top', [
-        'ROOT_MENU_TYPE' => 'top', 'MAX_LEVEL' => 2, 'CHILD_MENU_TYPE' => 'top', 'USE_EXT' => 'Y',
+        'ROOT_MENU_TYPE' => 'top', 'MAX_LEVEL' => 1, 'USE_EXT' => 'Y',
         'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
     ], false, ['HIDE_ICONS' => 'Y']) ?>
     <span class="r"><b><?= $co['city'] ?? '' ?></b>, <?= $co['street'] ?? '' ?> · <?= $co['hours'] ?? '' ?></span>
@@ -62,7 +62,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
     <div class="drawer__hd"><a class="brand" href="/"><?= $logo ?></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
     <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px"><?= bt_icon('search') ?> Поиск по каталогу</button></div>
     <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_drawer', [
-        'ROOT_MENU_TYPE' => 'drawer', 'MAX_LEVEL' => 2, 'CHILD_MENU_TYPE' => 'drawer', 'USE_EXT' => 'Y',
+        'ROOT_MENU_TYPE' => 'drawer', 'MAX_LEVEL' => 1, 'USE_EXT' => 'Y',
         'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
     ], false, ['HIDE_ICONS' => 'Y']) ?>
     <div class="drawer__ft">

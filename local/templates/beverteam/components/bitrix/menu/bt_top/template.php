@@ -3,7 +3,7 @@
 // Верхнее меню: пункт 1-го уровня + выпадающий список 2-го уровня; пункт без ссылки — только заголовок выпадашки
 $tree = [];
 foreach ($arResult as $item) {
-    if ($item['DEPTH_LEVEL'] == 1) {
+    if (($item['PARAMS']['DEPTH_LEVEL'] ?? 1) == 1) {
         $tree[] = $item + ['SUB' => []];
     } elseif ($tree) {
         $tree[array_key_last($tree)]['SUB'][] = $item;

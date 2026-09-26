@@ -3,7 +3,7 @@
 // Мобильное меню: разделы с подпунктами — аккордеоном, остальное — ссылками
 $tree = [];
 foreach ($arResult as $item) {
-    if ($item['DEPTH_LEVEL'] == 1) {
+    if (($item['PARAMS']['DEPTH_LEVEL'] ?? 1) == 1) {
         $tree[] = $item + ['SUB' => []];
     } elseif ($tree) {
         $tree[array_key_last($tree)]['SUB'][] = $item;
