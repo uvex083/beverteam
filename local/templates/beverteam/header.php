@@ -8,7 +8,7 @@ use Bitrix\Main\Web\Json;
 $co = bt_contacts();
 $asset = Asset::getInstance();
 // товары для поиска, корзины и сравнения в ui.js — до подключения скриптов
-$asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';</script>', false, AssetLocation::AFTER_CSS);
+$asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';window.BT_CATS=' . Json::encode(bt_mega_cats()) . ';</script>', false, AssetLocation::AFTER_CSS);
 $asset->addCss(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.css');
 $asset->addCss(SITE_TEMPLATE_PATH . '/css/ui.css');
 $asset->addJs(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.js');

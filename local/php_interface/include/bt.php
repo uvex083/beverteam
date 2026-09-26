@@ -128,6 +128,58 @@ function bt_card(array $m): string
         . '</article>';
 }
 
+// Мегаменю «Каталог»: корневые разделы с подразделами и промо-товаром + аренда; формат CATS из ui.js
+function bt_mega_cats(): array
+{
+    $catId = bt_iblock('catalog');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_mega_cats', '/bt/catalog')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/catalog');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $catId);
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('rent'));
+
+    $cats = [];
+    $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', '<=DEPTH_LEVEL' => 2], false, ['ID', 'NAME', 'DEPTH_LEVEL', 'SECTION_PAGE_URL', 'IBLOCK_SECTION_ID']);
+    $roots = [];
+    while ($s = $r->GetNext(true, false)) {
+        if ($s['DEPTH_LEVEL'] == 1) {
+            $roots[$s['ID']] = count($cats);
+            $cats[] = ['t' => $s['NAME'], 'h' => $s['SECTION_PAGE_URL'], 'sub' => [], 'id' => (int)$s['ID']];
+        } elseif (isset($roots[$s['IBLOCK_SECTION_ID']])) {
+            $cats[$roots[$s['IBLOCK_SECTION_ID']]]['sub'][] = [$s['NAME'], $s['SECTION_PAGE_URL']];
+        }
+    }
+    // промо: первый товар раздела с фото
+    foreach ($cats as &$c) {
+        $el = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'SECTION_ID' => $c['id'], 'INCLUDE_SUBSECTIONS' => 'Y', 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false], false, ['nTopCount' => 1], ['ID'])->Fetch();
+        $m = $el ? bt_product((string)$el['ID']) : null;
+        if ($m) {
+            $c['promo'] = ['img' => $m['img'], 'b' => $m['n'], 't' => $m['p'] ? bt_fmt($m['p']) . (!empty($m['bulk']) ? ' за кг' : '') : '', 'h' => $m['url']];
+        }
+        // у кофемашин подразделов нет — показываем модели
+        if (!$c['sub']) {
+            foreach (bt_catalog_data()[bt_product_group(\CIBlockSection::GetByID($c['id'])->Fetch()['CODE'])] ?? [] as $m2) {
+                $c['sub'][] = [$m2['n'], $m2['url']];
+            }
+        }
+        unset($c['id']);
+    }
+    unset($c);
+    $rent = bt_catalog_data()['rent'];
+    $cats[] = ['t' => 'Аренда кофемашин', 'h' => '/arenda-kofemashin/', 'sub' => [['Для офиса', '/arenda-kofemashin/'], ['Для кафе и HoReCa', '/arenda-kofemashin/'], ['На мероприятие', '/arenda-kofemashin/#event'], ['Кофе по подписке', '/podpiska/']],
+        'promo' => $rent ? ['img' => $rent[0]['img'], 'b' => $rent[0]['n'], 't' => 'от ' . bt_fmt(min(array_column($rent, 'p'))) . ' в месяц', 'h' => '/arenda-kofemashin/'] : null];
+    // порядок как в макете: Чай, Кофе, Кофемашины, Аренда, Аксессуары
+    $acc = array_filter($cats, fn($c) => $c['h'] === '/magazin/aksessuary/');
+    $cats = array_values(array_merge(array_filter($cats, fn($c) => $c['h'] !== '/magazin/aksessuary/'), $acc));
+
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($cats);
+    return $cats;
+}
+
 // Характеристики для страницы сравнения: id => ключи групп BT_SPEC_GROUPS из ui.js
 function bt_catalog_specs(): array
 {

@@ -398,13 +398,8 @@ window.BT_card = function(m){
 };
 
 /* ---------- каталог для меню ---------- */
-const CATS = [
-  {t:'Чай',h:'/magazin/chay/',sub:['Чёрный чай ароматизированный','Зелёный чай ароматизированный','Улуны','Чай травяной','Пуэр','Матча','Фруктовый чай','Красный чай','Добавки к чаю'],promo:{img:IMG.earl,b:'Эрл Грей классик',t:'800 ₽ за 250 г'}},
-  {t:'Кофе',h:'/magazin/kofe/',sub:['BOTANICA кофе под эспрессо','BOTANICA фильтр-кофе'],promo:{img:IMG.oromia,b:'Эфиопия Оромия',t:'2 687 ₽ за 1 кг · Q 82,5'}},
-  {t:'Кофемашины Jetinno',h:'/magazin/professionalnye-kofemashiny/',sub:['JL05 — дом и малый офис','JL15 VIVA — офис','JL36 — кафе и HoReCa','JL32 — самообслуживание'],promo:{img:IMG.jl36,b:'Jetinno JL36',t:'127 000 ₽ · автопромывка'}},
-  {t:'Аренда кофемашин',h:'/arenda-kofemashin/',sub:['Для офиса','Для кафе и HoReCa','На мероприятие','Для дома'],promo:{img:IMG.jl15,b:'Аренда JL15 VIVA',t:'от 7 500 ₽ в месяц'}},
-  {t:'Аксессуары',h:'/magazin/aksessuary/',sub:['Заварочные чайники','Воронки для фильтр-кофе','Чайные кружки'],promo:{img:IMG.catAcc,b:'Аксессуары',t:'для чая и кофе'}}
-];
+// разделы мегаменю отдаёт сервер (bt_mega_cats): {t, h, sub:[[название, ссылка]], promo:{img, b, t, h}}
+const CATS = window.BT_CATS || [];
 
 /* Структура горизонтального меню — по прототипу «Горизонтальное меню».
    Пункт «Главная» не выводим (дубль логотипа), «Аренда кофемашин» — отдельный пункт. */
@@ -451,11 +446,11 @@ function header(){
 }
 function megaPanel(i){
   const c = CATS[i]; const half = Math.ceil(c.sub.length/2);
-  const li = s => `<li><a href="${c.h}">${s}</a></li>`;
+  const li = s => `<li><a href="${s[1]}">${s[0]}</a></li>`;
   return `<h4><a href="${c.h}">${c.t} →</a></h4>
     <ul>${c.sub.slice(0,half).map(li).join('')}</ul>
     <ul>${c.sub.slice(half).map(li).join('')}</ul>
-    <a class="mega__promo" href="${c.h}"><img src="${c.promo.img}" alt=""><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`;
+    ${c.promo?`<a class="mega__promo" href="${c.promo.h}"><img src="${c.promo.img}" alt=""><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`:''}`;
 }
 function drawer(){
   return `<div class="drawer" id="drawer">
@@ -463,7 +458,7 @@ function drawer(){
     <div class="drawer__p">
       <div class="drawer__hd"><a class="brand" href="/"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
       <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px">${I.search} Поиск по каталогу</button></div>
-      ${CATS.map(c=>`<details class="acc"><summary>${c.t}</summary><ul>${c.sub.map(s=>`<li><a href="${c.h}">${s}</a></li>`).join('')}<li><a href="${c.h}" class="link">Все в разделе</a></li></ul></details>`).join('')}
+      ${CATS.map(c=>`<details class="acc"><summary>${c.t}</summary><ul>${c.sub.map(s=>`<li><a href="${s[1]}">${s[0]}</a></li>`).join('')}<li><a href="${c.h}" class="link">Все в разделе</a></li></ul></details>`).join('')}
       <a class="drawer__l" href="/podpiska/">Кофе по подписке</a>
       <a class="drawer__l" href="/servis/">Услуги и сервис</a>
       <a class="drawer__l" href="/servis/remont-kofemashin/">Ремонт кофемашин</a>
