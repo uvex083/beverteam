@@ -782,3 +782,30 @@ ym(110309111,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webv
 <noscript><div><img src="https://mc.yandex.ru/watch/110309111" style="position:absolute;left:-9999px" alt=""></div></noscript>
 HTML;
 }
+
+// sitemap.xml из реальных данных: страницы, разделы и товары каталога, статьи, бренды ремонта; вызывается агентом раз в сутки
+function bt_sitemap_build(): string
+{
+    Loader::includeModule('iblock');
+    $host = 'https://beverteam.ru';
+    $urls = ['/', '/magazin/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/news/',
+        '/o-kompanii/', '/otzyvy-o-nas/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
+        '/polzovatelskoe-soglashenie/', '/sitemap/'];
+    $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
+    while ($s = $r->GetNext()) {
+        $urls[] = $s['SECTION_PAGE_URL'];
+    }
+    foreach (['catalog', 'journal', 'repair_brands'] as $code) {
+        $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock($code), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'DETAIL_PAGE_URL', 'TIMESTAMP_X']);
+        while ($e = $r->GetNext()) {
+            $urls[] = [$e['DETAIL_PAGE_URL'], date('Y-m-d', MakeTimeStamp($e['TIMESTAMP_X']))];
+        }
+    }
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach (array_unique($urls, SORT_REGULAR) as $u) {
+        [$loc, $mod] = is_array($u) ? $u : [$u, null];
+        $xml .= '<url><loc>' . htmlspecialcharsbx($host . $loc) . '</loc>' . ($mod ? '<lastmod>' . $mod . '</lastmod>' : '') . "</url>\n";
+    }
+    file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/sitemap.xml', $xml . '</urlset>' . "\n");
+    return 'bt_sitemap_build();';
+}

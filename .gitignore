@@ -5,3 +5,4 @@
 /.idea/
 # на dev — запрет индексации, боевой robots.txt появится при запуске
 /robots.txt
+/sitemap.xml
