@@ -97,7 +97,7 @@ foreach ($products as $p) {
     $code = $p['code'];
     $isRent = in_array('arenda-kofemashin', $p['sections'], true);
     $ibId = $isRent ? $rentId : $catId;
-    $imgs = array_values(array_filter(array_map(fn($f) => $dir . $f, $p['images']), 'is_file'));
+    $imgs = array_values(array_filter(array_map(fn($f) => $dir . 'img/products/' . $code . '/' . $f, $p['images']), 'is_file'));
 
     $props = [];
     if ($isRent) {
@@ -154,24 +154,26 @@ foreach ($products as $p) {
         $fields['IBLOCK_SECTION_ID'] = $sections[$secCode] ?? $fail("нет раздела $secCode для $code");
     }
 
-    $ex = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code], false, false, ['ID'])->Fetch();
+    $ex = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code], false, false, ['ID', 'DETAIL_PICTURE'])->Fetch();
     $isRent ? $stat['rent']++ : ($ex ? $stat['upd']++ : $stat['new']++);
     if (!$apply) {
         continue;
     }
     $el = new CIBlockElement();
+    // картинки грузим только тем, у кого их ещё нет — повторный запуск не плодит копии файлов
+    $needImg = $imgs && !($ex['DETAIL_PICTURE'] ?? 0);
+    if ($needImg) {
+        $fields['DETAIL_PICTURE'] = CFile::MakeFileArray($imgs[0]);
+        $fields['PREVIEW_PICTURE'] = CFile::MakeFileArray($imgs[0]);
+        if (count($imgs) > 1) {
+            $props['MORE_PHOTO'] = array_map(fn($f) => ['VALUE' => CFile::MakeFileArray($f), 'DESCRIPTION' => ''], array_slice($imgs, 1));
+        }
+    }
     if ($ex) {
         $id = (int)$ex['ID'];
         $el->Update($id, $fields) or $fail("update $code: {$el->LAST_ERROR}");
     } else {
-        if ($imgs) {
-            $fields['DETAIL_PICTURE'] = CFile::MakeFileArray($imgs[0]);
-            $fields['PREVIEW_PICTURE'] = CFile::MakeFileArray($imgs[0]);
-        }
         $id = (int)$el->Add($fields) or $fail("add $code: {$el->LAST_ERROR}");
-        if (count($imgs) > 1) {
-            $props['MORE_PHOTO'] = array_map(fn($f) => ['VALUE' => CFile::MakeFileArray($f), 'DESCRIPTION' => ''], array_slice($imgs, 1));
-        }
     }
     CIBlockElement::SetPropertyValuesEx($id, $ibId, $props);
 
