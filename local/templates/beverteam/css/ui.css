@@ -180,6 +180,7 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .drawer__s .search{max-width:none;background:var(--paper);border-color:var(--line)}
 .drawer__s .search input{color:var(--ink)}
 .drawer__s .search button{color:var(--ink)}
+.drawer__s .btn svg{width:20px;height:20px;flex-shrink:0}
 .drawer .acc{border-bottom:1px solid var(--line)}
 .drawer .acc summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;font-weight:700;cursor:pointer}
 .drawer .acc summary::-webkit-details-marker{display:none}
