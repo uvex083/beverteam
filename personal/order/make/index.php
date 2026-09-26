@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.toLowerCase()):''}`:'&nbsp;';
   }
   let last=null;
-  function calc(){
+  function calc(again){
     const n=++calcN;
     return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId}).then(r=>{
       if(n!==calcN||!r.ok) return;
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(!sel||!all.some(o=>o.key===sel.key)) sel=all.find(o=>o.tab===tab)||all[0]||null;
       else sel=all.find(o=>o.key===sel.key);
       if(sel) tab=sel.tab;
-      if(sel&&sel.d.id!==r.delivery) return calc();
+      if(sel&&sel.d.id!==r.delivery&&!again) return calc(true);
       payId=avail.some(a=>a.id===payId)?payId:(avail[0]?avail[0].id:0);
       renderDeliv(); renderPay(); renderSum(r); ready();
     }).catch(()=>BT_toast('Не получилось пересчитать доставку — обновите страницу'));

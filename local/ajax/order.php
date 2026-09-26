@@ -101,7 +101,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
         }
         $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
-        $deliveries[$svc->getId()] = ['id' => $svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
+        $deliveries[(int)$svc->getId()] = ['id' => (int)$svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
             'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY')];
     }
     if (!isset($deliveries[$delivery])) {
