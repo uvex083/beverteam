@@ -769,7 +769,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   const PAGES=[{t:'Аренда кофемашин',u:'/arenda-kofemashin/',d:'Услуга · от 3 500 ₽ в месяц'},
     {t:'Кофе по подписке',u:'/podpiska/',d:'Услуга · кофемашина бесплатно от 3 кг'},
-    {t:'Ремонт и обслуживание кофемашин',u:'/servis/#price',d:'Услуга · диагностика бесплатно'},
+    {t:'Ремонт и обслуживание кофемашин',u:'/servis/remont-kofemashin/',d:'Услуга · сервисный центр Jetinno'},
+    {t:'Подбор кофе за минуту',u:'/podbor-kofe/',d:'5 вопросов — сорт BOTANICA с ценой'},
     {t:'Оплата и доставка',u:'/oplata-i-dostavka/',d:'Информация'},
     {t:'Журнал',u:'/news/',d:'Статьи и новости'},
     {t:'Контакты',u:'/kontakty/',d:'Екатеринбург, ул. Колокольная, 31А'}];
@@ -1083,6 +1084,128 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* 404: поиск открывает общий поиск по сайту с введённым запросом */
   document.querySelectorAll('[data-nf-search]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();
     const q=f.elements.q.value; BT_search(); setTimeout(()=>{const s=document.getElementById('sq'); s.value=q; s.dispatchEvent(new Event('input'));},80);}));
+  const escq=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ---------- аренда: калькулятор — модели и пороги из ИБ rent, расход 8 г × чашек × 22 дня, цена зерна из каталога ---------- */
+  const rc=document.querySelector('[data-rcalc]');
+  if(rc){
+    const C=JSON.parse(rc.dataset.rcalc), M=C.models, B=C.bean, q=s=>rc.querySelector(s), rng=q('[data-rc-cups]');
+    const kgf=x=>String(Math.round(x*10)/10).replace('.',','), cost=kg=>Math.round(kg*BT_tier(B,kg).p);
+    let cur=null;
+    const draw=()=>{
+      const cups=+rng.value, m=M.find(x=>x.cups>=cups)||M[M.length-1], need=cups*C.g*C.days/1000, free=need>=m.kg;
+      cur={m,cups,need};
+      q('[data-rc-n]').textContent=cups;
+      rc.querySelectorAll('[data-rc-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rcM===m.id));
+      const img=q('[data-rc-img]'); if(img.getAttribute('src')!==m.img) img.src=m.img; img.alt=m.m;
+      q('[data-rc-name]').textContent=m.m;
+      q('[data-rc-s]').textContent=`До ${m.cups} чашек в день · ${m.aud}`;
+      q('[data-rc-p]').textContent=free?'0 ₽':BT_fmt(m.price);
+      q('[data-rc-alt]').textContent=free?`при заказе кофе от ${m.kg} кг в месяц. Или ${BT_fmt(m.price)} в месяц с фиксированной оплатой`
+        :`или 0 ₽ при заказе кофе от ${m.kg} кг в месяц (≈ ${BT_fmt(cost(m.kg))} за кофе)`;
+      q('[data-rc-note]').innerHTML=`Расход ≈ <b>${kgf(need)} кг</b> кофе в месяц: ${C.g} г × ${cups} чашек × ${C.days} рабочих дня. `
+        +`Зерном <a class="link" href="${escq(B.url)}">${escq(B.n)}</a> — ≈ ${BT_fmt(cost(need))} в месяц.`
+        +(cups>M[M.length-1].cups?' Для такой нагрузки подберём решение индивидуально — оставьте заявку.':'');
+    };
+    const setModel=id=>{const m=M.find(x=>x.id===id); if(m){rng.value=m.cups; draw();}};
+    rng.addEventListener('input',draw);
+    rc.addEventListener('click',e=>{const b=e.target.closest('[data-rc-m]'); if(b) setModel(b.dataset.rcM);});
+    /* карточка модели на этой же странице ведёт в калькулятор с этой моделью */
+    document.querySelectorAll('.rentp [data-pc] a').forEach(a=>a.addEventListener('click',()=>setModel(a.closest('[data-pc]').dataset.pc)));
+    q('[data-rc-btn]').addEventListener('click',()=>{
+      const f=document.querySelector('#form form'); if(!f||!cur) return;
+      const sel=f.elements.model, msg=f.elements.message;
+      if(sel){ sel.value=cur.m.m; sel.dispatchEvent(new Event('change',{bubbles:true})); }
+      if(msg&&(!msg.value||msg.dataset.auto===msg.value)){ msg.value=msg.dataset.auto=`Расчёт на сайте: ≈ ${cur.cups} чашек в день, расход ≈ ${kgf(cur.need)} кг кофе в месяц`; }
+    });
+    draw();
+  }
+
+  /* ---------- ремонт: отмеченные симптомы — первой строкой поля «Что случилось», свой текст остаётся ---------- */
+  const sy=document.querySelector('[data-symp]'), st=document.querySelector('[data-symp-to]');
+  if(sy&&st) sy.addEventListener('change',()=>{
+    const list=[...sy.querySelectorAll('input:checked')].map(x=>x.value).join('; '), own=st.value.replace(/^Симптомы:.*(\n|$)/,'');
+    st.value=(list?'Симптомы: '+list+(own?'\n':''):'')+own;
+    if(st.closest('.field')?.classList.contains('is-err')) BT_checkField(st);
+  });
+
+  /* ---------- подписка: объём — пороги бесплатной аренды, цена — оптовая сетка сорта; расчёт уходит в заявку ---------- */
+  const sc=document.querySelector('[data-subcfg]');
+  if(sc){
+    const S=JSON.parse(sc.dataset.subcfg), q=s=>sc.querySelector(s), sel=q('[data-sub-sort]');
+    let per=q('[data-sub-per][aria-pressed=true]');
+    const calc=()=>{
+      const vi=+(q('input[name=vol]:checked')?.value||0), v=S.vols[vi], c=S.coffee[+sel.value]||S.coffee[0];
+      const sum=BT_tier(c,v.kg).p*v.kg, base=c.p*v.kg, cups=Math.round(v.kg*1000/8), p=per.textContent.toLowerCase();
+      sc.querySelectorAll('.vol').forEach((l,i)=>{ l.classList.toggle('on',i===vi);
+        const pct=BT_tierPct(c,BT_tier(c,S.vols[i].kg)); l.querySelector('[data-sub-pct]').textContent=pct?'−'+pct+'%':''; });
+      q('[data-sub-kg]').textContent='Кофе, '+v.kg+' кг';
+      q('[data-sub-sum]').textContent=BT_fmt(base);
+      q('[data-sub-disc]').textContent=base>sum?'−'+BT_fmt(base-sum):'—';
+      q('[data-sub-tot]').textContent=BT_fmt(sum);
+      q('[data-sub-cup]').innerHTML=`Примерно <b>${cups.toLocaleString('ru-RU')} чашек</b> в месяц (8 г на чашку) · ${BT_fmt(Math.round(sum/cups))} за чашку · доставка ${p}`;
+      q('[data-sub-msg]').value=`Объём: ${v.kg} кг в месяц (${v.m} — аренда 0 ₽); сорт: ${c.n}; доставка: ${p}; расчёт на сайте: ${sum} ₽ в месяц`;
+    };
+    sc.addEventListener('change',e=>{ if(e.target.name==='vol'||e.target===sel) calc(); });
+    sc.addEventListener('click',e=>{ const b=e.target.closest('[data-sub-per]'); if(!b) return; per=b;
+      sc.querySelectorAll('[data-sub-per]').forEach(x=>x.setAttribute('aria-pressed',x===b)); calc(); });
+    calc();
+  }
+
+  /* ---------- подбор кофе: вопросы и правила — с сервера (local/parts/podbor-kofe.php), результат — товар каталога ---------- */
+  const qz=document.querySelector('[data-quiz]');
+  if(qz){
+    const D=JSON.parse(qz.dataset.quiz), Q=D.q, A={}; let i=0, res=null;
+    const word=n=>n===1?'вопрос':n<5?'вопроса':'вопросов';
+    const pick=()=>{
+      let k=A.vol==='xl'||(A.taste==='choco'&&A.price==='cost')?'botanica-vending'
+        :A.dev==='filter'&&A.milk!=='milk'?'botanica-efiopiya-sidamo-1'
+        :A.milk==='milk'?'botanica-milk'
+        :A.taste==='fruit'?'botanica-efiopiya-oromiya'
+        :A.taste==='choco'?'botanica-braziliya-santos':D.fallback;
+      if(!D.res[k]||!BT_find(D.res[k].id)) k=D.fallback;
+      const r=D.res[k]; return r&&BT_find(r.id)?{p:BT_find(r.id),why:r.why}:null;
+    };
+    const render=()=>{
+      if(i>=Q.length) return result();
+      const x=Q[i], left=Q.length-i-1;
+      qz.innerHTML=`<div class="quiz__head"><div class="quiz__bar"><i style="width:${i/Q.length*100}%"></i></div><span class="n">${i+1} / ${Q.length}</span></div>
+        <p class="quiz__q">${escq(x.q)}</p>${x.h?`<p class="quiz__hint">${escq(x.h)}</p>`:'<div style="height:12px"></div>'}
+        <div class="quiz__opts">${x.o.map(o=>`<button type="button" data-v="${escq(o[0])}">${escq(o[1])}<small>${escq(o[2])}</small></button>`).join('')}</div>
+        <div class="quiz__nav">${i?'<button type="button" class="authback" data-qb>← Назад</button>':'<span></span>'}<span>${left?'Осталось '+left+' '+word(left):'Последний вопрос'}</span></div>`;
+    };
+    const result=()=>{
+      res=pick();
+      if(!res){ qz.innerHTML='<p class="quiz__q">Не получилось подобрать сорт</p><p class="quiz__hint">Позвоните нам — подберём вместе.</p>'; return; }
+      const p=res.p, t=p.bulk&&{m:5,l:10,xl:30}[A.vol]?BT_tier(p,{m:5,l:10,xl:30}[A.vol]):null;
+      const tier=t&&t.p<p.p?` · от ${t.kg} кг — ${BT_fmt(t.p)}/кг`:'';
+      qz.innerHTML=`<div class="quiz__head"><div class="quiz__bar"><i style="width:100%"></i></div><span class="n">готово</span></div>
+        <p class="quiz__q" style="margin-bottom:22px">Вам подойдёт</p>
+        <div class="quiz__res">
+          <a href="${escq(p.url)}">${p.img?`<img src="${escq(p.img)}" alt="${escq(p.n)}">`:''}</a>
+          <div>
+            <h3 class="h3" style="font-size:20px;margin-bottom:10px"><a href="${escq(p.url)}">${escq(p.n)}</a></h3>
+            <p style="margin:0 0 14px;color:#3A3A34;font-size:15px">${escq(res.why)}</p>
+            <p class="muted" style="font-size:13.5px;margin:0 0 18px">${escq(p.par)}</p>
+            <div class="row" style="gap:14px;margin-bottom:16px"><b style="font-family:Unbounded;font-size:24px">${BT_fmt(p.p)}</b><span class="muted" style="font-size:13px">за 1 кг${tier}</span></div>
+            <div class="row" style="gap:10px"><button type="button" class="btn" data-qadd>В корзину</button><a class="btn btn--line" href="${escq(p.url)}">Подробнее о сорте</a></div>
+          </div>
+        </div>
+        ${A.vol==='l'||A.vol==='xl'?'<div class="alert alert--info" style="margin-top:24px">При таком объёме кофемашина в аренду обойдётся в 0 ₽. <a class="link" href="/podpiska/">Посмотреть подписку</a></div>':''}
+        <hr class="hr" style="margin:26px 0">
+        <div class="row between" style="gap:14px"><button type="button" class="btn btn--ghost btn--sm" data-qagain>Пройти заново</button><a class="link" href="/kontakty/#form" data-lead="Подбор кофе">Хочу, чтобы подобрал человек →</a></div>`;
+    };
+    qz.addEventListener('click',e=>{
+      const v=e.target.closest('[data-v]'), t=e.target;
+      if(v){ A[Q[i].k]=v.dataset.v; i++; }
+      else if(t.closest('[data-qb]')) i--;
+      else if(t.closest('[data-qagain]')){ i=0; Object.keys(A).forEach(k=>delete A[k]); }
+      else if(t.closest('[data-qadd]')&&res){ BT_cartSet(res.p.id,(BT_CART[res.p.id]||0)+1); BT_toast(`«${escq(res.p.n)}» в корзине · <a href="/personal/cart/">Оформить</a>`); return; }
+      else return;
+      render();
+      if(qz.getBoundingClientRect().top<0) qz.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
   BT_phFit();
 
   /* BreadcrumbList — из хлебных крошек любой страницы */

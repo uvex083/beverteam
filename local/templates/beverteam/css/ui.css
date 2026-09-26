@@ -540,7 +540,7 @@ input,textarea{caret-color:var(--ink)}
   .post{grid-template-columns:1fr}.post__toc{position:static}}
 
 /* ================= Подписка ================= */
-.sub{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
+.subg{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
 .subcard{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:26px;position:sticky;top:130px}
 .vols{display:grid;gap:10px;margin-bottom:22px}
 .vol{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 16px;cursor:pointer}
@@ -557,7 +557,7 @@ input,textarea{caret-color:var(--ink)}
 .subhow div{border-top:2px solid var(--ink);padding-top:16px}
 .subhow b{display:block;font-family:Unbounded;font-size:15px;margin-bottom:7px}
 .subhow p{margin:0;font-size:14px;color:#4A4A43}
-@media(max-width:1000px){.sub{grid-template-columns:1fr}.subcard{position:static}.subhow{grid-template-columns:1fr 1fr}}
+@media(max-width:1000px){.subg{grid-template-columns:1fr}.subcard{position:static}.subhow{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.subhow{grid-template-columns:1fr}}
 
 /* ================= Отзывы с фото ================= */
@@ -616,8 +616,8 @@ input,textarea{caret-color:var(--ink)}
 
 /* ================= Ремонт по брендам ================= */
 .brands{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.brands a{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px 18px;transition:border-color .15s,transform .15s}
-.brands a:hover{border-color:var(--ink);transform:translateY(-2px)}
+.brands a{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px 18px;transition:border-color .15s}
+.brands a:hover{border-color:var(--ink)}
 .brands b{display:block;font-family:Unbounded;font-size:15px;margin-bottom:5px}
 .brands small{color:var(--gray);font-size:12.5px;line-height:1.5;display:block}
 .brands .badge{margin-top:9px}
@@ -1454,3 +1454,80 @@ form[data-form]{position:relative}
 .journalp .post__body ol{padding-left:22px;margin:0 0 16px}.journalp .post__body ol li{margin-bottom:7px}
 .journalp .post h1{overflow-wrap:anywhere;hyphens:auto}
 .nfp .nf__s{display:flex}
+
+/* ---------- аренда кофемашин (service-rent.html) ---------- */
+.rentp .top{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start;margin-top:18px}
+.rentp .top p.l{font-size:16px;max-width:48ch;color:#3A3A34;margin:16px 0 24px}
+.rentp .incl{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rentp .incl div{display:flex;gap:10px;font-size:14px}
+.rentp .incl div::before{content:"✓";color:var(--ok);font-weight:700}
+.rentp .calc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px}
+.rentp .calc .q{font-weight:700;font-size:14px;margin-bottom:9px;display:flex;justify-content:space-between;gap:12px}
+.rentp .calc .q b{font-family:Unbounded;font-variant-numeric:tabular-nums}
+.rentp .opts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.rentp .rng{display:block;width:100%;margin:4px 0 22px;accent-color:var(--ink);cursor:pointer}
+.rentp .calc__out{border-top:1px solid var(--line);padding-top:18px;display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center}
+.rentp .calc__out img{max-height:108px;width:auto;margin:auto;object-fit:contain}
+.rentp .calc__out h4{font-family:Unbounded;font-size:16px;margin:0 0 5px}
+.rentp .calc__out .sp{margin:0 0 10px;font-size:13px;color:var(--gray);min-height:1.5em}
+.rentp .calc__out .pr{font-family:Unbounded;font-size:23px;font-weight:800;margin-bottom:6px;white-space:nowrap}
+.rentp .calc__out .pr small{font-family:Manrope;font-size:12.5px;color:var(--gray);font-weight:400}
+.rentp .calc__alt{margin:0 0 14px;font-size:13px;color:#3A3A34;min-height:3em}
+.rentp .calc__note{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--gray);min-height:4.5em}
+.rentp .tblw{overflow-x:auto}
+.rentp .tblw .tbl{min-width:560px}
+.rentp .cta{background:var(--lime);border-radius:var(--rad);padding:clamp(26px,3.4vw,44px);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.rentp .cta p{margin:8px 0 0;max-width:44ch;color:#3B4310}
+.rentp .seo{font-size:14.5px;color:#4A515B;max-width:80ch}
+.rentp .seo h2{font-family:Unbounded;font-weight:700;font-size:22px;margin:0 0 12px}
+.rentp .seo p{margin:0 0 12px}
+.rentp .faq{max-width:860px}
+.faq__a{overflow-x:auto}
+.faq__a ul{margin:12px 0 0;padding-left:20px;color:var(--gray);font-size:14.5px;line-height:1.75}
+.faq__a table{margin-top:12px;border-collapse:collapse;font-size:13.5px;min-width:520px}
+.faq__a th,.faq__a td{padding:9px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}
+.faq__a th{background:var(--paper);font-weight:600}
+.rentp .form,.repp .form{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:900px){.rentp .top,.rentp .form,.repp .form{grid-template-columns:1fr}}
+@media(max-width:560px){.rentp .incl{grid-template-columns:1fr}.rentp .calc{padding:18px}.rentp .calc__out{grid-template-columns:72px 1fr}}
+
+/* ---------- услуги и сервис (services.html) ---------- */
+.servp .dir{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:28px;display:flex;flex-direction:column;transition:border-color .18s}
+.servp .dir:hover{border-color:#C2C2B6}
+.servp .dir .num{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;color:var(--gray);margin-bottom:22px}
+.servp .dir h2{font-family:Unbounded;font-weight:700;font-size:20px;margin-bottom:10px}
+.servp .dir h2 span{background-image:linear-gradient(180deg,transparent 30%,var(--lime) 30%,var(--lime) 96%,transparent 96%);background-repeat:no-repeat;background-size:0% 100%;transition:background-size .38s cubic-bezier(.22,1,.36,1)}
+.servp .dir:hover h2 span,.servp .dir:focus-visible h2 span{background-size:100% 100%}
+.servp .dir p{margin:0 0 16px;color:var(--gray);font-size:14.5px}
+.servp .dir ul{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:8px;font-size:14px}
+.servp .dir li{display:flex;gap:8px}
+.servp .dir li::before{content:"✓";color:var(--ok);font-weight:700}
+.servp .dir .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.servp .dir .foot b{font-family:Unbounded;font-size:19px;font-weight:700;white-space:nowrap}
+.servp .dir .foot b s{display:block;text-decoration:none;font-family:Manrope;font-size:12px;color:var(--gray);font-weight:400}
+.servp .pl,.repp .pl{background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(26px,3.4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.servp .pl ul,.repp .pl ul{list-style:none;margin:0;padding:0;border-top:1px solid #2C2C27}
+.servp .pl li,.repp .pl li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #2C2C27;font-size:14.5px}
+.servp .pl li i,.repp .pl li i{font-style:normal;color:var(--lime);font-family:'JetBrains Mono';font-size:12.5px;white-space:nowrap}
+.servp .pl p,.repp .pl p{color:#A8A8A0;margin:0 0 20px;max-width:40ch}
+@media(max-width:1100px){.servp .grid.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.servp .pl,.repp .pl{grid-template-columns:1fr}}
+@media(max-width:640px){.servp .grid.g3{grid-template-columns:1fr}}
+
+/* ---------- ремонт кофемашин (service-repair.html) ---------- */
+.repp .strip{background:var(--lime);border-radius:var(--rad);margin-bottom:var(--pad)}
+.repp .strip__in{display:grid;grid-template-columns:repeat(4,1fr);padding:clamp(22px,3vw,34px) clamp(20px,2.4vw,34px)}
+.repp .strip__i{display:flex;gap:14px;align-items:center;padding:4px clamp(14px,1.8vw,26px);border-left:1px solid rgba(14,14,12,.16)}
+.repp .strip__i:first-child{border-left:0;padding-left:0}
+.repp .strip__i:last-child{padding-right:0}
+.repp .strip__i p{margin:0;font-size:14.5px;font-weight:600;line-height:1.35}
+@media(max-width:1100px){.repp .strip__in{grid-template-columns:1fr 1fr;gap:20px 0}.repp .strip__i:nth-child(odd){border-left:0;padding-left:0}}
+@media(max-width:560px){.repp .strip__in{grid-template-columns:1fr;gap:0}.repp .strip__i{border-left:0;padding:14px 0;border-top:1px solid rgba(14,14,12,.16)}.repp .strip__i:first-child{border-top:0;padding-top:0}}
+
+/* ---------- кофе по подписке (subscription.html) ---------- */
+.subp .subcard{position:static}
+.subp .subcard__t{font-weight:700;font-size:16px;margin:0 0 4px}
+.subp .subcard__l{display:block;margin-bottom:10px}
+.subp .vol .pct:empty{display:none}
+.subp .utp{grid-template-columns:repeat(2,1fr)}
+@media(max-width:560px){.subp .utp{grid-template-columns:1fr}.subp .subcard{padding:20px}}
