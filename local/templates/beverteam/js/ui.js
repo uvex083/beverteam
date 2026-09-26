@@ -976,6 +976,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(key){ const b=foot.querySelector(`.addq [data-q="${key}"]`); if(b) b.focus({preventScroll:true}); }
     });
   };
+  // карточки приходят с сервера в состоянии «не в корзине» — подтягиваем степперы по корзине
+  Object.keys(CART).forEach(rerender);
   document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||!b.closest('.pc'))return;
     const id=b.dataset.add; BT_cartSet(id,(CART[id]||0)+1); rerender(id);});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-packs] button');if(!b)return;

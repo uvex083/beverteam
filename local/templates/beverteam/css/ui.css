@@ -271,7 +271,7 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .chip{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
 .chip b{color:var(--gray);font-weight:400}
-.chip button{border:0;background:none;color:var(--gray);padding:0;font-size:15px}
+.chip button,.chip a{border:0;background:none;color:var(--gray);padding:0;font-size:15px}
 .pager{display:flex;gap:6px;justify-content:center;margin-top:32px}
 .pager a,.pager span{min-width:40px;height:40px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--line);background:var(--white);font-weight:600;font-size:14px;padding:0 12px}
 .pager .cur{background:var(--ink);color:var(--lime);border-color:var(--ink)}
@@ -1013,3 +1013,24 @@ input,textarea{caret-color:var(--ink)}
 .sw .swiper-pagination-bullet-active{background:var(--ink)}
 @media(max-width:1200px){.sw-btn--p{left:4px}.sw-btn--n{right:4px}}
 @media(max-width:700px){.sw-btn{display:none}}
+
+/* ---------- страница раздела каталога (catalog.html) ---------- */
+.rootcats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:26px}
+.rootcats a{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:10px 12px;font-weight:600;font-size:13.5px}
+.rootcats a img{width:40px;height:40px;border-radius:8px;object-fit:cover}
+.rootcats a.cur{border-color:var(--ink)}
+.cat .seo{margin-top:40px}
+.mob-f{display:none}
+@media(max-width:1050px){.rootcats{grid-template-columns:repeat(3,1fr)}.mob-f{display:inline-flex}}
+@media(max-width:640px){
+  /* первый экран на мобильных: сразу видны товары с ценами */
+  .rootcats{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-bottom:16px}
+  .rootcats a{flex:0 0 auto;scroll-snap-align:start;padding:7px 12px 7px 8px;font-size:12.5px}
+  .rootcats a img{width:28px;height:28px}
+  .subcats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+  .subcats a{flex:0 0 auto;padding:7px 12px;font-size:12.5px}
+  .cat-page .pagehead{padding:10px 0 14px}
+  .cat-page .pagehead .sub{display:none}      /* тот же текст раскрыт в SEO-блоке внизу страницы */
+  .cat-page .crumbs{padding-top:12px}
+  .toolbar{gap:8px}
+}

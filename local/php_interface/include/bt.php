@@ -69,6 +69,65 @@ function bt_icon(string $name): string
     return $icons[$name] ?? '';
 }
 
+// Товар из bt_catalog_data() по ID элемента
+function bt_product(string $id): ?array
+{
+    static $index;
+    if ($index === null) {
+        $index = [];
+        foreach (bt_catalog_data() as $list) {
+            foreach ($list as $m) {
+                $index[$m['id']] = $m;
+            }
+        }
+    }
+    return $index[$id] ?? null;
+}
+
+function bt_fmt(float $n): string
+{
+    return number_format($n, 0, '', "\u{00A0}") . "\u{00A0}₽";
+}
+
+// Карточка товара — серверная копия BT_card() из ui.js в состоянии «не в корзине»; разметку менять в обоих местах
+function bt_card(array $m): string
+{
+    $e = fn($s) => htmlspecialcharsbx((string)$s);
+    $badges = !empty($m['badges']) ? '<div class="pc__badges">' . implode('', array_map(fn($b) => '<span class="badge">' . $e($b) . '</span>', $m['badges'])) . '</div>' : '';
+    $scales = !empty($m['sc']) ? '<div class="pc__scales">' . implode('', array_map(fn($x) => '<div class="pc__scale"><span>' . $e($x[0]) . '</span><i style="--v:' . (int)$x[1] . '%"></i></div>', $m['sc'])) . '</div>' : '';
+    $packs = '';
+    if (!empty($m['bulk'])) {
+        $first = $m['bulk'][0]['p'];
+        foreach ($m['bulk'] as $t) {
+            $pct = $t['p'] < $first ? (int)round((1 - $t['p'] / $first) * 100) : 0;
+            $packs .= '<button type="button" data-kg="' . $t['kg'] . '" aria-pressed="false">' . $t['kg'] . ' кг' . ($pct ? '<s>−' . $pct . '%</s>' : '') . '</button>';
+        }
+        $packs = '<div class="packs " data-packs="' . $e($m['id']) . '">' . $packs . '</div>';
+    }
+    $rent = !empty($m['rent']);
+    $price = $m['p'] ? bt_fmt($m['p']) : 'По запросу';
+    $sub = !empty($m['unit']) ? '<s>' . $e($m['unit']) . '</s>' : (!empty($m['bulk']) ? '<s>' . bt_fmt($m['bulk'][0]['p']) . ' за кг</s>' : (!empty($m['pre']) ? '<s>предзаказ</s>' : ''));
+    $old = !empty($m['old']) ? '<span class="price--old">' . bt_fmt($m['old']) . '</span>' : '';
+    $ctl = $rent ? '<a class="btn btn--sm" href="/arenda-kofemashin/#calc">Арендовать</a>'
+        : '<button class="btn btn--sm" data-add="' . $e($m['id']) . '">' . (!empty($m['pre']) ? 'Предзаказ' : 'В корзину') . '</button>';
+    $stock = !empty($m['stock']);
+    return '<article class="pc" data-pc="' . $e($m['id']) . '" itemscope itemtype="https://schema.org/Product">'
+        . '<meta itemprop="name" content="' . $e($m['n']) . '"><meta itemprop="image" content="' . $e($m['img']) . '"><meta itemprop="description" content="' . $e($m['par']) . '">'
+        . $badges
+        . '<div class="pc__acts"><button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">' . bt_icon('heart') . '</button>'
+        . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
+        . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '" loading="lazy">' : '') . '</a>'
+        . '<h3><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></h3>'
+        . '<p class="pc__par">' . $e($m['par']) . '</p>'
+        . $scales . $packs
+        . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span>'
+        . '<div class="pc__foot" itemprop="offers" itemscope itemtype="https://schema.org/Offer">'
+        . '<meta itemprop="priceCurrency" content="RUB">' . ($m['p'] ? '<meta itemprop="price" content="' . $m['p'] . '">' : '')
+        . '<link itemprop="availability" href="https://schema.org/' . ($stock ? 'InStock' : 'PreOrder') . '">'
+        . '<div>' . $old . '<span class="price">' . $price . $sub . '</span></div>' . $ctl . '</div>'
+        . '</article>';
+}
+
 // Группа товара для витрины и сравнения — по корневому разделу каталога
 function bt_product_group(string $rootCode): string
 {
