@@ -16,8 +16,6 @@ $revN = count($reviews);
 $co = bt_contacts();
 $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
 ?>
-<div class="wrap">
-  <?php $APPLICATION->ShowViewContent('bt_crumbs') ?>
   <nav class="pnav" style="margin-top:18px">
     <a href="<?= $e($arResult['BT_PREV']['url'] ?? $back) ?>" id="pPrev"><span id="iPrev"><?= bt_icon('arrL') ?></span> Предыдущий товар</a>
     <a href="<?= $e($back) ?>">Вернуться в раздел</a>
@@ -153,6 +151,5 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
     <div class="grid g4" id="rec"><?php foreach ($arResult['BT_REC'] as $r) { echo bt_card($r); } ?></div>
   </section>
   <?php endif ?>
-</div>
 <script>window.BT_PAGE=<?= Json::encode(['id' => (string)$arResult['ID'], 'name' => $name, 'unit' => $unit, 'photos' => count($photos), 'reviews' => $reviews]) ?>;</script>
 <?php include __DIR__ . '/script.php';

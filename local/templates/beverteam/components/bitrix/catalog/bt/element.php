@@ -5,6 +5,8 @@
  * @var CBitrixComponent $component
  * @global CMain $APPLICATION
  */
+// обёртка и крошки здесь, а не в шаблоне товара: ShowViewContent внутри кешируемого шаблона теряет вывод
+?><div class="wrap"><?php $APPLICATION->ShowViewContent('bt_crumbs') ?><?php
 $APPLICATION->IncludeComponent('bitrix:catalog.element', 'bt', [
     'IBLOCK_TYPE' => $arParams['IBLOCK_TYPE'], 'IBLOCK_ID' => $arParams['IBLOCK_ID'],
     'ELEMENT_CODE' => $arResult['VARIABLES']['ELEMENT_CODE'], 'SECTION_CODE' => '',
@@ -16,5 +18,6 @@ $APPLICATION->IncludeComponent('bitrix:catalog.element', 'bt', [
     'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['element'],
     'COMPATIBLE_MODE' => 'N', 'HIDE_NOT_AVAILABLE' => 'N', 'CHECK_SECTION_ID_VARIABLE' => 'N',
 ], $component, ['HIDE_ICONS' => 'Y']);
+?></div><?php
 // крошки после компонента — в цепочке уже есть разделы и товар
 $APPLICATION->AddViewContent('bt_crumbs', $APPLICATION->GetNavChain(false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false));
