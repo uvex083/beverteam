@@ -1243,3 +1243,18 @@ input,textarea{caret-color:var(--ink)}
 .cop .err-form:empty{min-height:0;margin:0}
 @media(max-width:900px){.cop .co{grid-template-columns:1fr}.cop .sum{position:static}}
 @media(max-width:600px){.cop .blk{padding:18px}.cop .pill-tabs{display:flex;width:100%}.cop .pill-tabs button{flex:1;padding:8px 10px}}
+
+/* ---------- заказ принят (order-success.html) ---------- */
+.okp .ok{max-width:760px;margin:0 auto}
+.okp .ok__hd{text-align:center;padding:clamp(28px,4vw,48px) 0 24px}
+.okp .ok__hd .ic{width:72px;height:72px;border-radius:50%;background:var(--lime);display:grid;place-items:center;margin:0 auto 22px;font-size:30px}
+.okp .ok__hd p{color:var(--gray);margin:14px auto 0;max-width:46ch}
+.okp .num{font-family:'JetBrains Mono';font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:8px 16px;display:inline-block;margin-top:14px}
+.okp .payblk{background:var(--ink);color:#fff;border-radius:var(--rad);padding:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.okp .payblk b{font-family:Unbounded;font-size:22px;display:block}
+.okp .payblk small{color:#A8A8A0}
+.okp .next{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.okp .next div{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px}
+.okp .next b{display:block;font-size:14px;margin-bottom:4px}
+.okp .next span{font-size:13px;color:var(--gray)}
+@media(max-width:700px){.okp .next{grid-template-columns:1fr}.okp .dl{grid-template-columns:1fr;gap:4px}.okp .dl dd{margin-bottom:10px}}
