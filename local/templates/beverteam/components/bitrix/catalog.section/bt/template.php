@@ -10,9 +10,7 @@
     }
 } ?>
 </div>
-<?php if (!$arResult['ITEMS']): ?>
-  <p class="muted">По выбранным условиям товаров нет. <a class="link" href="?">Сбросить фильтр</a></p>
-<?php endif ?>
+<p class="muted" id="cardsEmpty"<?= $arResult['ITEMS'] ? ' style="display:none"' : '' ?>>По выбранным условиям товаров нет — снимите часть условий фильтра.</p>
 
 <section class="sec sec--s">
   <h2 class="display h2" style="margin-bottom:20px">Почему покупают у нас</h2>
