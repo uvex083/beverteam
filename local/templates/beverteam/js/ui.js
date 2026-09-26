@@ -283,7 +283,7 @@ window.BT_cmpUpdate = () => {
     if(pc) b.setAttribute('aria-pressed', BT_cmpHas(pc.dataset.pc)?'true':'false'); });
 };
 window.BT_cartItems = () => Object.keys(CART).map(id=>{const p=BT_find(id);return p?{...p,q:CART[id]}:null;}).filter(Boolean);
-window.BT_cartTotal = () => BT_cartItems().reduce((a,c)=>{a.n+=c.q;a.sum+=c.p*c.q;a.disc+=c.old?(c.old-c.p)*c.q:0;return a;},{n:0,sum:0,disc:0});
+window.BT_cartTotal = () => BT_cartItems().reduce((a,c)=>{const p=c.bulk?BT_tier(c,c.q).p:c.p;/* оптовая ступень, как в карточке */a.n+=c.q;a.sum+=p*c.q;a.disc+=c.old?(c.old-c.p)*c.q:0;return a;},{n:0,sum:0,disc:0});
 window.BT_cartSet = (id,q) => { if(q>0) CART[id]=q; else delete CART[id]; cartSave(); BT_cartUpdate(true); document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q}})); };
 window.BT_cartUpdate = pulse => {
   const t=BT_cartTotal(), a=document.querySelector('.hact[href="/personal/cart/"]'); if(!a) return;
