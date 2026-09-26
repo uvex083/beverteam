@@ -1479,7 +1479,7 @@ form[data-form]{position:relative}
 .rentp .cta{background:var(--lime);border-radius:var(--rad);padding:clamp(26px,3.4vw,44px);display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
 .rentp .cta p{margin:8px 0 0;max-width:44ch;color:#3B4310}
 .rentp .seo{font-size:14.5px;color:#4A515B;max-width:80ch}
-.rentp .seo h2{font-family:Unbounded;font-weight:700;font-size:22px;margin:0 0 12px}
+.rentp .seo h2{font-family:Unbounded;font-weight:700;font-size:22px;margin:0 0 12px;color:var(--ink)}
 .rentp .seo p{margin:0 0 12px}
 .rentp .faq{max-width:860px}
 .faq__a{overflow-x:auto}
