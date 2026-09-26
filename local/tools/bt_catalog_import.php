@@ -201,7 +201,7 @@ foreach ($products as $p) {
     CIBlockElement::SetPropertyValuesEx($id, $ibId, $props);
 
     // SEO со старого сайта
-    $seo = array_filter(['ELEMENT_META_TITLE' => $p['seo_title'] ?? '', 'ELEMENT_META_DESCRIPTION' => $p['meta_description'] ?? '']);
+    $seo = array_filter(['ELEMENT_META_TITLE' => $p['seo_title'] ?? '', 'ELEMENT_META_DESCRIPTION' => $p['meta_description'] ?? '', 'ELEMENT_META_KEYWORDS' => $p['meta_keywords'] ?? '']);
     if ($seo) {
         (new ElementTemplates($ibId, $id))->set($seo);
     }
@@ -226,6 +226,22 @@ foreach ($products as $p) {
     foreach ($bulk[$code] ?? [[null, null, $p['price']]] as [$from, $to, $price]) {
         $r = Price::add(['PRODUCT_ID' => $id, 'CATALOG_GROUP_ID' => $basePrice, 'PRICE' => $price, 'CURRENCY' => 'RUB', 'QUANTITY_FROM' => $from, 'QUANTITY_TO' => $to]);
         $r->isSuccess() or $fail("price $code: " . implode('; ', $r->getErrorMessages()));
+    }
+}
+
+// SEO разделов со старого сайта (настраивал сеошник): H1, title, description
+if (is_file($dir . 'sections.json')) {
+    foreach (json_decode(file_get_contents($dir . 'sections.json'), true) as $sec) {
+        $sid = $sections[basename($sec['code'])] ?? 0;
+        $seo = array_filter(['SECTION_PAGE_TITLE' => $sec['h1'] ?? '', 'SECTION_META_TITLE' => $sec['seo_title'] ?? '', 'SECTION_META_DESCRIPTION' => $sec['meta_description'] ?? '']);
+        if (!$sid || !$seo) {
+            continue;
+        }
+        if ($apply) {
+            (new \Bitrix\Iblock\InheritedProperty\SectionTemplates($catId, $sid))->set($seo);
+        } else {
+            echo "[show] SEO раздела {$sec['code']}: {$seo['SECTION_PAGE_TITLE']}\n";
+        }
     }
 }
 
