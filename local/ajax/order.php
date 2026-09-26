@@ -67,6 +67,24 @@ function bt_order_build(int $userId, int $ptId, string $loc, int $deliveryId, in
     return $order;
 }
 
+function bt_order_shipment(Sale\Order $order): Sale\Shipment
+{
+    foreach ($order->getShipmentCollection() as $s) {
+        if (!$s->isSystem()) {
+            return $s;
+        }
+    }
+    throw new \RuntimeException('no shipment');
+}
+
+function bt_order_payment(Sale\Order $order): Sale\Payment
+{
+    foreach ($order->getPaymentCollection() as $p) {
+        return $p;
+    }
+    throw new \RuntimeException('no payment');
+}
+
 $userId = $USER->IsAuthorized() ? (int)$USER->GetID() : 0;
 $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
@@ -76,7 +94,7 @@ $deliveries = [];
 $pays = [];
 if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->isEmpty()) {
     $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
-    $shipment = $probe->getShipmentCollection()->getNotSystemItems()->current();
+    $shipment = bt_order_shipment($probe);
     foreach (Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment) as $svc) {
         if ($svc instanceof Sale\Delivery\Services\EmptyDeliveryService) {
             continue;
@@ -84,13 +102,13 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
         $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
         $deliveries[$svc->getId()] = ['id' => $svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
-            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)$o->getShipmentCollection()->getNotSystemItems()->current()->getField('BASE_PRICE_DELIVERY')];
+            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY')];
     }
     if (!isset($deliveries[$delivery])) {
         $delivery = (int)array_key_first($deliveries);
     }
     $probe = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, 0);
-    foreach (Sale\PaySystem\Manager::getListWithRestrictions($probe->getPaymentCollection()->current()) as $ps) {
+    foreach (Sale\PaySystem\Manager::getListWithRestrictions(bt_order_payment($probe)) as $ps) {
         if ($ps['ACTIVE'] === 'Y' && $ps['ACTION_FILE'] !== 'inner') {
             $pays[(int)$ps['ID']] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE']];
         }
@@ -202,7 +220,7 @@ foreach ($order->getPropertyCollection() as $prop) {
     }
 }
 $order->doFinalAction(true);
-$order->getPaymentCollection()->current()->setField('SUM', $order->getPrice());
+bt_order_payment($order)->setField('SUM', $order->getPrice());
 $r = $order->save();
 if (!$r->isSuccess()) {
     $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ: ' . implode('; ', $r->getErrorMessages())]]);

@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       BT_toast('Проверьте выделенные поля'); ready();
     }).catch(()=>{sending=false;submit.textContent='Подтвердить заказ';sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
   });
-  renderDeliv(); renderPay(); calc();
+  renderDeliv(); renderPay(); ready(); calc();
 });
 </script>
 <?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
