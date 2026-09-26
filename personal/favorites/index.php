@@ -2,6 +2,7 @@
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
 $APPLICATION->SetTitle('Избранное');
+$APPLICATION->AddChainItem('Избранное');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 ?>
 <div class="wrap">
