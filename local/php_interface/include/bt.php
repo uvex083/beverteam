@@ -178,13 +178,13 @@ function bt_catalog_data(): array
 
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y'], false, false,
         ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'DETAIL_PAGE_URL', 'PREVIEW_PICTURE', 'IBLOCK_SECTION_ID']);
-    while ($o = $r->GetNextElement(false, false)) { // сырые значения: экранирует bt_card()
-        $f = $o->GetFields();
+    while ($o = $r->GetNextElement()) {
+        $f = $o->GetFields(); // сырые значения — в ключах с «~», экранирует bt_card()
         $pr = $o->GetProperties();
         $pl = $prices[$f['ID']] ?? [['kg' => 1, 'p' => 0]];
         $m = [
-            'id' => (string)$f['ID'], 'code' => $f['CODE'], 'url' => $f['DETAIL_PAGE_URL'], 'img' => $img($f['PREVIEW_PICTURE']),
-            'n' => $f['NAME'], 'p' => $pl[0]['p'], 'par' => (string)$pr['SHORT_DESC']['VALUE'], 'stock' => 1,
+            'id' => (string)$f['ID'], 'code' => $f['CODE'], 'url' => $f['~DETAIL_PAGE_URL'], 'img' => $img($f['PREVIEW_PICTURE']),
+            'n' => $f['~NAME'], 'p' => $pl[0]['p'], 'par' => (string)$pr['SHORT_DESC']['~VALUE'], 'stock' => 1,
         ];
         if ($pr['OLD_PRICE']['VALUE']) {
             $m['old'] = (float)$pr['OLD_PRICE']['VALUE'];

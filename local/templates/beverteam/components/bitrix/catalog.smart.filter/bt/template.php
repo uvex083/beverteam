@@ -19,7 +19,12 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
   </div>
   <div class="filters__body">
     <div class="row between fdesk" style="margin:0 0 6px"><b>Фильтр</b><a class="link" href="<?= $e($reset) ?>" style="font-size:12.5px">Сбросить</a></div>
-    <?php foreach ($arResult['ITEMS'] as $item):
+    <?php
+    // порядок групп как в макете: цена, фасовка, страна, вкус, действие…; «Метки» — в конце
+    $order = ['PRICE' => 0, 'NET_WEIGHT' => 1, 'PACKING' => 2, 'ROAST' => 3, 'COUNTRY' => 4, 'TEA_KIND' => 5, 'TASTE' => 6, 'EFFECT' => 7, 'PROCESSING' => 8, 'BADGES' => 99];
+    $items = $arResult['ITEMS'];
+    uasort($items, fn($a, $b) => ($order[isset($a['PRICE']) ? 'PRICE' : $a['CODE']] ?? 50) <=> ($order[isset($b['PRICE']) ? 'PRICE' : $b['CODE']] ?? 50));
+    foreach ($items as $item):
         if (isset($item['PRICE'])):
             $min = $item['VALUES']['MIN'];
             $max = $item['VALUES']['MAX'];
@@ -36,6 +41,10 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
         <?php continue;
         endif;
         $values = array_filter($item['VALUES'], fn($v) => empty($v['DISABLED']) || !empty($v['CHECKED']));
+        if ($item['CODE'] === 'NET_WEIGHT') { // вес по возрастанию: 50 г … 1 кг
+            $grams = fn($v) => (float)str_replace(',', '.', $v['VALUE']) * (str_contains($v['VALUE'], 'кг') ? 1000 : 1);
+            uasort($values, fn($a, $b) => $grams($a) <=> $grams($b));
+        }
         if (!$values || isset($values['MIN'])) {
             continue;
         }
