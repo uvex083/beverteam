@@ -260,7 +260,7 @@ $one('main_rent', [
 $one('main_service', [
     'CAPTION' => 'Сервисный центр', 'TITLE' => "Сервис кофемашин\nJetinno", 'HIGHLIGHT' => 'Jetinno',
     'SUBTITLE' => 'Ремонт и обслуживание автоматических кофемашин в офисах, кафе и на дому.',
-    'ITEMS' => [['Плановое ТО и чистка молочной системы', 'от 2 500 ₽'], ['Ремонт с заменой узлов', 'по смете'], ['Выезд инженера по Екатеринбургу', 'по заявке']],
+    'ITEMS' => [['Плановое ТО и чистка молочной системы', 'по запросу'], ['Ремонт с заменой узлов', 'по смете'], ['Выезд инженера по Екатеринбургу', 'по заявке']],
     'BTN_TEXT' => 'Услуги и прайс', 'BTN_LINK' => '/servis/#price', 'BTN2_TEXT' => 'Перейти в раздел «Сервис»', 'BTN2_LINK' => '/servis/',
 ], ['PREVIEW_PICTURE' => bt_pic_of('catalog', 'jetinno-jl36')]);
 $oromia = CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('catalog'), '=CODE' => 'botanica-efiopiya-oromiya'], false, false, ['ID'])->Fetch();
