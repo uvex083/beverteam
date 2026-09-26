@@ -1196,3 +1196,22 @@ input,textarea{caret-color:var(--ink)}
 .cmp__r .lbl{padding:10px 18px 0}
 .cmp__empty{text-align:center;padding:60px 20px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad)}
 @media(max-width:900px){.cmp__nav{display:none}.cc__ph{height:140px}.cc__ph img{max-height:124px}}
+
+/* ---------- корзина (cart.html) ---------- */
+.cartp .cartl{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+.cartp .cartl.is-empty{grid-template-columns:1fr}
+.cartp .ci{display:grid;grid-template-columns:90px 1fr auto;gap:18px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px;margin-bottom:12px}
+.cartp .ci__ph{height:90px;background:var(--paper);border-radius:12px;display:grid;place-items:center;padding:8px}
+.cartp .ci__ph img{max-height:74px;width:auto;mix-blend-mode:multiply}
+.cartp .ci h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.cartp .ci .par{font-size:12.5px;color:var(--gray);margin:0 0 8px}
+.cartp .ci__r{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:130px}
+.cartp .ci__r .del{background:none;border:0;color:var(--gray);font-size:12.5px;padding:0;cursor:pointer}
+.cartp .ci__r .del:hover{color:var(--err)}
+.cartp .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
+.cartp .sum .l{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#3A3A34}
+.cartp .sum .l.t{border-top:1px solid var(--line);margin-top:8px;padding-top:14px;font-weight:800;font-size:18px;color:var(--ink);font-family:Unbounded}
+.cartp .free{background:var(--lime-soft);border-radius:var(--rad-s);padding:10px 12px;font-size:13px;margin-bottom:12px}
+@media(max-width:900px){.cartp .cartl{grid-template-columns:1fr}.cartp .sum{position:static}.cartp .ci{grid-template-columns:70px 1fr}
+  .cartp .ci__ph{height:70px}.cartp .ci__ph img{max-height:56px}
+  .cartp .ci__r{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}}

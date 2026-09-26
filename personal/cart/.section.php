@@ -1,6 +1,3 @@
-<?
-$sSectionName = "Моя корзина";
-$arDirProperties = array(
-
-);
-?>
+<?php
+$sSectionName = 'Корзина';
+$arDirProperties = ['robots' => 'noindex, follow'];
