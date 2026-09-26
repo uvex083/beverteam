@@ -250,44 +250,14 @@ const IMG = {
 window.BT_IMG = IMG;
 
 /* товары — реальные данные с beverteam.ru */
-window.BT_PRODUCTS = {
-  coffee:[
-    {id:'oromia',img:IMG.oromia,n:'BOTANICA Эфиопия Оромия, 1 кг',p:2687,par:'Натуральная · Q 82,5 · чёрный чай, сухофрукты, лимон',stock:1,badges:['Хит'],sc:[['Плотность',75],['Кислотность',70]],bulk:[{kg:1,p:2687},{kg:5,p:2203},{kg:10,p:2090},{kg:20,p:1990},{kg:30,p:1940}]},
-    {id:'brazil',img:IMG.brazil,n:'BOTANICA Бразилия Суль-Де-Минас, 1 кг',p:2637,par:'Шоколад, орехи, какао · для эспрессо и капучино',stock:1,sc:[['Плотность',85],['Кислотность',35]],bulk:[{kg:1,p:2687},{kg:5,p:2203},{kg:10,p:2090},{kg:20,p:1990},{kg:30,p:1940}]},
-    {id:'milk',img:IMG.milk,n:'BOTANICA Милк, 1 кг',p:2582,par:'90% арабика / 10% робуста · для капучино и латте',stock:1,sc:[['Плотность',80],['Кислотность',40]],bulk:[{kg:1,p:2687},{kg:5,p:2203},{kg:10,p:2090},{kg:20,p:1990},{kg:30,p:1940}]},
-    {id:'smes',img:IMG.smes,n:'BOTANICA Эспрессо смесь, 1 кг',p:2557,par:'Шоколад, орехи · универсальная для офиса',stock:1,sc:[['Плотность',70],['Кислотность',50]],bulk:[{kg:1,p:2687},{kg:5,p:2203},{kg:10,p:2090},{kg:20,p:1990},{kg:30,p:1940}]},
-    {id:'vending',img:IMG.vending,n:'BOTANICA Вендинг, 1 кг',p:2467,par:'50% робуста · для автоматов и высокой нагрузки',stock:1,sc:[['Плотность',95],['Кислотность',20]],bulk:[{kg:1,p:2687},{kg:5,p:2203},{kg:10,p:2090},{kg:20,p:1990},{kg:30,p:1940}]}
-  ],
-  tea:[
-    {id:'earl',img:IMG.earl,n:'Черный чай Эрл Грей классик, 250 г',p:800,par:'Цейлон · цитрусовый, бергамот',stock:1,sc:[['Крепость',70],['Аромат',90]]},
-    {id:'assam',img:IMG.assam,n:'Ассам TGFOP, 500 г',p:1550,par:'Индия · солодовый · тонизирует',stock:1,sc:[['Крепость',90],['Аромат',60]]},
-    {id:'chabrec',img:IMG.chabrec,n:'Черный чай с чабрецом, 250 г',p:650,par:'Травяной · витаминизирует',stock:1,sc:[['Крепость',60],['Аромат',75]]},
-    {id:'taiga',img:IMG.taiga,n:'Черный чай «Таёжный», 250 г',p:945,par:'Ягодный · тонизирует',stock:1,sc:[['Крепость',65],['Аромат',85]]},
-    {id:'ivan',img:IMG.ivan,n:'Иван-чай чёрный гранулированный, 200 г',p:676,old:754,par:'Россия · травяной · витаминизирует',stock:1,badges:['Скидка'],sc:[['Крепость',55],['Аромат',70]]},
-    {id:'masala',img:IMG.masala,n:'Черный чай «Масала», 250 г',p:725,par:'Пряности · витаминизирует',stock:1,sc:[['Крепость',80],['Аромат',95]]},
-    {id:'sencha',img:IMG.earl,n:'Зелёный чай Сенча, 250 г',p:890,par:'Япония · травянистый, свежий',stock:1,sc:[['Крепость',45],['Аромат',70]]},
-    {id:'milkoolong',img:IMG.taiga,n:'Улун Молочный, 250 г',p:1120,par:'Китай · сливочный, мягкий',stock:1,sc:[['Крепость',50],['Аромат',95]]},
-    {id:'puer',img:IMG.assam,n:'Пуэр Шу выдержанный, 250 г',p:1340,par:'Китай · землистый, тонизирует',stock:1,sc:[['Крепость',95],['Аромат',65]]},
-    {id:'matcha',img:IMG.chabrec,n:'Матча церемониальная, 100 г',p:1550,par:'Япония · порошковый, умами',stock:1,badges:['Новинка'],sc:[['Крепость',85],['Аромат',80]]}
-  ],
-  machines:[
-    {id:'jl05',img:IMG.jl05,n:'Кофемашина Jetinno JL05',p:65000,par:'До 20 чашек/день · натуральное молоко',stock:0,badges:['Топ продаж'],pre:1},
-    {id:'jl36',img:IMG.jl36,n:'Кофемашина Jetinno JL36',p:127000,par:'До 200 чашек/день · автопромывка молочной системы',stock:0,badges:['Топ продаж'],pre:1},
-    {id:'jl32',img:IMG.jl32,n:'Кофемашина Jetinno JL32',p:259000,par:'Экран 10.1″ Android · зерно и растворимые',stock:0,badges:['Новинка'],pre:1},
-    {id:'jl15',img:IMG.jl15,n:'Кофемашина Jetinno JL15 VIVA',p:0,par:'До 60 чашек/день · тачскрин · капучинатор',stock:0,pre:1}
-  ],
-  rent:[
-    {id:'r05',img:IMG.jl05,n:'Аренда Jetinno JL05',p:3500,unit:'в месяц',par:'Дом и малый офис · до 20 чашек/день',stock:1,rent:1},
-    {id:'r15',img:IMG.jl15,n:'Аренда Jetinno JL15 VIVA',p:7500,unit:'в месяц',par:'Офис до 30 человек · до 60 чашек/день',stock:1,rent:1,badges:['Хит аренды']},
-    {id:'r36',img:IMG.jl36,n:'Аренда Jetinno JL36',p:11000,unit:'в месяц',par:'Кафе и HoReCa · до 200 чашек/день',stock:1,rent:1}
-  ]
-};
+// товары отдаёт сервер (header.php → bt_catalog_data)
+window.BT_PRODUCTS = window.BT_DATA || {coffee:[],tea:[],machines:[],acc:[],rent:[]};
 
 const fmt = n => n.toLocaleString('ru-RU')+' ₽';
 window.BT_fmt = fmt;
 
 /* ---------- корзина: состояние в localStorage, общее для всех страниц прототипа ---------- */
-const ALL = () => [].concat(BT_PRODUCTS.coffee,BT_PRODUCTS.tea,BT_PRODUCTS.machines,BT_PRODUCTS.rent);
+const ALL = () => Object.values(BT_PRODUCTS).flat();
 window.BT_find = id => ALL().find(x=>x.id===id);
 let CART;
 try{ CART = JSON.parse(localStorage.getItem('bt_cart')||'null'); }catch(e){ CART=null; }
@@ -399,8 +369,8 @@ window.BT_card = function(m){
       <button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">${I.heart}</button>
       ${m.rent?'':`<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">${I.compare}</button>`}
     </div>
-    <a class="pc__ph" href="/magazin/"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
-    <h3><a href="/magazin/" itemprop="url">${m.n}</a></h3>
+    <a class="pc__ph" href="${m.url}"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
+    <h3><a href="${m.url}" itemprop="url">${m.n}</a></h3>
     <p class="pc__par">${m.par}</p>
     ${scales}
     ${BT_packs(m)}
@@ -823,7 +793,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   function paintResults(q){
     const ql=q.toLowerCase();
-    const prods=[].concat(BT_PRODUCTS.coffee,BT_PRODUCTS.tea,BT_PRODUCTS.machines,BT_PRODUCTS.rent)
+    const prods=Object.values(BT_PRODUCTS).flat()
       .filter(m=>(m.n+' '+m.par).toLowerCase().includes(ql)).slice(0,6);
     const pages=PAGES.filter(p=>(p.t+' '+p.d).toLowerCase().includes(ql)).slice(0,4);
     const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead).toLowerCase().includes(ql)).slice(0,3);
@@ -834,7 +804,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     sinner.innerHTML=`<div class="srch__grid"><div>
       ${prods.length?`<h4>Товары · ${prods.length}</h4><div class="sres">${prods.map(m=>
-        `<a href="/magazin/"><img src="${m.img}" alt="" loading="lazy"><span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
+        `<a href="${m.url}"><img src="${m.img}" alt="" loading="lazy"><span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
       ${pages.length?`<h4>Разделы</h4><div class="sres">${pages.map(p=>
         `<a href="${p.u}"><span><span class="n">${mark(p.t,q)}</span><span class="p">${esc(p.d)}</span></span></a>`).join('')}</div>`:''}
       ${posts.length?`<h4>Журнал</h4><div class="sres">${posts.map(p=>
@@ -1220,8 +1190,9 @@ window.BT_SPECS = {
 };
 window.BT_cmpCat = id => BT_PRODUCTS.coffee.some(x=>x.id===id)?'coffee'
   : BT_PRODUCTS.tea.some(x=>x.id===id)?'tea'
-  : BT_PRODUCTS.machines.some(x=>x.id===id)?'machines':'other';
-window.BT_CAT_NAMES = {coffee:'Кофе',tea:'Чай',machines:'Кофемашины',other:'Прочее'};
+  : BT_PRODUCTS.machines.some(x=>x.id===id)?'machines'
+  : (BT_PRODUCTS.acc||[]).some(x=>x.id===id)?'acc':'other';
+window.BT_CAT_NAMES = {coffee:'Кофе',tea:'Чай',machines:'Кофемашины',acc:'Аксессуары',other:'Прочее'};
 
 /* ---------- появление блоков при скролле (только там, где расставлены data-rv) ---------- */
 (function(){

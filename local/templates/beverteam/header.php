@@ -1,10 +1,14 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 
 use Bitrix\Main\Page\Asset;
+use Bitrix\Main\Page\AssetLocation;
+use Bitrix\Main\Web\Json;
 
 /** @global CMain $APPLICATION */
 $co = bt_contacts();
 $asset = Asset::getInstance();
+// товары для поиска, корзины и сравнения в ui.js — до подключения скриптов
+$asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';</script>', false, AssetLocation::AFTER_CSS);
 $asset->addCss(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.css');
 $asset->addCss(SITE_TEMPLATE_PATH . '/css/ui.css');
 $asset->addJs(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.js');
