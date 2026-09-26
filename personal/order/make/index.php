@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     sDel.textContent=!sel?'—':cdek?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total)+(cdek?' + доставка':'');
     const p=PAYS.find(x=>x.id===payId);
-    sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.toLowerCase()):''}`:'&nbsp;';
+    sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
   let last=null;
   function calc(again){

@@ -73,7 +73,7 @@ if (!$order) {
       <span class="num">Заказ № <?= $e($order->getField('ACCOUNT_NUMBER')) ?> · <?= $e(FormatDate('j F Y, H:i', $date->getTimestamp())) ?></span>
     </div>
 
-    <div class="payblk"><div><small>Способ оплаты: <?= $e(mb_strtolower($payment ? $payment->getPaymentSystemName() : '')) ?></small>
+    <div class="payblk"><div><small>Способ оплаты: <?php $pn = $payment ? $payment->getPaymentSystemName() : ''; echo $e(mb_strtolower(mb_substr($pn, 0, 1)) . mb_substr($pn, 1)) ?></small>
       <b><?= bt_fmt($order->getPrice()) ?><?= $dCode === 'bt_cdek' ? ' + доставка' : '' ?></b>
       <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : 'оплата при получении заказа' ?></small></div></div>
 
