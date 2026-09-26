@@ -77,9 +77,12 @@ switch ((string)$req->getPost('action')) {
             $hint = mb_substr($email, 0, 1) . '***' . mb_substr($email, mb_strpos($email, '@'));
         }
 
-        $left = WAIT - (time() - (int)($A['sent'] ?? 0));
-        if ($left > 0 || $count('BT_AUTH_SEND', ['=ITEM_ID' => md5($email)], WAIT)) {
-            $out(['ok' => false, 'wait' => max($left, 1), 'message' => 'Код уже отправлен. Повторить можно через ' . max($left, 1) . ' с.'], 429);
+        // пауза между письмами — и в этой сессии, и для этого e-mail из любой другой
+        $last = EventLogTable::getList(['filter' => ['=AUDIT_TYPE_ID' => 'BT_AUTH_SEND', '=ITEM_ID' => md5($email)], 'select' => ['TIMESTAMP_X'],
+            'order' => ['ID' => 'DESC'], 'limit' => 1])->fetch();
+        $left = max(WAIT - (time() - (int)($A['sent'] ?? 0)), $last ? WAIT - (time() - $last['TIMESTAMP_X']->getTimestamp()) : 0);
+        if ($left > 0) {
+            $out(['ok' => false, 'wait' => $left, 'message' => 'Код уже отправлен. Повторить можно через ' . $left . ' с.'], 429);
         }
         if ($count('BT_AUTH_SEND', ['=REMOTE_ADDR' => $ip], 3600) >= 10 || $count('BT_AUTH_SEND', ['=ITEM_ID' => md5($email)], 3600) >= 6
             || $count('BT_AUTH_SEND', ['=ITEM_ID' => md5($email)], 86400) >= 20) {
