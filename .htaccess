@@ -12,12 +12,6 @@ ErrorDocument 404 /404.php
   RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization}]
 </IfModule>
 
-# тестовые домены закрыты от индексации, боевой домен не затрагивается
-<IfModule mod_headers.c>
-  SetEnvIfNoCase Host "\.na4u\.ru$" BT_DEV
-  Header always set X-Robots-Tag "noindex, nofollow" env=BT_DEV
-</IfModule>
-
 <IfModule mod_dir.c>
   DirectoryIndex index.php index.html
 </IfModule>
