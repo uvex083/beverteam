@@ -260,7 +260,9 @@ window.BT_fmt = fmt;
 const ALL = () => Object.values(BT_PRODUCTS).flat();
 window.BT_find = id => ALL().find(x=>x.id===id);
 let CART;
-try{ CART = JSON.parse(localStorage.getItem('bt_cart')||'null'); }catch(e){ CART=null; }
+// корзина Битрикса — источник истины (header.php → BT_BASKET), localStorage — только запасной вариант
+if(window.BT_BASKET) CART = Object.assign({}, window.BT_BASKET.items);
+else { try{ CART = JSON.parse(localStorage.getItem('bt_cart')||'null'); }catch(e){ CART=null; } }
 if(!CART) CART = {};
 window.BT_CART = CART;
 const cartSave = () => { try{ localStorage.setItem('bt_cart',JSON.stringify(CART)); }catch(e){} };
@@ -298,7 +300,22 @@ window.BT_cmpUpdate = () => {
 };
 window.BT_cartItems = () => Object.keys(CART).map(id=>{const p=BT_find(id);return p?{...p,q:CART[id]}:null;}).filter(Boolean);
 window.BT_cartTotal = () => BT_cartItems().reduce((a,c)=>{const p=c.bulk?BT_tier(c,c.q).p:c.p;/* оптовая ступень, как в карточке */a.n+=c.q;a.sum+=p*c.q;a.disc+=c.old?(c.old-c.p)*c.q:0;return a;},{n:0,sum:0,disc:0});
-window.BT_cartSet = (id,q) => { if(q>0) CART[id]=q; else delete CART[id]; cartSave(); BT_cartUpdate(true); document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q}})); };
+window.BT_cartSet = (id,q) => { const was=CART[id]||0;
+  if(q>0) CART[id]=q; else delete CART[id]; cartSave(); BT_cartUpdate(true); document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q}}));
+  BT_cartSync(id,q,was); };
+/* запись в корзину Битрикса; не приняли — откатываем количество на экране */
+window.BT_cartSync = (id,q,was) => {
+  const fd=new FormData(); fd.append('action','set'); fd.append('id',id); fd.append('q',q);
+  fd.append('sessid',window.BX&&BX.bitrix_sessid?BX.bitrix_sessid():'');
+  return fetch('/local/ajax/cart.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
+    if(!d.ok) throw new Error(d.error||'cart');
+    window.BT_BASKET={items:d.items,sum:d.sum};
+  }).catch(()=>{
+    if(was>0) CART[id]=was; else delete CART[id]; cartSave(); BT_cartUpdate(false);
+    document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q:was}}));
+    BT_toast('Не получилось обновить корзину — попробуйте ещё раз');
+  });
+};
 window.BT_cartUpdate = pulse => {
   const t=BT_cartTotal(), a=document.querySelector('.hact[href="/personal/cart/"]'); if(!a) return;
   const c=a.querySelector('.cnt'); if(c) c.textContent=t.n;
@@ -987,6 +1004,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   };
   // карточки приходят с сервера в состоянии «не в корзине» — подтягиваем степперы по корзине
   Object.keys(CART).forEach(rerender);
+  // корзина изменилась не отсюда (откат после ошибки сервера, другая вкладка кода) — перерисовать карточку
+  document.addEventListener('bt:cart',e=>{ if(e.detail) rerender(e.detail.id); });
   document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||!b.closest('.pc'))return;
     const id=b.dataset.add; BT_cartSet(id,(CART[id]||0)+1); rerender(id);});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-packs] button');if(!b)return;

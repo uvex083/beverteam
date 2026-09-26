@@ -128,6 +128,22 @@ function bt_card(array $m): string
         . '</article>';
 }
 
+// Состояние корзины Битрикса для ui.js: {items: {ID товара: количество}, sum}
+function bt_basket_state(?\Bitrix\Sale\BasketBase $basket = null): array
+{
+    if (!Loader::includeModule('sale')) {
+        return ['items' => [], 'sum' => 0];
+    }
+    $basket ??= \Bitrix\Sale\Basket::loadItemsForFUser(\Bitrix\Sale\Fuser::getId(), SITE_ID);
+    $items = [];
+    foreach ($basket as $bi) {
+        if ($bi->canBuy() && !$bi->isDelay()) {
+            $items[(string)$bi->getProductId()] = (float)$bi->getQuantity();
+        }
+    }
+    return ['items' => (object)$items, 'sum' => (float)$basket->getPrice()];
+}
+
 // Мегаменю «Каталог»: корневые разделы с подразделами и промо-товаром + аренда; формат CATS из ui.js
 function bt_mega_cats(): array
 {
