@@ -1,5 +1,5 @@
 <?
-$sSectionName = "Главная страница";
+$sSectionName = "Главная";
 $arDirProperties = array(
    "description" => "BEVERTEAM — кофе собственной обжарки BOTANICA, кофемашины Jetinno: продажа, аренда, ремонт и сервисное обслуживание в Екатеринбурге.",
    "keywords" => "аренда кофемашин Екатеринбург, ремонт кофемашин, Jetinno, кофе BOTANICA",

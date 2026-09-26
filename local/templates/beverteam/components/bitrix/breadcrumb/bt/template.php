@@ -4,12 +4,12 @@
 if (empty($arResult)) {
     return '';
 }
-$items = array_merge([['TITLE' => 'Главная', 'LINK' => '/']], $arResult);
+$items = $arResult; // первый пункт цепочки — «Главная» из корневого .section.php
 $last = count($items) - 1;
 $html = '<nav class="crumbs" aria-label="Хлебные крошки">';
 foreach ($items as $i => $it) {
     $title = htmlspecialcharsbx($it['TITLE']);
-    $html .= $i === 0 ? '<a href="/">' . $title . '</a>'
+    $html .= $i === 0 ? '<a href="' . htmlspecialcharsbx($it['LINK'] ?: '/') . '">' . $title . '</a>'
         : '<span>' . ($i < $last && $it['LINK'] ? '<a href="' . htmlspecialcharsbx($it['LINK']) . '">' . $title . '</a>' : $title) . '</span>';
 }
 return $html . '</nav>';

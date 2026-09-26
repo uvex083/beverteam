@@ -173,6 +173,8 @@ foreach ($products as $p) {
     ];
     if (!$isRent) {
         $fields['IBLOCK_SECTION_ID'] = $sections[$secCode] ?? $fail("нет раздела $secCode для $code");
+        // товар бывает в нескольких разделах (улуны — и в «Зелёном чае»), основной — первый
+        $fields['IBLOCK_SECTION'] = array_values(array_unique(array_map(fn($c) => $sections[basename($c)] ?? $fail("нет раздела $c"), $p['sections'])));
     }
 
     $ex = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code], false, false, ['ID', 'DETAIL_PICTURE'])->Fetch();
