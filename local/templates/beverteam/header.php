@@ -8,7 +8,8 @@ use Bitrix\Main\Web\Json;
 $co = bt_contacts();
 $asset = Asset::getInstance();
 // товары для поиска, корзины и сравнения в ui.js — до подключения скриптов
-$asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';window.BT_CATS=' . Json::encode(bt_mega_cats()) . ';window.BT_BASKET=' . Json::encode(bt_basket_state()) . ';</script>', false, AssetLocation::AFTER_CSS);
+$asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';window.BT_CATS=' . Json::encode(bt_mega_cats()) . ';window.BT_BASKET=' . Json::encode(bt_basket_state()) . ';window.BT_POSTS=' . Json::encode(bt_posts())
+    . ';window.BT_UTP=' . Json::encode(array_map(fn($u) => [$u['icon'], $u['name'], $u['text']], bt_list('main_utp_items'))) . ';</script>', false, AssetLocation::AFTER_CSS);
 $asset->addCss(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.css');
 $asset->addCss(SITE_TEMPLATE_PATH . '/css/ui.css');
 $asset->addJs(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.js');
@@ -75,7 +76,18 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
       <a href="mailto:<?= $co['email'] ?? '' ?>" style="font-size:13.5px;font-weight:600"><?= $co['email'] ?? '' ?></a>
       <span class="muted" style="font-size:12.5px"><?= $co['zip'] ?? '' ?>, <?= $co['city'] ?? '' ?>, <?= $co['street'] ?? '' ?> · <?= $co['hours'] ?? '' ?></span>
       <?= $msgr('msgr--lg') ?>
-      <a class="btn btn--block" href="/kontakty/#form">Оставить заявку</a>
+      <a class="btn btn--block" href="/kontakty/#form" data-lead="Оставить заявку">Оставить заявку</a>
     </div>
   </div>
 </div>
+<?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): // текстовые страницы для покупателей: крошки, заголовок, боковое меню ?>
+<div class="wrap infop">
+  <?php $APPLICATION->AddBufferContent([$APPLICATION, 'GetNavChain'], false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false) ?>
+  <div class="pagehead"><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1></div>
+  <div class="info-l">
+    <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_info', [
+        'ROOT_MENU_TYPE' => 'info', 'MAX_LEVEL' => 1, 'USE_EXT' => 'N',
+        'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
+    ], false, ['HIDE_ICONS' => 'Y']) ?>
+    <div class="prose">
+<?php endif ?>

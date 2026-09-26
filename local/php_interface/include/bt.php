@@ -321,3 +321,247 @@ function bt_catalog_data(): array
     $cache->endDataCache($data);
     return $data;
 }
+
+// Блок страницы из одноэлементного инфоблока (главная, «О компании»): поля по коду свойства в нижнем регистре
+function bt_block(string $code): array
+{
+    $ibId = bt_iblock($code);
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_block_' . $code, '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $b = [];
+    $el = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, ['nTopCount' => 1], ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_PICTURE'])->GetNextElement();
+    if ($el) {
+        $f = $el->GetFields();
+        $b['pic'] = $f['PREVIEW_PICTURE'] ? \CFile::GetPath($f['PREVIEW_PICTURE']) : '';
+        $b['pic_id'] = (int)$f['PREVIEW_PICTURE'];
+        foreach ($el->GetProperties() as $pc => $p) {
+            $k = strtolower($pc);
+            if ($p['PROPERTY_TYPE'] === 'F') {
+                $b[$k] = $p['VALUE'] ? \CFile::GetPath($p['VALUE']) : '';
+            } elseif ($p['MULTIPLE'] === 'Y') {
+                $b[$k] = [];
+                foreach ((array)$p['~VALUE'] as $i => $v) {
+                    $b[$k][] = [trim((string)$v), trim((string)($p['~DESCRIPTION'][$i] ?? ''))];
+                }
+            } elseif (($p['USER_TYPE'] ?? '') === 'HTML') {
+                $b[$k] = trim((string)($p['~VALUE']['TEXT'] ?? ''));
+            } else {
+                $b[$k] = trim((string)$p['~VALUE']);
+            }
+        }
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($b);
+    return $b;
+}
+
+// Карточки спискового инфоблока: название, текст анонса, картинка, иконка
+function bt_list(string $code): array
+{
+    $ibId = bt_iblock($code);
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_list_' . $code, '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $hasIcon = (bool)\CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'ICON'])->Fetch();
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false,
+        array_merge(['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_TEXT_TYPE', 'PREVIEW_PICTURE'], $hasIcon ? ['PROPERTY_ICON'] : []));
+    while ($f = $r->GetNext()) {
+        $list[] = [
+            'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
+            'pic' => $f['PREVIEW_PICTURE'] ? \CFile::GetPath($f['PREVIEW_PICTURE']) : '',
+            'icon' => bt_svg((int)($f['PROPERTY_ICON_VALUE'] ?? 0)),
+        ];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
+    return $list;
+}
+
+// Иконка из файла: SVG встраиваем (цвет — от родителя через currentColor), PNG — картинкой
+function bt_svg(int $fileId): string
+{
+    $path = $fileId ? (string)\CFile::GetPath($fileId) : '';
+    if ($path === '') {
+        return '';
+    }
+    if (strtolower(pathinfo($path, PATHINFO_EXTENSION)) !== 'svg') {
+        return '<img src="' . htmlspecialcharsbx($path) . '" alt="" width="24" height="24">';
+    }
+    $svg = (string)@file_get_contents($_SERVER['DOCUMENT_ROOT'] . $path);
+    $svg = preg_replace(['/<\?xml.*?\?>|<!--.*?-->|<script.*?<\/script>/si', '/\son\w+="[^"]*"/i'], '', $svg);
+    $svg = preg_replace('/\s(fill|stroke)="(?!none|currentColor)[^"]*"/i', ' $1="currentColor"', $svg);
+    return preg_replace('/<svg\b/i', '<svg aria-hidden="true" focusable="false"', trim($svg), 1);
+}
+
+// Кнопка блока: ссылка #zayavka открывает попап заявки с темой = текст кнопки
+function bt_btn(string $text, string $link, string $cls = 'btn', string $attrs = ''): string
+{
+    if ($text === '') {
+        return '';
+    }
+    $e = fn($s) => htmlspecialcharsbx($s);
+    if ($link === '#zayavka') {
+        return '<a class="' . $cls . '" href="/kontakty/#form" data-lead="' . $e($text) . '"' . $attrs . '>' . $e($text) . '</a>';
+    }
+    return '<a class="' . $cls . '" href="' . $e($link ?: '#') . '"' . $attrs . '>' . $e($text) . '</a>';
+}
+
+// Заголовок блока: переносы строк из поля, выделенная часть — в теге $tag
+function bt_title(string $title, string $mark = '', string $tag = 'em'): string
+{
+    $h = nl2br(htmlspecialcharsbx($title), false);
+    if ($mark !== '') {
+        $m = htmlspecialcharsbx($mark);
+        $pos = mb_strpos($h, $m);
+        if ($pos !== false) {
+            $h = mb_substr($h, 0, $pos) . "<$tag>" . $m . "</$tag>" . mb_substr($h, $pos + mb_strlen($m));
+        }
+    }
+    return $h;
+}
+
+// Материалы журнала для поиска в шапке и карточек: формат BT_POSTS из ui.js
+function bt_posts(): array
+{
+    $ibId = bt_iblock('journal');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_posts', '/bt/journal')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/journal');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $posts = [];
+    $r = \CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC', 'SORT' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false,
+        ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
+    while ($f = $r->GetNext()) {
+        $posts[] = bt_post_data($f);
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($posts);
+    return $posts;
+}
+
+// Поля элемента журнала (выборка с PROPERTY_KIND/RUBRIC/READ_TIME) → формат BT_POSTS
+function bt_post_data(array $f): array
+{
+    $kind = 'article';
+    if (!empty($f['PROPERTY_KIND_ENUM_ID'])) {
+        $kind = \CIBlockPropertyEnum::GetByID($f['PROPERTY_KIND_ENUM_ID'])['XML_ID'] ?? 'article';
+    }
+    $date = $f['ACTIVE_FROM'] ?: $f['DATE_CREATE'];
+    return [
+        'id' => $f['CODE'], 'kind' => $kind, 'cat' => ($f['~PROPERTY_RUBRIC_VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'),
+        'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $f['~NAME'], 'lead' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
+        'min' => (int)($f['PROPERTY_READ_TIME_VALUE'] ?? 0), 'url' => $f['~DETAIL_PAGE_URL'],
+        'img' => $f['PREVIEW_PICTURE'] ? (\CFile::ResizeImageGet($f['PREVIEW_PICTURE'], ['width' => 1040, 'height' => 650], BX_RESIZE_IMAGE_EXACT)['src'] ?? '') : '',
+    ];
+}
+
+function bt_date_ru(string $iso): string
+{
+    $m = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    $t = strtotime($iso);
+    return $t ? date('j', $t) . ' ' . $m[date('n', $t) - 1] . ' ' . date('Y', $t) : '';
+}
+
+// Карточка журнала — серверная копия BT_postCard() из ui.js; без фото — фирменная заглушка (рисует BT_phFit)
+function bt_post_card(array $p): string
+{
+    $e = fn($s) => htmlspecialcharsbx((string)$s);
+    $img = $p['img'] ? '<img src="' . $e($p['img']) . '" alt="' . $e($p['t']) . '" loading="lazy" width="520" height="325">'
+        : '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-ph="' . $e($p['cat']) . '" data-ph-t="' . $e($p['t']) . '" alt="' . $e($p['t']) . '" width="520" height="325">';
+    return '<a class="ncard" href="' . $e($p['url']) . '">' . $img
+        . '<div class="ncard__b"><div class="ncard__m"><span class="tag">' . $e($p['cat']) . '</span><time datetime="' . $e($p['d']) . '">' . bt_date_ru($p['d']) . '</time>'
+        . ($p['kind'] === 'news' ? '<span class="tag tag--n">Новость</span>' : '') . '</div>'
+        . '<h3>' . $e($p['t']) . '</h3><p>' . $e($p['lead']) . '</p></div></a>';
+}
+
+// Модели аренды для главной: подбор на первом экране и «кофе по подписке»
+function bt_rent_models(): array
+{
+    $ibId = bt_iblock('rent');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_rent_models', '/bt/catalog')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/catalog');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false,
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG', 'PROPERTY_MACHINE']);
+    while ($f = $r->Fetch()) {
+        $m = $f['PROPERTY_MACHINE_VALUE'] ? bt_product((string)$f['PROPERTY_MACHINE_VALUE']) : null;
+        $list[] = [
+            'model' => trim(preg_replace('/^Кофемашина\s+|\s+Аренда$/u', '', $m['n'] ?? $f['NAME'])),
+            'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'],
+            'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'],
+            'img' => $f['PREVIEW_PICTURE'] ? (\CFile::ResizeImageGet($f['PREVIEW_PICTURE'], ['width' => 600, 'height' => 600], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'] ?? '') : ($m['img'] ?? ''),
+        ];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
+    return $list;
+}
+
+// Плитка разделов на главной: корневые разделы каталога с картинкой раздела + аренда
+function bt_home_tiles(): array
+{
+    $catId = bt_iblock('catalog');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_home_tiles', '/bt/catalog')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/catalog');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $catId);
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('rent'));
+    $plural = fn(int $n, array $w) => $n . ' ' . $w[($n % 10 === 1 && $n % 100 !== 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
+    $tiles = [];
+    $r = \CIBlockSection::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'DEPTH_LEVEL' => 1, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'PICTURE', 'SECTION_PAGE_URL', 'LEFT_MARGIN', 'RIGHT_MARGIN']);
+    while ($s = $r->GetNext()) {
+        $subs = (int)(($s['RIGHT_MARGIN'] - $s['LEFT_MARGIN'] - 1) / 2);
+        $tiles[] = [
+            'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'],
+            'img' => $s['PICTURE'] ? (\CFile::ResizeImageGet($s['PICTURE'], ['width' => 400, 'height' => 300], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'] ?? '') : '',
+            'note' => $subs ? $plural($subs, ['категория', 'категории', 'категорий']) : $plural((int)$s['ELEMENT_CNT'], ['модель', 'модели', 'моделей']),
+        ];
+    }
+    $rent = bt_rent_models();
+    if ($rent) {
+        // аренда — после кофемашин, как в меню
+        array_splice($tiles, min(3, count($tiles)), 0, [[
+            'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'],
+            'note' => 'от ' . bt_fmt(min(array_column($rent, 'price'))) . '/мес',
+        ]]);
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($tiles);
+    return $tiles;
+}
+
+// Хвост формы заявки: sessid, ловушка для ботов, согласие, кнопка — одинаково во всех формах
+function bt_form_tail(string $btn = 'Отправить заявку'): string
+{
+    return '<input type="hidden" name="sessid" value="' . bitrix_sessid() . '">'
+        . '<div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>'
+        . '<label class="check check--top" style="margin-bottom:16px"><input type="checkbox" name="agree" value="Y"> <span>Я ознакомлен(а) с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">политикой конфиденциальности</a></span></label>'
+        . '<button class="btn btn--block" type="submit">' . htmlspecialcharsbx($btn) . '</button>';
+}

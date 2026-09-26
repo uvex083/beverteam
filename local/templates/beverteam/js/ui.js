@@ -39,47 +39,9 @@ const IDP=[
 window.BT_IDP=IDP;
 
 /* ---------- Журнал: новости и статьи в одном инфоблоке, рубрика решает раздел ---------- */
-window.BT_POSTS=[
-  {id:'lungo',    kind:'article', cat:'Приготовление', d:'2026-09-11', t:'Что такое австралийский лунго',
-   lead:'Популярный напиток с кофейного чемпионата: чем отличается от обычного лунго и как повторить его на автомате.', img:'catCoffee', min:6},
-  {id:'office-norm',kind:'article',cat:'Для бизнеса', d:'2026-09-04', t:'Сколько кофе нужно офису на 30 человек',
-   lead:'Считаем расход зерна на месяц, разбираем пиковые часы и объясняем, почему 8 граммов на чашку это не догма.', img:'jl15', min:7},
-  {id:'grounds',  kind:'article', cat:'Уход',          d:'2026-08-28', t:'Куда девать кофейную гущу',
-   lead:'От смягчения воды до ухода за кофемашиной: что делать с жмыхом вместо того, чтобы выбрасывать.', img:'catMach', min:4},
-  {id:'descale',  kind:'article', cat:'Уход',          d:'2026-08-21', t:'Декальцинация: как часто и чем',
-   lead:'Жёсткость воды в Екатеринбурге, признаки накипи и почему лимонная кислота убивает термоблок.', img:'drawing', min:5},
-  {id:'cupping',  kind:'article', cat:'Обжарка',       d:'2026-08-14', t:'Что такое каппинг и зачем он покупателю',
-   lead:'Как профессионалы дегустируют кофе и что означает Q-оценка на упаковке.', img:'catTea', min:8},
-  {id:'grind',    kind:'article', cat:'Приготовление', d:'2026-08-07', t:'Помол: как настроить за пять минут',
-   lead:'Кофе горчит или течёт водой. Разбираем, в какую сторону крутить жернова и почему менять надо по одному делению.', img:'jl05', min:6},
-  {id:'milk-foam',kind:'article', cat:'Приготовление', d:'2026-07-31', t:'Почему не взбивается молоко',
-   lead:'Жирность, температура, чистота капучинатора и растительные альтернативы: что реально влияет на пену.', img:'milk', min:5},
-  {id:'rent-vs-buy',kind:'article',cat:'Для бизнеса',  d:'2026-07-24', t:'Аренда или покупка кофемашины: считаем на цифрах',
-   lead:'Сравниваем три года владения JL15 с арендой при том же объёме кофе. Где точка окупаемости.', img:'jl36', min:9},
-  {id:'water',    kind:'article', cat:'Уход',          d:'2026-07-17', t:'Вода решает больше, чем зерно',
-   lead:'Жёсткость, TDS и фильтры: почему один и тот же кофе в двух офисах вкусный и невкусный.', img:'catAcc', min:6},
-  {id:'storage',  kind:'article', cat:'Обжарка',       d:'2026-07-10', t:'Как хранить зерно, чтобы не потерять аромат',
-   lead:'Дегазация, клапан на пачке, холодильник и вакуум. Что работает, а что миф.', img:'oromia', min:4},
-  {id:'robusta',  kind:'article', cat:'Обжарка',       d:'2026-07-03', t:'Робуста не враг: когда она нужна',
-   lead:'Крема, кофеин и цена. Почему в вендинге и офисе купаж с робустой часто честнее чистой арабики.', img:'vending', min:5},
-  {id:'tea-office',kind:'article',cat:'Для бизнеса',   d:'2026-06-26', t:'Чай в офисе: что брать, кроме пакетиков',
-   lead:'Развесной чай, фасовка и хранение. Как перейти на нормальный чай без лишней возни.', img:'earl', min:5},
-  {id:'horeca',   kind:'article', cat:'Для бизнеса',   d:'2026-06-19', t:'Кофе для кафе: как выбрать смесь под меню',
-   lead:'Под эспрессо, под молочные, под альтернативу. Разбираем, что ставить в рожок, если гость пьёт всё подряд.', img:'smes', min:7},
-  {id:'jl36-news',kind:'news',    cat:'Оборудование',  d:'2026-09-08', t:'Jetinno JL36 снова в наличии',
-   lead:'Партия пришла на склад в Екатеринбурге. Доступна в аренду и в продажу, установка за три дня.', img:'jl36', min:2},
-  {id:'oromia-lot',kind:'news',   cat:'Обжарка',       d:'2026-08-26', t:'Новый лот Эфиопия Оромия, Q 82,5',
-   lead:'Обжарили свежую партию натуральной обработки. Ноты чёрного чая, сухофруктов и лимона.', img:'oromiaL', min:2},
-  {id:'sub-start',kind:'news',    cat:'Компания',      d:'2026-08-12', t:'Запустили кофе по подписке',
-   lead:'Зерно приезжает по графику, кофемашина в аренду бесплатно при заказе от 3 кг в месяц.', img:'jl05', min:3},
-  {id:'delivery', kind:'news',    cat:'Компания',      d:'2026-07-29', t:'Бесплатная доставка теперь от 3 000 ₽',
-   lead:'Снизили порог по Екатеринбургу. В регионы по-прежнему СДЭК, Boxberry и Яндекс Доставка.', img:'hero', min:1},
-  {id:'service-brands',kind:'news',cat:'Сервис',       d:'2026-07-15', t:'Ремонтируем не только Jetinno',
-   lead:'Добавили в сервис Saeco, Jura, Nuova Simonelli, WMF и De Longhi. Диагностика по-прежнему бесплатно.', img:'drawing', min:2},
-  {id:'hours',    kind:'news',    cat:'Компания',      d:'2026-06-30', t:'График работы в летний период',
-   lead:'Как работают склад, доставка и сервисный центр в июле и августе.', img:'catCoffee', min:1}
-];
-window.BT_postUrl = p => '/news/'+p.id+'/';
+// материалы журнала отдаёт сервер (header.php → bt_posts)
+window.BT_POSTS=window.BT_POSTS||[];
+window.BT_postUrl = p => p.url||'/news/'+p.id+'/';
 
 /* Фирменная заглушка вместо фото: SVG в data-URI, не зависит от внешних картинок.
    Используется, пока клиент не пришлёт реальные снимки. */
@@ -125,7 +87,7 @@ addEventListener('resize',()=>{clearTimeout(window.__phT);window.__phT=setTimeou
 window.BT_postDate = iso => { const d=new Date(iso), M=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear(); };
 window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}">
-    <img src="${BT_ph(p.cat,p.t)}" data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}" alt="${p.t}" loading="lazy" width="520" height="325">
+    <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="325">
     <div class="ncard__b"><div class="ncard__m"><span class="tag">${p.cat}</span><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'?'<span class="tag tag--n">Новость</span>':''}</div>
     <h3>${p.t}</h3><p>${p.lead}</p></div></a>`;
 
@@ -210,15 +172,10 @@ const msgrHtml = (cls) => `<div class="msgr ${cls||''}">${CO.msg.map(m=>`<a href
 window.BT_msgr = msgrHtml;
 
 /* УТП — единый блок для главной и категорий («добавить блок с УТП, 3–5 отличий») */
-window.BT_UTP = [
-  ['uRent','Аренда кофемашины бесплатно','Не платите за аппарат — при заказе от 3 кг кофе в месяц аренда 0 ₽.'],
-  ['uPrice','Оптовые цены от 3 кг','Пять ступеней скидки на кофе собственной обжарки — до −28% от 30 кг.'],
-  ['uSwap','Замена аппарата при поломке','Привозим подменную кофемашину, пока ремонтируем вашу. Простоя нет.'],
-  ['uTruck','Доставка, установка и настройка','Привозим, подключаем, настраиваем рецепты и обучаем персонал за 3 дня.'],
-  ['uTool','Свой сервисный центр','Авторизованный сервис Jetinno в Екатеринбурге, выезд инженера за 24 часа.']
-];
+// карточки УТП отдаёт сервер (ИБ «Почему BEVERTEAM: карточки»): [svg-иконка, заголовок, текст]
+window.BT_UTP = window.BT_UTP || [];
 window.BT_utp = function(n){
-  return BT_UTP.slice(0,n||4).map(u=>`<div class="utp__i"><div class="ic">${I[u[0]]}</div><b>${u[1]}</b><p>${u[2]}</p></div>`).join('');
+  return BT_UTP.slice(0,n||4).map(u=>`<div class="utp__i"><div class="ic">${String(u[0]).startsWith('<')?u[0]:(I[u[0]]||'')}</div><b>${u[1]}</b><p>${u[2]}</p></div>`).join('');
 };
 
 const T = 'https://beverteam.ru/thumb/2/';
@@ -1058,6 +1015,70 @@ document.addEventListener('DOMContentLoaded',()=>{
     l.href=SITE+location.pathname.split('/').pop().replace(/index\.html$/,'');
     document.head.appendChild(l);
   }
+
+  /* ---------- заявки: попап быстрой заявки и формы data-form → local/ajax/form.php ---------- */
+  window.BT_fieldErr=fieldErr;
+  const ld=document.getElementById('lead');
+  if(ld){
+    ld.addEventListener('click',e=>{if(e.target.closest('[data-close]'))ld.classList.remove('open');});
+    new MutationObserver(()=>lock()).observe(ld,{attributes:true,attributeFilter:['class']});
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('[data-lead]'); if(!b||b.closest('#lead')) return;
+      e.preventDefault();
+      const topic=b.dataset.lead||'Оставить заявку', f=ld.querySelector('form');
+      f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
+      ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic;
+      document.getElementById('drawer')?.classList.remove('open');
+      ld.classList.add('open');
+      /* на десктопе каретка сразу в первом пустом поле, на мобильном — нет (клавиатура закроет форму) */
+      if(innerWidth>768) setTimeout(()=>{const i=[...f.querySelectorAll('.field input')].find(x=>!x.value); if(i) i.focus();},40);
+    });
+  }
+  document.addEventListener('submit',async e=>{
+    const f=e.target.closest('form[data-form]'); if(!f) return;
+    /* невалидную форму уже остановил общий обработчик submit выше */
+    if(e.defaultPrevented||f.dataset.busy){e.preventDefault();return;}
+    e.preventDefault();
+    const btn=f.querySelector('button[type=submit]'), fd=new FormData(f);
+    fd.append('form',f.dataset.form); fd.append('page',location.pathname);
+    f.dataset.busy='1'; if(btn) btn.disabled=true;
+    try{
+      const r=await fetch('/local/ajax/form.php',{method:'POST',body:fd,credentials:'same-origin'});
+      const d=await r.json().catch(()=>({}));
+      if(d.ok){
+        if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
+        else location.href='/form-success/';
+        return;
+      }
+      if(d.errors){ let first=null;
+        Object.entries(d.errors).forEach(([k,msg])=>{const el=f.elements[k]; if(!el) return;
+          if(el.type==='checkbox'){el.closest('.check')?.classList.add('is-err');} else fieldErr(el,msg); first=first||el;});
+        if(first) first.focus();
+        BT_toast('Проверьте выделенные поля');
+      } else BT_toast(d.message||'Не удалось отправить заявку. Позвоните нам: '+(document.querySelector('.hdr__tel')?.textContent||''));
+    }catch(err){ BT_toast('Нет связи с сервером. Попробуйте ещё раз'); }
+    finally{ delete f.dataset.busy; if(btn) btn.disabled=false; }
+  });
+
+  /* ---------- главная: подбор кофемашины, вкладки «аренда/продажа», карта ---------- */
+  const cfg=document.querySelector('[data-cfg]');
+  if(cfg){
+    const C=JSON.parse(cfg.dataset.cfg), q=s=>cfg.querySelector(s);
+    cfg.addEventListener('click',e=>{const b=e.target.closest('.chipx'); if(!b) return;
+      cfg.querySelectorAll('.chipx').forEach(x=>x.setAttribute('aria-pressed',x===b));
+      const d=C[+b.dataset.i], a=q('[data-cfg-btn]');
+      q('[data-cfg-img]').src=d.img; q('[data-cfg-img]').alt=d.m; q('[data-cfg-m]').textContent=d.m; q('[data-cfg-s]').textContent=d.s;
+      q('[data-cfg-p]').textContent=d.p; q('[data-cfg-u]').textContent=d.u;
+      if(d.lead){a.dataset.lead=d.lead; a.textContent='Оставить заявку';} else {delete a.dataset.lead; a.textContent=a.dataset.text; a.href=a.dataset.href;}
+    });
+  }
+  document.querySelectorAll('.pill-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{
+    const sec=b.closest('section'); b.parentNode.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
+    sec.querySelectorAll('[data-tabpane]').forEach(p=>p.hidden=p.dataset.tabpane!==b.dataset.tab);
+    BT_cmpUpdate(); BT_favUpdate();
+  }));
+  document.querySelectorAll('[data-ymap]').forEach(el=>BT_mapWidget(el));
+  BT_phFit();
 
   /* BreadcrumbList — из хлебных крошек любой страницы */
   const cr=document.querySelector('.crumbs');

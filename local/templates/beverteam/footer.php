@@ -11,6 +11,11 @@ foreach (bt_messengers() as [$code, $name, $href]) {
     $msgr .= '<a href="' . htmlspecialcharsbx($href ?: '#') . '" title="' . $name . '" aria-label="' . $name . '" rel="nofollow noopener" target="_blank">' . bt_icon($code) . '</a>';
 }
 ?>
+<?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): ?>
+    </div>
+  </div>
+</div>
+<?php endif ?>
 <footer class="ftr" itemscope itemtype="https://schema.org/LocalBusiness"><div class="wrap">
   <meta itemprop="name" content="BEVERTEAM — чай и кофе для дома и бизнеса">
   <meta itemprop="priceRange" content="650–297000 ₽">
@@ -32,6 +37,27 @@ foreach (bt_messengers() as [$code, $name, $href]) {
   </div>
   <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ОГРНИП <?= $co['ogrnip'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/sitemap/">Карта сайта</a></span></div>
 </div></footer>
+<div class="modal" id="lead" role="dialog" aria-modal="true" aria-labelledby="leadTitle">
+  <div class="modal__bg" data-close></div>
+  <div class="modal__p">
+    <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+    <form class="lead" data-form="lead" novalidate>
+      <p class="display h3 lead__t" id="leadTitle">Оставить заявку</p>
+      <p class="muted lead__s">Менеджер свяжется с вами в течение 5 минут в рабочее время (<?= htmlspecialcharsbx($co['hours'] ?? '') ?>).</p>
+      <input type="hidden" name="topic" value="Оставить заявку">
+      <div class="field"><label>Имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div>
+      <div class="field"><label>Телефон *</label><input name="phone" placeholder="+7 ___ ___-__-__"></div>
+      <div class="field"><label>Комментарий</label><textarea name="message" rows="3" maxlength="2000" placeholder="Что нужно: модель, количество, адрес"></textarea></div>
+      <?= bt_form_tail() ?>
+    </form>
+    <div class="lead__ok" hidden>
+      <div class="lead__ic" aria-hidden="true">✓</div>
+      <p class="display h3">Заявка отправлена</p>
+      <p class="muted">Менеджер свяжется с вами в течение 5 минут в рабочее время. Заявки, отправленные вечером и в выходные, обрабатываем в первый рабочий день.</p>
+      <button class="btn btn--line btn--block" type="button" data-close>Закрыть</button>
+    </div>
+  </div>
+</div>
 </div>
 </body>
 </html>
