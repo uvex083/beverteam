@@ -62,7 +62,7 @@ $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CA
       <div class="toolbar">
         <button class="btn btn--ghost btn--sm mob-f" type="button" aria-haspopup="dialog">Фильтр</button>
         <span class="cnt"><?php $APPLICATION->ShowViewContent('bt_cat_count') ?></span>
-        <select aria-label="Сортировка" onchange="var u=new URL(location.href);u.searchParams.set('sort',this.value);location.href=u">
+        <select aria-label="Сортировка" onchange="var u=new window.URL(location.href);u.searchParams.set('sort',this.value);location.href=u">
           <?php foreach ($sorts as $k => [$name]): ?><option value="<?= $k ?>"<?= $k === $sortKey ? ' selected' : '' ?>><?= $name ?></option><?php endforeach ?>
         </select>
       </div>
