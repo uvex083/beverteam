@@ -1531,3 +1531,6 @@ form[data-form]{position:relative}
 .subp .vol .pct:empty{display:none}
 .subp .utp{grid-template-columns:repeat(2,1fr)}
 @media(max-width:560px){.subp .utp{grid-template-columns:1fr}.subp .subcard{padding:20px}}
+.subp .subhow{grid-template-columns:1fr 1fr}
+@media(max-width:1000px){.subp .subcard{order:-1}}
+@media(max-width:640px){.subp .subhow{grid-template-columns:1fr}}
