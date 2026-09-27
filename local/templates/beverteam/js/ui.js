@@ -1455,15 +1455,16 @@ window.BT_slider = (box, opts) => {
    Интерактивная карта (клик по точке + определение адреса) работает только с API-ключом:
    ключ бесплатный, лимит Геокодера — 1000 запросов в сутки. Вписать ключ сюда:            */
 window.BT_YMAPS_KEY = '';           /* ← сюда ключ из кабинета разработчика Яндекса */
-window.BT_CO_COORDS = [60.685,56.878];   /* ул. Колокольная, 31А — уточнить у клиента */
+window.BT_CO_COORDS = [60.533999,56.78314];   /* ул. Колокольная, 31А — точка Яндекса */
 
 /* Статичная карта-виджет: работает БЕЗ ключа (конструктор карт Яндекса) */
 window.BT_MAP_QUERY = 'Екатеринбург, улица Колокольная, 31А';
 window.BT_mapWidget = (el, opts) => {
   if(!el) return;
-  /* ищем по адресу: точные координаты не нужны, виджет ставит метку сам */
-  const o = Object.assign({text:BT_MAP_QUERY, z:17}, opts||{});
-  const src = `https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(o.text)}&z=${o.z}&lang=ru_RU`;
+  /* по координатам с меткой, а не поиском по адресу: у поиска поверх карты панель «1 найден» */
+  const o = Object.assign({c:BT_CO_COORDS, z:17}, opts||{});
+  const ll = o.c.join(',');
+  const src = `https://yandex.ru/map-widget/v1/?ll=${ll}&z=${o.z}&pt=${ll},pm2dgl&lang=ru_RU`;
   const f = document.createElement('iframe');
   f.title='Карта — BEVERTEAM'; f.allowFullscreen=true;
   f.style.cssText='width:100%;height:100%;border:0;display:block';

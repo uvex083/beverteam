@@ -881,6 +881,8 @@ input,textarea{caret-color:var(--ink)}
 .ymap .addr{position:absolute;z-index:2;left:16px;top:16px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 18px;font-size:13.5px;max-width:280px}
 .ymap .addr b{display:block;font-family:Unbounded;font-size:13px;margin-bottom:6px}
 .ymap iframe{position:absolute;inset:0;z-index:1}
+/* верхняя полоса виджета (линейка, «Пробки») уходит за край блока; копирайт и условия Яндекса внизу остаются */
+.ymap iframe,.contp .map iframe{top:-56px!important;height:calc(100% + 56px)!important}
 
 /* — компактная форма «Напишите нам» на главной — */
 .wr{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,3vw,40px);align-items:start}
