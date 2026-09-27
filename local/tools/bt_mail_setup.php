@@ -45,7 +45,7 @@ function m_h2(string $t): string
 function m_btn(string $url, string $text): string
 {
     return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 4px"><tr>'
-        . '<td bgcolor="#D7E85C" style="background-color:#D7E85C;border-radius:999px">'
+        . '<td bgcolor="#D7E85C" style="background-color:#D7E85C;border-radius:999px;mso-padding-alt:14px 28px">'
         . '<a href="' . $url . '" style="display:inline-block;padding:14px 28px;' . FONT . 'font-size:14px;font-weight:700;line-height:1.2;color:#0E0E0C;text-decoration:none;border-radius:999px">' . $text . ' &rarr;</a>'
         . "</td></tr></table>\n";
 }
