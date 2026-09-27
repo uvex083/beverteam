@@ -18,7 +18,7 @@ $ids = $bill ? array_unique(array_column(PaymentTable::getList(['filter' => ['@P
 $orders = $ids ? OrderTable::getList(['filter' => ['@ID' => $ids, '=LID' => SITE_ID], 'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'PRICE', 'PAYED', 'CANCELED', 'STATUS_ID'], 'order' => ['ID' => 'DESC']])->fetchAll() : [];
 $orgs = bt_profiles($uid, 'UR');
 
-bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h1>', 'Счёт, УПД и акт сверки по заказам юрлица присылает менеджер на e‑mail. Здесь — заказы с оплатой по счёту и запрос документов.');
+bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h1>', 'Счёт на оплату приходит на e‑mail, как только менеджер подтвердит заказ, и сразу доступен здесь. УПД и акт сверки присылает менеджер.');
 ?>
 <?php if ($orgs): ?>
 <div class="b2b">
@@ -37,7 +37,8 @@ bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h
       <td><a class="link" href="/personal/orders/<?= (int)$o['ID'] ?>/">№ <?= $e($o['ACCOUNT_NUMBER']) ?></a></td>
       <td style="white-space:nowrap;font-variant-numeric:tabular-nums"><?= bt_fmt((float)$o['PRICE']) ?></td>
       <td><?php if ($o['CANCELED'] === 'Y'): ?><span class="status st-cancel">Отменён</span><?php else: ?><span class="status <?= $o['PAYED'] === 'Y' ? 'st-paid' : 'st-new' ?>"><?= $o['PAYED'] === 'Y' ? 'Оплачен' : 'Ждёт оплаты' ?></span><?php endif ?></td>
-      <td style="text-align:right;white-space:nowrap"><a href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($o['ACCOUNT_NUMBER']) ?>"><?= bt_icon('doc') ?> Запросить</a></td></tr>
+      <td style="text-align:right;white-space:nowrap"><?php if ($o['CANCELED'] !== 'Y' && $o['STATUS_ID'] !== 'N'): ?><a href="/local/ajax/bill.php?id=<?= (int)$o['ID'] ?>"><?= bt_icon('doc') ?> Счёт PDF</a>
+        <?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="muted" style="font-size:13px">Счёт — после подтверждения</span><?php endif ?></td></tr>
   <?php endforeach ?></tbody>
 </table></div>
 <?php else: ?>

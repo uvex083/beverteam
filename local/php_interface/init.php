@@ -18,6 +18,11 @@ require_once __DIR__ . '/include/bt_mail.php';
 // письма о заказе: состав и детали заказа полями #BT_*#
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_before_send');
 
+// счёт юрлицу: PDF в письме «Заказ подтверждён» и в кабинете; реквизиты продавца — из «Контактов»
+require_once __DIR__ . '/include/bt_bill.php';
+AddEventHandler('main', 'OnBeforeEventSend', 'bt_bill_attach');
+AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contacts');
+
 // вход через Яндекс ID, VK ID, T-Bank, Сбер, Альфа (модуль «Социальные сервисы»)
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, array_fill_keys(['BtOAuth', 'BtOAuthBank', 'BtOAuthTbank', 'BtOAuthSber', 'BtOAuthAlfa'], '/local/php_interface/include/bt_oauth.php'));
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);

@@ -88,7 +88,9 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
     <dt>Статус</dt><dd><span class="status <?= $order->isPaid() ? 'st-paid' : 'st-new' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
-    <dt>Документы</dt><dd><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?><br>
+    <dt>Документы</dt><dd><?php if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>"><?= bt_icon('doc') ?> Скачать счёт (PDF)</a><br>
+      <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?>Счёт придёт на e‑mail после подтверждения заказа менеджером<br>
+      <?php else: ?><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?><br><?php endif ?>
       <a class="link" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
   </dl></div>
 </div>

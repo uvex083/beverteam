@@ -142,6 +142,12 @@ $messages = [
         . $rows(['Статус' => '#HTML_STATUS_NAME#', 'Подробности' => '#HTML_STATUS_DESCRIPTION#', 'Трек-номер' => '#HTML_TRACKING_NUMBER#'])
         . $ifText('DELIVERY_TRACKING_URL', m_btn('#DELIVERY_TRACKING_URL#', 'Отследить отправление'))
         . m_note('История заказов — в <a href="https://#SERVER_NAME#/personal/orders/" style="color:#6C6C64">личном кабинете</a>.')],
+    'SALE_STATUS_CHANGED_C' => ['Заказ № #ORDER_ID# подтверждён', $sale[0], $sale[1], '',
+        m_head('Заказ подтверждён', 'Заказ № #ORDER_ID#')
+        . m_p('#BT_HELLO# Менеджер проверил заказ № #ORDER_ID#: всё в наличии, сумма и доставка уточнены.')
+        . $ifText('BT_BILL', m_box(m_p('<b>Счёт на оплату — во вложении.</b> Его же можно скачать в личном кабинете. После оплаты соберём заказ и пришлём УПД.')))
+        . $ifText('TEXT', m_p('#HTML_TEXT#'))
+        . '#BT_ORDER#' . $orderBtn],
     'SALE_STATUS_CHANGED_P' => ['Заказ № #ORDER_ID# оплачен и собирается', $sale[0], $sale[1], '',
         m_head('Собираем заказ', 'Заказ № #ORDER_ID#')
         . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен и формируется к отправке. Статус и трек-номер сообщит менеджер.')
