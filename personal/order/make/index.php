@@ -81,7 +81,7 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>2</b>Город доставки</h2>
         <div class="field city"><label for="cityIn">Населённый пункт *</label>
-          <input id="cityIn" name="city" value="<?= $e($popular[0]['n'] ?? '') ?>" autocomplete="off" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-controls="cityList" aria-expanded="false">
+          <input id="cityIn" name="city" value="<?= $e($popular[0]['n'] ?? '') ?>" autocomplete="new-password" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-controls="cityList" aria-expanded="false">
           <input type="hidden" name="loc" id="locIn" value="<?= $e($popular[0]['code'] ?? '') ?>">
           <ul id="cityList" role="listbox"></ul>
         </div>
@@ -93,7 +93,7 @@ $co = bt_contacts();
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
         <div class="opts" id="deliv"></div>
         <div id="addr" hidden style="margin-top:18px">
-          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" type="search" name="street" placeholder="Начните вводить улицу" autocomplete="off" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
+          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <div id="pvz" hidden style="margin-top:18px">
