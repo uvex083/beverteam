@@ -62,6 +62,13 @@ function bt_bill_sync(): void
     $map = ['SELLER_COMPANY_NAME' => $co['legal'] ?? '' ?: 'BEVERTEAM', 'SELLER_COMPANY_INN' => $co['inn'] ?? '', 'SELLER_COMPANY_ADDRESS' => $addr,
         'SELLER_COMPANY_PHONE' => $co['phone1'] ?? '', 'SELLER_COMPANY_BANK_NAME' => $co['bank'] ?? '', 'SELLER_COMPANY_BANK_BIC' => $co['bik'] ?? '',
         'SELLER_COMPANY_BANK_ACCOUNT' => $co['rs'] ?? '', 'SELLER_COMPANY_BANK_ACCOUNT_CORR' => $co['ks'] ?? ''];
+    // у ИП подписывает сам предприниматель, бухгалтера в счёте нет; вместо шаблонного текста про курс доллара — наши условия
+    $legal = trim((string)($co['legal'] ?? ''));
+    $ip = preg_match('/^ИП\s+(\S+)\s+(\S)\S*\s+(\S)/u', $legal, $m);
+    $map += ['SELLER_COMPANY_DIRECTOR_POSITION' => $ip ? 'Индивидуальный предприниматель' : 'Руководитель',
+        'SELLER_COMPANY_DIRECTOR_NAME' => $ip ? "{$m[1]} {$m[2]}. {$m[3]}." : '', 'SELLER_COMPANY_ACCOUNTANT_POSITION' => '', 'SELLER_COMPANY_ACCOUNTANT_NAME' => '',
+        'BILL_COMMENT1' => 'Счёт действителен 5 рабочих дней. В назначении платежа укажите номер счёта. Товар отгружается после поступления оплаты на расчётный счёт.',
+        'BILL_COMMENT2' => ''];
     foreach ($map as $code => $v) {
         Sale\BusinessValue::setMapping($code, Sale\PaySystem\Service::PAY_SYSTEM_PREFIX . $ps['ID'], null, ['PROVIDER_KEY' => 'VALUE', 'PROVIDER_VALUE' => (string)$v]);
     }
