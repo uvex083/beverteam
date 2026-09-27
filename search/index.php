@@ -54,7 +54,7 @@ $hints = ['кофе в зёрнах', 'аренда кофемашины', 'ре
 
   <div id="spRes">
   <?php if ($total): ?>
-    <p class="spage__sum">По запросу «<b><?= $e($q) ?></b>» <?= $plural($total, ['найден', 'найдено', 'найдено']) ?> <?= $total ?> <?= $plural($total, ['результат', 'результата', 'результатов']) ?></p>
+    <p class="spage__found">По запросу «<b><?= $e($q) ?></b>» <?= $plural($total, ['найден', 'найдено', 'найдено']) ?> <?= $total ?> <?= $plural($total, ['результат', 'результата', 'результатов']) ?></p>
     <nav class="spage__tabs" aria-label="Что показать">
       <?php foreach ((count($groups) > 1 ? ['all' => ['Все', $total]] + $groups : []) as $t => [$name, $n]): ?>
         <a class="spage__tab" href="<?= $e($tabUrl($t)) ?>"<?= $t === $tab ? ' aria-current="page"' : '' ?>><?= $name ?><sup><?= $n ?></sup></a>
