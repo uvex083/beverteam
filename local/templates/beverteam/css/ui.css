@@ -432,6 +432,8 @@ html{scrollbar-gutter:stable}
 html.is-locked,body.is-locked{overflow:hidden!important;overscroll-behavior:none;touch-action:none}
 body.is-locked{padding-right:var(--sbw,0)}
 body.is-locked .hdr{padding-right:var(--sbw,0)}
+/* под блокировкой прокрутки sticky-шапка уезжает к началу страницы — пока открыто мобильное меню, держим её fixed */
+body:has(.drawer.open) .hdr{position:fixed;top:0;left:0;right:0}
 
 /* — browser surfaces: выделение, каретка, скроллбар — из палитры, а не дефолт браузера — */
 ::selection{background:var(--lime);color:var(--ink)}
