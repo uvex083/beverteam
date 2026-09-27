@@ -1084,6 +1084,8 @@ input,textarea{caret-color:var(--ink)}
 
 /* ---------- страница товара (product.html) ---------- */
 .prod{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:start}
+.prod>[itemprop]:not(.gal){display:none}
+.prod .h1{font-size:24px;line-height:1.2}
 .gal{position:sticky;top:130px;display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;align-items:start}
 .gal__main{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);height:480px;padding:30px;position:relative;overflow:hidden}
 .gal__big{height:100%}

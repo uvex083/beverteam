@@ -819,11 +819,15 @@ function bt_og(): string
     $host = 'https://beverteam.ru';
     $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
     $url = $host . $APPLICATION->GetCurPage(false);
+    // картинки и адрес для соцсетей — с того домена, где открыта страница: на тестовом домене файлов боевого сайта нет
+    $self = 'https://' . preg_replace('/[^a-z0-9.\-]/i', '', $_SERVER['HTTP_HOST'] ?? 'beverteam.ru');
     $img = $APPLICATION->GetPageProperty('og_image') ?: '/local/templates/beverteam/images/og-logo.png';
+    $img = str_starts_with($img, 'http') ? $img : $self . $img;
     $html = '<meta property="og:type" content="' . $e($APPLICATION->GetPageProperty('og_type') ?: 'website') . '"><meta property="og:site_name" content="BEVERTEAM">'
         . '<meta property="og:locale" content="ru_RU"><meta property="og:title" content="' . $e($title) . '">'
         . '<meta property="og:description" content="' . $e($APPLICATION->GetPageProperty('description')) . '">'
-        . '<meta property="og:url" content="' . $e($url) . '"><meta property="og:image" content="' . $e(str_starts_with($img, 'http') ? $img : $host . $img) . '">'
+        . '<meta property="og:url" content="' . $e($self . $APPLICATION->GetCurPage(false)) . '"><meta property="og:image" content="' . $e($img) . '"><meta property="og:image:alt" content="' . $e($title) . '">'
+        . '<meta property="og:logo" content="' . $self . '/local/templates/beverteam/images/og-logo.png"><meta name="twitter:image" content="' . $e($img) . '">'
         . '<meta name="twitter:card" content="summary_large_image">' . $APPLICATION->GetPageProperty('og_extra');
     // страницы фильтра, сортировки и поиска склеиваем с чистым адресом; у товара canonical ставит сам компонент
     if (!$APPLICATION->GetPageProperty('canonical')) {
