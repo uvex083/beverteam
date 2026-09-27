@@ -66,6 +66,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--lime);color:var(--ink);
   border:1px solid var(--lime);border-radius:999px;padding:13px 24px;font-weight:700;font-size:14px;white-space:nowrap;
   transition:transform .15s,background .15s;text-decoration:none}
+.btn>svg{width:18px;height:18px;flex-shrink:0}
 .btn:hover{background:var(--lime-d);border-color:var(--lime-d);transform:translateY(-1px)}
 .btn--line{background:transparent;border-color:var(--ink);color:var(--ink)}
 .btn--line:hover{background:var(--ink);color:var(--lime);border-color:var(--ink)}
