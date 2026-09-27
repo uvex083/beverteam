@@ -79,9 +79,25 @@ if (!$order) {
       <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : 'оплата при получении заказа' ?></small></div></div>
 
     <div class="card">
-      <h3 class="h3" style="margin-bottom:16px">Состав заказа</h3>
+      <h3 class="h3" style="margin-bottom:12px">Состав заказа</h3>
+      <div class="oitems">
+        <?php foreach ($order->getBasket() as $bi):
+            $m = bt_product((string)$bi->getProductId());
+            $q = (float)$bi->getQuantity();
+            $tag = !empty($m['url']) ? 'a' : 'div'; ?>
+        <<?= $tag ?> class="oit"<?= $tag === 'a' ? ' href="' . $e($m['url']) . '"' : '' ?>>
+          <span class="oit__img"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="56" height="56"><?php endif ?></span>
+          <span class="oit__n"><?= $e($bi->getField('NAME')) ?><small><?= $q ?> шт × <?= bt_fmt($bi->getPrice()) ?></small></span>
+          <b><?= bt_fmt($bi->getFinalPrice()) ?></b>
+        </<?= $tag ?>>
+        <?php endforeach ?>
+      </div>
+      <div class="otot">
+        <div><span>Товары</span><span><?= bt_fmt($order->getBasket()->getPrice()) ?></span></div>
+        <div><span>Доставка</span><span><?= $dCode === 'bt_cdek' ? 'сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно') ?></span></div>
+        <div class="t"><span>Итого</span><span><?= bt_fmt($order->getPrice()) ?></span></div>
+      </div>
       <dl class="dl">
-        <dt>Товары</dt><dd><?php foreach ($order->getBasket() as $bi): ?><?= $e($bi->getField('NAME')) ?> × <?= (float)$bi->getQuantity() ?> — <?= bt_fmt($bi->getFinalPrice()) ?><br><?php endforeach ?></dd>
         <dt>Доставка</dt><dd><?= $e($delivText) ?></dd>
         <?php if ($where): ?><dt><?= $dCode === 'bt_pickup' ? 'Самовывоз' : ($props['PVZ'] ?? '' ? 'Пункт выдачи' : 'Адрес') ?></dt><dd><?= $e(($city && $dCode !== 'bt_pickup' ? $city . ', ' : '') . $where) ?></dd><?php endif ?>
         <?php if (!empty($props['COMPANY'])): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
