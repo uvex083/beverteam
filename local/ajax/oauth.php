@@ -10,7 +10,7 @@ use Bitrix\Socialservices\OAuth\StateService;
 
 /** @global CUser $USER */
 $fail = function (string $msg, string $back = '/') {
-    $_SESSION['BT_OAUTH_ERR'] = $msg;
+    $_SESSION['BT_OAUTH_ERR'] = ['msg' => $msg];
     LocalRedirect($back . (str_contains($back, '?') ? '&' : '?') . 'auth_service_error=1');
 };
 if (!CModule::IncludeModule('socialservices')) {
