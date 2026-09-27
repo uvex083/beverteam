@@ -16,7 +16,7 @@
       'SET_TITLE' => 'Y', 'SET_BROWSER_TITLE' => 'Y', 'BROWSER_TITLE' => '-', 'SET_META_KEYWORDS' => 'Y', 'META_KEYWORDS' => '-',
       'SET_META_DESCRIPTION' => 'Y', 'META_DESCRIPTION' => '-', 'SET_CANONICAL_URL' => 'Y',
       'SET_STATUS_404' => 'Y', 'SHOW_404' => 'Y', 'FILE_404' => '/404.php', 'MESSAGE_404' => '',
-      'INCLUDE_IBLOCK_INTO_CHAIN' => 'N', 'ADD_SECTIONS_CHAIN' => 'N', 'ADD_ELEMENT_CHAIN' => 'Y', 'USE_PERMISSIONS' => 'N',
+      'INCLUDE_IBLOCK_INTO_CHAIN' => 'N', 'ADD_SECTIONS_CHAIN' => 'Y', 'ADD_ELEMENT_CHAIN' => 'Y', 'USE_PERMISSIONS' => 'N',
       'DISPLAY_TOP_PAGER' => 'N', 'DISPLAY_BOTTOM_PAGER' => 'N', 'STRICT_SECTION_CHECK' => 'N',
   ], $component) ?>
   <?php
