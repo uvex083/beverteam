@@ -47,8 +47,13 @@ function bt_mail_order(Sale\Order $order): array
     $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') : '';
     $city = '';
     if ($props['LOCATION'] ?? '') {
-        $loc = ['=NAME.LANGUAGE_ID' => 'ru', is_numeric($props['LOCATION']) ? '=ID' : '=CODE' => $props['LOCATION']];
-        $city = (string)(Sale\Location\LocationTable::getList(['filter' => $loc, 'select' => ['N' => 'NAME.NAME']])->fetch()['N'] ?? '');
+        // в новых заказах хранится код местоположения, в старых — ID
+        foreach (['=CODE', '=ID'] as $by) {
+            $city = (string)(Sale\Location\LocationTable::getList(['filter' => [$by => $props['LOCATION'], '=NAME.LANGUAGE_ID' => 'ru'], 'select' => ['N' => 'NAME.NAME']])->fetch()['N'] ?? '');
+            if ($city !== '' || !ctype_digit($props['LOCATION'])) {
+                break;
+            }
+        }
     }
     $name = $props['FIO'] ?? '' ?: ($props['CONTACT_PERSON'] ?? '');
     $d = function_exists('bt_phone_digits') ? bt_phone_digits($props['PHONE'] ?? '') : '';
@@ -66,20 +71,22 @@ function bt_mail_order(Sale\Order $order): array
         }
         $qty = (float)$bi->getQuantity() . "\u{00A0}" . $e($bi->getField('MEASURE_NAME') ?: 'шт');
         $rows .= '<tr><td style="' . $cell . ';padding:12px 12px 12px 0">' . $title . '</td>'
-            . '<td align="center" style="' . $cell . ';padding:12px 8px;white-space:nowrap">' . $qty . '</td>'
+            . '<td width="56" align="center" style="' . $cell . ';padding:12px 6px;white-space:nowrap">' . $qty . '</td>'
             . '<td align="right" style="' . $cell . ';padding:12px 0 12px 8px;white-space:nowrap;font-weight:700">' . bt_fmt($bi->getFinalPrice()) . '</td></tr>';
     }
     $dPrice = (float)$order->getDeliveryPrice();
     $dText = $dCode === 'bt_cdek' ? 'стоимость сообщит менеджер'
-        : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? 'бесплатно (заказ от 3 000 ₽)' : 'бесплатно'));
+        : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? 'бесплатно (заказ от 3\u{00A0}000\u{00A0}₽)' : 'бесплатно'));
     $sum = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;color:#6C6C64;padding:10px 0 0';
     $total = bt_fmt($order->getPrice()) . ($dCode === 'bt_cdek' ? ' + доставка' : '');
+    $right = fn(string $v, string $css = '') => '<td colspan="2" align="right" style="' . $sum . $css . '">' . $v . '</td>';
     $items = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px">'
         . '<tr><td style="' . $head . '">Товар</td><td align="center" style="' . $head . '">Кол-во</td><td align="right" style="' . $head . '">Сумма</td></tr>' . $rows
-        . '<tr><td colspan="2" style="' . $sum . '">Товары</td><td align="right" style="' . $sum . ';white-space:nowrap">' . bt_fmt($order->getBasket()->getPrice()) . '</td></tr>'
-        . ($shipment ? '<tr><td colspan="2" style="' . $sum . '">Доставка</td><td align="right" style="' . $sum . '">' . $dText . '</td></tr>' : '')
-        . '<tr><td colspan="2" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0E0E0C;padding:14px 0 0">Итого</td>'
-        . '<td align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . $total . '</td></tr></table>';
+        . '<tr><td style="' . $sum . '">Товары</td>' . $right(bt_fmt($order->getBasket()->getPrice()), ';white-space:nowrap') . '</tr>'
+        . ($shipment ? '<tr><td style="' . $sum . '">Доставка</td>' . $right($dText) . '</tr>' : '')
+        . '<tr><td valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0E0E0C;padding:14px 0 0">Итого</td>'
+        . '<td colspan="2" align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . bt_fmt($order->getPrice())
+        . ($dCode === 'bt_cdek' ? '<div style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;font-weight:400;color:#6C6C64;white-space:normal">+ доставка, стоимость сообщит менеджер</div>' : '') . '</td></tr></table>';
 
     // детали: доставка, адрес, оплата, покупатель, получатель
     $where = $props['ADDRESS'] ?? '' ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
@@ -133,7 +140,7 @@ function bt_mail_rows(array $rows): string
     $html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';
     foreach ($rows as $k => $v) {
         $html .= '<tr><td width="34%" valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#6C6C64;padding:0 12px 10px 0">' . $k . '</td>'
-            . '<td valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#0E0E0C;padding:0 0 10px">' . $v . '</td></tr>';
+            . '<td valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#0E0E0C;padding:0 0 10px;word-break:break-word">' . $v . '</td></tr>';
     }
     return $html . '</table>';
 }

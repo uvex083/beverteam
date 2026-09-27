@@ -61,7 +61,7 @@ function m_code(string $code, string $caption): string
 {
     return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#0E0E0C" style="background-color:#0E0E0C;border-radius:14px;margin:8px 0 18px"><tr>'
         . '<td style="padding:18px 28px 20px"><div style="' . FONT . 'font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9C9C94;margin:0 0 6px">' . $caption . '</div>'
-        . "<div style=\"font-family:'JetBrains Mono','Courier New',Courier,monospace;font-size:34px;line-height:1.1;font-weight:700;letter-spacing:6px;color:#D7E85C\">" . $code . "</div></td></tr></table>\n";
+        . "<div style=\"font-family:'JetBrains Mono','Courier New',Courier,monospace;font-size:30px;line-height:1.15;font-weight:700;letter-spacing:4px;color:#D7E85C;word-break:break-all\">" . $code . "</div></td></tr></table>\n";
 }
 
 $rows = fn(array $r) => m_box(bt_mail_rows($r));
