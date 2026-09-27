@@ -702,10 +702,32 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('click',e=>{if(!e.target.closest('#mega')&&!e.target.closest('#catbtn')){mega.classList.remove('open');document.getElementById('hdr').classList.remove('mega-on');cb.setAttribute('aria-expanded',false);}});
 
   /* drawer */
-  const dr=document.getElementById('drawer');watch(dr,'[data-close].drawer__x');
-  document.getElementById('burger').addEventListener('click',()=>dr.classList.add('open'));
-  dr.addEventListener('click',e=>{if(e.target.closest('[data-close]'))dr.classList.remove('open');});
-  if(location.hash==='#menu') dr.classList.add('open');
+  const dr=document.getElementById('drawer'), burger=document.getElementById('burger'), dn=document.getElementById('dn');
+  watch(dr,'.dn__srch');
+  const dnStack=[];
+  const dnCur=()=>dn.querySelector('.dn__p.is-on');
+  /* кабинет и счётчики — из данных посетителя в браузере, а не в разметке: меню кешируется */
+  const dnFill=()=>{
+    const q=s=>dn.querySelector(s), u=window.BT_USER;
+    if(u){ q('[data-dme-name]').textContent=u.name||u.email; q('[data-dme-sub]').textContent='Личный кабинет';
+      q('[data-dme-i]').textContent=(u.name||u.email||'?').trim().charAt(0).toUpperCase(); }
+    q('[data-dcnt="fav"]').textContent=(window.BT_FAV||[]).length||'';
+    q('[data-dcnt="cmp"]').textContent=(window.BT_CMP||[]).length||'';
+  };
+  new MutationObserver(()=>{ const o=dr.classList.contains('open');
+    burger.setAttribute('aria-expanded',o); burger.setAttribute('aria-label',o?'Закрыть меню':'Меню');
+    if(!o){ dn.querySelectorAll('.dn__p').forEach(p=>p.classList.remove('is-on','is-past')); document.getElementById('dp0').classList.add('is-on'); dnStack.length=0; }
+  }).observe(dr,{attributes:true,attributeFilter:['class']});
+  const dnOpen=()=>{ dr.style.setProperty('--dtop',Math.max(0,document.getElementById('hdr').getBoundingClientRect().bottom)+'px'); dnFill(); dr.classList.add('open'); };
+  burger.addEventListener('click',()=>dr.classList.contains('open')?dr.classList.remove('open'):dnOpen());
+  dn.addEventListener('click',e=>{
+    const go=e.target.closest('[data-dgo]'), back=e.target.closest('[data-dback]');
+    if(go){ const cur=dnCur(), next=document.getElementById(go.dataset.dgo); dnStack.push(cur);
+      cur.classList.replace('is-on','is-past'); next.scrollTop=0; next.classList.add('is-on'); return; }
+    if(back){ const cur=dnCur(), prev=dnStack.pop(); if(!prev) return; cur.classList.remove('is-on'); prev.classList.remove('is-past'); prev.classList.add('is-on'); return; }
+    if(e.target.closest('a[href]')) dr.classList.remove('open');
+  });
+  if(location.hash==='#menu') dnOpen();
 
   /* ---------- полноэкранный поиск ---------- */
   const sp=document.getElementById('srch'), sq=document.getElementById('sq'),
@@ -914,7 +936,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(location.hash==='#auth'||document.querySelector('[data-auth-open]')) BT_auth();
   document.addEventListener('click',e=>{ const b=e.target.closest('[data-auth]'); if(!b) return; e.preventDefault(); BT_auth(); });
   /* «Кабинет» в шапке и меню: гостя ведём в окно входа, покупателя — в кабинет */
-  document.querySelectorAll('.hact[href="/personal/"],.drawer__l[href="/personal/"]').forEach(a=>
+  document.querySelectorAll('.hact[href="/personal/"],.dn__me').forEach(a=>
     a.addEventListener('click',e=>{ if(!USER){ e.preventDefault(); document.getElementById('drawer')?.classList.remove('open'); BT_auth(); } }));
 
   /* toast + add to cart */

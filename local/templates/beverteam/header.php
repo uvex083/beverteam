@@ -41,7 +41,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
 <div id="app">
 <header class="hdr" id="hdr">
   <div class="wrap hdr__top">
-    <button class="burger" id="burger" aria-label="Меню"><?= bt_icon('burger') ?></button>
+    <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="drawer"><?= bt_icon('burger') . bt_icon('close') ?></button>
     <a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><?= $logo ?></a>
     <button class="catbtn" id="catbtn" aria-expanded="false" aria-controls="mega"><span class="catbtn__i"><?= bt_icon('cat') . bt_icon('close') ?></span><span class="lbl">Каталог</span></button>
     <div class="hdr__msgr"><?= $msgr() ?></div>
@@ -66,23 +66,12 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
     <div class="mega__panel" id="megaPanel"></div>
   </div></div>
 </header>
-<div class="drawer" id="drawer">
-  <div class="drawer__bg" data-close></div>
+<div class="drawer" id="drawer" aria-label="Меню">
   <div class="drawer__p">
-    <div class="drawer__hd"><a class="brand" href="/"><?= $logo ?></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
-    <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px"><?= bt_icon('search') ?> Поиск по каталогу</button></div>
     <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_drawer', [
         'ROOT_MENU_TYPE' => 'drawer', 'MAX_LEVEL' => 1, 'USE_EXT' => 'Y',
         'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
     ], false, ['HIDE_ICONS' => 'Y']) ?>
-    <div class="drawer__ft">
-      <a class="tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
-      <a class="tel" href="<?= $co['phone2_href'] ?? '' ?>" style="font-size:14px"><?= $co['phone2'] ?? '' ?></a>
-      <a href="mailto:<?= $co['email'] ?? '' ?>" style="font-size:13.5px;font-weight:600"><?= $co['email'] ?? '' ?></a>
-      <span class="muted" style="font-size:12.5px"><?= $co['zip'] ?? '' ?>, <?= $co['city'] ?? '' ?>, <?= $co['street'] ?? '' ?> · <?= $co['hours'] ?? '' ?></span>
-      <?= $msgr('msgr--lg') ?>
-      <a class="btn btn--block" href="/kontakty/#form" data-lead="Оставить заявку">Оставить заявку</a>
-    </div>
   </div>
 </div>
 <?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): // текстовые страницы для покупателей: крошки, заголовок, боковое меню ?>
