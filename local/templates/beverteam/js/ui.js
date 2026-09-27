@@ -76,7 +76,7 @@ window.BT_postDate = iso => { const d=new Date(iso), M=['января','февр
   return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear(); };
 window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}">
     <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="325">
-    <div class="ncard__b"><div class="ncard__m"><span class="tag">${p.cat}</span><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'?'<span class="tag tag--n">Новость</span>':''}</div>
+    <div class="ncard__b"><div class="ncard__m"><span class="tag">${p.cat}</span><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
     <h3>${p.t}</h3><p>${p.lead}</p></div></a>`;
 
 /* ---------- Ремонт: бренды под посадочные страницы ---------- */
