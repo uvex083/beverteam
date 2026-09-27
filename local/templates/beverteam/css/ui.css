@@ -501,7 +501,7 @@ input,textarea{caret-color:var(--ink)}
 .code4{display:flex;gap:10px;margin:4px 0 10px}
 .code4 input{width:56px;height:62px;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:24px;
   border:1px solid var(--line);border-radius:var(--rad-s);background:var(--white);padding:0}
-.code4 input:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.code4 input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 60%,transparent)}
 .code4.is-err input{border-color:var(--err);animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
 .resend{font-size:12.5px;color:var(--gray);min-height:1lh}
