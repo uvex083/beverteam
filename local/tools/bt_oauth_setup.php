@@ -38,10 +38,8 @@ foreach ($opts as $k => $v) {
 }
 
 // ключи: только заполнено или нет, значения не печатаем
-$keys = ['YandexOAuth' => ['yandex_appid', 'yandex_appsecret'], 'VKontakte' => ['vkontakte_appid', 'vkontakte_appsecret'],
-    'BtTbank' => ['bt_tbank_id', 'bt_tbank_secret'], 'BtSber' => ['bt_sber_id', 'bt_sber_secret'], 'BtAlfa' => ['bt_alfa_id', 'bt_alfa_secret']];
-foreach ($keys as $id => $names) {
-    $filled = array_map(fn($n) => $n . (trim(CSocServAuth::GetOption($n)) !== '' ? ' заполнен' : ' пуст'), $names);
-    print("$id: " . implode(', ', $filled) . "\n");
+foreach (array_keys(BtOAuth::IDP) as $id) {
+    $names = array_filter(array_column(array_filter((array)$m->GetSettingByServiceId($id), 'is_array'), 0), 'is_string');
+    print("$id: " . implode(', ', array_map(fn($n) => $n . (trim(CSocServAuth::GetOption($n)) !== '' ? ' заполнен' : ' пуст'), $names)) . "\n");
 }
 print('Кнопки на сайте сейчас: ' . (implode(', ', array_column(BtOAuth::buttons(), 't')) ?: 'нет') . "\n");
