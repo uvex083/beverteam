@@ -213,10 +213,10 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .pc__acts button{position:relative}
 .pc__acts button svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:17px;height:17px;display:block}
-.pc__acts button:hover{border-color:var(--ink);color:var(--ink)}
-.pc__fav[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+@media(hover:hover){.pc__acts button:hover{border-color:var(--ink);color:var(--ink)}}
+.pc__acts .pc__fav[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--lime)}
 .pc__fav[aria-pressed=true] svg{fill:currentColor}
-.pc__cmpi[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+.pc__acts .pc__cmpi[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
 .pc__ph{height:180px;display:grid;place-items:center;margin:6px 0 12px;background:var(--paper);border-radius:var(--rad-s);overflow:hidden}
 .pc__ph img{max-height:160px;width:auto;mix-blend-mode:multiply}
 .pc h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;font-family:Manrope}
