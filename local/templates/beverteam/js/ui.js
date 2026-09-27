@@ -1306,8 +1306,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     ul.addEventListener('mousedown',e=>e.preventDefault());
     ul.addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li) return;
       ci.value=li.dataset.n; f.elements.loc.value=li.dataset.code; showCities([]); fieldErr(ci,''); });
-    ci.addEventListener('blur',()=>{ showCities([]); if(ci.value.trim()&&!f.elements.loc.value) setTimeout(()=>fieldErr(ci,'Выберите город из списка'),0); });
-    ci.addEventListener('keydown',e=>{ if(e.key==='Enter'&&ul.classList.contains('open')){ e.preventDefault(); ul.querySelector('li')?.click(); } });
+    // ввели не до конца и ушли — первое совпадение по началу названия, мусор не подставляем
+    const lt=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
+    const autoCity=()=>{ const v=ci.value.trim(); if(!v||f.elements.loc.value) return; const n=++cityN; clearTimeout(cityT);
+      cityPost(v).then(r=>{ if(n!==cityN||ci.value.trim()!==v||f.elements.loc.value) return;
+        const c=(r.list||[]).find(c=>lt(c.n).startsWith(lt(v)));
+        if(c){ ci.value=c.n; f.elements.loc.value=c.code; fieldErr(ci,''); } else fieldErr(ci,'Выберите город из списка'); }); };
+    ci.addEventListener('blur',()=>{ showCities([]); autoCity(); });
+    ci.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const li=ul.classList.contains('open')&&ul.querySelector('li'); li?li.click():autoCity(); } if(e.key==='Escape') showCities([]); });
+    BT_addrSuggest(f.elements.street,{city:()=>f.elements.loc.value?ci.value.trim():''});
     accForm(f,'addr_save',r=>reloadWith(f.elements.id.value>0?'Адрес сохранён':'Адрес добавлен'));
   }
 
@@ -1619,3 +1626,39 @@ window.BT_confirm = o => new Promise(res => {
   m.addEventListener('click',onClick); addEventListener('keydown',onKey,true);
   m.classList.add('open'); setTimeout(()=>m.querySelector('.modal__btns [data-cf="1"]').focus(),30);
 });
+
+/* Подсказки адреса DaData: улица и дом в городе (opt.city) или полный адрес (opt.full). Ввели не до конца и ушли из поля — подставляем лучшее совпадение */
+window.BT_addrSuggest=(inp,opt={})=>{
+  if(!inp||inp.dataset.sugg) return; inp.dataset.sugg=1;
+  const f=inp.closest('.field'); f.classList.add('city','street');
+  Object.entries({autocomplete:'new-password',spellcheck:'false',role:'combobox','aria-autocomplete':'list','aria-expanded':'false'}).forEach(([k,v])=>inp.setAttribute(k,v));
+  const ul=document.createElement('ul'); ul.setAttribute('role','listbox'); inp.after(ul);
+  const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const words=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/\d.*$/,'').split(/[^a-zа-я]+/).filter(w=>w.length>1&&!/^(ул|улица|д|дом|г|город|пр|кв|обл|р-н)$/.test(w));
+  const flat=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
+  const req=q=>{const fd=new FormData();fd.append('action','street');fd.append('q',q);fd.append('sessid',window.BT_SID||'');
+    opt.full?fd.append('full','1'):fd.append('city',opt.city?opt.city():'');
+    return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
+  const show=list=>{ul.innerHTML=list.map(s=>`<li role="option" data-v="${esc(s.v)}" data-h="${s.house?1:0}">${esc(s.v)}${s.r?`<small>${esc(s.r)}</small>`:''}</li>`).join('');
+    ul.classList.toggle('open',list.length>0);inp.setAttribute('aria-expanded',list.length>0);};
+  const err=m=>window.BT_fieldErr&&BT_fieldErr(inp,m);
+  const changed=()=>inp.dispatchEvent(new Event('change',{bubbles:true}));
+  let t=0,n=0;
+  inp.addEventListener('input',()=>{const v=inp.value.trim();clearTimeout(t);if(v.length<2){show([]);return;}
+    const k=++n;t=setTimeout(()=>req(v).then(r=>{if(k===n&&document.activeElement===inp)show(r.list||[]);}),250);});
+  ul.addEventListener('mousedown',e=>e.preventDefault());
+  ul.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
+    inp.value=li.dataset.v+(li.dataset.h==='1'||opt.full?'':', д ');show([]);err('');inp.focus();changed();
+    if(li.dataset.h!=='1'&&!opt.full)inp.dispatchEvent(new Event('input'));});
+  const auto=()=>{const v=inp.value.trim();if(v.length<2)return;const k=++n;clearTimeout(t);
+    req(v).then(r=>{if(k!==n||inp.value.trim()!==v)return;
+      const s=(r.list||[])[0],num=v.match(/\d.*$/),w=words(v);
+      if(!s||!w.length||!w.every(x=>flat(s.v).includes(x)))return;
+      const same=s.house&&num&&s.v.replace(/\D/g,'').endsWith(num[0].replace(/\D/g,''));
+      inp.value=same?s.v:opt.full?(num?v:s.v):(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
+      show([]);if(num)err('');changed();});};
+  inp.addEventListener('blur',()=>{show([]);auto();});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=ul.classList.contains('open')&&ul.querySelector('li');li?li.click():auto();}
+    if(e.key==='Escape'&&ul.classList.contains('open')){e.preventDefault();show([]);}});
+};
+document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('input[name=company_adr]').forEach(i=>BT_addrSuggest(i,{full:true})));

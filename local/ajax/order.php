@@ -33,17 +33,20 @@ if ($action === 'street') {
     $http->setHeader('Content-Type', 'application/json');
     $http->setHeader('Accept', 'application/json');
     $http->setHeader('Authorization', 'Token ' . $key);
-    $body = ['query' => $q, 'count' => 7, 'from_bound' => ['value' => 'street'], 'to_bound' => ['value' => 'house'], 'restrict_value' => true];
-    if ($city !== '') {
+    $full = $in('full') === '1';
+    $body = $full ? ['query' => $q, 'count' => 7]
+        : ['query' => $q, 'count' => 7, 'from_bound' => ['value' => 'street'], 'to_bound' => ['value' => 'house'], 'restrict_value' => true];
+    if ($city !== '' && !$full) {
         $body['locations'] = [['city' => $city], ['settlement' => $city]];
     }
     $res = json_decode((string)$http->post('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', json_encode($body, JSON_UNESCAPED_UNICODE)), true);
     $list = [];
     foreach ($res['suggestions'] ?? [] as $s) {
         $d = $s['data'] ?? [];
-        $street = trim(($d['street_with_type'] ?? '') . ($d['house'] ? ', ' . ($d['house_type'] ?? 'д') . ' ' . $d['house'] : '') . ($d['block'] ? ' ' . ($d['block_type'] ?? '') . ' ' . $d['block'] : ''));
+        $street = $full ? (string)($s['value'] ?? '')
+            : trim(($d['street_with_type'] ?? '') . ($d['house'] ? ', ' . ($d['house_type'] ?? 'д') . ' ' . $d['house'] : '') . ($d['block'] ? ' ' . ($d['block_type'] ?? '') . ' ' . $d['block'] : ''));
         if ($street !== '') {
-            $list[] = ['v' => $street, 's' => $d['street_with_type'] ?? '', 'house' => (bool)$d['house'], 'r' => trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
+            $list[] = ['v' => $street, 's' => $d['street_with_type'] ?? '', 'house' => (bool)$d['house'], 'r' => $full ? '' : trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
         }
     }
     $out(['ok' => true, 'list' => $list]);

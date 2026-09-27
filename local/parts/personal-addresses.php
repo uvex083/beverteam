@@ -44,8 +44,8 @@ bt_acc_start('addr', '<h1 class="display h1">Адреса доставки</h1>'
         <input type="hidden" name="loc" value="">
         <div class="f2">
           <div class="field"><label>Название</label><input name="tag" placeholder="Офис, дом, склад…" maxlength="50"></div>
-          <div class="field city"><label>Город *</label><input name="city" autocomplete="off" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-expanded="false"><ul role="listbox"></ul></div>
-          <div class="field" style="grid-column:1/-1"><label>Улица, дом *</label><input name="street" data-v="addr" placeholder="ул. Ленина, 10" maxlength="200" autocomplete="street-address"></div>
+          <div class="field city"><label>Город *</label><input name="city" autocomplete="new-password" spellcheck="false" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-expanded="false"><ul role="listbox"></ul></div>
+          <div class="field" style="grid-column:1/-1"><label>Улица, дом *</label><input name="street" data-v="addr" placeholder="Начните вводить улицу" maxlength="200"></div>
           <div class="field"><label>Квартира / офис</label><input name="flat" maxlength="50"></div>
           <div class="field"><label>Подъезд, этаж, домофон</label><input name="entr" maxlength="100"></div>
           <div class="field"><label>Получатель</label><input name="who" maxlength="100" autocomplete="off"></div>
