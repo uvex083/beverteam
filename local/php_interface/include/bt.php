@@ -951,3 +951,44 @@ function bt_password_change_guard(array &$fields): bool
     $GLOBALS['APPLICATION']->ThrowException('Пароли на сайте не используются. Войдите по коду из письма.');
     return false;
 }
+
+// Разделы и услуги для поиска (шапка и /search/): страницы сайта + направления сервиса + модели в аренду; k — слова, по которым находится
+function bt_search_pages(): array
+{
+    $dirs = bt_iblock('servis_dirs');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_search_pages', '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $dirs);
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('rent'));
+    $pages = [
+        ['t' => 'Услуги и сервис', 'u' => '/servis/', 'd' => 'Аренда, продажа, ремонт и обслуживание кофемашин', 'k' => 'услуги сервис обслуживание'],
+        ['t' => 'Ремонт и обслуживание кофемашин', 'u' => '/servis/remont-kofemashin/', 'd' => 'Сервисный центр Jetinno · выезд инженера', 'k' => 'ремонт сервис обслуживание починка неисправность диагностика инженер jetinno'],
+        ['t' => 'Аренда кофемашин', 'u' => '/arenda-kofemashin/', 'd' => 'Для дома, офиса и кафе', 'k' => 'аренда прокат кофемашина офис кафе'],
+        ['t' => 'Кофе по подписке', 'u' => '/podpiska/', 'd' => 'Регулярная доставка кофе, кофемашина бесплатно', 'k' => 'подписка доставка кофе регулярно'],
+        ['t' => 'Подбор кофе', 'u' => '/podbor-kofe/', 'd' => '5 вопросов — сорт BOTANICA с ценой', 'k' => 'подбор кофе тест выбрать'],
+        ['t' => 'Оплата и доставка', 'u' => '/oplata-i-dostavka/', 'd' => 'Способы оплаты, доставка и самовывоз', 'k' => 'оплата доставка самовывоз курьер'],
+        ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],
+        ['t' => 'О компании', 'u' => '/o-kompanii/', 'd' => 'BEVERTEAM с 2010 года', 'k' => 'о компании beverteam'],
+        ['t' => 'Отзывы', 'u' => '/otzyvy-o-nas/', 'd' => 'Что говорят клиенты', 'k' => 'отзывы'],
+        ['t' => 'Журнал', 'u' => '/news/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
+        ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],
+    ];
+    $known = array_column($pages, 'u');
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $dirs, 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PREVIEW_TEXT', 'PROPERTY_LINK']);
+    while ($f = $r->Fetch()) {
+        $u = (string)$f['PROPERTY_LINK_VALUE'];
+        if ($u !== '' && !in_array($u, $known, true)) {
+            $pages[] = ['t' => $f['NAME'], 'u' => $u, 'd' => 'Услуга · ' . trim(strip_tags((string)$f['PREVIEW_TEXT'])), 'k' => 'услуги'];
+        }
+    }
+    foreach (bt_rent_models() as $m) {
+        $pages[] = ['t' => $m['name'], 'u' => '/arenda-kofemashin/', 'd' => 'Аренда · ' . bt_fmt($m['price']) . ' в месяц · ' . $m['audience'], 'k' => 'аренда ' . $m['model']];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($pages);
+    return $pages;
+}

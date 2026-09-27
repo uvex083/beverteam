@@ -377,6 +377,7 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .empty .display{font-size:22px;color:var(--ink);margin-bottom:10px}
 
 /* footer */
+#app{display:flex;flex-direction:column;min-height:100vh}#app>*{flex-shrink:0}#app>.wrap{width:100%}#app>:has(+.ftr){flex-grow:1}
 .ftr{background:var(--ink);color:#9C9C94;margin-top:var(--pad);padding:52px 0 32px;font-size:13.5px}
 .ftr__g{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.1fr;gap:28px}
 .ftr h5{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
@@ -658,6 +659,36 @@ input,textarea{caret-color:var(--ink)}
 .sres mark{background:var(--lime);color:inherit;border-radius:3px;padding:0 2px}
 .sempty{text-align:center;padding:40px 20px;color:var(--gray)}
 .sempty b{display:block;font-family:Unbounded;font-size:18px;color:var(--ink);margin-bottom:8px}
+/* страница результатов поиска */
+.spage .h1{margin:14px 0 22px}
+.spage__f{display:flex;align-items:center;gap:6px;max-width:720px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 20px;transition:border-color .15s,box-shadow .15s}
+.spage__f:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
+.spage__f>svg{width:18px;height:18px;flex-shrink:0;color:var(--gray)}
+.spage__f input{flex:1;min-width:0;border:0;background:none;font:500 16px/1.4 inherit;color:var(--ink);padding:10px 6px}
+.spage__f input:focus{outline:none}
+.spage__f input::placeholder{color:var(--gray-2)}
+.spage__f input::-webkit-search-cancel-button,.spage__f input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+.spage__clr{display:none;place-items:center;width:34px;height:34px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);flex-shrink:0;cursor:pointer}
+.spage__clr:hover{background:var(--line)}
+.spage__clr svg{width:14px;height:14px}
+.spage__f.has-q .spage__clr{display:grid}
+.spage__f .btn{padding:12px 24px}
+.spage__sum{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 8px;color:var(--gray);font-size:14.5px}
+.spage__sum>span{margin-right:4px}.spage__sum b{color:var(--ink)}
+.spage__sum .chipx{background:var(--white)}
+.spage__empty{margin-top:28px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:28px;color:var(--gray)}
+.spage__empty b{display:block;font-family:Unbounded;font-size:18px;color:var(--ink);margin-bottom:8px}
+.spage__empty p{margin:0}
+.spage__sec{margin-top:40px;scroll-margin-top:130px}
+.spage__sec .h2{margin:0 0 20px}.spage__sec sup{font:600 13px/1 'JetBrains Mono',monospace;color:var(--gray);vertical-align:super;margin-left:4px}
+.spage__pages{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.spage__pages a{display:flex;align-items:center;gap:16px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:18px 20px;transition:border-color .15s}
+.spage__pages a:hover{border-color:var(--ink)}
+.spage__pages a>span{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.spage__pages b{font-size:15.5px;line-height:1.35}
+.spage__pages a>span>span{font-size:13px;color:var(--gray);line-height:1.45}
+.spage__pages svg{width:18px;height:18px;flex-shrink:0}
+@media(max-width:720px){.spage__pages{grid-template-columns:1fr}.spage__f{padding-left:14px}.spage__f .btn{padding:11px 16px}}
 @media(max-width:900px){.srch__grid{grid-template-columns:1fr}.srch__secs{grid-template-columns:1fr 1fr}.srch__x span{display:none}}
 @media(max-width:560px){.srch__secs{grid-template-columns:1fr}}
 
@@ -744,7 +775,8 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:1050px){
   .g4{grid-template-columns:repeat(3,1fr)}
   .ftr__g{grid-template-columns:1fr 1fr 1fr}
-  .hdr__nav,.search,.hdr__tel,.catbtn .lbl{display:none}
+  .hdr__nav,.search,.hdr__tel,.catbtn{display:none}
+  .hdr__acts{margin-left:auto}.burger{order:10;margin-right:-6px}
   .burger{display:block}
   .cat,.acc-l,.info-l{grid-template-columns:1fr}
   .acc-nav,.info-nav{position:static}   /* .filters на мобильных — шторка fixed, static её ломал */

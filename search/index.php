@@ -1,7 +1,7 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
-// Результаты поиска: те же данные, что у живого поиска в шапке (товары и статьи); на страницу ведёт SearchAction главной
+// Результаты поиска: те же данные, что у живого поиска в шапке (товары, разделы и услуги, журнал); на страницу ведёт SearchAction главной
 $q = trim((string)($_GET['q'] ?? ''));
 $APPLICATION->SetTitle($q !== '' ? 'Результаты поиска' : 'Поиск по сайту');
 $APPLICATION->SetPageProperty('title', ($q !== '' ? '«' . $q . '» — поиск' : 'Поиск') . ' | Beverteam');
@@ -12,41 +12,81 @@ $norm = fn(string $s) => str_replace('ё', 'е', mb_strtolower($s));
 $words = array_filter(preg_split('/\s+/u', $norm($q)));
 $match = fn(string $text) => $words && !array_filter($words, fn($w) => !str_contains($norm($text), $w));
 
-$products = $posts = [];
+$products = $pages = $posts = [];
 if ($words) {
     foreach (bt_catalog_data() as $list) {
         foreach ($list as $m) {
             if ($match($m['n'] . ' ' . $m['par'] . ' ' . $m['code'])) {
-                $products[] = $m;
+                $products[$m['code']] = $m;
             }
         }
     }
+    foreach (bt_search_pages() as $p) {
+        if ($match($p['t'] . ' ' . $p['d'] . ' ' . $p['k'])) {
+            $pages[] = $p;
+        }
+    }
     foreach (bt_posts() as $p) {
-        if ($match($p['t'] . ' ' . $p['lead'])) {
+        if ($match($p['t'] . ' ' . $p['lead'] . ' ' . $p['cat'])) {
             $posts[] = $p;
         }
     }
 }
 $e = fn($s) => htmlspecialcharsbx((string)$s);
+$plural = fn(int $n, array $f) => $n . ' ' . $f[($n % 10 == 1 && $n % 100 != 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
+$found = array_filter([
+    'sp-prod' => $products ? $plural(count($products), ['товар', 'товара', 'товаров']) : '',
+    'sp-pages' => $pages ? $plural(count($pages), ['раздел или услуга', 'раздела и услуги', 'разделов и услуг']) : '',
+    'sp-posts' => $posts ? $plural(count($posts), ['статья', 'статьи', 'статей']) : '',
+]);
+$co = bt_contacts();
+$hints = ['кофе в зёрнах', 'аренда кофемашины', 'ремонт кофемашины', 'Jetinno', 'чай', 'дрип-пакеты'];
 ?>
-<div class="wrap">
+<div class="wrap spage">
   <?php bt_crumbs() ?>
-  <h1 class="display h1" style="margin:14px 0 22px"><?php $APPLICATION->ShowTitle(false) ?></h1>
-  <form class="search" action="/search/" method="get" style="max-width:640px;margin-bottom:28px">
-    <input type="search" name="q" value="<?= $e($q) ?>" placeholder="Кофе, чай, кофемашина или услуга" aria-label="Поисковый запрос">
-    <button type="submit" aria-label="Найти"><?= bt_icon('search') ?></button>
+  <h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1>
+  <form class="spage__f<?= $q !== '' ? ' has-q' : '' ?>" action="/search/" method="get" role="search">
+    <?= bt_icon('search') ?>
+    <input type="search" name="q" value="<?= $e($q) ?>" placeholder="Кофе, чай, кофемашина или услуга" aria-label="Поисковый запрос" autocomplete="off">
+    <button type="button" class="spage__clr" aria-label="Очистить"><?= bt_icon('close') ?></button>
+    <button type="submit" class="btn">Найти</button>
   </form>
-  <?php if ($q !== '' && !$products && !$posts): ?>
-    <p class="muted">По запросу «<?= $e($q) ?>» ничего не нашлось. Попробуйте короче или загляните в <a class="link" href="/magazin/">каталог</a>. Можно позвонить: <a class="link" href="<?= bt_contacts()['phone1_href'] ?? '' ?>"><?= bt_contacts()['phone1'] ?? '' ?></a></p>
+
+  <?php if ($found): ?>
+    <div class="spage__sum">
+      <span>По запросу «<b><?= $e($q) ?></b>» найдено:</span>
+      <?php foreach ($found as $id => $t): ?><a class="chipx" href="#<?= $id ?>"><?= $t ?></a><?php endforeach ?>
+    </div>
+  <?php elseif ($q !== ''): ?>
+    <div class="spage__empty">
+      <b>По запросу «<?= $e($q) ?>» ничего не нашлось</b>
+      <p>Проверьте написание или сократите запрос. Можно заглянуть в <a class="link" href="/magazin/">каталог</a> или позвонить: <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a></p>
+    </div>
   <?php endif ?>
+  <?php if (!$found): ?>
+    <div class="spage__sum"><span>Часто ищут:</span><?php foreach ($hints as $h): ?><a class="chipx" href="/search/?q=<?= urlencode($h) ?>"><?= $e($h) ?></a><?php endforeach ?></div>
+  <?php endif ?>
+
   <?php if ($products): ?>
-    <p class="muted" style="margin:0 0 16px">Товары: <?= count($products) ?></p>
-    <div class="grid g4"><?php foreach ($products as $m) { echo bt_card($m); } ?></div>
+    <section class="spage__sec" id="sp-prod">
+      <h2 class="display h2">Товары <sup><?= count($products) ?></sup></h2>
+      <div class="grid g4"><?php foreach ($products as $m) { echo bt_card($m); } ?></div>
+    </section>
+  <?php endif ?>
+  <?php if ($pages): ?>
+    <section class="spage__sec" id="sp-pages">
+      <h2 class="display h2">Разделы и услуги <sup><?= count($pages) ?></sup></h2>
+      <div class="spage__pages">
+        <?php foreach ($pages as $p): ?>
+          <a href="<?= $e($p['u']) ?>"><span><b><?= $e($p['t']) ?></b><span><?= $e($p['d']) ?></span></span><?= bt_icon('arrR') ?></a>
+        <?php endforeach ?>
+      </div>
+    </section>
   <?php endif ?>
   <?php if ($posts): ?>
-    <section class="sec sec--s">
-      <h2 class="display h2" style="margin-bottom:20px">Статьи</h2>
-      <ul class="prose"><?php foreach ($posts as $p): ?><li><a class="link" href="<?= $e($p['url']) ?>"><?= $e($p['t']) ?></a></li><?php endforeach ?></ul>
+    <section class="spage__sec" id="sp-posts">
+      <h2 class="display h2">Журнал <sup><?= count($posts) ?></sup></h2>
+      <div class="news"><?php foreach ($posts as $p) { echo bt_post_card($p); } ?></div>
     </section>
   <?php endif ?>
 </div>

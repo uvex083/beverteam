@@ -749,19 +749,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const mark=(t,q)=>{const i=t.toLowerCase().indexOf(q.toLowerCase());
     return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length));};
 
-  const PAGES=[{t:'Аренда кофемашин',u:'/arenda-kofemashin/',d:'Услуга · от 3 500 ₽ в месяц'},
-    {t:'Кофе по подписке',u:'/podpiska/',d:'Услуга · кофемашина бесплатно от 3 кг'},
-    {t:'Ремонт и обслуживание кофемашин',u:'/servis/remont-kofemashin/',d:'Услуга · сервисный центр Jetinno'},
-    {t:'Подбор кофе за минуту',u:'/podbor-kofe/',d:'5 вопросов — сорт BOTANICA с ценой'},
-    {t:'Оплата и доставка',u:'/oplata-i-dostavka/',d:'Информация'},
-    {t:'Журнал',u:'/news/',d:'Статьи и новости'},
-    {t:'Контакты',u:'/kontakty/',d:'Екатеринбург, ул. Колокольная, 31А'}];
+  const PAGES=window.BT_PAGES||[];
 
   function paintResults(q){
     const ql=q.toLowerCase();
     const prods=Object.values(BT_PRODUCTS).flat()
       .filter(m=>(m.n+' '+m.par).toLowerCase().includes(ql)).slice(0,6);
-    const pages=PAGES.filter(p=>(p.t+' '+p.d).toLowerCase().includes(ql)).slice(0,4);
+    const pages=PAGES.filter(p=>(p.t+' '+p.d+' '+(p.k||'')).toLowerCase().includes(ql)).slice(0,5);
     const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead).toLowerCase().includes(ql)).slice(0,3);
     if(!prods.length&&!pages.length&&!posts.length){
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>
@@ -1527,3 +1521,8 @@ window.BT_mapPicker = (el, onPick, opts) => {
     return map;
   }).catch(()=>null);
 };
+
+/* Страница результатов поиска: свой крестик очистки вместо системного */
+document.addEventListener('click',e=>{const b=e.target.closest('.spage__clr'); if(!b) return;
+  const f=b.form; f.q.value=''; f.classList.remove('has-q'); f.q.focus();});
+document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('.spage__f'); if(f) f.classList.toggle('has-q',!!e.target.value);});
