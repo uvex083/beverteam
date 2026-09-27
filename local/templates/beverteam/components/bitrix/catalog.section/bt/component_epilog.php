@@ -4,3 +4,6 @@
 $n = (int)($arResult['BT_COUNT'] ?? 0);
 $word = ['товар', 'товара', 'товаров'][($n % 10 === 1 && $n % 100 !== 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
 $APPLICATION->AddViewContent('bt_cat_count', $n . ' ' . $word);
+if (!empty($arResult['BT_OG_IMAGE'])) {
+    $APPLICATION->SetPageProperty('og_image', $arResult['BT_OG_IMAGE']);
+}

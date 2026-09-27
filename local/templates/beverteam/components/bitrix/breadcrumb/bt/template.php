@@ -12,4 +12,10 @@ foreach ($items as $i => $it) {
     $html .= $i === 0 ? '<a href="' . htmlspecialcharsbx($it['LINK'] ?: '/') . '">' . $title . '</a>'
         : '<span>' . ($i < $last && $it['LINK'] ? '<a href="' . htmlspecialcharsbx($it['LINK']) . '">' . $title . '</a>' : $title) . '</span>';
 }
-return $html . '</nav>';
+// BreadcrumbList для поисковиков — из тех же пунктов
+$ld = ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => []];
+foreach ($items as $i => $it) {
+    $ld['itemListElement'][] = ['@type' => 'ListItem', 'position' => $i + 1, 'name' => $it['TITLE']]
+        + ($it['LINK'] ? ['item' => 'https://beverteam.ru' . $it['LINK']] : []);
+}
+return $html . '</nav><script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';

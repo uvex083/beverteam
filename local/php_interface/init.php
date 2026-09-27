@@ -1,6 +1,9 @@
 <?php
 
 require_once __DIR__ . '/include/bt.php';
+
+// FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы
+AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 require_once __DIR__ . '/include/bt_mail.php';
 
 // письма о заказе: состав и детали заказа полями #BT_*#

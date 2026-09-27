@@ -769,17 +769,79 @@ function bt_acc_end(): void
     echo '</div></div></div>';
 }
 
-// Open Graph: заголовок и описание страницы берутся после выполнения страницы (вызывается через AddBufferContent)
+// Open Graph и canonical: считаются после выполнения страницы (AddBufferContent); тип и картинку страница задаёт свойствами og_type / og_image
 function bt_og(): string
 {
     global $APPLICATION;
     $e = fn($s) => htmlspecialcharsbx(trim(strip_tags((string)$s)));
+    $host = 'https://beverteam.ru';
     $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
-    $url = 'https://beverteam.ru' . $APPLICATION->GetCurPage(false);
-    return '<meta property="og:type" content="website"><meta property="og:site_name" content="BEVERTEAM">'
-        . '<meta property="og:title" content="' . $e($title) . '">'
+    $url = $host . $APPLICATION->GetCurPage(false);
+    $img = $APPLICATION->GetPageProperty('og_image') ?: '/local/templates/beverteam/images/og-logo.png';
+    $html = '<meta property="og:type" content="' . $e($APPLICATION->GetPageProperty('og_type') ?: 'website') . '"><meta property="og:site_name" content="BEVERTEAM">'
+        . '<meta property="og:locale" content="ru_RU"><meta property="og:title" content="' . $e($title) . '">'
         . '<meta property="og:description" content="' . $e($APPLICATION->GetPageProperty('description')) . '">'
-        . '<meta property="og:url" content="' . $e($url) . '"><meta property="og:image" content="https://beverteam.ru/local/templates/beverteam/images/og-logo.png">';
+        . '<meta property="og:url" content="' . $e($url) . '"><meta property="og:image" content="' . $e(str_starts_with($img, 'http') ? $img : $host . $img) . '">'
+        . '<meta name="twitter:card" content="summary_large_image">' . $APPLICATION->GetPageProperty('og_extra');
+    // страницы фильтра, сортировки и поиска склеиваем с чистым адресом; у товара canonical ставит сам компонент
+    if (!$APPLICATION->GetPageProperty('canonical')) {
+        $html .= '<link rel="canonical" href="' . $e($url) . '">';
+    }
+    return $html;
+}
+
+// Организация для поисковиков: JSON-LD из контактов сайта (ИБ «Контакты и реквизиты»), на всех страницах
+function bt_org_ld(): string
+{
+    $co = bt_contacts();
+    $host = 'https://beverteam.ru/';
+    $sameAs = array_values(array_filter(array_map(fn($m) => $m[2], bt_messengers())));
+    $ld = ['@context' => 'https://schema.org', '@type' => 'LocalBusiness', '@id' => $host . '#org',
+        'name' => 'BEVERTEAM', 'alternateName' => 'Бэвертим', 'legalName' => $co['legal'] ?? '', 'url' => $host,
+        'logo' => $host . 'local/templates/beverteam/images/og-logo.png', 'image' => $host . 'local/templates/beverteam/images/og-logo.png',
+        'description' => 'Кофе BOTANICA, чай, кофемашины Jetinno: продажа, аренда, ремонт и сервис в Екатеринбурге.',
+        'email' => $co['email'] ?? '', 'telephone' => array_values(array_filter([$co['phone1'] ?? '', $co['phone2'] ?? ''])),
+        'priceRange' => '₽₽', 'taxID' => $co['inn'] ?? '',
+        'address' => ['@type' => 'PostalAddress', 'postalCode' => $co['zip'] ?? '', 'addressLocality' => $co['city'] ?? '',
+            'streetAddress' => $co['street'] ?? '', 'addressCountry' => 'RU'],
+        'openingHoursSpecification' => [['@type' => 'OpeningHoursSpecification',
+            'dayOfWeek' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 'opens' => '10:00', 'closes' => '17:00']]];
+    if ($sameAs) {
+        $ld['sameAs'] = $sameAs;
+    }
+    return '<script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+}
+
+// FAQPage для поисковиков из блоков вопросов-ответов на готовой странице (details/summary внутри .faq); обработчик OnEndBufferContent
+function bt_faq_ld(&$content): void
+{
+    if (defined('ADMIN_SECTION') || !str_contains($content, 'faq') || str_contains($content, '"FAQPage"') || !str_contains($content, '</head>')) {
+        return;
+    }
+    $doc = new \DOMDocument();
+    @$doc->loadHTML('<?xml encoding="utf-8"?>' . $content, LIBXML_NOERROR | LIBXML_NOWARNING);
+    $xp = new \DOMXPath($doc);
+    $qs = [];
+    foreach ($xp->query('//*[contains(concat(" ", normalize-space(@class), " "), " faq ")]//details') as $d) {
+        $q = $xp->query('./summary', $d)->item(0);
+        if (!$q) {
+            continue;
+        }
+        $a = [];
+        foreach ($d->childNodes as $n) {
+            if ($n !== $q) {
+                $a[] = trim(preg_replace('/\s+/u', ' ', $n->textContent));
+            }
+        }
+        $a = trim(implode(' ', array_filter($a)));
+        if ($a !== '') {
+            $qs[] = ['@type' => 'Question', 'name' => trim(preg_replace('/\s+/u', ' ', $q->textContent)), 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $a]];
+        }
+    }
+    if ($qs) {
+        $ld = '<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => $qs], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+        $content = preg_replace('~</head>~', $ld . '</head>', $content, 1);
+    }
 }
 
 // Яндекс.Метрика — счётчик старого сайта, только на боевом домене: заходы с dev не портят статистику клиента

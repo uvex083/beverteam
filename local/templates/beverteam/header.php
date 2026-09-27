@@ -31,7 +31,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
 <title><?php $APPLICATION->ShowTitle() ?></title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/favicon.svg">
 <meta name="yandex-verification" content="36480871fc540413">
-<?php $APPLICATION->AddBufferContent('bt_og') ?>
+<?php $APPLICATION->AddBufferContent('bt_og') ?><?= bt_org_ld() ?>
 <?php $APPLICATION->ShowHead() ?>
 <?= bt_metrika() ?>
 </head>

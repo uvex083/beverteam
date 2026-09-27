@@ -1010,16 +1010,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(b.dataset.d==='-'&&v<=1){ i.dispatchEvent(new CustomEvent('bt:qtyzero',{bubbles:true})); return; }
     v+= b.dataset.d==='-'?-1:1;i.value=Math.max(1,v);i.dispatchEvent(new Event('change',{bubbles:true}));});
 
-  /* ===== Доработки SEO: canonical + микроразметка (Списко доработок, п.1 и п.7) ===== */
-  const SITE='https://beverteam.ru/';
-  const addLd=o=>{const t=document.createElement('script');t.type='application/ld+json';t.textContent=JSON.stringify(o);document.head.appendChild(t);};
-
-  /* canonical — в прототипе проставляется скриптом; на Битриксе выводится в <head> шаблона */
-  if(!document.querySelector('link[rel="canonical"]')){
-    const l=document.createElement('link');l.rel='canonical';
-    l.href=SITE+location.pathname.split('/').pop().replace(/index\.html$/,'');
-    document.head.appendChild(l);
-  }
+  /* SEO-разметка (крошки, FAQ, организация, canonical) выводится сервером — см. bt_og, bt_org_ld, bt_faq_ld */
 
   /* ---------- заявки: попап быстрой заявки и формы data-form → local/ajax/form.php ---------- */
   window.BT_fieldErr=fieldErr;
@@ -1305,31 +1296,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     }).catch(()=>BT_toast('Нет связи с сервером — попробуйте ещё раз')).finally(()=>b.disabled=false);
   });
 
-  /* BreadcrumbList — из хлебных крошек любой страницы */
-  const cr=document.querySelector('.crumbs');
-  if(cr){
-    const items=[...cr.querySelectorAll('a,span')].filter(n=>n.tagName==='A'||!n.querySelector('a'));
-    addLd({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:items.map((n,i)=>({
-      '@type':'ListItem',position:i+1,name:n.textContent.trim(),
-      item:n.tagName==='A'?SITE+n.getAttribute('href'):undefined}))});
-  }
-
-  /* FAQPage — из любого блока .faq с <details> */
-  const faq=document.querySelector('.faq');
-  if(faq){
-    const qs=[...faq.querySelectorAll('details')].map(d=>({'@type':'Question',
-      name:d.querySelector('summary').textContent.trim(),
-      acceptedAnswer:{'@type':'Answer',text:[...d.querySelectorAll('summary ~ *')].map(x=>x.textContent.trim()).join(' ')}}));
-    if(qs.length) addLd({'@context':'https://schema.org','@type':'FAQPage',mainEntity:qs});
-  }
-
-  /* LocalBusiness — на всех страницах */
-  addLd({'@context':'https://schema.org','@type':'LocalBusiness','@id':SITE+'#org',
-    name:'BEVERTEAM — чай и кофе для дома и бизнеса',legalName:CO.legal,url:SITE,email:CO.mail,
-    telephone:[CO.tel1,CO.tel2],priceRange:'650–297000 ₽',
-    address:{'@type':'PostalAddress',postalCode:CO.zip,addressLocality:CO.city,streetAddress:CO.street,addressCountry:'RU'},
-    openingHoursSpecification:[{'@type':'OpeningHoursSpecification',dayOfWeek:['Monday','Tuesday','Wednesday','Thursday','Friday'],opens:'10:00',closes:'17:00'}],
-    taxID:CO.inn,identifier:CO.ogrnip});
 });
 })();
 

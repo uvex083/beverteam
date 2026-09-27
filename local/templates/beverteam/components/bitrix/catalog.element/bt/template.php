@@ -24,6 +24,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
   </nav>
   <div class="prod" itemscope itemtype="https://schema.org/Product">
     <meta itemprop="name" content="<?= $e($name) ?>">
+    <meta itemprop="sku" content="<?= $e($arResult['CODE']) ?>"><?php if ($arResult['BT_BRAND']): ?><div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="<?= $arResult['BT_BRAND'] ?>"></div><?php endif ?>
     <div class="gal">
       <div class="gal__side">
         <button class="gal__ar" id="thUp" type="button" aria-label="Предыдущие фото"<?= count($photos) > 1 ? '' : ' style="visibility:hidden"' ?>><svg viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></svg></button>

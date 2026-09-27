@@ -77,3 +77,11 @@ while ($e = $r->Fetch()) {
     $arResult['BT_REVIEWS'][] = ['a' => $e['NAME'], 'r' => (int)$e['PROPERTY_RATING_VALUE'], 't' => $e['PREVIEW_TEXT'],
         'd' => ConvertDateTime($e['ACTIVE_FROM'] ?: $e['DATE_CREATE'], 'YYYY-MM-DD'), 'm' => $e['PROPERTY_MACHINE_VALUE'], 'ok' => (bool)$e['PROPERTY_VERIFIED_VALUE']];
 }
+
+// бренд для разметки Product и данные для Open Graph (component_epilog работает и при кеше)
+$arResult['BT_BRAND'] = preg_match('/botanica/i', $arResult['~NAME']) ? 'BOTANICA' : (preg_match('/jetinno/i', $arResult['~NAME']) ? 'Jetinno' : '');
+$arResult['BT_OG'] = ['image' => $arResult['BT_PHOTOS'][0]['big'] ?? '', 'price' => $arResult['BT']['bulk'][0]['p'] ?? ($arResult['BT']['p'] ?? 0)];
+$cp = $this->getComponent();
+if ($cp) {
+    $cp->arResultCacheKeys = array_merge($cp->arResultCacheKeys, ['BT_OG']);
+}

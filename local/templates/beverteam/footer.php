@@ -16,9 +16,7 @@ foreach (bt_messengers() as [$code, $name, $href]) {
   </div>
 </div>
 <?php endif ?>
-<footer class="ftr" itemscope itemtype="https://schema.org/LocalBusiness"><div class="wrap">
-  <meta itemprop="name" content="BEVERTEAM — чай и кофе для дома и бизнеса">
-  <meta itemprop="priceRange" content="650–297000 ₽">
+<footer class="ftr"><div class="wrap">
   <div class="ftr__g">
     <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. <?= $co['city'] ?? '' ?>, с 2010 года.</p>
@@ -27,12 +25,12 @@ foreach (bt_messengers() as [$code, $name, $href]) {
     <div><h5>Каталог</h5><?php $menu('foot_catalog') ?></div>
     <div><h5>Услуги</h5><?php $menu('foot_services') ?></div>
     <div><h5>Покупателям</h5><?php $menu('foot_buyers') ?></div>
-    <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><h5>Контакты</h5><ul>
-      <li><a href="<?= $co['phone1_href'] ?? '' ?>" itemprop="telephone"><?= $co['phone1'] ?? '' ?></a></li>
+    <div><h5>Контакты</h5><ul>
+      <li><a href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a></li>
       <li><a href="<?= $co['phone2_href'] ?? '' ?>"><?= $co['phone2'] ?? '' ?></a></li>
-      <li><a href="mailto:<?= $co['email'] ?? '' ?>" itemprop="email"><?= $co['email'] ?? '' ?></a></li>
-      <li><span itemprop="postalCode"><?= $co['zip'] ?? '' ?></span>, <span itemprop="addressLocality"><?= $co['city'] ?? '' ?></span>,<br><span itemprop="streetAddress"><?= $co['street'] ?? '' ?></span></li>
-      <li><meta itemprop="openingHours" content="Mo-Fr 10:00-17:00"><span class="muted"><?= $co['hours'] ?? '' ?></span></li>
+      <li><a href="mailto:<?= $co['email'] ?? '' ?>"><?= $co['email'] ?? '' ?></a></li>
+      <li><span><?= $co['zip'] ?? '' ?></span>, <span><?= $co['city'] ?? '' ?></span>,<br><span><?= $co['street'] ?? '' ?></span></li>
+      <li><span class="muted"><?= $co['hours'] ?? '' ?></span></li>
     </ul></div>
   </div>
   <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ОГРНИП <?= $co['ogrnip'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/sitemap/">Карта сайта</a></span></div>
