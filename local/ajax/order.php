@@ -1,5 +1,5 @@
 <?php
-// Оформление заказа: POST action=city (поиск местоположения) | calc (доставки, оплаты, итог без сохранения) | create
+// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -20,6 +20,34 @@ Loader::includeModule('catalog');
 $out = fn(array $a) => die(json_encode($a, JSON_UNESCAPED_UNICODE));
 $in = fn(string $k) => trim((string)$req->getPost($k));
 $action = $in('action');
+
+// Улица и дом через DaData, только в выбранном городе; ключ API — опция bt/dadata_key (bt_dadata_setup.php)
+if ($action === 'street') {
+    $q = $in('q');
+    $city = $in('city');
+    $key = \COption::GetOptionString('bt', 'dadata_key');
+    if ($key === '' || mb_strlen($q) < 2) {
+        $out(['ok' => true, 'list' => []]);
+    }
+    $http = new \Bitrix\Main\Web\HttpClient(['socketTimeout' => 3, 'streamTimeout' => 3]);
+    $http->setHeader('Content-Type', 'application/json');
+    $http->setHeader('Accept', 'application/json');
+    $http->setHeader('Authorization', 'Token ' . $key);
+    $body = ['query' => $q, 'count' => 7, 'from_bound' => ['value' => 'street'], 'to_bound' => ['value' => 'house'], 'restrict_value' => true];
+    if ($city !== '') {
+        $body['locations'] = [['city' => $city], ['settlement' => $city]];
+    }
+    $res = json_decode((string)$http->post('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', json_encode($body, JSON_UNESCAPED_UNICODE)), true);
+    $list = [];
+    foreach ($res['suggestions'] ?? [] as $s) {
+        $d = $s['data'] ?? [];
+        $street = trim(($d['street_with_type'] ?? '') . ($d['house'] ? ', ' . ($d['house_type'] ?? 'д') . ' ' . $d['house'] : '') . ($d['block'] ? ' ' . ($d['block_type'] ?? '') . ' ' . $d['block'] : ''));
+        if ($street !== '') {
+            $list[] = ['v' => $street, 'house' => (bool)$d['house'], 'r' => trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
+        }
+    }
+    $out(['ok' => true, 'list' => $list]);
+}
 
 if ($action === 'city') {
     $q = str_replace(['ё', 'Ё'], ['е', 'Е'], $in('q'));

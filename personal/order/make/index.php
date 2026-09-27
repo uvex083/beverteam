@@ -90,10 +90,10 @@ $co = bt_contacts();
 
       <div class="blk" id="blkD">
         <h2><b>3</b>Доставка</h2>
-        <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
+        <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
         <div class="opts" id="deliv"></div>
         <div id="addr" hidden style="margin-top:18px">
-          <div class="f2"><div class="field" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" placeholder="ул. Ленина, 10" autocomplete="street-address" value="<?= $e($u['street'] ?? '') ?>"></div>
+          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" placeholder="Начните вводить улицу" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <div id="pvz" hidden style="margin-top:18px">
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
-  let pt='FIZ', dl=[], avail=[], sel=null, tab='addr', payId=0, calcN=0, sending=false;
+  let pt='FIZ', dl=[], avail=[], sel=null, tab='pvz', payId=0, calcN=0, sending=false;
 
   /* доставки Битрикса → варианты макета: СДЭК до двери и в пункт выдачи — одна служба с разным адресом */
   const opts=()=>dl.flatMap(d=>d.code==='bt_cdek'
@@ -215,6 +215,21 @@ document.addEventListener('DOMContentLoaded',()=>{
   cityIn.addEventListener('blur',()=>{showCities([]);if(cityIn.value.trim()&&!locIn.value)setTimeout(()=>setErr(cityIn,'Выберите город из списка'),0);});
   cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=cityList.querySelector('li');if(li&&cityList.classList.contains('open'))li.click();}
     if(e.key==='Escape')showCities([]);});
+
+  /* улица и дом: подсказки DaData в пределах выбранного города; без дома — дописываем номер дальше */
+  const stIn=document.getElementById('coStreet'), stList=document.getElementById('streetList');
+  const showStreets=list=>{stList.innerHTML=list.map(s=>`<li role="option" data-v="${esc(s.v)}" data-h="${s.house?1:0}">${esc(s.v)}${s.r?`<small>${esc(s.r)}</small>`:''}</li>`).join('');
+    const o=list.length>0;stList.classList.toggle('open',o);stIn.setAttribute('aria-expanded',o);};
+  let stT=0, stN=0;
+  stIn.addEventListener('input',()=>{ready();const v=stIn.value.trim();clearTimeout(stT);if(v.length<2){showStreets([]);return;}
+    const n=++stN; stT=setTimeout(()=>post({action:'street',q:v,city:locIn.value?cityIn.value.trim():''}).then(r=>{if(n===stN&&document.activeElement===stIn)showStreets(r.list||[]);}),250);});
+  stList.addEventListener('mousedown',e=>e.preventDefault());
+  stList.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
+    stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);setErr(stIn,'');stIn.focus();ready();
+    if(li.dataset.h!=='1') stIn.dispatchEvent(new Event('input'));});
+  stIn.addEventListener('blur',()=>showStreets([]));
+  stIn.addEventListener('keydown',e=>{if(e.key==='Enter'&&stList.classList.contains('open')){e.preventDefault();stList.querySelector('li')?.click();}
+    if(e.key==='Escape')showStreets([]);});
 
   /* ошибки под полем — та же разметка, что у BT_checkField */
   function setErr(el,msg){
