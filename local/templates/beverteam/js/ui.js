@@ -121,9 +121,18 @@ window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new Cu
 window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ if(document.querySelector('.accp')) location.href='/'; else location.reload(); });
 /* вход через сервисы (header.php → BT_IDP): только настроенные в модуле «Социальные сервисы», переход сразу — правило 11 */
 const IDP=window.BT_IDP||[];
+/* фирменные знаки и подписи кнопок по правилам сервисов; у кого знака нет — монограмма */
+const IDP_LOGO={
+  'i-ya':'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#FC3F1D"/><path fill="#fff" d="M13.32 7.666h-.924c-1.694 0-2.585.858-2.585 2.123 0 1.43.616 2.1 1.881 2.959l1.045.704-3.003 4.487H7.49l2.695-4.014c-1.55-1.111-2.42-2.19-2.42-4.015 0-2.288 1.595-3.85 4.62-3.85h3.003v11.868H13.32V7.666z"/></svg>',
+  'i-vk':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#0077FF"/><path fill="#fff" d="M12.78 17.3c-5.41 0-8.5-3.71-8.63-9.88h2.71c.09 4.53 2.09 6.45 3.67 6.84V7.42h2.55v3.91c1.56-.17 3.2-1.95 3.75-3.91h2.55c-.43 2.42-2.21 4.2-3.48 4.93 1.27.59 3.3 2.14 4.07 4.95h-2.81c-.6-1.88-2.1-3.33-4.08-3.53v3.53h-.3z"/></svg>'};
+const IDP_TEXT={'i-ya':'Войти с Яндекс ID','i-vk':'Войти с VK ID'};
 window.BT_idpHtml = label => { const back=encodeURIComponent(location.pathname+location.search.replace(/[?&]auth_service_(id|error)=[^&]*/g,'').replace(/^&/,'?'));
-  return `<div class="idp--row">${label?`<b>${label}</b>`:''}<div class="idp">${IDP.map(p=>
-  `<a class="${p.cls}" href="/local/ajax/oauth.php?go=${p.id}&amp;back=${back}" rel="nofollow" title="${p.t}" aria-label="Войти через ${p.t}">${p.m}</a>`).join('')}</div></div>`; };
+  const href=p=>`/local/ajax/oauth.php?go=${p.id}&amp;back=${back}`;
+  /* в окне входа — широкие фирменные кнопки, в строке на оформлении заказа — значки */
+  if(!label) return `<div class="idp idp--big">${IDP.map(p=>
+    `<a class="${p.cls}" href="${href(p)}" rel="nofollow">${IDP_LOGO[p.cls]||`<i>${p.m}</i>`}<span>${IDP_TEXT[p.cls]||'Войти через '+p.t}</span></a>`).join('')}</div>`;
+  return `<div class="idp--row"><b>${label}</b><div class="idp">${IDP.map(p=>
+  `<a class="${p.cls}" href="${href(p)}" rel="nofollow" title="${p.t}" aria-label="Войти через ${p.t}">${IDP_LOGO[p.cls]||p.m}</a>`).join('')}</div></div>`; };
 window.BT_authUpdate = () => {
   const a=document.querySelector('.hact[href="/personal/"]'); if(!a) return;
   const l=a.querySelector('span:not(.cnt)');
