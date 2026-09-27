@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(li.dataset.h!=='1') stIn.dispatchEvent(new Event('input'));});
   stIn.addEventListener('blur',()=>showStreets([]));
   stIn.addEventListener('keydown',e=>{if(e.key==='Enter'&&stList.classList.contains('open')){e.preventDefault();stList.querySelector('li')?.click();}
-    if(e.key==='Escape')showStreets([]);});
+    if(e.key==='Escape'){e.preventDefault();showStreets([]);}});
 
   /* ошибки под полем — та же разметка, что у BT_checkField */
   function setErr(el,msg){
