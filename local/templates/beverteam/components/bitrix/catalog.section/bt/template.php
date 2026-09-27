@@ -14,7 +14,7 @@
 
 <section class="sec sec--s">
   <h2 class="display h2" style="margin-bottom:20px">Почему покупают у нас</h2>
-  <div class="utp" id="utp" style="grid-template-columns:repeat(2,1fr)"></div>
+  <div class="utp" id="utp"></div>
   <script>document.addEventListener('DOMContentLoaded',()=>{utp.innerHTML=BT_utp(4);});</script>
 </section>
 

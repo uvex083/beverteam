@@ -9,4 +9,6 @@ $aMenuLinks = [
     ['Оплата и доставка', '/oplata-i-dostavka/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Личный кабинет', '/personal/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Избранное', '/personal/favorites/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Сравнение товаров', '/magazin/compare/', [], ['DEPTH_LEVEL' => 1], ''],
 ];

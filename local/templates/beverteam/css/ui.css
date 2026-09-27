@@ -32,7 +32,7 @@ h1,h2,h3,h4{margin:0;line-height:1.1}
 .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
 .sec{padding:var(--pad) 0}.sec--t0{padding-top:0}.sec--s{padding:clamp(24px,3vw,40px) 0}
 .grid{display:grid;gap:20px}
-.grid>*,.cat>*{min-width:0} /* колонка 1fr не должна раздуваться по самому широкому содержимому карточки */
+.grid>*,.cat>*,.prod>*,.gal>*{min-width:0} /* колонка 1fr не должна раздуваться по самому широкому содержимому карточки */
 .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
 .card{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px}
 .hr{border:0;border-top:1px solid var(--line);margin:0}
@@ -1587,3 +1587,8 @@ form[data-form]{position:relative}
   .accp .oit{grid-template-columns:52px 1fr}.accp .oit img,.accp .oit .ph{width:52px;height:52px}.accp .oit .q,.accp .oit .p{grid-column:2}}
 @media(max-width:700px){.accp .ord{grid-template-columns:1fr;padding:18px}.accp .ord .r{align-items:flex-start;text-align:left}
   .accp .li .acts{justify-content:flex-start}.accp .two .dl{grid-template-columns:1fr;gap:2px}.accp .two .dl dd{margin-bottom:8px}}
+
+/* узкие телефоны: УТП раздела в одну колонку; в шапке 5 иконок не помещаются — «Сравнение» уходит в мобильное меню */
+.cat .utp{grid-template-columns:repeat(2,1fr)}
+@media(max-width:640px){.cat .utp{grid-template-columns:1fr}}
+@media(max-width:374px){.hdr__acts .hact--cmp{display:none}}
