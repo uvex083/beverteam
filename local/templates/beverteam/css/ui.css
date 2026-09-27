@@ -45,17 +45,20 @@ select{-webkit-appearance:none;appearance:none;
 select::-ms-expand{display:none}
 .field select{padding-right:40px}
 
-:focus-visible{outline:1.5px solid var(--ink);outline-offset:2px;border-radius:inherit}
-/* поля ввода: кольцо ложится по самой рамке, снаружи мягкий лаймовый ореол */
-/* фокус поля — одна обводка: тёмная рамка, без ореола */
-input:focus-visible,textarea:focus-visible,select:focus-visible,
-input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);border-width:1.5px}
-.field.is-err input:focus,.field.is-err textarea:focus,.field.is-err select:focus{border-color:var(--err);box-shadow:none}
-/* пилюли и круглые кнопки: кольцо не должно квадратиться */
-.btn:focus-visible,.catbtn:focus-visible,.chipx:focus-visible,.chip button:focus-visible,
-.subcats a:focus-visible,.pager a:focus-visible,.jfilter button:focus-visible,
-.pill-tabs button:focus-visible,.opts button:focus-visible,.msgr a:focus-visible,
-.hact:focus-visible,.srch__x:focus-visible,.srch__clr:focus-visible{outline-offset:3px;border-radius:999px}
+:focus,:focus-visible{outline:none}
+/* сброс браузерных мелочей: подсветка тапа, внутренняя рамка кнопок в Firefox, крестики и стрелки полей, жёлтый автозаполнения */
+*{-webkit-tap-highlight-color:transparent}
+button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border:0;padding:0}
+input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration,input[type=search]::-webkit-search-results-button{-webkit-appearance:none;appearance:none}
+input::-ms-clear,input::-ms-reveal{display:none}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-text-fill-color:var(--ink);-webkit-box-shadow:0 0 0 1000px var(--white) inset;transition:background-color 9999s}
+summary{list-style:none}summary::-webkit-details-marker{display:none}
+/* единый фокус сайта: лаймовая рамка у полей, лаймовое кольцо у кнопок и ссылок (только с клавиатуры) */
+input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select:focus{outline:none;border-color:var(--lime-d);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
+.field.is-err input:focus,.field.is-err textarea:focus,.field.is-err select:focus{border-color:var(--err);box-shadow:0 0 0 3px rgba(192,57,43,.12)}
+:focus-visible:not(input,textarea,select){outline:none;box-shadow:0 0 0 3px rgba(215,232,92,.7);border-radius:inherit}
 .pc:has(:focus-visible),.vol:focus-within,.radio-card:focus-within,.symp label:focus-within{border-color:#C2C2B6}
 [hidden]{display:none!important}
 
@@ -107,7 +110,7 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .search{flex:1;display:flex;max-width:460px;background:#1F1F1B;border:1px solid #33332E;border-radius:999px;overflow:hidden}
 .search input{flex:1;background:none;border:0;padding:10px 16px;color:#fff;min-width:0}
 .search input::placeholder{color:#8B8B82}
-.search input:focus{outline:none}
+.search input:focus{outline:none;box-shadow:none}
 .search button{border:0;background:none;color:#C9C9C2;padding:0 14px;display:grid;place-items:center}
 .search button svg{width:17px;height:17px}
 .hdr__acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
@@ -301,7 +304,6 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .field--flat{padding-bottom:0}
 .field label{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)}
 .field input,.field select,.field textarea{width:100%;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:12px 14px;font-size:15px}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ink)}
 /* место под сообщение зарезервировано, сам текст абсолютом — ничего не прыгает */
 .field .err{position:absolute;left:0;right:0;top:100%;margin-top:-18px;color:var(--err);font-size:12.5px;
   line-height:1.35;display:block;pointer-events:none}
@@ -313,7 +315,6 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .check.is-err{color:var(--err)}
 .check.is-err input{outline:2px solid var(--err);outline-offset:2px;border-radius:4px}
 .field.is-err input{border-color:var(--err)}
-.field.is-err input:focus-visible{outline:none;border-color:var(--err)}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .check{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--gray);line-height:1.5;cursor:pointer}
 .check input{margin:0;accent-color:var(--ink);width:16px;height:16px;flex-shrink:0;cursor:pointer}
@@ -428,9 +429,6 @@ html{color-scheme:light}
 [id]{scroll-margin-top:124px}
 .skip{position:absolute;left:16px;top:-100px;z-index:200;background:var(--lime);color:var(--ink);padding:10px 16px;border-radius:999px;font-weight:700}
 .skip:focus{top:12px}
-.hdr :focus-visible,.ftr :focus-visible,.svc :focus-visible,.pl :focus-visible,.cert :focus-visible,.bean :focus-visible,.btn--dark:focus-visible{outline-color:var(--lime)}
-.btn:focus-visible,.catbtn:focus-visible{outline-color:var(--ink)}
-.hdr .btn:focus-visible{outline-color:#fff}
 .btn:active,.catbtn:active,.chipx:active,.opts button:active{transform:translateY(0) scale(.98)}
 .display,h1,h2,h3,h4{text-wrap:balance}
 p,li,dd{text-wrap:pretty}
@@ -502,7 +500,7 @@ input,textarea{caret-color:var(--ink)}
 .code4{display:flex;gap:10px;margin:4px 0 10px}
 .code4 input{width:56px;height:62px;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:24px;
   border:1px solid var(--line);border-radius:var(--rad-s);background:var(--white);padding:0}
-.code4 input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 60%,transparent)}
+.code4 input:focus{border-color:var(--lime-d)}
 .code4.is-err input{border-color:var(--err);animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
 .resend{font-size:12.5px;color:var(--gray);min-height:1lh}
@@ -657,7 +655,7 @@ input,textarea{caret-color:var(--ink)}
 .srch__f input{flex:1;background:none;border:0;color:#fff;font-family:Unbounded;font-weight:700;
   font-size:clamp(18px,2.6vw,30px);letter-spacing:-.01em;padding:0;min-width:0}
 .srch__f input::placeholder{color:#6E6E66;font-weight:500}
-.srch__f input:focus{outline:none}
+.srch__f input:focus{outline:none;box-shadow:none}
 .srch__f input{caret-color:var(--lime)}  /* тёмная каретка на тёмном фоне была не видна */
 .srch__f input::-webkit-search-cancel-button,.srch__f input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .srch__clr{width:34px;height:34px;border-radius:50%;background:#2C2C27;border:0;color:#C9C9C2;display:none;place-items:center;font-size:17px;flex-shrink:0}
@@ -711,7 +709,7 @@ input,textarea{caret-color:var(--ink)}
 .spage__f:focus-within{border-color:var(--lime);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
 .spage__f>svg{width:18px;height:18px;flex-shrink:0;color:var(--gray)}
 .spage__f input{flex:1;min-width:0;border:0;background:none;font:500 16px/1.4 inherit;color:var(--ink);padding:10px 6px}
-.spage__f input:focus{outline:none}
+.spage__f input:focus{outline:none;box-shadow:none}
 .spage__f input::placeholder{color:var(--gray-2)}
 .spage__f input::-webkit-search-cancel-button,.spage__f input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .spage__clr{display:none;place-items:center;width:34px;height:34px;border:0;background:none;color:var(--gray);flex-shrink:0;cursor:pointer}
@@ -1295,8 +1293,6 @@ input,textarea{caret-color:var(--ink)}
 .cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
 /* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
-.pill-tabs button:focus-visible,.link:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 70%,transparent)}
-.link:focus-visible{border-radius:6px}
 .cop .corec{display:flex;align-items:center;gap:16px;margin:-6px 0 20px;padding:16px 18px;border-radius:var(--rad-s);background:var(--lime-soft);border:1px solid var(--lime)}
 .cop .corec[hidden]{display:none}
 .cop .corec>div{flex:1;display:grid;gap:3px;font-size:13.5px;line-height:1.45;color:var(--gray)}
