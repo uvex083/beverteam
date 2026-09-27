@@ -193,6 +193,8 @@ if (!$locOk) {
     $err['delivery'] = 'Выберите способ доставки';
 } elseif ($f['mode'] === 'addr' && $f['street'] === '') {
     $err['street'] = 'Это поле нужно заполнить';
+} elseif ($f['mode'] === 'addr' && !preg_match('/\p{L}{2,}.*\d/u', $f['street'])) {
+    $err['street'] = 'Укажите номер дома';
 } elseif ($f['mode'] === 'pvz' && $f['pvz'] === '') {
     $err['pvz'] = 'Это поле нужно заполнить';
 }

@@ -569,9 +569,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     tel:{test:v=>v.replace(/\D/g,'').length===11, msg:'Введите номер полностью: +7 и 10 цифр'},
     name:{test:v=>v.trim().length>=2, msg:'Как к вам обращаться? Минимум 2 символа'},
     inn:{test:v=>[10,12].includes(v.replace(/\D/g,'').length), msg:'ИНН состоит из 10 цифр у компании и 12 у ИП'},
-    text:{test:v=>v.trim().length>0, msg:'Заполните поле'}
+    text:{test:v=>v.trim().length>0, msg:'Заполните поле'},
+    addr:{test:v=>/[а-яёa-z]{2,}.*\d/i.test(v), msg:'Укажите номер дома'}
   };
   const kindOf = el => {
+    if(el.dataset.v) return el.dataset.v;
     const lab=(el.closest('.field')?.querySelector('label')?.textContent||'').toLowerCase();
     if(el.type==='email'||lab.includes('mail')) return 'email';
     if(el.type==='tel'||lab.includes('телефон')) return 'tel';
