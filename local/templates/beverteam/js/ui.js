@@ -1473,10 +1473,16 @@ window.BT_mapWidget = (el, opts) => {
   const o = Object.assign({text:BT_MAP_QUERY, z:17}, opts||{});
   const src = `https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(o.text)}&z=${o.z}&lang=ru_RU`;
   const f = document.createElement('iframe');
-  f.src=src; f.loading='lazy'; f.title='Карта — BEVERTEAM'; f.allowFullscreen=true;
+  f.title='Карта — BEVERTEAM'; f.allowFullscreen=true;
   f.style.cssText='width:100%;height:100%;border:0;display:block';
-  /* если виджет не загрузился (нет сети), остаётся подложка-заглушка под ним */
-  el.appendChild(f);
+  /* виджет тянет ~2 МБ скриптов: грузим, когда блок рядом с экраном и посетитель начал действовать; до того и без сети — подложка-заглушка */
+  const evs=['scroll','wheel','touchstart','pointerdown','pointermove','keydown'];
+  let seen=false, acted=false;
+  const go=()=>{ if(f.src||!seen||!acted) return; f.src=src; el.appendChild(f); io.disconnect(); evs.forEach(e=>removeEventListener(e,act,true)); };
+  const act=()=>{ acted=true; go(); };
+  const io=new IntersectionObserver(es=>{ if(es.some(x=>x.isIntersecting)){ seen=true; go(); } },{rootMargin:'400px 0px'});
+  io.observe(el); evs.forEach(e=>addEventListener(e,act,{capture:true,passive:true}));
+  el.addEventListener('click',()=>{ seen=acted=true; go(); });
   return f;
 };
 
