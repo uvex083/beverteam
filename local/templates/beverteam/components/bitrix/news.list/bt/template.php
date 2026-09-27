@@ -8,7 +8,7 @@ foreach ($arResult['ITEMS'] as $it) {
     $kind = $it['PROPERTIES']['KIND']['VALUE_XML_ID'] ?? 'article';
     $date = $it['ACTIVE_FROM'] ?: $it['DATE_CREATE'];
     $posts[] = [
-        'kind' => $kind ?: 'article', 'cat' => ($it['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'),
+        'kind' => $kind ?: 'article', 'cat' => bt_blog_rubrics()[(int)$it['IBLOCK_SECTION_ID']]['name'] ?? (($it['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи')),
         'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $it['~NAME'], 'lead' => trim(strip_tags((string)$it['~PREVIEW_TEXT'])),
         'url' => $it['~DETAIL_PAGE_URL'], 'img' => $it['PREVIEW_PICTURE']['SRC'] ?? '',
     ];

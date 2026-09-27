@@ -29,7 +29,7 @@ I.home='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-wid
 /* ---------- Журнал: новости и статьи в одном инфоблоке, рубрика решает раздел ---------- */
 // материалы журнала отдаёт сервер (header.php → bt_posts)
 window.BT_POSTS=window.BT_POSTS||[];
-window.BT_postUrl = p => p.url||'/news/'+p.id+'/';
+window.BT_postUrl = p => p.url||'/blog/'+p.id+'/';
 
 /* Фирменная заглушка вместо фото: SVG в data-URI, не зависит от внешних картинок.
    Используется, пока клиент не пришлёт реальные снимки. */
@@ -257,7 +257,7 @@ window.BT_cartSync = (id,q,was) => {
 };
 window.BT_cartUpdate = pulse => {
   const t=BT_cartTotal(), a=document.querySelector('.hact[href="/personal/cart/"]'); if(!a) return;
-  const c=a.querySelector('.cnt'); if(c) c.textContent=t.n;
+  const c=a.querySelector('.cnt'); if(c){ c.textContent=t.n; c.hidden=!t.n; }
   const l=a.querySelector('span:not(.cnt)'); if(l) l.textContent=t.n?fmt(t.sum):'Корзина';
   if(pulse){a.classList.remove('is-pulse');void a.offsetWidth;a.classList.add('is-pulse');}
 };
@@ -364,7 +364,7 @@ const NAV = [
   {t:'Магазин', h:'/magazin/', sub:[['Кофе','/magazin/'],['Чай','/magazin/'],['Кофемашины','/magazin/'],['Аксессуары','/magazin/']]},
   {t:'Аренда кофемашин', h:'/arenda-kofemashin/', sub:[['Для офиса','/arenda-kofemashin/'],['Для кафе и HoReCa','/arenda-kofemashin/'],['На мероприятие','/arenda-kofemashin/'],['Кофе по подписке','/podpiska/']]},
   {t:'Сервис', h:'/servis/', sub:[['Ремонт кофемашин','/servis/remont-kofemashin/'],['Плановое ТО и чистка','/servis/#price'],['Продажа оборудования','/servis/'],['Вызвать инженера','/servis/remont-kofemashin/#form']]},
-  {t:'Журнал', h:'/news/', sub:[['Статьи','/news/'],['Новости','/news/'],['Подбор кофе за минуту','/podbor-kofe/']]},
+  {t:'Журнал', h:'/blog/', sub:[['Все материалы','/blog/']]},
   {t:'Ещё', h:'', sub:[['Оплата и доставка','/oplata-i-dostavka/'],['Возврат и обмен','/vozvrat-i-obmen/'],['О компании','/o-kompanii/'],['Контакты','/kontakty/'],['Карта сайта','/sitemap/']]}
 ];
 function navHtml(){
@@ -387,7 +387,7 @@ function header(){
       <a class="hact" href="/personal/">${I.user}<span>Кабинет</span></a>
       <a class="hact" href="#" onclick="BT_toast('Избранное — в прототипе не реализовано');return false">${I.heart}<span>Избранное</span></a>
       <a class="hact hact--cmp" href="/magazin/compare/" aria-label="Сравнение товаров">${I.compare}<span class="cnt" hidden>0</span><span>Сравнение</span></a>
-      <a class="hact" href="/personal/cart/" aria-label="Корзина">${I.cart}<span class="cnt">${cartCnt}</span><span>Корзина</span></a>
+      <a class="hact" href="/personal/cart/" aria-label="Корзина">${I.cart}<span class="cnt"${cartCnt?'':' hidden'}>${cartCnt}</span><span>Корзина</span></a>
     </div>
   </div>
   <div class="wrap hdr__nav">
@@ -418,7 +418,7 @@ function drawer(){
       <a class="drawer__l" href="/podpiska/">Кофе по подписке</a>
       <a class="drawer__l" href="/servis/">Услуги и сервис</a>
       <a class="drawer__l" href="/servis/remont-kofemashin/">Ремонт кофемашин</a>
-      <a class="drawer__l" href="/news/">Журнал</a>
+      <a class="drawer__l" href="/blog/">Журнал</a>
       <a class="drawer__l" href="/o-kompanii/">О компании</a>
       <a class="drawer__l" href="/oplata-i-dostavka/">Оплата и доставка</a>
       <a class="drawer__l" href="/kontakty/">Контакты</a>
@@ -445,7 +445,7 @@ function footer(){
       <div class="ftr__hours"><b>Время работы</b>Офис: ${CO.hours}<br>${CO.hoursSvc}<br>Сб–Вс — выходные</div></div>
     <div><h5>Каталог</h5><ul><li><a href="/magazin/">Чай</a></li><li><a href="/magazin/">Кофе BOTANICA</a></li><li><a href="/magazin/">Автоматические кофемашины JETINNO</a></li><li><a href="/magazin/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
     <div><h5>Услуги</h5><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/magazin/">Кофе оптом</a></li></ul></div>
-    <div><h5>Покупателям</h5><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/news/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
+    <div><h5>Покупателям</h5><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/blog/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
     <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><h5>Контакты</h5><ul>
       <li><a href="tel:${CO.tel1}" itemprop="telephone">${CO.tel1f}</a></li>
       <li><a href="tel:${CO.tel2}">${CO.tel2f}</a></li>

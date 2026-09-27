@@ -500,7 +500,7 @@ function bt_posts(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $posts = [];
     $r = \CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC', 'SORT' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false,
-        ['ID', 'IBLOCK_ID', 'NAME', 'CODE', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
+        ['ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'NAME', 'CODE', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
     while ($f = $r->GetNext()) {
         $posts[] = bt_post_data($f);
     }
@@ -509,7 +509,7 @@ function bt_posts(): array
     return $posts;
 }
 
-// Поля элемента журнала (выборка с PROPERTY_KIND/RUBRIC/READ_TIME) → формат BT_POSTS
+// Поля элемента журнала (выборка с IBLOCK_SECTION_ID и PROPERTY_KIND/RUBRIC/READ_TIME) → формат BT_POSTS; рубрика — раздел инфоблока
 function bt_post_data(array $f): array
 {
     $kind = 'article';
@@ -518,7 +518,8 @@ function bt_post_data(array $f): array
     }
     $date = $f['ACTIVE_FROM'] ?: $f['DATE_CREATE'];
     return [
-        'id' => $f['CODE'], 'kind' => $kind, 'cat' => ($f['~PROPERTY_RUBRIC_VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'),
+        'id' => $f['CODE'], 'kind' => $kind, 'cat' => bt_blog_rubrics()[(int)($f['IBLOCK_SECTION_ID'] ?? 0)]['name'] ?? (($f['~PROPERTY_RUBRIC_VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи')),
+        'rub' => bt_blog_rubrics()[(int)($f['IBLOCK_SECTION_ID'] ?? 0)]['url'] ?? '',
         'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $f['~NAME'], 'lead' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
         'min' => (int)($f['PROPERTY_READ_TIME_VALUE'] ?? 0), 'url' => $f['~DETAIL_PAGE_URL'],
         'img' => bt_img($f['PREVIEW_PICTURE'], 1040, 650, BX_RESIZE_IMAGE_EXACT),
@@ -905,12 +906,15 @@ function bt_sitemap_build(): string
 {
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
-    $urls = ['/', '/magazin/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/news/',
+    $urls = ['/', '/magazin/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
         '/o-kompanii/', '/otzyvy-o-nas/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
         $urls[] = $s['SECTION_PAGE_URL'];
+    }
+    foreach (bt_blog_rubrics() as $rub) {
+        $urls[] = $rub['url'];
     }
     foreach (['catalog', 'journal', 'repair_brands'] as $code) {
         $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock($code), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'DETAIL_PAGE_URL', 'TIMESTAMP_X']);
@@ -974,7 +978,7 @@ function bt_search_pages(): array
         ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],
         ['t' => 'О компании', 'u' => '/o-kompanii/', 'd' => 'BEVERTEAM с 2010 года', 'k' => 'о компании beverteam'],
         ['t' => 'Отзывы', 'u' => '/otzyvy-o-nas/', 'd' => 'Что говорят клиенты', 'k' => 'отзывы'],
-        ['t' => 'Журнал', 'u' => '/news/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
+        ['t' => 'Журнал', 'u' => '/blog/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
         ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],
     ];
     $known = array_column($pages, 'u');
@@ -991,4 +995,27 @@ function bt_search_pages(): array
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
     $cache->endDataCache($pages);
     return $pages;
+}
+
+// Рубрики журнала (разделы инфоблока journal) с числом активных материалов; пустые рубрики не показываем
+function bt_blog_rubrics(): array
+{
+    $ibId = bt_iblock('journal');
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_blog_rubrics', '/bt/journal')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/journal');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $r = \CIBlockSection::GetList(['SORT' => 'ASC', 'NAME' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'CODE', 'SECTION_PAGE_URL']);
+    while ($s = $r->GetNext()) {
+        if ($s['ELEMENT_CNT'] > 0) {
+            $list[(int)$s['ID']] = ['name' => $s['~NAME'], 'code' => $s['CODE'], 'url' => $s['~SECTION_PAGE_URL'], 'cnt' => (int)$s['ELEMENT_CNT']];
+        }
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
+    return $list;
 }

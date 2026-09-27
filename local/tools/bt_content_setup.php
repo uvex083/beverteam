@@ -84,7 +84,7 @@ $transCode = ['CODE' => ['IS_REQUIRED' => 'Y', 'DEFAULT_VALUE' => ['UNIQUE' => '
 
 $journalId = bt_iblock_ensure([
     'IBLOCK_TYPE_ID' => 'news', 'CODE' => 'journal', 'API_CODE' => 'Journal', 'NAME' => 'Статьи и новости', 'SORT' => 10,
-    'LIST_PAGE_URL' => '/news/', 'DETAIL_PAGE_URL' => '/news/#ELEMENT_CODE#/', 'INDEX_ELEMENT' => 'Y', 'FIELDS' => $transCode,
+    'LIST_PAGE_URL' => '/blog/', 'SECTION_PAGE_URL' => '/blog/#SECTION_CODE#/', 'DETAIL_PAGE_URL' => '/blog/#ELEMENT_CODE#/', 'INDEX_ELEMENT' => 'Y', 'FIELDS' => $transCode,
 ], [
     'KIND' => ['Тип материала', 'L', ['VALUES' => [['VALUE' => 'Статья', 'XML_ID' => 'article', 'DEF' => 'Y'], ['VALUE' => 'Новость', 'XML_ID' => 'news']]]],
     'RUBRIC' => ['Рубрика', 'S', []],

@@ -14,7 +14,10 @@ ErrorDocument 404 /404.php
   RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/magazin/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
   RewriteRule ^magazin/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
   RewriteRule ^magazin/product/(jl-05-arenda|jl-15-viva-arenda|jl-36-arenda)/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
-  RewriteRule ^news/view/([^/]+)/?$ https://%{HTTP_HOST}/news/$1/ [R=301,L]
+  RewriteRule ^news/view/([^/]+)/?$ https://%{HTTP_HOST}/blog/$1/ [R=301,L]
+  # журнал переехал с /news/ на /blog/
+  RewriteRule ^news/?$ https://%{HTTP_HOST}/blog/ [R=301,L]
+  RewriteRule ^news/([^/]+)/?$ https://%{HTTP_HOST}/blog/$1/ [R=301,L]
   RewriteRule ^napishite-nam/?$ https://%{HTTP_HOST}/kontakty/#form [R=301,NE,L]
   RewriteRule ^registraciya/?$ https://%{HTTP_HOST}/personal/ [R=301,L]
 
