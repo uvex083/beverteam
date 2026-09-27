@@ -1652,8 +1652,10 @@ window.BT_addrSuggest=(inp,opt={})=>{
     if(li.dataset.h!=='1'&&!opt.full)inp.dispatchEvent(new Event('input'));});
   const auto=()=>{const v=inp.value.trim();if(v.length<2)return;const k=++n;clearTimeout(t);
     req(v).then(r=>{if(k!==n||inp.value.trim()!==v)return;
-      const s=(r.list||[])[0],num=v.match(/\d.*$/),w=words(v);
-      if(!s||!w.length||!w.every(x=>flat(s.v).includes(x)))return;
+      // слова введённого должны встречаться в подсказке в том же порядке: «москва тверская» ≠ «Тверская обл, деревня Москва»
+      const num=v.match(/\d.*$/),w=words(v),fits=x=>{let i=0;return w.every(y=>{const k=flat(x).indexOf(y,i);if(k<0)return false;i=k+y.length;return true;});};
+      const s=w.length&&(r.list||[]).find(x=>fits(x.v));
+      if(!s)return;
       const same=s.house&&num&&s.v.replace(/\D/g,'').endsWith(num[0].replace(/\D/g,''));
       inp.value=same?s.v:opt.full?(num?v:s.v):(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
       show([]);if(num)err('');changed();});};
