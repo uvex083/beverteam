@@ -39,6 +39,7 @@ $allowed = fn(array $u) => $u['ACTIVE'] === 'Y' && !in_array(1, array_map('intva
 $login = function (int $id) use ($USER, $out, $user) {
     unset($_SESSION['BT_AUTH']);
     $USER->Authorize($id, true);
+    BtOAuth::link($id);
     $u = $user($id);
     $out(['ok' => true, 'user' => ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => $u['EMAIL']], 'sessid' => bitrix_sessid()]);
 };

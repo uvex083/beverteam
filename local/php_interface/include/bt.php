@@ -649,6 +649,20 @@ function bt_user_js(): ?array
     return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN'])] : null;
 }
 
+// Кнопки входа через сервисы для ui.js: только включённые в модуле «Социальные сервисы» и с заполненными ключами
+function bt_idp(): array
+{
+    return Loader::includeModule('socialservices') ? BtOAuth::buttons() : [];
+}
+
+// Причина неудачного входа через сервис ['msg', 'email'] — один раз, для окна входа после возврата
+function bt_idp_error(): array
+{
+    $e = (array)($_SESSION['BT_OAUTH_ERR'] ?? []);
+    unset($_SESSION['BT_OAUTH_ERR']);
+    return $e;
+}
+
 // Профили покупателя (реквизиты юрлиц — UR, адреса доставки — FIZ): [id, name, v => значения по коду свойства]
 function bt_profiles(int $userId, string $ptCode): array
 {
