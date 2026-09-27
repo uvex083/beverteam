@@ -1591,4 +1591,4 @@ form[data-form]{position:relative}
 /* узкие телефоны: УТП раздела в одну колонку; в шапке 5 иконок не помещаются — «Сравнение» уходит в мобильное меню */
 .cat .utp{grid-template-columns:repeat(2,1fr)}
 @media(max-width:640px){.cat .utp{grid-template-columns:1fr}}
-@media(max-width:374px){.hdr__acts .hact--cmp{display:none}.pnav{font-size:12px;gap:8px}.pnav a{gap:4px}}
+@media(max-width:374px){.hdr__acts .hact--cmp{display:none}.pnav{font-size:12px;gap:8px}.pnav a{gap:4px}.btn{white-space:normal;max-width:100%;text-align:center}}
