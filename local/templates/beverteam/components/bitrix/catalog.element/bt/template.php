@@ -79,7 +79,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
       </details>
       <?php endif ?>
       <?php if ($arResult['BT_NOTES']): ?>
-        <p class="notes" style="margin:22px 0 0;font-size:16px;max-width:54ch;display:block">Во вкусе: <?= implode(', ', array_map(fn($n) => '<i>' . $e(trim($n)) . '</i>', explode(',', $arResult['BT_NOTES']))) ?></p>
+        <p class="notes" style="margin:22px 0 0;font-size:16px;max-width:54ch;display:flex;flex-wrap:wrap;align-items:center;gap:6px">Во вкусе: <?= implode('', array_map(fn($n) => '<i>' . $e(trim($n)) . '</i>', explode(',', $arResult['BT_NOTES']))) ?></p>
       <?php elseif (!empty($m['par'])): ?>
         <p class="notes" style="margin:22px 0 0;font-size:16px;max-width:54ch;display:block"><?= $e($m['par']) ?></p>
       <?php endif ?>
