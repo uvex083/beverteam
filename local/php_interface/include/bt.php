@@ -500,7 +500,7 @@ function bt_posts(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $posts = [];
     $r = \CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC', 'SORT' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false,
-        ['ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'NAME', 'CODE', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
+        ['ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'NAME', 'CODE', 'TAGS', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
     while ($f = $r->GetNext()) {
         $posts[] = bt_post_data($f);
     }
@@ -520,6 +520,7 @@ function bt_post_data(array $f): array
     return [
         'id' => $f['CODE'], 'kind' => $kind, 'cat' => bt_blog_rubrics()[(int)($f['IBLOCK_SECTION_ID'] ?? 0)]['name'] ?? (($f['~PROPERTY_RUBRIC_VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи')),
         'rub' => bt_blog_rubrics()[(int)($f['IBLOCK_SECTION_ID'] ?? 0)]['url'] ?? '',
+        'tags' => bt_tags_split((string)($f['~TAGS'] ?? $f['TAGS'] ?? '')),
         'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $f['~NAME'], 'lead' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
         'min' => (int)($f['PROPERTY_READ_TIME_VALUE'] ?? 0), 'url' => $f['~DETAIL_PAGE_URL'],
         'img' => bt_img($f['PREVIEW_PICTURE'], 1040, 650, BX_RESIZE_IMAGE_EXACT),
@@ -1056,4 +1057,27 @@ function bt_requisites(): array
         ['Сайт', 'beverteam.ru'],
     ];
     return array_values(array_filter($rows, fn($r) => trim((string)$r[1]) !== ''));
+}
+
+// Теги журнала: поле элемента «Теги» (через запятую) → список; облако — все теги с числом материалов, частые первыми
+function bt_tags_split(string $tags): array
+{
+    return array_values(array_unique(array_filter(array_map(fn($t) => trim($t), explode(',', $tags)), 'strlen')));
+}
+
+function bt_blog_tags(): array
+{
+    $cnt = [];
+    foreach (bt_posts() as $p) {
+        foreach ($p['tags'] ?? [] as $t) {
+            $cnt[$t] = ($cnt[$t] ?? 0) + 1;
+        }
+    }
+    uksort($cnt, fn($a, $b) => [$cnt[$b], $a] <=> [$cnt[$a], $b]);
+    return $cnt;
+}
+
+function bt_tag_url(string $tag): string
+{
+    return '/blog/?tag=' . rawurlencode($tag);
 }

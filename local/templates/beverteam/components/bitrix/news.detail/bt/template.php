@@ -4,7 +4,8 @@
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $kind = $arResult['PROPERTIES']['KIND']['VALUE_XML_ID'] ?? 'article';
-$cat = ($arResult['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи');
+$cat = bt_blog_rubrics()[(int)$arResult['IBLOCK_SECTION_ID']]['name'] ?? (($arResult['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'));
+$tags = bt_tags_split((string)($arResult['~TAGS'] ?? ''));
 $min = (int)($arResult['PROPERTIES']['READ_TIME']['VALUE'] ?? 0);
 $date = $arResult['ACTIVE_FROM'] ?: $arResult['DATE_CREATE'];
 $iso = $date ? date('Y-m-d', MakeTimeStamp($date)) : '';
@@ -29,6 +30,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     </div>
     <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>" itemprop="image"></figure><?php endif ?>
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>
+    <?php if ($tags): ?><div class="jtags jtags--post"><?php foreach ($tags as $t): ?><a href="<?= $e(bt_tag_url($t)) ?>">#<?= $e($t) ?></a><?php endforeach ?><meta itemprop="keywords" content="<?= $e(implode(', ', $tags)) ?>"></div><?php endif ?>
     <div class="row" style="margin-top:32px;gap:12px">
       <a class="btn" href="/magazin/kofe/">Выбрать зерно</a>
       <a class="btn btn--line" href="/podbor-kofe/">Подобрать кофе за минуту</a>

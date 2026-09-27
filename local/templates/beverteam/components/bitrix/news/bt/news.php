@@ -6,7 +6,21 @@
 
 $rubric = (string)($btRubric ?? '');
 $rubrics = bt_blog_rubrics();
+$tags = bt_blog_tags();
+$tag = (string)($_GET['tag'] ?? '');
+$tag = isset($tags[$tag]) ? $tag : '';
 $posts = $rubric !== '' ? array_values(array_filter(bt_posts(), fn($p) => $p['rub'] === $arResult['FOLDER'] . $rubric . '/')) : bt_posts();
+global $btJournalFilter;
+$btJournalFilter = [];
+if ($tag !== '') {
+    // подборка по тегу — служебная страница: не индексируем, canonical ведёт на журнал
+    $posts = array_values(array_filter($posts, fn($p) => in_array($tag, $p['tags'] ?? [], true)));
+    $btJournalFilter['=CODE'] = array_column($posts, 'id') ?: ['-'];
+    $APPLICATION->SetTitle('#' . $tag);
+    $APPLICATION->SetPageProperty('title', 'Материалы по теме «' . $tag . '» — журнал BEVERTEAM');
+    $APPLICATION->SetPageProperty('robots', 'noindex, follow');
+    $APPLICATION->AddChainItem('#' . $tag);
+}
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'ItemList',
     'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => 'https://' . SITE_SERVER_NAME . $p['url'], 'name' => $p['t']], $posts, array_keys($posts))],
     JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
@@ -15,11 +29,14 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php bt_crumbs() ?>
   <div class="pagehead"><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1><p class="sub">Как выбирать зерно, настраивать кофемашину и ухаживать за оборудованием. Пишем сами, на своём опыте обжарки и сервиса.</p></div>
 
-  <?php if (count($rubrics) > 1 || $rubric !== ''): ?>
+  <?php if (count($rubrics) > 1 || $rubric !== '' || $tag !== ''): ?>
   <nav class="jfilter" aria-label="Рубрики">
-    <a href="<?= $arResult['FOLDER'] ?>" aria-pressed="<?= $rubric === '' ? 'true' : 'false' ?>">Всё</a>
+    <a href="<?= $arResult['FOLDER'] ?>" aria-pressed="<?= $rubric === '' && $tag === '' ? 'true' : 'false' ?>">Всё</a>
     <?php foreach ($rubrics as $r): ?><a href="<?= htmlspecialcharsbx($r['url']) ?>" aria-pressed="<?= $r['code'] === $rubric ? 'true' : 'false' ?>"><?= htmlspecialcharsbx($r['name']) ?></a><?php endforeach ?>
   </nav>
+  <?php endif ?>
+  <?php if ($tags): ?>
+  <nav class="jtags" aria-label="Темы"><span>Темы:</span><?php foreach ($tags as $t => $n): ?><a href="<?= htmlspecialcharsbx(bt_tag_url($t)) ?>"<?= $t === $tag ? ' aria-current="page"' : '' ?>>#<?= htmlspecialcharsbx($t) ?><sup><?= $n ?></sup></a><?php endforeach ?></nav>
   <?php endif ?>
 
   <?php $APPLICATION->IncludeComponent('bitrix:news.list', 'bt', [
@@ -28,7 +45,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
       'SORT_BY2' => $arParams['SORT_BY2'], 'SORT_ORDER2' => $arParams['SORT_ORDER2'],
       'FIELD_CODE' => ['PREVIEW_PICTURE'], 'PROPERTY_CODE' => ['KIND', 'RUBRIC', 'READ_TIME'],
       'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['detail'],
-      'PARENT_SECTION_CODE' => $rubric, 'INCLUDE_SUBSECTIONS' => 'Y', 'CHECK_DATES' => 'Y',
+      'PARENT_SECTION_CODE' => $rubric, 'INCLUDE_SUBSECTIONS' => 'Y', 'CHECK_DATES' => 'Y', 'FILTER_NAME' => 'btJournalFilter',
       'CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_FILTER' => 'Y', 'CACHE_GROUPS' => 'N',
       'SET_TITLE' => $rubric !== '' ? 'Y' : 'N', 'SET_BROWSER_TITLE' => $rubric !== '' ? 'Y' : 'N', 'SET_META_KEYWORDS' => 'N',
       'SET_META_DESCRIPTION' => $rubric !== '' ? 'Y' : 'N', 'SET_LAST_MODIFIED' => 'N',

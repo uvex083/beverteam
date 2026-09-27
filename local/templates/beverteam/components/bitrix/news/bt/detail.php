@@ -10,7 +10,7 @@
   <?php $id = $APPLICATION->IncludeComponent('bitrix:news.detail', 'bt', [
       'IBLOCK_TYPE' => $arParams['IBLOCK_TYPE'], 'IBLOCK_ID' => $arParams['IBLOCK_ID'],
       'ELEMENT_ID' => $arResult['VARIABLES']['ELEMENT_ID'] ?? '', 'ELEMENT_CODE' => $arResult['VARIABLES']['ELEMENT_CODE'] ?? '',
-      'FIELD_CODE' => ['PREVIEW_PICTURE', 'DETAIL_PICTURE'], 'PROPERTY_CODE' => ['KIND', 'RUBRIC', 'READ_TIME'],
+      'FIELD_CODE' => ['PREVIEW_PICTURE', 'DETAIL_PICTURE', 'TAGS'], 'PROPERTY_CODE' => ['KIND', 'RUBRIC', 'READ_TIME'],
       'CHECK_DATES' => 'Y', 'IBLOCK_URL' => $arResult['FOLDER'], 'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['detail'],
       'CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_GROUPS' => 'N',
       'SET_TITLE' => 'Y', 'SET_BROWSER_TITLE' => 'Y', 'BROWSER_TITLE' => '-', 'SET_META_KEYWORDS' => 'Y', 'META_KEYWORDS' => '-',
