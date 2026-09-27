@@ -1301,6 +1301,8 @@ input,textarea{caret-color:var(--ink)}
 .cop .city ul,#addrModal .city ul{position:absolute;left:0;right:0;top:calc(100% - 20px);background:var(--white);border:1px solid var(--line);border-radius:12px;list-style:none;margin:4px 0 0;padding:6px;z-index:5;display:none;box-shadow:0 12px 30px rgba(0,0,0,.1);max-height:320px;overflow:auto}
 .cop .city ul.open,#addrModal .city ul.open{display:block}
 .cop .city.street ul{top:100%}
+/* type=search у улицы — чтобы Chrome не подставлял свои адреса поверх подсказок DaData; системный крестик прячем */
+.cop .street input::-webkit-search-cancel-button,.cop .street input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .cop .city li,#addrModal .city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px}
 .cop .city li:hover,#addrModal .city li:hover{background:var(--paper)}
 .cop .city li small,#addrModal .city li small{color:var(--gray);margin-left:6px}
