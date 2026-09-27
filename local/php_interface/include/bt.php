@@ -1081,3 +1081,33 @@ function bt_tag_url(string $tag): string
 {
     return '/blog/?tag=' . rawurlencode($tag);
 }
+
+// Картинка для соцсетей 1200×630: фото (часто вертикальное) вписывается целиком на фирменный фон. Готовый файл кешируется в /upload/bt_og/
+function bt_og_card(string $src): string
+{
+    $root = $_SERVER['DOCUMENT_ROOT'];
+    $file = $root . parse_url($src, PHP_URL_PATH);
+    if (!is_file($file) || !function_exists('imagecreatetruecolor')) {
+        return $src;
+    }
+    $out = '/upload/bt_og/' . md5($src . filemtime($file)) . '.jpg';
+    if (is_file($root . $out)) {
+        return $out;
+    }
+    $im = @imagecreatefromstring((string)file_get_contents($file));
+    if (!$im) {
+        return $src;
+    }
+    [$W, $H, $pad] = [1200, 630, 40];
+    $w = imagesx($im);
+    $h = imagesy($im);
+    $k = min(($W - 2 * $pad) / $w, ($H - 2 * $pad) / $h);
+    $nw = (int)round($w * $k);
+    $nh = (int)round($h * $k);
+    $card = imagecreatetruecolor($W, $H);
+    imagefill($card, 0, 0, imagecolorallocate($card, 0xEF, 0xEF, 0xE9));
+    imagecopyresampled($card, $im, (int)(($W - $nw) / 2), (int)(($H - $nh) / 2), 0, 0, $nw, $nh, $w, $h);
+    \Bitrix\Main\IO\Directory::createDirectory($root . '/upload/bt_og');
+    imagejpeg($card, $root . $out, 86);
+    return $out;
+}
