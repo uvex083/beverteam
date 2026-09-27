@@ -114,7 +114,7 @@ let USER=window.BT_USER||null;
 try{ localStorage.removeItem('bt_user'); }catch(e){}
 window.BT_user = () => USER;
 window.BT_authPost = data => { const fd=new FormData(); Object.entries(data).forEach(([k,v])=>fd.append(k,v));
-  fd.append('sessid',window.BX&&BX.bitrix_sessid?BX.bitrix_sessid():'');
+  fd.append('sessid',window.BT_SID||'');
   return fetch('/local/ajax/auth.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
 window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
 /* выход: из кабинета — на главную, с остальных страниц — та же страница уже гостем */
@@ -245,7 +245,7 @@ window.BT_cartSet = (id,q) => { const was=CART[id]||0;
 /* запись в корзину Битрикса; не приняли — откатываем количество на экране */
 window.BT_cartSync = (id,q,was) => {
   const fd=new FormData(); fd.append('action','set'); fd.append('id',id); fd.append('q',q);
-  fd.append('sessid',window.BX&&BX.bitrix_sessid?BX.bitrix_sessid():'');
+  fd.append('sessid',window.BT_SID||'');
   return fetch('/local/ajax/cart.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
     if(!d.ok) throw new Error(d.error||'cart');
     window.BT_BASKET={items:d.items,sum:d.sum};
@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     $a('#aUId').textContent=USER.email||''; }
   /* вошли: страницы кабинета и оформления перерисовывает сервер под покупателя */
   function done(r,msg){
-    if(r.sessid&&window.BX&&BX.message) BX.message({bitrix_sessid:r.sessid});
+    if(r.sessid) window.BT_SID=r.sessid;
     BT_login(r.user); clearInterval(timer);
     if(location.pathname.startsWith('/personal/')){ location.reload(); return; }
     fillDone(); step('done'); BT_toast(msg);
@@ -1206,7 +1206,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* ---------- личный кабинет: профиль, юрлица, адреса, повтор заказа → local/ajax/account.php ---------- */
   const accPost=data=>{ const fd=data instanceof FormData?data:new FormData();
     if(!(data instanceof FormData)) Object.entries(data).forEach(([k,v])=>fd.append(k,v));
-    fd.append('sessid',BX.bitrix_sessid());
+    fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/account.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
   /* после сохранения страницу перерисовывает сервер, сообщение показываем уже на новой */
   try{ const m=sessionStorage.getItem('bt_toast'); if(m){ sessionStorage.removeItem('bt_toast'); setTimeout(()=>BT_toast(m),200); } }catch(e){}
@@ -1248,7 +1248,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(am){
     const f=am.querySelector('form'), D=JSON.parse(am.dataset.ekb), ci=f.elements.city, ul=f.querySelector('.city ul'), box=document.getElementById('adrMap');
     let mapOn=false, cityT=0, cityN=0;
-    const cityPost=q=>{ const fd=new FormData(); fd.append('action','city'); fd.append('q',q); fd.append('sessid',BX.bitrix_sessid());
+    const cityPost=q=>{ const fd=new FormData(); fd.append('action','city'); fd.append('q',q); fd.append('sessid',window.BT_SID||'');
       return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
     const showCities=list=>{ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
       ul.innerHTML=list.map(c=>`<li role="option" data-code="${esc(c.code)}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`).join('');

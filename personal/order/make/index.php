@@ -135,7 +135,7 @@ window.BT_CO_DATA=<?= Json::encode(['popular' => $popular, 'pays' => $pays]) ?>;
 document.addEventListener('DOMContentLoaded',()=>{
   const {popular:POP,pays:PAYS}=BT_CO_DATA, fmt=BT_fmt, form=coForm;
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',BX.bitrix_sessid());
+  const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
   let pt='FIZ', dl=[], avail=[], sel=null, tab='addr', payId=0, calcN=0, sending=false;
 

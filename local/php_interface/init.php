@@ -22,4 +22,12 @@ if (preg_match('/\.na4u\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
 // push-сервер не подключён: клиент Push & Pull на сайте не запускаем, иначе у авторизованных ошибка PULL_DISABLED в консоли
 if (!defined('ADMIN_SECTION')) {
     define('BX_PULL_SKIP_INIT', true);
+    // ядро BX посетителям не нужно: его тянут только клиент pull и счётчик модуля «Конверсия»
+    $em = \Bitrix\Main\EventManager::getInstance();
+    foreach ($em->findEventHandlers('main', 'OnProlog') as $key => $h) {
+        if (in_array($h['TO_MODULE_ID'] ?? '', ['pull', 'conversion'], true)) {
+            $em->removeEventHandler('main', 'OnProlog', $key);
+        }
+    }
+    unset($em, $key, $h);
 }
