@@ -8,6 +8,11 @@ AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 // покупатели входят только по коду или через сервисы: пароль — только у администраторов
 AddEventHandler('main', 'OnBeforeUserLogin', 'bt_password_login_guard');
 AddEventHandler('main', 'OnBeforeUserChangePassword', 'bt_password_change_guard');
+
+// меню (каталог, журнал, аренда) — новый раздел или рубрика видны сразу, без ожидания кеша
+foreach (['OnAfterIBlockSectionAdd', 'OnAfterIBlockSectionUpdate', 'OnAfterIBlockSectionDelete', 'OnAfterIBlockElementAdd', 'OnAfterIBlockElementUpdate', 'OnAfterIBlockElementDelete'] as $ev) {
+    AddEventHandler('iblock', $ev, 'bt_menu_cache_reset');
+}
 require_once __DIR__ . '/include/bt_mail.php';
 
 // письма о заказе: состав и детали заказа полями #BT_*#

@@ -1019,3 +1019,15 @@ function bt_blog_rubrics(): array
     $cache->endDataCache($list);
     return $list;
 }
+
+// Меню строятся из инфоблоков (каталог, аренда, рубрики журнала), а кеш компонента меню без тегов — сбрасываем его при правке этих инфоблоков
+function bt_menu_cache_reset($fields): void
+{
+    static $done = false;
+    $ib = (int)(is_array($fields) ? ($fields['IBLOCK_ID'] ?? 0) : 0);
+    if ($done || !in_array($ib, [bt_iblock('catalog'), bt_iblock('journal'), bt_iblock('rent')], true)) {
+        return;
+    }
+    $done = true;
+    \CBitrixComponent::clearComponentCache('bitrix:menu');
+}
