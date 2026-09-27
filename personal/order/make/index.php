@@ -76,7 +76,11 @@ $co = bt_contacts();
     <div>
       <div class="blk">
         <h2><b>1</b>Получатель</h2>
-        <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div><p class="muted">Войдите, чтобы не заполнять данные и видеть историю заказов, или <a class="link" href="#auth" data-auth>получите код на почту</a>. Можно оформить и без входа.</p></div><?php endif ?>
+        <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div></div>
+        <div class="field" style="margin-bottom:18px"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>">
+          <span class="hint">Если вы уже покупали у нас — подставим данные из прошлого заказа</span></div>
+        <div class="alert alert--info corec" id="coRec" hidden>Вы уже покупали у нас. <button type="button" class="link" id="coRecBtn">Получить код на почту</button> — и мы подставим имя, телефон, адрес и реквизиты. Или просто продолжайте.</div>
+        <?php endif ?>
         <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="<?= $ptDef === 'FIZ' ? 'true' : 'false' ?>" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="<?= $ptDef === 'UR' ? 'true' : 'false' ?>" data-t="UR">Юрлицо или ИП</button></div>
         <div id="urFields"<?= $ptDef === 'UR' ? '' : ' hidden' ?> style="margin-top:18px">
           <?php if ($orgs): ?>
@@ -100,7 +104,7 @@ $co = bt_contacts();
         <div class="f2" style="margin-top:18px">
           <div class="field"><label for="coName" id="coNameL">Имя *</label><input id="coName" name="name" autocomplete="name" value="<?= $e($u['name']) ?>"></div>
           <div class="field"><label for="coPhone">Телефон *</label><input id="coPhone" name="phone" type="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__" value="<?= $e($u['phone'] ? bt_phone_fmt($u['phone']) : '') ?>"></div>
-          <div class="field" style="grid-column:1/-1"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>"></div>
+          <?php if ($USER->IsAuthorized()): ?><div class="field" style="grid-column:1/-1"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>"></div><?php endif ?>
         </div>
       </div>
 
@@ -231,6 +235,18 @@ document.addEventListener('DOMContentLoaded',()=>{
     const v=r.value==='0'?{}:JSON.parse(r.dataset.v);
     ['company','inn','kpp','company_adr'].forEach(k=>{form.elements[k].value=v[k]||'';setErr(form.elements[k],'');});
     orgFields.hidden=r.value!=='0'; if(r.value==='0')coCompany.focus(); ready();});
+
+  /* гость ввёл e-mail постоянного покупателя — предлагаем код, без входа тоже можно */
+  const rec=document.getElementById('coRec');
+  if(rec){ let recFor='';
+    coEmail.addEventListener('blur',()=>{const v=coEmail.value.trim().toLowerCase();
+      if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(v)){rec.hidden=true;return;}
+      if(v===recFor)return; recFor=v;
+      BT_authPost({action:'check',email:v}).then(r=>{rec.hidden=!(r.ok&&r.exists&&coEmail.value.trim().toLowerCase()===v);}).catch(()=>{});});
+    coEmail.addEventListener('input',()=>{if(coEmail.value.trim().toLowerCase()!==recFor)rec.hidden=true;});
+    coRecBtn.addEventListener('click',()=>BT_auth(coEmail.value.trim()));
+    if(coEmail.value.trim())coEmail.dispatchEvent(new Event('blur'));
+  }
 
   /* город: популярные из макета + поиск по местоположениям Битрикса */
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;

@@ -4,6 +4,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CUser $USER */
 
 use Bitrix\Main\Loader;
+use Bitrix\Main\Web\Json;
 use Bitrix\Sale;
 
 $APPLICATION->SetTitle('Заказ принят');
@@ -89,6 +90,10 @@ if (!$order) {
       </dl>
     </div>
 
+    <?php if (!$USER->IsAuthorized() && !empty($props['EMAIL'])): ?>
+    <div class="alert alert--info oklogin"><b>Кабинет покупателя</b><span>История заказов, адреса и реквизиты для следующих покупок. Пароль не нужен — пришлём код на <?= $e($props['EMAIL']) ?>.</span>
+      <button type="button" class="btn btn--dark" onclick="BT_auth(<?= $e(Json::encode($props['EMAIL'])) ?>)">Войти в кабинет</button></div>
+    <?php endif ?>
     <div class="next">
       <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/">личном кабинете</a></span></div>
       <div><b>Изменить заказ</b><span>Позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a> до отправки</span></div>

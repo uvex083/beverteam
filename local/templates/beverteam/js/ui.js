@@ -835,7 +835,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
   let pending=null, timer=null, busy=false;
 
-  window.BT_auth=()=>{ au.classList.add('open'); step(USER?'done':'pick'); if(USER) fillDone(); };
+  window.BT_auth=login=>{ au.classList.add('open');
+    if(typeof login==='string'&&login&&!USER){ $a('#aLogin').value=login; step('pick'); send(login); return; }
+    step(USER?'done':'pick'); if(USER) fillDone(); };
   au.addEventListener('click',e=>{if(e.target.closest('[data-close]'))au.classList.remove('open');});
 
   function fillDone(){ if(!USER)return;

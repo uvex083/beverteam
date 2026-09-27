@@ -1,5 +1,5 @@
 <?php
-// Вход = регистрация по коду из письма. POST action=send (login) | verify (code) | register (name) | logout.
+// Вход = регистрация по коду из письма. POST action=check (email → есть ли покупатель) | send (login) | verify (code) | register (name) | logout.
 // Код — 4 цифры, в сессии только хэш: 10 минут, 5 попыток. Отправки и ошибки пишутся в журнал событий — по нему лимиты на e-mail и IP.
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
@@ -49,6 +49,11 @@ switch ((string)$req->getPost('action')) {
         unset($_SESSION['BT_AUTH']);
         $USER->Logout();
         $out(['ok' => true, 'sessid' => bitrix_sessid()]);
+
+    case 'check':
+        $email = mb_strtolower(trim((string)$req->getPost('email')));
+        $found = check_email($email, true) ? UserTable::getList(['filter' => ['=EMAIL' => $email], 'select' => ['ID', 'ACTIVE'], 'limit' => 1])->fetch() : null;
+        $out(['ok' => true, 'exists' => (bool)($found && $allowed($found))]);
 
     case 'send':
         if ($USER->IsAuthorized()) {
