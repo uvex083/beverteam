@@ -60,7 +60,6 @@ foreach (bt_messengers() as [$code, $name, $href]) {
 ?>
 <div class="dn" id="dn">
   <section class="dn__p dn__root is-on" id="dp0">
-    <button class="dn__srch" type="button" id="srchBtnM"><?= bt_icon('search') ?>Что ищем?</button>
     <nav class="dn__accent" aria-label="Разделы сайта"><?= $accent ?></nav>
     <nav class="dn__plain" aria-label="Покупателям"><?= $plain ?></nav>
     <div class="dn__acc">

@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* drawer */
   const dr=document.getElementById('drawer'), burger=document.getElementById('burger'), dn=document.getElementById('dn');
-  watch(dr,'.dn__srch');
+  watch(dr,'.dn__a');
   const dnStack=[];
   const dnCur=()=>dn.querySelector('.dn__p.is-on');
   /* кабинет и счётчики — из данных посетителя в браузере, а не в разметке: меню кешируется */
