@@ -1483,22 +1483,19 @@ window.BT_CO_COORDS = [60.533999,56.78314];   /* ул. Колокольная, 3
 window.BT_MAP_QUERY = 'Екатеринбург, улица Колокольная, 31А';
 window.BT_mapWidget = (el, opts) => {
   if(!el) return;
-  /* по координатам с меткой, а не поиском по адресу: у поиска поверх карты панель «1 найден» */
+  /* статичная карта Яндекса (без ключа, рекламы и кнопок виджета) по размеру блока, метка — наша, в центре */
   const o = Object.assign({c:BT_CO_COORDS, z:17}, opts||{});
-  const ll = o.c.join(',');
-  const src = `https://yandex.ru/map-widget/v1/?ll=${ll}&z=${o.z}&pt=${ll},pm2dgl&lang=ru_RU`;
-  const f = document.createElement('iframe');
-  f.title='Карта — BEVERTEAM'; f.allowFullscreen=true;
-  f.style.cssText='width:100%;height:100%;border:0;display:block';
-  /* виджет тянет ~2 МБ скриптов: грузим, когда блок рядом с экраном и посетитель начал действовать; до того и без сети — подложка-заглушка */
-  const evs=['scroll','wheel','touchstart','pointerdown','pointermove','keydown'];
-  let seen=false, acted=false;
-  const go=()=>{ if(f.src||!seen||!acted) return; f.src=src; el.appendChild(f); io.disconnect(); evs.forEach(e=>removeEventListener(e,act,true)); };
-  const act=()=>{ acted=true; go(); };
-  const io=new IntersectionObserver(es=>{ if(es.some(x=>x.isIntersecting)){ seen=true; go(); } },{rootMargin:'400px 0px'});
-  io.observe(el); evs.forEach(e=>addEventListener(e,act,{capture:true,passive:true}));
-  el.addEventListener('click',()=>{ seen=acted=true; go(); });
-  return f;
+  const ll = o.c.join(','), W = el.clientWidth||650, H = el.clientHeight||420;
+  const w = 650, h = Math.min(450, Math.round(w*H/W)), z = W > 900 ? o.z-1 : o.z;
+  const img = new Image();
+  img.alt = 'Карта: '+BT_MAP_QUERY; img.loading = 'lazy'; img.decoding = 'async'; img.className = 'map__img';
+  img.src = `https://static-maps.yandex.ru/1.x/?ll=${ll}&z=${z}&size=${w},${h}&scale=2&l=map&lang=ru_RU`;
+  img.onload = () => el.classList.add('is-map');
+  const lat = o.c[1], lon = o.c[0];
+  el.insertAdjacentHTML('beforeend', `<span class="map__pin"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path fill="#0E0E0C" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.8" fill="#D7E85C"/></svg></span>
+    <span class="map__btns"><a class="map__btn" href="https://yandex.ru/maps/?pt=${lon},${lat}&z=17&l=map" target="_blank" rel="noopener">Открыть в Яндекс Картах</a><a class="map__btn map__btn--lime" href="https://yandex.ru/maps/?rtext=~${lat},${lon}&rtt=auto" target="_blank" rel="noopener">Маршрут</a></span>`);
+  el.prepend(img);
+  return img;
 };
 
 /* Интерактивная карта с выбором точки. Без ключа возвращает null — вызывающий код
