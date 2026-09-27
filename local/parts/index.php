@@ -156,7 +156,7 @@ if ($bp):
     $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['notes'] ?? ''))));
 ?>
 <section class="sec sec--t0"><div class="wrap"><div class="bean" data-rv>
-  <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bp['img']) ?>" alt="<?= $e($bp['n']) ?>" loading="lazy"></div>
+  <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e(bt_img((int)(CIBlockElement::GetList([], ['ID' => $bp['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bp['img']) ?>" alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
   <div class="bean__c">
     <div class="mono"><?= $e($bean['caption'] ?? '') ?></div>
     <h2 class="display h2"><?= bt_title($bean['title'] ?? $bp['n']) ?></h2>

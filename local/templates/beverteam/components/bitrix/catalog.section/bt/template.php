@@ -3,10 +3,10 @@
 // Карточки рисует bt_card() по данным bt_catalog_data(): та же разметка, что у BT_card() в ui.js
 ?>
 <div class="grid g3" id="cards">
-<?php foreach ($arResult['ITEMS'] as $item) {
+<?php $n = 0; foreach ($arResult['ITEMS'] as $item) {
     $m = bt_product((string)$item['ID']);
     if ($m) {
-        echo bt_card($m);
+        echo bt_card($m, $n++ < 3); // первый ряд — без lazy, это LCP раздела
     }
 } ?>
 </div>

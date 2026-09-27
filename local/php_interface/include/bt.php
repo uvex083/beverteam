@@ -18,6 +18,40 @@ function bt_iblock(string $code): int
     return $ids[$code];
 }
 
+// Картинка для вывода: ресайз ядра (не больше $w×$h) и WebP-копия рядом в resize_cache
+function bt_img($file, int $w, int $h, int $mode = BX_RESIZE_IMAGE_PROPORTIONAL): string
+{
+    $src = $file ? (\CFile::ResizeImageGet($file, ['width' => $w, 'height' => $h], $mode)['src'] ?? '') : '';
+    return $src !== '' ? bt_webp($src) : '';
+}
+
+// WebP-копия файла из /upload: /upload/resize_cache/<путь>.webp, создаётся при первом обращении; удаляется ядром вместе с resize_cache файла
+function bt_webp(string $src): string
+{
+    if (!preg_match('~^/upload/(?:resize_cache/)?(.+\.(jpe?g|png))$~i', $src, $m)) {
+        return $src;
+    }
+    $dst = '/upload/resize_cache/' . $m[1] . '.webp';
+    $abs = $_SERVER['DOCUMENT_ROOT'] . $dst;
+    if (is_file($abs)) {
+        return $dst;
+    }
+    $from = $_SERVER['DOCUMENT_ROOT'] . $src;
+    $im = is_file($from) && function_exists('imagewebp') ? @(strtolower($m[2]) === 'png' ? imagecreatefrompng($from) : imagecreatefromjpeg($from)) : false;
+    if (!$im) {
+        return $src;
+    }
+    imagepalettetotruecolor($im);
+    imagealphablending($im, false);
+    imagesavealpha($im, true);
+    CheckDirPath($abs);
+    $tmp = $abs . '.' . getmypid() . '.tmp';
+    $ok = imagewebp($im, $tmp, 82) && rename($tmp, $abs);
+    imagedestroy($im);
+    @unlink($tmp);
+    return $ok ? $dst : $src;
+}
+
 // Контакты и реквизиты: один элемент инфоблока site_contacts, единый источник для шапки, футера и страниц
 function bt_contacts(): array
 {
@@ -90,7 +124,7 @@ function bt_fmt(float $n): string
 }
 
 // Карточка товара — серверная копия BT_card() из ui.js в состоянии «не в корзине»; разметку менять в обоих местах
-function bt_card(array $m): string
+function bt_card(array $m, bool $eager = false): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
     $badges = !empty($m['badges']) ? '<div class="pc__badges">' . implode('', array_map(fn($b) => '<span class="badge">' . $e($b) . '</span>', $m['badges'])) . '</div>' : '';
@@ -116,7 +150,7 @@ function bt_card(array $m): string
         . $badges
         . '<div class="pc__acts"><button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">' . bt_icon('heart') . '</button>'
         . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
-        . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '" loading="lazy">' : '') . '</a>'
+        . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '"' . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async">' : '') . '</a>'
         . '<h3><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></h3>'
         . '<p class="pc__par">' . $e($m['par']) . '</p>'
         . $scales . $packs
@@ -249,7 +283,7 @@ function bt_catalog_data(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $catId);
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $rentId);
 
-    $img = fn($fileId) => $fileId ? (\CFile::ResizeImageGet($fileId, ['width' => 600, 'height' => 600], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'] ?? '') : '';
+    $img = fn($fileId) => bt_img($fileId, 480, 340);
     $data = ['coffee' => [], 'tea' => [], 'machines' => [], 'acc' => [], 'rent' => []];
 
     // корневой раздел каждого раздела
@@ -349,7 +383,7 @@ function bt_blocks(string $code, int $limit = 0): array
         $f = $el->GetFields();
         $b = ['id' => (int)$f['ID'], 'name' => $f['~NAME'], 'code' => (string)$f['CODE'],
             'html' => $f['PREVIEW_TEXT_TYPE'] === 'html' ? trim((string)$f['~PREVIEW_TEXT']) : nl2br(htmlspecialcharsbx(trim((string)$f['~PREVIEW_TEXT'])), false)];
-        $b['pic'] = $f['PREVIEW_PICTURE'] ? \CFile::GetPath($f['PREVIEW_PICTURE']) : '';
+        $b['pic'] = bt_img($f['PREVIEW_PICTURE'], 1000, 1000);
         $b['pic_id'] = (int)$f['PREVIEW_PICTURE'];
         foreach ($el->GetProperties() as $pc => $p) {
             $k = strtolower($pc);
@@ -394,7 +428,7 @@ function bt_list(string $code): array
     while ($f = $r->GetNext()) {
         $list[] = [
             'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
-            'pic' => $f['PREVIEW_PICTURE'] ? \CFile::GetPath($f['PREVIEW_PICTURE']) : '',
+            'pic' => bt_img($f['PREVIEW_PICTURE'], 1000, 1000),
             'icon' => bt_svg((int)($f['PROPERTY_ICON_VALUE'] ?? 0)),
         ];
     }
@@ -480,7 +514,7 @@ function bt_post_data(array $f): array
         'id' => $f['CODE'], 'kind' => $kind, 'cat' => ($f['~PROPERTY_RUBRIC_VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи'),
         'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $f['~NAME'], 'lead' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
         'min' => (int)($f['PROPERTY_READ_TIME_VALUE'] ?? 0), 'url' => $f['~DETAIL_PAGE_URL'],
-        'img' => $f['PREVIEW_PICTURE'] ? (\CFile::ResizeImageGet($f['PREVIEW_PICTURE'], ['width' => 1040, 'height' => 650], BX_RESIZE_IMAGE_EXACT)['src'] ?? '') : '',
+        'img' => bt_img($f['PREVIEW_PICTURE'], 1040, 650, BX_RESIZE_IMAGE_EXACT),
     ];
 }
 
@@ -524,7 +558,7 @@ function bt_rent_models(): array
             'model' => trim(preg_replace('/^Кофемашина\s+|\s+Аренда$/u', '', $m['n'] ?? $f['NAME'])),
             'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'],
             'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'],
-            'img' => $f['PREVIEW_PICTURE'] ? (\CFile::ResizeImageGet($f['PREVIEW_PICTURE'], ['width' => 600, 'height' => 600], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'] ?? '') : ($m['img'] ?? ''),
+            'img' => $f['PREVIEW_PICTURE'] ? bt_img($f['PREVIEW_PICTURE'], 480, 340) : ($m['img'] ?? ''),
         ];
     }
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
@@ -551,7 +585,7 @@ function bt_home_tiles(): array
         $subs = (int)(($s['RIGHT_MARGIN'] - $s['LEFT_MARGIN'] - 1) / 2);
         $tiles[] = [
             'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'],
-            'img' => $s['PICTURE'] ? (\CFile::ResizeImageGet($s['PICTURE'], ['width' => 400, 'height' => 300], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'] ?? '') : '',
+            'img' => bt_img($s['PICTURE'], 400, 300),
             'note' => $subs ? $plural($subs, ['категория', 'категории', 'категорий']) : $plural((int)$s['ELEMENT_CNT'], ['модель', 'модели', 'моделей']),
         ];
     }

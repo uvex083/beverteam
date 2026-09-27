@@ -406,7 +406,7 @@ function megaPanel(i){
   return `<h4><a href="${c.h}">${c.t} →</a></h4>
     <ul>${c.sub.slice(0,half).map(li).join('')}</ul>
     <ul>${c.sub.slice(half).map(li).join('')}</ul>
-    ${c.promo?`<a class="mega__promo" href="${c.promo.h}"><img src="${c.promo.img}" alt=""><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`:''}`;
+    ${c.promo?`<a class="mega__promo" href="${c.promo.h}"><img src="${c.promo.img}" alt="" loading="lazy"><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`:''}`;
 }
 function drawer(){
   return `<div class="drawer" id="drawer">

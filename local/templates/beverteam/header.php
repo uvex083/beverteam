@@ -29,7 +29,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0E0E0C">
 <title><?php $APPLICATION->ShowTitle() ?></title>
-<link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Unbounded-3959e2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Manrope-e5e254.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Unbounded-3959e2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Manrope-e5e254.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/JetBrainsMono-6ca536.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/favicon.svg">
 <meta name="yandex-verification" content="36480871fc540413">
 <?php $APPLICATION->AddBufferContent('bt_og') ?><?= bt_org_ld() ?>

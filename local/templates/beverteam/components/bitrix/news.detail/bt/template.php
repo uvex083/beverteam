@@ -14,7 +14,7 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
     $toc[] = [$id, trim(strip_tags($m[3]))];
     return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
 }, (string)$arResult['~DETAIL_TEXT']);
-$pic = $arResult['DETAIL_PICTURE']['SRC'] ?? ($arResult['PREVIEW_PICTURE']['SRC'] ?? '');
+$pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']['ID'] ?? 0), 1600, 1600);
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
   <div>

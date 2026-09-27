@@ -19,7 +19,7 @@ $revs = bt_list('reviews');
       <div class="facts"><?php foreach ($intro['items'] as [$v, $d]): ?><div><b><?= $e($v) ?></b><span><?= $e($d) ?></span></div><?php endforeach ?></div>
       <?php endif ?>
     </div>
-    <div class="intro__ph"><?php if (!empty($intro['pic'])): ?><img src="<?= $e($intro['pic']) ?>" alt="Чай и кофе BEVERTEAM"><?php else: ?><div class="ph"><span>Фото компании<br><small>нужен файл от клиента</small></span></div><?php endif ?></div>
+    <div class="intro__ph"><?php if (!empty($intro['pic'])): ?><img src="<?= $e($intro['pic']) ?>" alt="Чай и кофе BEVERTEAM" fetchpriority="high"><?php else: ?><div class="ph"><span>Фото компании<br><small>нужен файл от клиента</small></span></div><?php endif ?></div>
   </div>
 
   <section class="sec"><div class="grid g2" style="gap:40px">

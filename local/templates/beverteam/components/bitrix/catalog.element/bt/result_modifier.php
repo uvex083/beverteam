@@ -12,8 +12,9 @@ $arResult['BT'] = bt_product((string)$id) ?? [];
 // галерея: основное фото + дополнительные
 $files = array_filter(array_merge([$arResult['DETAIL_PICTURE']['ID'] ?? 0], (array)($pr['MORE_PHOTO']['VALUE'] ?? [])));
 $arResult['BT_PHOTOS'] = array_map(fn($f) => [
-    'big' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'],
-    'th' => CFile::ResizeImageGet($f, ['width' => 116, 'height' => 116], BX_RESIZE_IMAGE_EXACT, true)['src'],
+    'big' => bt_img($f, 900, 900),
+    'th' => bt_img($f, 116, 116, BX_RESIZE_IMAGE_EXACT),
+    'og' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900])['src'] ?? '',
 ], array_values($files));
 
 // характеристики «Подробнее»: только заполненные
@@ -80,7 +81,7 @@ while ($e = $r->Fetch()) {
 
 // бренд для разметки Product и данные для Open Graph (component_epilog работает и при кеше)
 $arResult['BT_BRAND'] = preg_match('/botanica/i', $arResult['~NAME']) ? 'BOTANICA' : (preg_match('/jetinno/i', $arResult['~NAME']) ? 'Jetinno' : '');
-$arResult['BT_OG'] = ['image' => $arResult['BT_PHOTOS'][0]['big'] ?? '', 'price' => $arResult['BT']['bulk'][0]['p'] ?? ($arResult['BT']['p'] ?? 0)];
+$arResult['BT_OG'] = ['image' => $arResult['BT_PHOTOS'][0]['og'] ?? '', 'price' => $arResult['BT']['bulk'][0]['p'] ?? ($arResult['BT']['p'] ?? 0)];
 $cp = $this->getComponent();
 if ($cp) {
     $cp->arResultCacheKeys = array_merge($cp->arResultCacheKeys, ['BT_OG']);

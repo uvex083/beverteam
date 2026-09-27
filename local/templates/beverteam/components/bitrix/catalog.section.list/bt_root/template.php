@@ -3,7 +3,7 @@
 /** @var array $arParams */
 // Корневые разделы плиткой с картинкой; аренда — отдельная страница, но в ряду разделов как в макете
 $cur = (int)($arParams['BT_CUR_ROOT'] ?? 0);
-$img = fn($pic) => $pic ? (CFile::ResizeImageGet($pic['ID'] ?? $pic, ['width' => 80, 'height' => 80], BX_RESIZE_IMAGE_EXACT)['src'] ?? '') : '';
+$img = fn($pic) => $pic ? bt_img($pic['ID'] ?? $pic, 80, 80, BX_RESIZE_IMAGE_EXACT) : '';
 $rent = CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock('rent'), 'ACTIVE' => 'Y'], false, ['nTopCount' => 1], ['PREVIEW_PICTURE'])->Fetch();
 // картинки разделов со старого сайта — баннеры с надписями, в плитке 40px нечитаемы; берём фото первого товара раздела
 $photo = function (int $sectionId) use ($arParams) {

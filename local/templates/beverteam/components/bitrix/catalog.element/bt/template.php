@@ -36,7 +36,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
       <div class="gal__main">
         <div class="gal__badges"><?php foreach ($m['badges'] ?? [] as $b): ?><span class="badge"><?= $e($b) ?></span><?php endforeach ?><?php if ($arResult['BT_Q']): ?><span class="badge badge--dark">Q <?= $e($arResult['BT_Q']) ?></span><?php endif ?></div>
         <div class="swiper gal__big" id="galBig"><div class="swiper-wrapper">
-          <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide"><img src="<?= $ph['big'] ?>" alt="<?= $e($name) ?> — фото <?= $i + 1 ?>"<?= $i ? ' loading="lazy"' : ' itemprop="image"' ?>></div><?php endforeach ?>
+          <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide"><img src="<?= $ph['big'] ?>" alt="<?= $e($name) ?> — фото <?= $i + 1 ?>"<?= $i ? ' loading="lazy" decoding="async"' : ' itemprop="image" fetchpriority="high"' ?>></div><?php endforeach ?>
           <?php if (!$photos): ?><div class="swiper-slide"><div class="ph">Фото товара<br>(нужен файл от клиента)</div></div><?php endif ?>
         </div></div>
         <span class="gal__n" id="galN"><?= $photos ? '1 / ' . count($photos) : '' ?></span>
