@@ -75,7 +75,7 @@ if (!$order) {
     </div>
 
     <div class="payblk"><div><small>Способ оплаты: <?php $pn = $payment ? $payment->getPaymentSystemName() : ''; echo $e(mb_strtolower(mb_substr($pn, 0, 1)) . mb_substr($pn, 1)) ?></small>
-      <b><?= bt_fmt($order->getPrice()) ?></b><?= $dCode === 'bt_cdek' ? '<small>без учёта доставки — стоимость сообщит менеджер</small>' : '' ?>
+      <b><?= bt_fmt($order->getPrice()) ?></b>
       <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : 'оплата при получении заказа' ?></small></div></div>
 
     <div class="card">
