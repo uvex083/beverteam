@@ -12,7 +12,7 @@ $APPLICATION->IncludeComponent('bitrix:news', 'bt', [
     'CHECK_DATES' => 'Y',
     'SEF_MODE' => 'Y',
     'SEF_FOLDER' => '/blog/',
-    'SEF_URL_TEMPLATES' => ['news' => '', 'section' => '#SECTION_CODE#/', 'detail' => '#ELEMENT_CODE#/'],
+    'SEF_URL_TEMPLATES' => ['news' => '', 'section' => '#SECTION_CODE_PATH#/', 'detail' => '#ELEMENT_CODE#/'],
     'CACHE_TYPE' => 'A', 'CACHE_TIME' => 36000000, 'CACHE_FILTER' => 'Y', 'CACHE_GROUPS' => 'N',
     'SET_TITLE' => 'Y', 'SET_BROWSER_TITLE' => 'Y', 'SET_META_DESCRIPTION' => 'Y', 'SET_META_KEYWORDS' => 'Y',
     'BROWSER_TITLE' => '-', 'META_KEYWORDS' => '-', 'META_DESCRIPTION' => '-',
