@@ -1486,10 +1486,10 @@ window.BT_mapWidget = (el, opts) => {
   /* статичная карта Яндекса (без ключа, рекламы и кнопок виджета) по размеру блока, метка — наша, в центре */
   const o = Object.assign({c:BT_CO_COORDS, z:17}, opts||{});
   const ll = o.c.join(','), W = el.clientWidth||650, H = el.clientHeight||420;
-  const w = 650, h = Math.min(450, Math.round(w*H/W)), z = W > 900 ? o.z-1 : o.z;
+  const w = Math.min(650, W), h = Math.min(450, Math.round(w*H/W)), z = o.z;
   const img = new Image();
   img.alt = 'Карта: '+BT_MAP_QUERY; img.loading = 'lazy'; img.decoding = 'async'; img.className = 'map__img';
-  img.src = `https://static-maps.yandex.ru/1.x/?ll=${ll}&z=${z}&size=${w},${h}&scale=2&l=map&lang=ru_RU`;
+  img.src = `https://static-maps.yandex.ru/1.x/?ll=${ll}&z=${z}&size=${w},${h}&l=map&lang=ru_RU`;
   img.onload = () => el.classList.add('is-map');
   const lat = o.c[1], lon = o.c[0];
   el.insertAdjacentHTML('beforeend', `<span class="map__pin"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path fill="#0E0E0C" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.8" fill="#D7E85C"/></svg></span>
