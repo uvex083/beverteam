@@ -25,10 +25,16 @@ foreach (bt_messengers() as [$code, $name, $href]) {
         <div><dt>Мессенджеры</dt><dd><div class="msgr msgr--lg"><?= $msgr ?></div></dd></div>
       </dl>
       <hr class="hr" style="margin:22px 0">
-      <dl class="dl2" style="gap:12px">
-        <div><dt>Название компании</dt><dd>BEVERTEAM — чай и кофе для дома и бизнеса</dd></div>
-        <div><dt>Реквизиты</dt><dd style="font-size:14px;font-weight:500"><?= $e($co['legal'] ?? '') ?><br>ОГРНИП <?= $e($co['ogrnip'] ?? '') ?><br>ИНН <?= $e($co['inn'] ?? '') ?><br><span class="muted" style="font-size:13px">на рынке с 2010 года</span></dd></div>
-      </dl>
+      <?php $req = bt_requisites(); $onPage = array_filter($req, fn($r) => !in_array($r[0], ['Фактический адрес', 'Телефон', 'E-mail', 'Сайт'], true)); ?>
+      <div class="req">
+        <div class="req__hd"><div><span class="req__k">Реквизиты</span><b>BEVERTEAM — чай и кофе для дома и бизнеса</b><span class="muted">на рынке с 2010 года</span></div><?= bt_icon('doc') ?></div>
+        <dl class="req__list"><?php foreach ($onPage as [$l, $v]): ?><div><dt><?= $e($l) ?></dt><dd><?= $e($v) ?></dd></div><?php endforeach ?></dl>
+        <div class="req__btns">
+          <a class="btn" href="/local/ajax/requisites.php" download="BEVERTEAM-rekvizity.pdf"><?= bt_icon('doc') ?>Скачать реквизиты (PDF)</a>
+          <button class="btn btn--line" type="button" data-copy="<?= $e(implode("
+", array_map(fn($r) => $r[0] . ': ' . $r[1], $req))) ?>">Скопировать</button>
+        </div>
+      </div>
     </div>
     <div class="map" data-ymap><div class="pin"></div><div class="cap">Яндекс Карты · <?= $e($co['street'] ?? '') ?></div></div>
   </div>

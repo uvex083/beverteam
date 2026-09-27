@@ -1684,3 +1684,16 @@ form[data-form]{position:relative}
 .cat .utp{grid-template-columns:repeat(2,1fr)}
 @media(max-width:640px){.cat .utp{grid-template-columns:1fr}}
 @media(max-width:374px){.hdr__acts .hact--cmp{display:none}.pnav{font-size:12px;gap:8px}.pnav a{gap:4px}.btn{white-space:normal;max-width:100%;text-align:center}.home .hero__title{font-size:27px}.home .svc__list li i{white-space:normal;text-align:right}}
+/* реквизиты в «Контактах» */
+.req{margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}
+.req__hd{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
+.req__hd>div{display:grid;gap:4px}.req__hd b{font-size:15px}.req__hd .muted{font-size:13px}
+.req__hd>svg{width:40px;height:40px;padding:9px;border-radius:12px;background:var(--lime);flex-shrink:0}
+.req__k{font:600 11px/1 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:4px}
+.req__list{margin:0;display:grid;background:var(--paper);border-radius:var(--rad-s);padding:4px 16px}
+.req__list>div{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.req__list>div:last-child{border-bottom:0}
+.req__list dt{font-size:13px;color:var(--gray)}.req__list dd{margin:0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.req__btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.req__btns .btn svg{width:18px;height:18px;margin-right:8px;flex-shrink:0}
+@media(max-width:480px){.req__list>div{grid-template-columns:1fr;gap:2px}.req__btns .btn{flex:1 1 100%}}

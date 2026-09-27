@@ -1580,3 +1580,8 @@ document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest
     e.preventDefault(); if(!a.hasAttribute('aria-current')) load(a.href,true);});
   addEventListener('popstate',()=>{ if(document.getElementById('spRes')) load(location.href,false); });
 })();
+/* «Скопировать» (реквизиты и т.п.): текст из data-copy в буфер обмена */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]'); if(!b) return;
+  const done=()=>window.BT_toast&&BT_toast('Скопировано в буфер обмена');
+  if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done).catch(()=>{});
+  else { const t=document.createElement('textarea'); t.value=b.dataset.copy; document.body.appendChild(t); t.select(); try{document.execCommand('copy');done();}catch(err){} t.remove(); }});

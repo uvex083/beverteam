@@ -1035,3 +1035,25 @@ function bt_menu_cache_reset($fields): void
     $done = true;
     \CBitrixComponent::clearComponentCache('bitrix:menu');
 }
+
+// Реквизиты для «Контактов» и PDF: только заполненные поля ИБ «Контакты и реквизиты», по порядку карточки предприятия
+function bt_requisites(): array
+{
+    $co = bt_contacts();
+    $addr = trim(implode(', ', array_filter([$co['zip'] ?? '', $co['city'] ?? '', $co['street'] ?? ''])));
+    $rows = [
+        ['Полное наименование', $co['legal'] ?? ''],
+        ['ИНН', $co['inn'] ?? ''],
+        ['ОГРНИП', $co['ogrnip'] ?? ''],
+        ['Юридический адрес', $co['legal_address'] ?? ''],
+        ['Фактический адрес', $addr],
+        ['Банк', $co['bank'] ?? ''],
+        ['БИК', $co['bik'] ?? ''],
+        ['Расчётный счёт', $co['rs'] ?? ''],
+        ['Корреспондентский счёт', $co['ks'] ?? ''],
+        ['Телефон', $co['phone1'] ?? ''],
+        ['E-mail', $co['email'] ?? ''],
+        ['Сайт', 'beverteam.ru'],
+    ];
+    return array_values(array_filter($rows, fn($r) => trim((string)$r[1]) !== ''));
+}
