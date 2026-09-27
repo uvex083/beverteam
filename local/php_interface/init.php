@@ -4,6 +4,10 @@ require_once __DIR__ . '/include/bt.php';
 
 // FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы
 AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
+
+// покупатели входят только по коду или через сервисы: пароль — только у администраторов
+AddEventHandler('main', 'OnBeforeUserLogin', 'bt_password_login_guard');
+AddEventHandler('main', 'OnBeforeUserChangePassword', 'bt_password_change_guard');
 require_once __DIR__ . '/include/bt_mail.php';
 
 // письма о заказе: состав и детали заказа полями #BT_*#

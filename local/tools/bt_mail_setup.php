@@ -86,17 +86,6 @@ $messages = [
         . m_p('Вы — покупатель сайта #SERVER_NAME#. Пароль не нужен: в личный кабинет входите по e-mail <b>#HTML_EMAIL#</b>, мы пришлём код для входа.')
         . m_p('В кабинете — история заказов, адреса доставки и реквизиты компаний для счетов.')
         . $cabinet],
-    'USER_PASS_REQUEST' => ['Смена пароля на сайте BEVERTEAM', '#EMAIL#', '#DEFAULT_EMAIL_FROM#', '',
-        m_head('Смена пароля')
-        . m_p($hello)
-        . m_p('Для логина <b>#HTML_LOGIN#</b> запросили смену пароля. Если это были вы — задайте новый пароль по ссылке.')
-        . m_btn('https://#SERVER_NAME#/bitrix/admin/index.php?change_password=yes&amp;lang=ru&amp;USER_CHECKWORD=#CHECKWORD#&amp;USER_LOGIN=#URL_LOGIN#', 'Задать новый пароль')
-        . m_note('Если вы не запрашивали смену пароля, просто не отвечайте на это письмо — пароль останется прежним. Покупателям пароль не нужен: в личный кабинет входят по коду из письма.')],
-    'USER_PASS_CHANGED' => ['Пароль на сайте BEVERTEAM изменён', '#EMAIL#', '#DEFAULT_EMAIL_FROM#', '',
-        m_head('Пароль изменён')
-        . m_p($hello)
-        . m_p('Пароль для логина <b>#HTML_LOGIN#</b> на сайте #SERVER_NAME# изменён.')
-        . m_note('Если это сделали не вы, ' . $phonesBelow . '.')],
     'USER_INVITE' => ['Приглашение в личный кабинет BEVERTEAM', '#EMAIL#', '#DEFAULT_EMAIL_FROM#', '',
         m_head('Добро пожаловать')
         . m_p($hello)
@@ -182,7 +171,8 @@ $messages = [
 // не нужны магазину: блог, форум, опросы, рассылки, подписка на товар, продление подписки, форма обратной связи main.feedback,
 // подтверждение регистрации и вход по коду ядра (на сайте свой вход BT_AUTH_CODE), «вход с нового устройства» (у покупателей нет пароля),
 // «статус: принят» — дублирует письмо о новом заказе
-$off = ['FEEDBACK_FORM', 'NEW_USER_CONFIRM', 'USER_CODE_REQUEST', 'NEW_DEVICE_LOGIN', 'SALE_STATUS_CHANGED_N', 'SALE_SUBSCRIBE_PRODUCT',
+// паролей у покупателей нет (вход по коду или через сервисы) — письма о смене пароля не нужны
+$off = ['USER_PASS_REQUEST', 'USER_PASS_CHANGED', 'FEEDBACK_FORM', 'NEW_USER_CONFIRM', 'USER_CODE_REQUEST', 'NEW_DEVICE_LOGIN', 'SALE_STATUS_CHANGED_N', 'SALE_SUBSCRIBE_PRODUCT',
     'SALE_NEW_ORDER_RECURRING', 'SALE_RECURRING_CANCEL', 'CATALOG_PRODUCT_SUBSCRIBE_LIST_CONFIRM', 'CATALOG_PRODUCT_SUBSCRIBE_NOTIFY',
     'CATALOG_PRODUCT_SUBSCRIBE_NOTIFY_REPEATED', 'SENDER_SUBSCRIBE_CONFIRM', 'SUBSCRIBE_CONFIRM', 'VOTE_FOR'];
 $offPrefix = ['NEW_BLOG_', 'BLOG_', 'NEW_FORUM_', 'EDIT_FORUM_', 'FORUM_'];

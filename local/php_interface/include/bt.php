@@ -926,3 +926,28 @@ function bt_sitemap_build(): string
     file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/sitemap.xml', $xml . '</urlset>' . "\n");
     return 'bt_sitemap_build();';
 }
+
+// Паролей у покупателей нет: вход по паролю и смена пароля — только для администраторов (группа 1). Обработчики OnBeforeUserLogin / OnBeforeUserChangePassword
+function bt_is_admin_login(string $login): bool
+{
+    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=LOGIN' => $login], 'select' => ['ID'], 'limit' => 1])->fetch();
+    return $u && in_array(1, \CUser::GetUserGroup((int)$u['ID']), false);
+}
+
+function bt_password_login_guard(array &$fields): bool
+{
+    if (bt_is_admin_login((string)($fields['LOGIN'] ?? ''))) {
+        return true;
+    }
+    $GLOBALS['APPLICATION']->ThrowException('Вход по паролю отключён. Войдите на сайте по коду из письма.');
+    return false;
+}
+
+function bt_password_change_guard(array &$fields): bool
+{
+    if (bt_is_admin_login((string)($fields['LOGIN'] ?? ''))) {
+        return true;
+    }
+    $GLOBALS['APPLICATION']->ThrowException('Пароли на сайте не используются. Войдите по коду из письма.');
+    return false;
+}

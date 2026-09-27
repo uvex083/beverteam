@@ -65,4 +65,12 @@ if (!CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'USER_ID'])->
             or $fail("prop USER_ID: {$bp->LAST_ERROR}");
     }
 }
+
+// паролей у покупателей нет: штатные регистрация и восстановление пароля Битрикса посетителям не нужны
+foreach (['new_user_registration' => 'N', 'new_user_registration_email_confirmation' => 'N', 'store_password' => 'N'] as $opt => $val) {
+    if (COption::GetOptionString('main', $opt) !== $val) {
+        $say("главный модуль: $opt = $val");
+        $apply and COption::SetOptionString('main', $opt, $val);
+    }
+}
 echo "done\n";
