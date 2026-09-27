@@ -151,6 +151,7 @@ $co = bt_contacts();
       <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
       <button class="btn btn--block" type="submit" id="submit" disabled>Подтвердить заказ</button>
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function renderSum(r){ if(!r) return;
     const cdek=sel&&sel.d.code==='bt_cdek';
     sDel.textContent=!sel?'—':cdek?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
-    sTot.textContent=fmt(r.total)+(cdek?' + доставка':'');
+    sTot.textContent=fmt(r.total); sTotNote.hidden=!cdek;
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
