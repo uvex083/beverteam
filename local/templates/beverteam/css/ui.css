@@ -1297,7 +1297,12 @@ input,textarea{caret-color:var(--ink)}
 /* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
 .pill-tabs button:focus-visible,.link:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 70%,transparent)}
 .link:focus-visible{border-radius:6px}
-.cop .corec{display:block;margin:-8px 0 18px;font-size:14px;line-height:1.5}.cop .corec .link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
+.cop .corec{display:flex;align-items:center;gap:16px;margin:-6px 0 20px;padding:16px 18px;border-radius:var(--rad-s);background:var(--lime-soft);border:1px solid var(--lime)}
+.cop .corec[hidden]{display:none}
+.cop .corec>div{flex:1;display:grid;gap:3px;font-size:13.5px;line-height:1.45;color:var(--gray)}
+.cop .corec b{font-size:15px;color:var(--ink)}
+.cop .corec .btn{flex-shrink:0;white-space:nowrap}
+@media(max-width:600px){.cop .corec{flex-direction:column;align-items:stretch}}
 .okp .oklogin{display:grid;grid-template-columns:1fr auto;gap:4px 20px;align-items:center;margin-top:18px}
 .okp .oklogin b{font-size:15px}.okp .oklogin span{font-size:13.5px;color:var(--gray)}.okp .oklogin .btn{grid-row:1/span 2}
 @media(max-width:600px){.okp .oklogin{grid-template-columns:1fr}.okp .oklogin .btn{grid-row:auto;margin-top:8px}}
