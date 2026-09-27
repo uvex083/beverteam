@@ -47,7 +47,7 @@ if (!$orders): ?>
     <div><span class="mono" style="color:var(--lime)">Последний заказ · <?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?></span>
       <h2>Повторить заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?></h2>
       <p>Положим тот же состав в корзину. Доставку и оплату выберете при оформлении.</p>
-      <div class="it"><?php foreach (array_slice($items[$repeat['ID']], 0, 6) as $b): ?><span><?= $e($b['NAME']) ?> × <?= (float)$b['QUANTITY'] ?></span><?php endforeach ?></div></div>
+      <div class="it"><?php foreach (array_slice($items[$repeat['ID']], 0, 6) as $b): ?><span><?= $e($b['NAME']) ?> · <?= (float)$b['QUANTITY'] ?> <?= $e($b['MEASURE_NAME'] ?: 'шт') ?></span><?php endforeach ?></div></div>
     <div style="display:grid;gap:10px"><button class="btn" type="button" data-reorder="<?= (int)$repeat['ID'] ?>"><?= bt_icon('repeat') ?> Повторить заказ</button>
       <a class="btn btn--line" style="color:#fff;border-color:#fff" href="/personal/docs/">Счета и документы</a></div>
   </div>

@@ -83,11 +83,10 @@ if (!$order) {
       <div class="oitems">
         <?php foreach ($order->getBasket() as $bi):
             $m = bt_product((string)$bi->getProductId());
-            $q = (float)$bi->getQuantity();
             $tag = !empty($m['url']) ? 'a' : 'div'; ?>
         <<?= $tag ?> class="oit"<?= $tag === 'a' ? ' href="' . $e($m['url']) . '"' : '' ?>>
           <span class="oit__img"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="56" height="56"><?php endif ?></span>
-          <span class="oit__n"><?= $e($bi->getField('NAME')) ?><small><?= $q ?> шт × <?= bt_fmt($bi->getPrice()) ?></small></span>
+          <span class="oit__n"><?= $e($bi->getField('NAME')) ?><small><?= bt_basket_qty($bi) ?> · <?= bt_fmt($bi->getPrice()) ?><?= bt_basket_pack($bi) ? ' за кг' : '' ?></small></span>
           <b><?= bt_fmt($bi->getFinalPrice()) ?></b>
         </<?= $tag ?>>
         <?php endforeach ?>

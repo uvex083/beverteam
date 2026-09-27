@@ -63,7 +63,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="oit">
     <?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="64" height="64"><?php else: ?><span class="ph"></span><?php endif ?>
     <div><?php if ($m): ?><a href="<?= $e($m['url'] ?? '') ?>"><b><?= $e($bi->getField('NAME')) ?></b></a><?php else: ?><b><?= $e($bi->getField('NAME')) ?></b><?php endif ?><?php if (!empty($m['par'])): ?><span class="muted" style="font-size:12.5px"><?= $e($m['par']) ?></span><?php endif ?></div>
-    <span class="q"><?= (float)$bi->getQuantity() ?> <?= $e($bi->getField('MEASURE_NAME') ?: 'шт') ?> × <?= bt_fmt($bi->getPrice()) ?></span>
+    <span class="q"><?= bt_basket_qty($bi) ?> · <?= bt_fmt($bi->getPrice()) ?><?= bt_basket_pack($bi) ? ' за кг' : '' ?></span>
     <span class="p"><?= bt_fmt($bi->getFinalPrice()) ?></span>
   </div>
   <?php endforeach ?>

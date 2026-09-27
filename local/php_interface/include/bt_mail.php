@@ -69,7 +69,7 @@ function bt_mail_order(Sale\Order $order): array
         if ($url !== '') {
             $title = '<a href="' . $e(str_starts_with($url, 'http') ? $url : $host . $url) . '" style="color:#0E0E0C;text-decoration:none;font-weight:600">' . $title . '</a>';
         }
-        $qty = (float)$bi->getQuantity() . "\u{00A0}" . $e($bi->getField('MEASURE_NAME') ?: 'шт');
+        $qty = str_replace(' ', "\u{00A0}", bt_basket_qty($bi));
         $rows .= '<tr><td style="' . $cell . ';padding:12px 12px 12px 0">' . $title . '</td>'
             . '<td width="56" align="center" style="' . $cell . ';padding:12px 6px;white-space:nowrap">' . $qty . '</td>'
             . '<td align="right" style="' . $cell . ';padding:12px 0 12px 8px;white-space:nowrap;font-weight:700">' . bt_fmt($bi->getFinalPrice()) . '</td></tr>';

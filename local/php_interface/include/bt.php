@@ -141,16 +141,16 @@ function bt_card(array $m, bool $eager = false): string
         $first = $m['bulk'][0]['p'];
         foreach ($m['bulk'] as $t) {
             $pct = $t['p'] < $first ? (int)round((1 - $t['p'] / $first) * 100) : 0;
-            $packs .= '<button type="button" data-kg="' . $t['kg'] . '" aria-pressed="false">' . $t['kg'] . ' кг' . ($pct ? '<s>−' . $pct . '%</s>' : '') . '</button>';
+            $packs .= '<button type="button" data-kg="' . $t['kg'] . '" aria-pressed="' . ($t === $m['bulk'][0] ? 'true' : 'false') . '">' . $t['kg'] . ' кг' . ($pct ? '<s>−' . $pct . '%</s>' : '') . '</button>';
         }
         $packs = '<div class="packs " data-packs="' . $e($m['id']) . '">' . $packs . '</div>';
     }
     $rent = !empty($m['rent']);
     $price = $m['p'] ? bt_fmt($m['p']) : 'По запросу';
-    $sub = !empty($m['unit']) ? '<s>' . $e($m['unit']) . '</s>' : (!empty($m['bulk']) ? '<s>' . bt_fmt($m['bulk'][0]['p']) . ' за кг</s>' : (!empty($m['pre']) ? '<s>предзаказ</s>' : ''));
+    $sub = !empty($m['unit']) ? '<s>' . $e($m['unit']) . '</s>' : (!empty($m['bulk']) ? '<s>' . bt_fmt($m['bulk'][0]['p']) . ' за кг · ' . $m['bulk'][0]['kg'] . ' кг</s>' : (!empty($m['pre']) ? '<s>предзаказ</s>' : ''));
     $old = !empty($m['old']) ? '<span class="price--old">' . bt_fmt($m['old']) . '</span>' : '';
     $ctl = $rent ? '<a class="btn btn--sm" href="/arenda-kofemashin/#calc">Арендовать</a>'
-        : '<button class="btn btn--sm" data-add="' . $e($m['id']) . '">' . (!empty($m['pre']) ? 'Предзаказ' : 'В корзину') . '</button>';
+        : '<button class="btn btn--sm" data-add="' . $e($m['id'] . (!empty($m['bulk']) ? ':' . $m['bulk'][0]['kg'] : '')) . '">' . (!empty($m['pre']) ? 'Предзаказ' : 'В корзину') . '</button>';
     $stock = !empty($m['stock']);
     return '<article class="pc" data-pc="' . $e($m['id']) . '" itemscope itemtype="https://schema.org/Product">'
         . '<meta itemprop="name" content="' . $e($m['n']) . '"><meta itemprop="image" content="' . $e($m['img']) . '"><meta itemprop="description" content="' . $e($m['par']) . '">'
@@ -179,10 +179,60 @@ function bt_basket_state(?\Bitrix\Sale\BasketBase $basket = null): array
     $items = [];
     foreach ($basket as $bi) {
         if ($bi->canBuy() && !$bi->isDelay()) {
-            $items[(string)$bi->getProductId()] = (float)$bi->getQuantity();
+            $kg = bt_basket_pack($bi);
+            $items[$bi->getProductId() . ($kg ? ':' . $kg : '')] = $kg ? round($bi->getQuantity() / $kg) : (float)$bi->getQuantity();
         }
     }
     return ['items' => (object)$items, 'sum' => (float)$basket->getPrice()];
+}
+
+// Фасовка строки корзины (кофе на развес): 20 — упаковка 20 кг; 0 — штучный товар. Старые строки без свойства — упаковки по 1 кг
+function bt_basket_pack(\Bitrix\Sale\BasketItemBase $bi): int
+{
+    $v = $bi->getPropertyCollection()->getPropertyValues()['PACK']['VALUE'] ?? '';
+    return $v !== '' ? (int)$v : (!empty(bt_product((string)$bi->getProductId())['bulk']) ? 1 : 0);
+}
+
+// Количество строки для заказа и писем: «2 шт × 20 кг» у кофе на развес, «3 шт» у остального
+function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
+{
+    $kg = bt_basket_pack($bi);
+    return $kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт';
+}
+
+// Положить в корзину: $kg — фасовка кофе на развес (каждая фасовка — своя строка, количество в Битриксе — в кг), $q — штук.
+// $add — прибавить к тому, что уже лежит (повтор заказа). Возвращает текст ошибки или ''
+function bt_basket_put(\Bitrix\Sale\BasketBase $basket, int $id, int $kg, float $q, bool $add = false): string
+{
+    $m = bt_product((string)$id);
+    if (!$m || !\Bitrix\Catalog\ProductTable::getById($id)->fetch()) {
+        return 'product';
+    }
+    $packs = array_column($m['bulk'] ?? [], 'kg');
+    $kg = $packs ? (in_array($kg, $packs) ? $kg : (int)$packs[0]) : 0;
+    $item = null;
+    foreach ($basket as $bi) {
+        if ((int)$bi->getProductId() === $id && bt_basket_pack($bi) === $kg) {
+            $item = $bi;
+            break;
+        }
+    }
+    $q = $add && $item ? round($item->getQuantity() / ($kg ?: 1)) + $q : $q;
+    if ($q <= 0) {
+        $item?->delete();
+        return '';
+    }
+    if ($item) {
+        $r = $item->setField('QUANTITY', $q * ($kg ?: 1));
+        return $r->isSuccess() ? '' : implode('; ', $r->getErrorMessages());
+    }
+    $item = $basket->createItem('catalog', $id);
+    $r = $item->setFields(['QUANTITY' => $q * ($kg ?: 1), 'CURRENCY' => \Bitrix\Currency\CurrencyManager::getBaseCurrency(), 'LID' => SITE_ID,
+        'PRODUCT_PROVIDER_CLASS' => \Bitrix\Catalog\Product\CatalogProvider::class]);
+    if ($r->isSuccess() && $kg) {
+        $item->getPropertyCollection()->setProperty([['NAME' => 'Фасовка', 'CODE' => 'PACK', 'VALUE' => $kg . ' кг', 'SORT' => 100]]);
+    }
+    return $r->isSuccess() ? '' : implode('; ', $r->getErrorMessages());
 }
 
 // Мегаменю «Каталог»: корневые разделы с подразделами и промо-товаром + аренда; формат CATS из ui.js

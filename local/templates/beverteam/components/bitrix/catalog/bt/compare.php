@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const d=e.target.closest('[data-del]');
     if(d){ BT_cmpRemove(d.dataset.del); BT_toast('Товар убран из сравнения'); render(); return; }
     const a=e.target.closest('[data-add]');
-    if(a){ BT_cartSet(a.dataset.add,(BT_CART[a.dataset.add]||0)+1); BT_toast('Товар в корзине · <a href="/personal/cart/">Оформить</a>'); return; }
+    if(a){ BT_cartAdd(a.dataset.add); BT_toast('Товар в корзине · <a href="/personal/cart/">Оформить</a>'); return; }
     const f=e.target.closest('.fav');
     if(f){ const on=f.getAttribute('aria-pressed')!=='true'; f.setAttribute('aria-pressed',on);
       BT_toast(on?'Добавлено в избранное':'Убрано из избранного'); return; }

@@ -9,7 +9,7 @@ $name = $arResult['~NAME'];
 $h1 = $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'] ?: $name; // H1 из SEO-настроек товара, если задан
 $photos = $arResult['BT_PHOTOS'];
 $bulk = $m['bulk'] ?? null;
-$unit = $bulk ? 'кг' : 'шт';
+$unit = 'шт';
 $first = $bulk ? $bulk[0]['p'] : ($m['p'] ?? 0);
 $section = $arResult['BT_SECTION'];
 $reviews = $arResult['BT_REVIEWS'];
@@ -56,7 +56,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
       </div>
       <div class="buy" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
         <meta itemprop="price" content="<?= $first ?>"><meta itemprop="priceCurrency" content="RUB"><link itemprop="availability" href="https://schema.org/InStock">
-        <div class="buy__price"><b id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><span class="per" id="pPer">за 1 <?= $unit ?></span><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?></div>
+        <div class="buy__price"><b id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><span class="per" id="pPer"><?= $bulk ? bt_fmt($first) . ' за кг · ' . $bulk[0]['kg'] . ' кг' : 'за 1 шт' ?></span><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?></div>
         <div id="pPacks"></div>
         <div class="buy__row">
           <div class="qty"><button data-d="-" aria-label="Уменьшить">−</button><input id="qty" value="1" inputmode="numeric" aria-label="Количество, <?= $unit ?>"><button data-d="+" aria-label="Увеличить">+</button></div>

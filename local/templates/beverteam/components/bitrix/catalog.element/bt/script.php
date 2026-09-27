@@ -21,44 +21,37 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  /* ---- количество, объём и корзина: один источник истины ---- */
-  const price = q => PM.bulk ? BT_tier(PM,q).p : PM.p;
+  /* ---- фасовка, количество (шт) и корзина: один источник истины ---- */
+  const key = () => BT_keyOf(PM);
   function sync(from){
-    const q=Math.max(1,parseInt(qty.value,10)||1);
+    const q=Math.max(1,parseInt(qty.value,10)||1), kg=BT_packOf(PM);
     if(String(q)!==qty.value) qty.value=q;
-    const pr=price(q);
-    if(PM.p){ pTotal.textContent=BT_fmt(pr*q); pPer.textContent = q>1 ? `${BT_fmt(pr)} × ${q} ${U}` : `за 1 ${U}`; }
-    if(tiers) [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',pr===+r.cells[1].textContent.replace(/\D/g,'')));
-    pPacks.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.kg===q));
-    const inCart=BT_CART[PID]||0;
+    const pc=BT_piece(PM,kg,q);
+    if(PM.p){ pTotal.textContent=BT_fmt(pc*q);
+      pPer.textContent = PM.bulk ? `${BT_fmt(BT_perKg(PM,kg,q))} за кг · ${kg} кг${q>1?` × ${q} шт`:''}` : (q>1 ? `${BT_fmt(pc)} × ${q} шт` : 'за 1 шт'); }
+    if(tiers&&PM.bulk){ const p=BT_perKg(PM,kg,q); [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',p===+r.cells[1].textContent.replace(/\D/g,''))); }
+    if(PM.bulk) pPacks.innerHTML=BT_packs(PM,true);
+    const inCart=BT_CART[key()]||0;
     if(inCart){
-      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} ${U} → оформить</a>`;
+      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} шт → оформить</a>`;
     } else {
       pAdd.innerHTML=`<button class="btn" id="pBuy" type="button">В корзину</button>`;
       document.getElementById('pBuy').addEventListener('click',()=>{
-        BT_cartSet(PID,Math.max(1,parseInt(qty.value,10)||1));
+        BT_cartSet(key(),Math.max(1,parseInt(qty.value,10)||1));
         sync('cart');
-        BT_toast(`${qty.value} ${U} в корзине · <a href="/personal/cart/">Оформить</a>`);
+        BT_toast(`${qty.value} шт${PM.bulk?` по ${BT_packOf(PM)} кг`:''} в корзине · <a href="/personal/cart/">Оформить</a>`);
       });
     }
-    /* если товар уже в корзине, степпер правит корзину */
-    if(inCart && from==='qty' && inCart!==q){ BT_cartSet(PID,q); sync('cart'); }
+    /* если эта фасовка уже в корзине, степпер правит корзину */
+    if(inCart && from==='qty' && inCart!==q){ BT_cartSet(key(),q); sync('cart'); }
   }
-  if(PM.bulk){
-    pPacks.innerHTML=BT_packs(PM,true);
-    pPacks.querySelectorAll('button').forEach(b=>b.addEventListener('click',e=>{
-      e.stopPropagation(); // общий обработчик [data-packs] кладёт в корзину сразу — на странице товара выбор объёма только меняет количество
-      const kg=+b.dataset.kg; qty.value=kg;
-      if(BT_CART[PID]) BT_cartSet(PID,kg);
-      sync('packs');
-      const t=BT_tier(PM,kg),pct=BT_tierPct(PM,t);
-      BT_toast(`${kg} кг · ${BT_fmt(t.p)} за кг${pct?` · выгода ${pct}%`:''}`);
-    }));
-  }
-  if(BT_CART[PID]) qty.value=BT_CART[PID];
+  // фасовка: счётчик переключается на её количество в корзине (или 1)
+  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return;
+    BT_packSet(PID,+b.dataset.kg); qty.value=BT_CART[key()]||1; sync('packs'); });
+  if(BT_CART[key()]) qty.value=BT_CART[key()];
   qty.addEventListener('change',()=>sync('qty'));
   /* «−» на единице: убираем товар из корзины и возвращаем кнопку «В корзину» */
-  qty.addEventListener('bt:qtyzero',()=>{ if(BT_CART[PID]){ BT_cartSet(PID,0); BT_toast('Товар убран из корзины'); } sync('cart'); });
+  qty.addEventListener('bt:qtyzero',()=>{ if(BT_CART[key()]){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } sync('cart'); });
   qty.addEventListener('input',()=>{ if(/^\d+$/.test(qty.value)) sync('qty'); });
   document.addEventListener('bt:cart',e=>{ if(e.detail&&e.detail.id===PID) sync('ext'); });
   sync('init');

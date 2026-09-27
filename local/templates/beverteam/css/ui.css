@@ -762,6 +762,9 @@ input,textarea{caret-color:var(--ink)}
 .packs button s{display:block;text-decoration:none;font-family:'JetBrains Mono';font-size:9.5px;font-weight:700;
   color:var(--ok);margin-top:2px}
 .packs button[aria-pressed=true] s{color:var(--lime)}
+.packs button em{position:absolute;top:-6px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--lime);color:var(--ink);
+  font:700 10px/17px 'JetBrains Mono',monospace;font-style:normal;text-align:center;box-shadow:0 0 0 2px var(--white)}
+.ci__pack{margin:2px 0 4px;font-size:13px;color:var(--gray)}.ci__pack b{color:var(--ink)}
 .packs__lab{width:100%;font-family:'JetBrains Mono';font-size:10px;letter-spacing:.07em;text-transform:uppercase;
   color:var(--gray);margin-bottom:2px}
 /* крупный вариант для страницы товара */
@@ -1318,6 +1321,7 @@ input,textarea{caret-color:var(--ink)}
 .cop .sum .it{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .cop .sum .it img{width:44px;height:44px;object-fit:contain;background:var(--paper);border-radius:8px;padding:4px;mix-blend-mode:multiply}
 .cop .sum .it b{margin-left:auto;white-space:nowrap;font-family:'JetBrains Mono';font-size:13px}
+.cop .sum .it span small{display:block;margin-top:2px;font-size:12px;color:var(--gray)}
 .cop .sum .l{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px;color:#3A3A34}
 .cop .sum .l span:last-child{text-align:right}
 .cop .sum .l.t{border-top:1px solid var(--line);margin-top:8px;padding-top:14px;font-weight:800;font-size:18px;color:var(--ink);font-family:Unbounded}

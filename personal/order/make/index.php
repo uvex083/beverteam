@@ -146,7 +146,7 @@ $co = bt_contacts();
     <aside class="sum">
       <div id="sumItems"><?php foreach ($basket as $bi):
           $m = bt_product((string)$bi->getProductId()); ?>
-        <div class="it"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif ?><span><?= $e($bi->getField('NAME')) ?> × <?= (float)$bi->getQuantity() ?></span><b><?= bt_fmt($bi->getFinalPrice()) ?></b></div>
+        <div class="it"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif ?><span><?= $e($bi->getField('NAME')) ?><small><?= bt_basket_qty($bi) ?></small></span><b><?= bt_fmt($bi->getFinalPrice()) ?></b></div>
       <?php endforeach ?></div>
       <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>

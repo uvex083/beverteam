@@ -127,20 +127,8 @@ switch ((string)$req->getPost('action')) {
                 $skipped++;
                 continue;
             }
-            $item = null;
-            foreach ($basket as $bi) {
-                if ((int)$bi->getProductId() === $id) {
-                    $item = $bi;
-                }
-            }
-            if ($item) {
-                $r = $item->setField('QUANTITY', $item->getQuantity() + $oi->getQuantity());
-            } else {
-                $item = $basket->createItem('catalog', $id);
-                $r = $item->setFields(['QUANTITY' => $oi->getQuantity(), 'CURRENCY' => \Bitrix\Currency\CurrencyManager::getBaseCurrency(), 'LID' => SITE_ID,
-                    'PRODUCT_PROVIDER_CLASS' => \Bitrix\Catalog\Product\CatalogProvider::class]);
-            }
-            $r->isSuccess() ? $added++ : $skipped++;
+            $kg = bt_basket_pack($oi);
+            bt_basket_put($basket, $id, $kg, $kg ? round($oi->getQuantity() / $kg) : $oi->getQuantity(), true) === '' ? $added++ : $skipped++;
         }
         $r = $basket->save();
         $r->isSuccess() or $out(['ok' => false, 'message' => implode('; ', $r->getErrorMessages())], 500);
