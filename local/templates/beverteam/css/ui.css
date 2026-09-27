@@ -67,7 +67,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
   border:1px solid var(--lime);border-radius:999px;padding:13px 24px;font-weight:700;font-size:14px;white-space:nowrap;
   transition:transform .15s,background .15s;text-decoration:none}
 .btn>svg{width:18px;height:18px;flex-shrink:0}
-.btn:hover{background:var(--lime-d);border-color:var(--lime-d);transform:translateY(-1px)}
+.btn:hover{background:var(--lime-d);border-color:var(--lime-d)}
 .btn--line{background:transparent;border-color:var(--ink);color:var(--ink)}
 .btn--line:hover{background:var(--ink);color:var(--lime);border-color:var(--ink)}
 .btn--dark{background:var(--ink);border-color:var(--ink);color:#fff}
@@ -607,7 +607,7 @@ input,textarea{caret-color:var(--ink)}
 .quiz__hint{color:var(--gray);margin:0 0 24px;font-size:14.5px}
 .quiz__opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:26px}
 .quiz__opts button{background:var(--paper);border:1px solid var(--line);border-radius:var(--rad-s);padding:18px 20px;text-align:left;font-size:15px;font-weight:600;transition:border-color .15s,transform .15s}
-.quiz__opts button:hover{border-color:var(--ink);transform:translateY(-2px)}
+.quiz__opts button:hover{border-color:var(--ink)}
 .quiz__opts button small{display:block;font-weight:400;font-size:13px;color:var(--gray);margin-top:4px}
 .quiz__nav{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--gray)}
 .quiz__res{display:grid;grid-template-columns:200px 1fr;gap:28px;align-items:center}
@@ -1755,4 +1755,3 @@ form[data-form]{position:relative}
 .modal--confirm p{margin:0 0 22px;font-size:14.5px}
 .modal__btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .modal__btns .btn{flex:1 1 140px}
-.modal__btns .btn:hover{transform:none}
