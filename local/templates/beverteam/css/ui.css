@@ -1294,6 +1294,9 @@ input,textarea{caret-color:var(--ink)}
 .cop .blk{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;margin-bottom:16px}
 .cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
+/* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
+.pill-tabs button:focus-visible,.link:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 70%,transparent)}
+.link:focus-visible{border-radius:6px}
 .cop .corec{display:block;margin:-8px 0 18px;font-size:14px;line-height:1.5}.cop .corec .link{background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
 .okp .oklogin{display:grid;grid-template-columns:1fr auto;gap:4px 20px;align-items:center;margin-top:18px}
 .okp .oklogin b{font-size:15px}.okp .oklogin span{font-size:13.5px;color:var(--gray)}.okp .oklogin .btn{grid-row:1/span 2}
