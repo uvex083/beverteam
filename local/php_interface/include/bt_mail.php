@@ -57,7 +57,7 @@ function bt_mail_order(Sale\Order $order): array
     }
     $name = $props['FIO'] ?? '' ?: ($props['CONTACT_PERSON'] ?? '');
     $d = function_exists('bt_phone_digits') ? bt_phone_digits($props['PHONE'] ?? '') : '';
-    $phone = $d ? '+7 ' . substr($d, 1, 3) . ' ' . substr($d, 4, 3) . '-' . substr($d, 7, 2) . '-' . substr($d, 9, 2) : ($props['PHONE'] ?? '');
+    $phone = $d ? "+7\u{00A0}" . substr($d, 1, 3) . "\u{00A0}" . substr($d, 4, 3) . "\u{2011}" . substr($d, 7, 2) . "\u{2011}" . substr($d, 9, 2) : ($props['PHONE'] ?? '');
 
     // состав: товар, количество, сумма
     $cell = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#0E0E0C;border-bottom:1px solid #DCDCD4;vertical-align:top';
