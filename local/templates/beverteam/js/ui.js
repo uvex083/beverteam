@@ -1481,21 +1481,41 @@ window.BT_CO_COORDS = [60.533999,56.78314];   /* ул. Колокольная, 3
 
 /* Статичная карта-виджет: работает БЕЗ ключа (конструктор карт Яндекса) */
 window.BT_MAP_QUERY = 'Екатеринбург, улица Колокольная, 31А';
+/* Проекция Яндекса — Меркатор на эллипсоиде WGS84: пиксели мира на масштабе z <-> долгота/широта */
+const BT_merc = {
+  e: 0.0818191908426,
+  toPx(lon, lat, z){ const S = 256*2**z, f = lat*Math.PI/180, es = this.e*Math.sin(f);
+    return [(lon+180)/360*S, S/2 - S/(2*Math.PI)*Math.log(Math.tan(Math.PI/4+f/2)*((1-es)/(1+es))**(this.e/2))]; },
+  toLL(x, y, z){ const S = 256*2**z, t = Math.exp((S/2-y)*2*Math.PI/S); let f = 2*Math.atan(t)-Math.PI/2;
+    for(let i=0;i<6;i++){ const es=this.e*Math.sin(f); f = 2*Math.atan(t*((1+es)/(1-es))**(this.e/2))-Math.PI/2; }
+    return [x/S*360-180, f*180/Math.PI]; }
+};
 window.BT_mapWidget = (el, opts) => {
   if(!el) return;
-  /* статичная карта Яндекса (без ключа, рекламы и кнопок виджета) по размеру блока, метка — наша, в центре */
+  /* статичная карта Яндекса без ключа, рекламы и кнопок виджета. Одна картинка — максимум 650×450,
+     поэтому большой блок собираем из кусков внахлёст: следующий кусок закрывает логотип предыдущего, виден один — в правом нижнем углу */
   const o = Object.assign({c:BT_CO_COORDS, z:17}, opts||{});
-  const ll = o.c.join(','), W = el.clientWidth||650, H = el.clientHeight||420;
-  const w = Math.min(650, W), h = Math.min(450, Math.round(w*H/W)), z = o.z;
-  const img = new Image();
-  img.alt = 'Карта: '+BT_MAP_QUERY; img.loading = 'lazy'; img.decoding = 'async'; img.className = 'map__img';
-  img.src = `https://static-maps.yandex.ru/1.x/?ll=${ll}&z=${z}&size=${w},${h}&l=map&lang=ru_RU`;
-  img.onload = () => el.classList.add('is-map');
+  const W = Math.round(el.clientWidth||650), H = Math.round(el.clientHeight||420);
+  const cols = W <= 650 ? 1 : Math.max(2, Math.ceil((W-210)/(650-210))), rows = H <= 450 ? 1 : Math.ceil((H-30)/(450-30));
+  const tw = cols > 1 ? 650 : W, th = rows > 1 ? 450 : H;
+  const [cx, cy] = BT_merc.toPx(o.c[0], o.c[1], o.z);
+  const box = document.createElement('div'); box.className = 'map__tiles';
+  let left = cols*rows;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const x0 = cols > 1 ? Math.round(c*(W-tw)/(cols-1)) : 0, y0 = rows > 1 ? Math.round(r*(H-th)/(rows-1)) : 0;
+    const [lon, lat] = BT_merc.toLL(cx + x0 + tw/2 - W/2, cy + y0 + th/2 - H/2, o.z);
+    const img = new Image(); img.alt = ''; img.decoding = 'async'; img.loading = 'lazy';
+    img.style.cssText = `left:${x0}px;top:${y0}px;width:${tw}px;height:${th}px`;
+    img.onload = img.onerror = () => { if(--left === 0) el.classList.add('is-map'); };
+    img.src = `https://static-maps.yandex.ru/1.x/?ll=${lon.toFixed(6)},${lat.toFixed(6)}&z=${o.z}&size=${tw},${th}&l=map&lang=ru_RU`;
+    box.appendChild(img);
+  }
   const lat = o.c[1], lon = o.c[0];
+  box.setAttribute('role','img'); box.setAttribute('aria-label','Карта: '+BT_MAP_QUERY);
+  el.prepend(box);
   el.insertAdjacentHTML('beforeend', `<span class="map__pin"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path fill="#0E0E0C" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.8" fill="#D7E85C"/></svg></span>
     <span class="map__btns"><a class="map__btn" href="https://yandex.ru/maps/?pt=${lon},${lat}&z=17&l=map" target="_blank" rel="noopener">Открыть в Яндекс Картах</a><a class="map__btn map__btn--lime" href="https://yandex.ru/maps/?rtext=~${lat},${lon}&rtt=auto" target="_blank" rel="noopener">Маршрут</a></span>`);
-  el.prepend(img);
-  return img;
+  return box;
 };
 
 /* Интерактивная карта с выбором точки. Без ключа возвращает null — вызывающий код
