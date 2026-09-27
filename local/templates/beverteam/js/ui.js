@@ -1094,7 +1094,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
   document.querySelectorAll('.pill-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{
-    const sec=b.closest('section'); b.parentNode.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
+    const sec=b.closest('section'); if(!sec||!sec.querySelector('[data-tabpane]')) return; /* у вкладок доставки на оформлении заказа свой обработчик */
+    b.parentNode.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
     sec.querySelectorAll('[data-tabpane]').forEach(p=>p.hidden=p.dataset.tabpane!==b.dataset.tab);
     BT_cmpUpdate(); BT_favUpdate();
   }));
