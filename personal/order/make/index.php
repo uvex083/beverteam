@@ -96,8 +96,7 @@ $co = bt_contacts();
           <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
-        <div id="pvz" hidden style="margin-top:18px">
-          <div class="field"><label for="coPvz">Адрес пункта выдачи СДЭК *</label><input id="coPvz" name="pvz" placeholder="Например: ул. Малышева, 51"><span class="hint muted">Удобный пункт можно найти на cdek.ru — менеджер сверит адрес при звонке</span></div>
+        <div id="pvz" hidden>
         </div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
       </div>
@@ -209,11 +208,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     const n=++cityN; cityT=setTimeout(()=>post({action:'city',q:v}).then(r=>{if(n===cityN&&document.activeElement===cityIn)showCities(r.list||[]);}),200);});
   cityIn.addEventListener('focus',()=>{if(!locIn.value)cityIn.dispatchEvent(new Event('input'));else showCities(POP);});
   cityList.addEventListener('mousedown',e=>e.preventDefault());
-  cityList.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
-    cityIn.value=li.dataset.n;locIn.value=li.dataset.code;showCities([]);setErr(cityIn,'');
-    calc().then(()=>BT_toast('Доставка пересчитана для города '+esc(li.dataset.n)));});
-  cityIn.addEventListener('blur',()=>{showCities([]);if(cityIn.value.trim()&&!locIn.value)setTimeout(()=>setErr(cityIn,'Выберите город из списка'),0);});
-  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=cityList.querySelector('li');if(li&&cityList.classList.contains('open'))li.click();}
+  const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');
+    calc().then(()=>BT_toast('Доставка пересчитана для города '+esc(c.n)));};
+  cityList.addEventListener('click',e=>{const li=e.target.closest('li');if(li)pickCity({n:li.dataset.n,code:li.dataset.code});});
+  const letters=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
+  // ввели не до конца и ушли из поля — берём первое совпадение по началу названия, мусор не подставляем
+  const autoCity=()=>{const v=cityIn.value.trim();if(!v||locIn.value)return;const n=++cityN;clearTimeout(cityT);
+    post({action:'city',q:v}).then(r=>{if(n!==cityN||cityIn.value.trim()!==v||locIn.value)return;
+      const c=(r.list||[]).find(c=>letters(c.n).startsWith(letters(v)));
+      c?pickCity(c):setErr(cityIn,'Выберите город из списка');});};
+  cityIn.addEventListener('blur',()=>{showCities([]);autoCity();});
+  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=cityList.classList.contains('open')&&cityList.querySelector('li');li?li.click():autoCity();}
     if(e.key==='Escape')showCities([]);});
 
   /* улица и дом: подсказки DaData в пределах выбранного города; без дома — дописываем номер дальше */
@@ -227,8 +232,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   stList.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
     stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);setErr(stIn,'');stIn.focus();ready();
     if(li.dataset.h!=='1') stIn.dispatchEvent(new Event('input'));});
-  stIn.addEventListener('blur',()=>showStreets([]));
-  stIn.addEventListener('keydown',e=>{if(e.key==='Enter'&&stList.classList.contains('open')){e.preventDefault();stList.querySelector('li')?.click();}
+  // ввели руками и ушли — улицу берём из справочника, дом оставляем свой, если справочник его не знает
+  const autoStreet=()=>{const v=stIn.value.trim();if(v.length<2)return;const n=++stN;clearTimeout(stT);
+    post({action:'street',q:v,city:locIn.value?cityIn.value.trim():''}).then(r=>{if(n!==stN||stIn.value.trim()!==v)return;
+      const s=(r.list||[])[0], num=v.match(/\d.*$/);
+      if(!s||!letters(s.v).includes(letters(v.replace(/\d.*$/,'').replace(/(^|[\s.,])(ул|улица|д|дом)(?=[\s.,]|$)/gi,' '))))return;
+      stIn.value=s.house&&num&&s.v.replace(/\D/g,'')===num[0].replace(/\D/g,'')?s.v:(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
+      showStreets([]);ready();if(num)setErr(stIn,'');});};
+  stIn.addEventListener('blur',()=>{showStreets([]);autoStreet();});
+  stIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();stList.classList.contains('open')&&stList.querySelector('li')?stList.querySelector('li').click():autoStreet();}
     if(e.key==='Escape'){e.preventDefault();showStreets([]);}});
 
   /* ошибки под полем — та же разметка, что у BT_checkField */
@@ -250,7 +262,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!locIn.value)miss.push('город');
     else if(!sel)miss.push('способ доставки');
     else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(val('street')?'номер дома':'адрес доставки');
-    else if(sel.tab==='pvz'&&!val('pvz'))miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     if(!coAgree.checked)miss.push('согласие с условиями');
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):'Всё заполнено — можно подтверждать';

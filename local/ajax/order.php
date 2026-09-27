@@ -43,7 +43,7 @@ if ($action === 'street') {
         $d = $s['data'] ?? [];
         $street = trim(($d['street_with_type'] ?? '') . ($d['house'] ? ', ' . ($d['house_type'] ?? 'д') . ' ' . $d['house'] : '') . ($d['block'] ? ' ' . ($d['block_type'] ?? '') . ' ' . $d['block'] : ''));
         if ($street !== '') {
-            $list[] = ['v' => $street, 'house' => (bool)$d['house'], 'r' => trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
+            $list[] = ['v' => $street, 's' => $d['street_with_type'] ?? '', 'house' => (bool)$d['house'], 'r' => trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
         }
     }
     $out(['ok' => true, 'list' => $list]);
@@ -195,8 +195,6 @@ if (!$locOk) {
     $err['street'] = 'Это поле нужно заполнить';
 } elseif ($f['mode'] === 'addr' && !preg_match('/\p{L}{2,}.*\d/u', $f['street'])) {
     $err['street'] = 'Укажите номер дома';
-} elseif ($f['mode'] === 'pvz' && $f['pvz'] === '') {
-    $err['pvz'] = 'Это поле нужно заполнить';
 }
 if ($locOk && !isset($pays[(int)$req->getPost('pay')])) {
     $err['pay'] = 'Выберите способ оплаты';

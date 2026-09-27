@@ -111,10 +111,10 @@ input:focus,textarea:focus{outline:none;box-shadow:none;border-color:var(--ink);
 .search button{border:0;background:none;color:#C9C9C2;padding:0 14px;display:grid;place-items:center}
 .search button svg{width:17px;height:17px}
 .hdr__acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.hact{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 8px;border-radius:10px;
+.hact{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:10px;
   font-size:11px;color:#C9C9C2;position:relative;background:none;border:0;
   /* одинаковая ширина у всех действий: сумма в корзине меняется, шапка не прыгает */
-  min-width:78px;text-align:center}
+  min-width:64px;text-align:center}
 .hact>span:not(.cnt){display:block;width:100%;white-space:nowrap;font-variant-numeric:tabular-nums}
 .hact svg{width:20px;height:20px}
 .hact:hover{color:var(--lime)}
