@@ -1736,3 +1736,4 @@ form[data-form]{position:relative}
 .modal--confirm p{margin:0 0 22px;font-size:14.5px}
 .modal__btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .modal__btns .btn{flex:1 1 140px}
+.modal__btns .btn:hover{transform:none}
