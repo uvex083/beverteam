@@ -216,6 +216,7 @@ if (!$userId) {
         $userId = (int)$found['ID'];
     } else {
         $userId = bt_user_create($f['email'], $f['name'], $phone);
+        $fresh = true;
         if (!is_int($userId)) {
             $out(['ok' => false, 'errors' => ['email' => 'Не получилось сохранить покупателя: ' . $userId]]);
         }
@@ -245,5 +246,37 @@ if (!$r->isSuccess()) {
     $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ: ' . implode('; ', $r->getErrorMessages())]]);
 }
 $_SESSION['BT_ORDERS'][] = (int)$order->getId();
+
+// для следующего заказа: плательщик, способ доставки и последний адрес; гость с чужим e-mail в чужой кабинет не пишет
+if ($USER->IsAuthorized() || !empty($fresh)) {
+    $prev = CUserOptions::GetOption('bt', 'last_ship', [], $userId);
+    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc];
+    $ship += $f['mode'] === 'addr' ? ['street' => $f['street'], 'flat' => $f['flat'], 'entrance' => $f['entrance']]
+        : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
+    CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);
+    // реквизиты организации — в профиль покупателя (по ИНН), чтобы в следующий раз выбрать её из списка
+    if ($pt === 'UR') {
+        $urId = $ptypes['UR'];
+        $orgId = 0;
+        foreach (bt_profiles($userId, 'UR') as $p) {
+            if (($p['v']['INN'] ?? '') === $f['inn']) {
+                $orgId = $p['id'];
+            }
+        }
+        $r = $orgId ? Sale\Internals\UserPropsTable::update($orgId, ['NAME' => $f['company'], 'DATE_UPDATE' => new \Bitrix\Main\Type\DateTime()])
+            : Sale\Internals\UserPropsTable::add(['NAME' => $f['company'], 'USER_ID' => $userId, 'PERSON_TYPE_ID' => $urId, 'DATE_UPDATE' => new \Bitrix\Main\Type\DateTime()]);
+        if ($r->isSuccess()) {
+            $orgId = $orgId ?: (int)$r->getId();
+            $vals = ['COMPANY' => $f['company'], 'INN' => $f['inn'], 'KPP' => $f['kpp'], 'COMPANY_ADR' => $f['company_adr']];
+            $props = array_column(Sale\Internals\OrderPropsTable::getList(['filter' => ['=PERSON_TYPE_ID' => $urId, '@CODE' => array_keys($vals)], 'select' => ['ID', 'CODE', 'NAME']])->fetchAll(), null, 'CODE');
+            $have = array_column(Sale\Internals\UserPropsValueTable::getList(['filter' => ['=USER_PROPS_ID' => $orgId], 'select' => ['ID', 'ORDER_PROPS_ID']])->fetchAll(), 'ID', 'ORDER_PROPS_ID');
+            foreach ($props as $code => $pr) {
+                isset($have[$pr['ID']]) ? Sale\Internals\UserPropsValueTable::update($have[$pr['ID']], ['VALUE' => $vals[$code]])
+                    : Sale\Internals\UserPropsValueTable::add(['USER_PROPS_ID' => $orgId, 'ORDER_PROPS_ID' => $pr['ID'], 'NAME' => $pr['NAME'], 'VALUE' => $vals[$code]]);
+            }
+            CUserOptions::SetOption('bt', 'last_org', $orgId, false, $userId);
+        }
+    }
+}
 $out(['ok' => true, 'orderId' => (int)$order->getId(), 'accountNumber' => $order->getField('ACCOUNT_NUMBER'),
     'redirect' => '/personal/order/success/?id=' . (int)$order->getId()]);

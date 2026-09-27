@@ -37,17 +37,33 @@ foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTIVE' => 'Y', '!=ACTI
 }
 
 $u = ['name' => '', 'email' => '', 'phone' => ''];
+$orgs = [];
+$ship = [];
+$orgSel = 0;
 if ($USER->IsAuthorized()) {
     $cu = CUser::GetByID($USER->GetID())->Fetch() ?: [];
     $u = ['name' => trim(($cu['NAME'] ?? '') . ' ' . ($cu['LAST_NAME'] ?? '')), 'email' => $cu['EMAIL'] ?? '', 'phone' => $cu['PERSONAL_PHONE'] ?: ($cu['PERSONAL_MOBILE'] ?? '')];
     // основной адрес и первые реквизиты из кабинета
     $a = bt_addresses((int)$USER->GetID())[0] ?? null;
     $u += $a ? ['street' => $a['street'], 'flat' => $a['flat'], 'entrance' => $a['entr']] : [];
-    $u += bt_profiles((int)$USER->GetID(), 'UR')[0]['v'] ?? [];
-    if ($a && $a['loc'] !== '' && $a['city'] !== '') {
-        $popular = array_merge([['code' => $a['loc'], 'n' => $a['city'], 'r' => '']], array_values(array_filter($popular, fn($c) => $c['code'] !== $a['loc'])));
+    // прошлый заказ важнее адреса из кабинета: плательщик, способ и адрес доставки, организация
+    $ship = CUserOptions::GetOption('bt', 'last_ship', [], (int)$USER->GetID());
+    $ship = is_array($ship) ? $ship : [];
+    if (($ship['street'] ?? '') !== '') {
+        $u = ['street' => $ship['street'], 'flat' => $ship['flat'] ?? '', 'entrance' => $ship['entrance'] ?? ''] + $u;
+    }
+    $orgs = bt_profiles((int)$USER->GetID(), 'UR');
+    $orgSel = (int)CUserOptions::GetOption('bt', 'last_org', 0, (int)$USER->GetID());
+    $orgSel = in_array($orgSel, array_column($orgs, 'id'), true) ? $orgSel : (int)($orgs[0]['id'] ?? 0);
+    foreach ($orgs as $o) {
+        $o['id'] === $orgSel and $u += $o['v'];
+    }
+    $city = ($ship['loc'] ?? '') !== '' ? ['loc' => $ship['loc'], 'city' => bt_loc($ship['loc'])['n']] : $a;
+    if ($city && $city['loc'] !== '' && $city['city'] !== '') {
+        $popular = array_merge([['code' => $city['loc'], 'n' => $city['city'], 'r' => '']], array_values(array_filter($popular, fn($c) => $c['code'] !== $city['loc'])));
     }
 }
+$ptDef = ($ship['pt'] ?? '') === 'UR' ? 'UR' : 'FIZ';
 $co = bt_contacts();
 ?>
 <div class="wrap cop">
@@ -61,9 +77,19 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>1</b>Получатель</h2>
         <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div><p class="muted">Войдите, чтобы не заполнять данные и видеть историю заказов, или <a class="link" href="#auth" data-auth>получите код на почту</a>. Можно оформить и без входа.</p></div><?php endif ?>
-        <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="false" data-t="UR">Юрлицо или ИП</button></div>
-        <div id="urFields" hidden style="margin-top:18px">
-          <div class="f2">
+        <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="<?= $ptDef === 'FIZ' ? 'true' : 'false' ?>" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="<?= $ptDef === 'UR' ? 'true' : 'false' ?>" data-t="UR">Юрлицо или ИП</button></div>
+        <div id="urFields"<?= $ptDef === 'UR' ? '' : ' hidden' ?> style="margin-top:18px">
+          <?php if ($orgs): ?>
+          <div class="orgs" id="orgs" role="radiogroup" aria-label="Организация">
+            <?php foreach ($orgs as $o): ?>
+            <label class="radio-card<?= $o['id'] === $orgSel ? ' on' : '' ?>"><input type="radio" name="org" value="<?= $o['id'] ?>"<?= $o['id'] === $orgSel ? ' checked' : '' ?>
+              data-v="<?= $e(Json::encode(['company' => $o['v']['COMPANY'] ?? $o['name'], 'inn' => $o['v']['INN'] ?? '', 'kpp' => $o['v']['KPP'] ?? '', 'company_adr' => $o['v']['COMPANY_ADR'] ?? ''])) ?>">
+              <div><div class="t"><?= $e($o['v']['COMPANY'] ?? $o['name']) ?></div><div class="d">ИНН <?= $e($o['v']['INN'] ?? '—') ?><?= ($o['v']['KPP'] ?? '') !== '' ? ' · КПП ' . $e($o['v']['KPP']) : '' ?></div></div></label>
+            <?php endforeach ?>
+            <label class="radio-card"><input type="radio" name="org" value="0"><div><div class="t">Другая организация</div><div class="d">Заполнить реквизиты</div></div></label>
+          </div>
+          <?php endif ?>
+          <div class="f2" id="orgFields"<?= $orgs ? ' hidden' : '' ?>>
             <div class="field"><label for="coCompany">Название организации *</label><input id="coCompany" name="company" placeholder="ООО «Ромашка»" autocomplete="organization" value="<?= $e($u['COMPANY'] ?? '') ?>"></div>
             <div class="field"><label for="coInn">ИНН *</label><input id="coInn" name="inn" placeholder="10 или 12 цифр" inputmode="numeric" maxlength="12" value="<?= $e($u['INN'] ?? '') ?>"></div>
             <div class="field"><label for="coKpp">КПП</label><input id="coKpp" name="kpp" placeholder="9 цифр, если есть" inputmode="numeric" maxlength="9" value="<?= $e($u['KPP'] ?? '') ?>"></div>
@@ -136,7 +162,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
-  let pt='FIZ', dl=[], avail=[], sel=null, tab='pvz', payId=0, calcN=0, sending=false;
+  let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, payId=0, calcN=0, sending=false;
 
   /* доставки Битрикса → варианты макета: СДЭК до двери и в пункт выдачи — одна служба с разным адресом */
   const opts=()=>dl.flatMap(d=>d.code==='bt_cdek'
@@ -181,7 +207,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(n!==calcN||!r.ok) return;
       dl=r.deliveries; avail=r.pays; last=r;
       const all=opts();
-      if(!sel||!all.some(o=>o.key===sel.key)) sel=all.find(o=>o.tab===tab)||all[0]||null;
+      if(!sel||!all.some(o=>o.key===sel.key)) sel=all.find(o=>o.key===want&&o.tab===tab)||all.find(o=>o.tab===tab)||all[0]||null;
       else sel=all.find(o=>o.key===sel.key);
       if(sel) tab=sel.tab;
       if(sel&&sel.d.id!==r.delivery&&!again) return calc(true);
@@ -197,6 +223,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   ptypeTabs.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b||b.dataset.t===pt)return;
     [...ptypeTabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));pt=b.dataset.t;urFields.hidden=pt!=='UR';
     coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';calc();ready();});
+  coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';
+
+  /* сохранённые организации: выбрали — подставили реквизиты, «Другая» — пустые поля */
+  window.orgs&&orgs.addEventListener('change',e=>{const r=e.target;if(r.name!=='org')return;
+    orgs.querySelectorAll('.radio-card').forEach(c=>c.classList.toggle('on',c.contains(r)));
+    const v=r.value==='0'?{}:JSON.parse(r.dataset.v);
+    ['company','inn','kpp','company_adr'].forEach(k=>{form.elements[k].value=v[k]||'';setErr(form.elements[k],'');});
+    orgFields.hidden=r.value!=='0'; if(r.value==='0')coCompany.focus(); ready();});
 
   /* город: популярные из макета + поиск по местоположениям Битрикса */
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;
@@ -272,7 +306,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||!ready()) return;
     sending=true; submit.disabled=true; submit.textContent='Оформляем…'; sErr.textContent='';
-    const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,pay:payId,agree:coAgree.checked?'Y':''};
+    const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,dkey:sel.key,pay:payId,agree:coAgree.checked?'Y':''};
     [...form.elements].forEach(el=>{if(el.name&&el.type!=='radio'&&el.type!=='checkbox'&&!(el.name in data))data[el.name]=el.value;});
     post(data).then(r=>{
       if(r.ok){
@@ -285,6 +319,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       let first=null;
       Object.entries(r.errors||{}).forEach(([k,m])=>{const el=form.elements[k];
         if(el&&el.type!=='hidden'){setErr(el,m);first=first||el;} else sErr.textContent=m;});
+      if(window.orgFields&&['company','inn','kpp','company_adr'].some(k=>r.errors&&r.errors[k]))orgFields.hidden=false;
       if(r.errors&&r.errors.agree){setErr(coAgree,'x');first=first||coAgree;}
       if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});}
       BT_toast('Проверьте выделенные поля'); ready();
