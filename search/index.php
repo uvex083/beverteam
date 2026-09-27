@@ -33,12 +33,12 @@ if ($words) {
     }
 }
 $e = fn($s) => htmlspecialcharsbx((string)$s);
-$plural = fn(int $n, array $f) => $n . ' ' . $f[($n % 10 == 1 && $n % 100 != 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
-$found = array_filter([
-    'sp-prod' => $products ? $plural(count($products), ['товар', 'товара', 'товаров']) : '',
-    'sp-pages' => $pages ? $plural(count($pages), ['раздел или услуга', 'раздела и услуги', 'разделов и услуг']) : '',
-    'sp-posts' => $posts ? $plural(count($posts), ['статья', 'статьи', 'статей']) : '',
-]);
+$plural = fn(int $n, array $f) => $f[($n % 10 == 1 && $n % 100 != 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
+$groups = array_filter(['prod' => ['Товары', count($products)], 'pages' => ['Разделы и услуги', count($pages)], 'posts' => ['Журнал', count($posts)]], fn($g) => $g[1] > 0);
+$total = array_sum(array_column($groups, 1));
+$tab = isset($groups[$_GET['t'] ?? '']) ? $_GET['t'] : 'all';
+$show = fn(string $g) => isset($groups[$g]) && ($tab === 'all' || $tab === $g);
+$tabUrl = fn(string $t) => '/search/?q=' . urlencode($q) . ($t === 'all' ? '' : '&t=' . $t);
 $co = bt_contacts();
 $hints = ['кофе в зёрнах', 'аренда кофемашины', 'ремонт кофемашины', 'Jetinno', 'чай', 'дрип-пакеты'];
 ?>
@@ -52,30 +52,33 @@ $hints = ['кофе в зёрнах', 'аренда кофемашины', 'ре
     <button type="submit" class="btn">Найти</button>
   </form>
 
-  <?php if ($found): ?>
-    <div class="spage__sum">
-      <span>По запросу «<b><?= $e($q) ?></b>» найдено:</span>
-      <?php foreach ($found as $id => $t): ?><a class="chipx" href="#<?= $id ?>"><?= $t ?></a><?php endforeach ?>
-    </div>
+  <div id="spRes">
+  <?php if ($total): ?>
+    <p class="spage__sum">По запросу «<b><?= $e($q) ?></b>» <?= $plural($total, ['найден', 'найдено', 'найдено']) ?> <?= $total ?> <?= $plural($total, ['результат', 'результата', 'результатов']) ?></p>
+    <nav class="spage__tabs" aria-label="Что показать">
+      <?php foreach ((count($groups) > 1 ? ['all' => ['Все', $total]] + $groups : []) as $t => [$name, $n]): ?>
+        <a class="spage__tab" href="<?= $e($tabUrl($t)) ?>"<?= $t === $tab ? ' aria-current="page"' : '' ?>><?= $name ?><sup><?= $n ?></sup></a>
+      <?php endforeach ?>
+    </nav>
   <?php elseif ($q !== ''): ?>
     <div class="spage__empty">
       <b>По запросу «<?= $e($q) ?>» ничего не нашлось</b>
       <p>Проверьте написание или сократите запрос. Можно заглянуть в <a class="link" href="/magazin/">каталог</a> или позвонить: <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a></p>
     </div>
   <?php endif ?>
-  <?php if (!$found): ?>
+  <?php if (!$total): ?>
     <div class="spage__sum"><span>Часто ищут:</span><?php foreach ($hints as $h): ?><a class="chipx" href="/search/?q=<?= urlencode($h) ?>"><?= $e($h) ?></a><?php endforeach ?></div>
   <?php endif ?>
 
-  <?php if ($products): ?>
-    <section class="spage__sec" id="sp-prod">
-      <h2 class="display h2">Товары <sup><?= count($products) ?></sup></h2>
+  <?php if ($show('prod')): ?>
+    <section class="spage__sec">
+      <?php if ($tab === 'all'): ?><h2 class="display h2">Товары <sup><?= count($products) ?></sup></h2><?php endif ?>
       <div class="grid g4"><?php foreach ($products as $m) { echo bt_card($m); } ?></div>
     </section>
   <?php endif ?>
-  <?php if ($pages): ?>
-    <section class="spage__sec" id="sp-pages">
-      <h2 class="display h2">Разделы и услуги <sup><?= count($pages) ?></sup></h2>
+  <?php if ($show('pages')): ?>
+    <section class="spage__sec">
+      <?php if ($tab === 'all'): ?><h2 class="display h2">Разделы и услуги <sup><?= count($pages) ?></sup></h2><?php endif ?>
       <div class="spage__pages">
         <?php foreach ($pages as $p): ?>
           <a href="<?= $e($p['u']) ?>"><span><b><?= $e($p['t']) ?></b><span><?= $e($p['d']) ?></span></span><?= bt_icon('arrR') ?></a>
@@ -83,11 +86,12 @@ $hints = ['кофе в зёрнах', 'аренда кофемашины', 'ре
       </div>
     </section>
   <?php endif ?>
-  <?php if ($posts): ?>
-    <section class="spage__sec" id="sp-posts">
-      <h2 class="display h2">Журнал <sup><?= count($posts) ?></sup></h2>
+  <?php if ($show('posts')): ?>
+    <section class="spage__sec">
+      <?php if ($tab === 'all'): ?><h2 class="display h2">Журнал <sup><?= count($posts) ?></sup></h2><?php endif ?>
       <div class="news"><?php foreach ($posts as $p) { echo bt_post_card($p); } ?></div>
     </section>
   <?php endif ?>
+  </div>
 </div>
 <?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

@@ -1526,3 +1526,19 @@ window.BT_mapPicker = (el, onPick, opts) => {
 document.addEventListener('click',e=>{const b=e.target.closest('.spage__clr'); if(!b) return;
   const f=b.form; f.q.value=''; f.classList.remove('has-q'); f.q.focus();});
 document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('.spage__f'); if(f) f.classList.toggle('has-q',!!e.target.value);});
+/* вкладки результатов поиска: подменяем блок результатов без перезагрузки страницы */
+(()=>{
+  const load=(url,push)=>{const box=document.getElementById('spRes'); if(!box) return location.assign(url);
+    box.classList.add('is-loading');
+    fetch(url,{credentials:'same-origin'}).then(r=>r.text()).then(html=>{
+      const n=new DOMParser().parseFromString(html,'text/html').getElementById('spRes');
+      if(!n) return location.assign(url);
+      box.replaceWith(n); window.BT_phFit&&BT_phFit(n);
+      if(push) history.pushState({sp:1},'',url);
+      Object.keys(BT_CART).forEach(id=>document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q:BT_CART[id]}})));
+    }).catch(()=>location.assign(url));
+  };
+  document.addEventListener('click',e=>{const a=e.target.closest('.spage__tab'); if(!a||e.ctrlKey||e.metaKey||e.shiftKey) return;
+    e.preventDefault(); if(!a.hasAttribute('aria-current')) load(a.href,true);});
+  addEventListener('popstate',()=>{ if(document.getElementById('spRes')) load(location.href,false); });
+})();

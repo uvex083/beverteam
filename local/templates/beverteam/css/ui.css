@@ -662,7 +662,7 @@ input,textarea{caret-color:var(--ink)}
 /* страница результатов поиска */
 .spage .h1{margin:14px 0 22px}
 .spage__f{display:flex;align-items:center;gap:6px;max-width:720px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 20px;transition:border-color .15s,box-shadow .15s}
-.spage__f:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
+.spage__f:focus-within{border-color:var(--lime);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
 .spage__f>svg{width:18px;height:18px;flex-shrink:0;color:var(--gray)}
 .spage__f input{flex:1;min-width:0;border:0;background:none;font:500 16px/1.4 inherit;color:var(--ink);padding:10px 6px}
 .spage__f input:focus{outline:none}
@@ -676,6 +676,13 @@ input,textarea{caret-color:var(--ink)}
 .spage__sum{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 8px;color:var(--gray);font-size:14.5px}
 .spage__sum>span{margin-right:4px}.spage__sum b{color:var(--ink)}
 .spage__sum .chipx{background:var(--white)}
+.spage__tabs{display:inline-flex;max-width:100%;overflow-x:auto;scrollbar-width:none;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:4px}
+.spage__tabs::-webkit-scrollbar{display:none}
+.spage__tab{display:flex;align-items:baseline;gap:6px;padding:9px 18px;border-radius:999px;font-weight:600;font-size:14px;color:var(--gray);white-space:nowrap;transition:background-color .15s,color .15s}
+.spage__tab sup{font:600 11px/1 'JetBrains Mono',monospace;opacity:.7}
+.spage__tab:hover{color:var(--ink)}
+.spage__tab[aria-current]{background:var(--ink);color:#fff}
+#spRes{transition:opacity .15s}#spRes.is-loading{opacity:.45;pointer-events:none}
 .spage__empty{margin-top:28px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:28px;color:var(--gray)}
 .spage__empty b{display:block;font-family:Unbounded;font-size:18px;color:var(--ink);margin-bottom:8px}
 .spage__empty p{margin:0}
