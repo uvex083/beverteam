@@ -38,7 +38,7 @@ $revs = bt_list('reviews');
   <?php if ($cert): ?>
   <section class="sec sec--t0"><div class="cert">
     <div><div class="mono" style="color:var(--lime)"><?= $e($cert['caption'] ?? '') ?></div><h2 class="display h2" style="margin:14px 0"><?= $e($cert['title'] ?? '') ?></h2><p style="color:#A8A8A0;margin:0;max-width:40ch"><?= $e($cert['subtitle'] ?? '') ?></p></div>
-    <?php if (!empty($cert['pic'])): ?><img class="cert__img" src="<?= $e($cert['pic']) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"><?php else: ?><div class="ph"><span>Скан сертификата авторизации<br><small>нужен файл от клиента</small></span></div><?php endif ?>
+    <?php if (!empty($cert['pic'])): ?><img class="cert__img" src="<?= $e($cert['pic']) ?>"<?= bt_img_wh($cert['pic']) ?> alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"><?php else: ?><div class="ph"><span>Скан сертификата авторизации<br><small>нужен файл от клиента</small></span></div><?php endif ?>
   </div></section>
   <?php endif ?>
 

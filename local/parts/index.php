@@ -145,18 +145,19 @@ $c0 = $chips[$cur] ?? null;
     <?php if (!empty($svc['items'])): ?><ul class="svc__list"><?php foreach ($svc['items'] as [$t, $v]): ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?></ul><?php endif ?>
     <div class="row"><?= bt_btn($svc['btn_text'] ?? '', $svc['btn_link'] ?? '') ?><?= bt_btn($svc['btn2_text'] ?? '', $svc['btn2_link'] ?? '', 'btn btn--line btn--inv') ?></div>
   </div>
-  <div class="svc__r"><?php if ($svc['pic']): ?><img src="<?= $e($svc['pic']) ?>" alt="<?= $e(str_replace("\n", ' ', $svc['title'] ?? '')) ?>" loading="lazy"><?php endif ?></div>
+  <div class="svc__r"><?php if ($svc['pic']): ?><img src="<?= $e($svc['pic']) ?>"<?= bt_img_wh($svc['pic']) ?> alt="<?= $e(str_replace("\n", ' ', $svc['title'] ?? '')) ?>" loading="lazy"><?php endif ?></div>
 </div></div></section>
 <?php endif ?>
 
 <?php
 $bp = !empty($bean['product']) ? bt_product((string)$bean['product']) : null;
 if ($bp):
+    $bpImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $bp['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bp['img'];
     $spec = bt_catalog_specs()[$bp['id']] ?? [];
     $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['notes'] ?? ''))));
 ?>
 <section class="sec sec--t0"><div class="wrap"><div class="bean" data-rv>
-  <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e(bt_img((int)(CIBlockElement::GetList([], ['ID' => $bp['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bp['img']) ?>" alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
+  <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bpImg) ?>"<?= bt_img_wh($bpImg) ?> alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
   <div class="bean__c">
     <div class="mono"><?= $e($bean['caption'] ?? '') ?></div>
     <h2 class="display h2"><?= bt_title($bean['title'] ?? $bp['n']) ?></h2>
@@ -197,7 +198,7 @@ if ($bp):
     </ul>
     <div class="row"><?= bt_btn($sub['btn_text'] ?? '', $sub['btn_link'] ?? '') ?><?= bt_btn($sub['btn2_text'] ?? '', $sub['btn2_link'] ?? '', 'btn btn--line btn--inv') ?></div>
   </div>
-  <div class="svc__r"><?php if ($sub['pic']): ?><img src="<?= $e($sub['pic']) ?>" alt="<?= $e(str_replace("\n", ' ', $sub['title'] ?? '')) ?>" loading="lazy"><?php endif ?></div>
+  <div class="svc__r"><?php if ($sub['pic']): ?><img src="<?= $e($sub['pic']) ?>"<?= bt_img_wh($sub['pic']) ?> alt="<?= $e(str_replace("\n", ' ', $sub['title'] ?? '')) ?>" loading="lazy"><?php endif ?></div>
 </div></div></section>
 <?php endif ?>
 

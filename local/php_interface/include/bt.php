@@ -25,6 +25,13 @@ function bt_img($file, int $w, int $h, int $mode = BX_RESIZE_IMAGE_PROPORTIONAL)
     return $src !== '' ? bt_webp($src) : '';
 }
 
+// Атрибуты width/height по файлу картинки — место под неё резервируется до загрузки
+function bt_img_wh(string $src): string
+{
+    $s = $src !== '' ? @getimagesize($_SERVER['DOCUMENT_ROOT'] . $src) : false;
+    return $s ? ' width="' . $s[0] . '" height="' . $s[1] . '"' : '';
+}
+
 // WebP-копия файла из /upload: /upload/resize_cache/<путь>.webp, создаётся при первом обращении; удаляется ядром вместе с resize_cache файла
 function bt_webp(string $src): string
 {
