@@ -1723,7 +1723,14 @@ form[data-form]{position:relative}
 #addrModal.has-map .amap{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
 #addrModal .amap__box{position:relative;height:360px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--line);background:var(--paper)}
 @media(max-width:860px){#addrModal.has-map .amap{grid-template-columns:1fr}#addrModal .amap__box{height:260px}}
-@media(max-width:800px){.accp .two{grid-template-columns:1fr}.accp .track{grid-template-columns:repeat(2,1fr);row-gap:14px}
+@media(max-width:800px){.accp .two{grid-template-columns:1fr}.accp .track{grid-template-columns:1fr;row-gap:0;margin-bottom:16px}
+  .accp .track div{text-align:left;padding:0 0 18px 30px;font-size:14px}
+  .accp .track div::after{left:0;top:1px;transform:none}
+  .accp .track div::before,.accp .track div:first-child::before{left:6px;right:auto;top:16px;bottom:-1px;width:2px;height:auto;background:var(--line)}
+  .accp .track div:last-child{padding-bottom:0}.accp .track div:last-child::before{display:none}
+  .accp .track div.done:has(+.done)::before{background:var(--lime)}
+  .accp .track div.cur::after{box-shadow:0 0 0 4px rgba(215,232,92,.55)}
+  .accp .track small{display:inline;margin-left:8px}
   .accp .oit{grid-template-columns:52px 1fr}.accp .oit img,.accp .oit .ph{width:52px;height:52px}.accp .oit .q,.accp .oit .p{grid-column:2}}
 @media(max-width:700px){.accp .ord{grid-template-columns:1fr;padding:18px}.accp .ord .r{align-items:flex-start;text-align:left}
   .accp .li .acts{justify-content:flex-start}.accp .two .dl{grid-template-columns:1fr;gap:2px}.accp .two .dl dd{margin-bottom:8px}}
