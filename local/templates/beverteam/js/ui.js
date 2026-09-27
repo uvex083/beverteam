@@ -1595,3 +1595,23 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]'); i
   const done=()=>window.BT_toast&&BT_toast('Скопировано в буфер обмена');
   if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done).catch(()=>{});
   else { const t=document.createElement('textarea'); t.value=b.dataset.copy; document.body.appendChild(t); t.select(); try{document.execCommand('copy');done();}catch(err){} t.remove(); }});
+
+/* Окно подтверждения на стилях модалок: BT_confirm({title,text,ok,cancel}) → Promise<boolean>. Esc, фон и «×» — отмена */
+window.BT_confirm = o => new Promise(res => {
+  let m=document.getElementById('btConfirm');
+  if(!m){ document.body.insertAdjacentHTML('beforeend',`<div class="modal modal--confirm" id="btConfirm" role="alertdialog" aria-modal="true" aria-labelledby="btConfirmT" aria-describedby="btConfirmD">
+    <div class="modal__bg" data-cf="0"></div><div class="modal__p"><button class="modal__x" type="button" data-cf="0" aria-label="Закрыть">×</button>
+    <h3 class="display" id="btConfirmT"></h3><p class="muted" id="btConfirmD"></p>
+    <div class="modal__btns"><button class="btn btn--line" type="button" data-cf="0"></button><button class="btn btn--dark" type="button" data-cf="1"></button></div></div></div>`);
+    m=document.getElementById('btConfirm'); }
+  const last=document.activeElement;
+  m.querySelector('#btConfirmT').textContent=o.title||'Вы уверены?';
+  m.querySelector('#btConfirmD').innerHTML=o.text||'';
+  m.querySelector('.modal__btns [data-cf="0"]').textContent=o.cancel||'Отмена';
+  m.querySelector('.modal__btns [data-cf="1"]').textContent=o.ok||'Да';
+  const done=v=>{ m.classList.remove('open'); m.removeEventListener('click',onClick); removeEventListener('keydown',onKey,true); if(last&&last.focus) last.focus(); res(v); };
+  const onClick=e=>{ const b=e.target.closest('[data-cf]'); if(b) done(b.dataset.cf==='1'); };
+  const onKey=e=>{ if(e.key==='Escape'){ e.stopPropagation(); done(false); } };
+  m.addEventListener('click',onClick); addEventListener('keydown',onKey,true);
+  m.classList.add('open'); setTimeout(()=>m.querySelector('.modal__btns [data-cf="1"]').focus(),30);
+});

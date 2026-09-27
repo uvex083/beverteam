@@ -1721,3 +1721,13 @@ form[data-form]{position:relative}
 .req__btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .req__btns .btn svg{width:18px;height:18px;margin-right:8px;flex-shrink:0}
 @media(max-width:480px){.req__list>div{grid-template-columns:1fr;gap:2px}.req__btns .btn{flex:1 1 100%}}
+/* корзина: «Очистить корзину» справа от заголовка */
+.cart__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cart__clear{background:none;border:0;padding:0 0 4px;font:600 14px/1.4 Manrope,sans-serif;color:var(--gray);cursor:pointer}
+.cart__clear:hover{color:var(--err,#C0392B)}
+/* окно подтверждения (BT_confirm) */
+.modal--confirm .modal__p{max-width:420px}
+.modal--confirm h3{font-size:20px;margin:0 28px 10px 0}
+.modal--confirm p{margin:0 0 22px;font-size:14.5px}
+.modal__btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.modal__btns .btn{flex:1 1 140px}

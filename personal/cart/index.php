@@ -7,7 +7,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 ?>
 <div class="wrap cartp">
   <nav class="crumbs" aria-label="Хлебные крошки"><a href="/">Главная</a><span>Корзина</span></nav>
-  <div class="pagehead"><h1 class="display h1">Корзина</h1></div>
+  <div class="pagehead cart__head"><h1 class="display h1">Корзина</h1><button type="button" class="link cart__clear" id="clearCart" hidden>Очистить корзину</button></div>
 
   <div id="tl"></div>
   <div class="cartl" id="cartl">
@@ -51,12 +51,21 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="ci__r">${line(c)}<button type="button" class="del" data-id="${c.id}">Удалить</button></div>
     </div>`).join('');
     totals();
-    tl.hidden=sumBox.hidden=!cart.length; cartl.classList.toggle('is-empty',!cart.length);
+    tl.hidden=sumBox.hidden=clearCart.hidden=!cart.length; cartl.classList.toggle('is-empty',!cart.length);
   }
-  const remove=id=>{const q=BT_CART[id],m=BT_find(id);
-    set(id,0); render();
-    BT_toast(`«${esc(m?m.n:'Товар')}» удалён · <a href="#" id="undoDel">Вернуть</a>`);
-    document.getElementById('undoDel').onclick=ev=>{ev.preventDefault();set(id,q);render();BT_toast('Вернули в корзину');};};
+  // удаление — только после подтверждения; «Вернуть» в уведомлении остаётся
+  const remove=id=>{const q=BT_CART[id],m=BT_find(id),n=esc(m?m.n:'Товар');
+    BT_confirm({title:'Удалить товар?',text:`«${n}» будет удалён из корзины.`,ok:'Удалить',cancel:'Оставить'}).then(yes=>{
+      if(!yes){render();return;}
+      set(id,0); render();
+      BT_toast(`«${n}» удалён · <a href="#" id="undoDel">Вернуть</a>`);
+      document.getElementById('undoDel').onclick=ev=>{ev.preventDefault();set(id,q);render();BT_toast('Вернули в корзину');};});};
+  clearCart.addEventListener('click',()=>{const was={...BT_CART},n=Object.keys(was).length;
+    BT_confirm({title:'Очистить корзину?',text:`Из корзины будут удалены все товары: ${n} ${plural(n,['позиция','позиции','позиций'])}.`,ok:'Очистить',cancel:'Оставить'}).then(yes=>{
+      if(!yes)return;
+      Object.keys(was).forEach(id=>set(id,0)); render();
+      BT_toast('Корзина очищена · <a href="#" id="undoClear">Вернуть</a>');
+      document.getElementById('undoClear').onclick=ev=>{ev.preventDefault();Object.entries(was).forEach(([id,q])=>set(id,q));render();BT_toast('Вернули товары в корзину');};});});
   // количество меняем точечно: строка и итог, без пересборки списка
   items.addEventListener('change',e=>{const i=e.target.closest('input[data-id]');if(!i)return;
     const q=Math.max(1,parseInt(i.value,10)||1);i.value=q;set(i.dataset.id,q);
