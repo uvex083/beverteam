@@ -78,8 +78,8 @@ $co = bt_contacts();
         <h2><b>1</b>Получатель</h2>
         <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div></div>
         <div class="field" style="margin-bottom:18px"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>">
-          <span class="hint">Если вы уже покупали у нас — подставим данные из прошлого заказа</span></div>
-        <div class="alert alert--info corec" id="coRec" hidden>Вы уже покупали у нас. <button type="button" class="link" id="coRecBtn">Получить код на почту</button> — и мы подставим имя, телефон, адрес и реквизиты. Или просто продолжайте.</div>
+          <span class="hint">Сюда придёт подтверждение заказа</span></div>
+        <div class="alert alert--info corec" id="coRec" hidden><span id="coRecT"></span> <button type="button" class="link" id="coRecBtn">Получить код на почту</button> <span id="coRecD"></span></div>
         <?php endif ?>
         <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="<?= $ptDef === 'FIZ' ? 'true' : 'false' ?>" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="<?= $ptDef === 'UR' ? 'true' : 'false' ?>" data-t="UR">Юрлицо или ИП</button></div>
         <div id="urFields"<?= $ptDef === 'UR' ? '' : ' hidden' ?> style="margin-top:18px">
@@ -242,7 +242,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     coEmail.addEventListener('blur',()=>{const v=coEmail.value.trim().toLowerCase();
       if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(v)){rec.hidden=true;return;}
       if(v===recFor)return; recFor=v;
-      BT_authPost({action:'check',email:v}).then(r=>{rec.hidden=!(r.ok&&r.exists&&coEmail.value.trim().toLowerCase()===v);}).catch(()=>{});});
+      BT_authPost({action:'check',email:v}).then(r=>{rec.hidden=!(r.ok&&r.exists&&coEmail.value.trim().toLowerCase()===v);if(rec.hidden)return;
+        coRecT.textContent=r.orders?'Вы уже покупали у нас.':'У вас уже есть аккаунт с этим e‑mail.';
+        coRecD.textContent=r.orders?'— и мы подставим имя, телефон, адрес и реквизиты. Или просто продолжайте.':'— войдите, и заказ сохранится в личном кабинете. Или просто продолжайте.';}).catch(()=>{});});
     coEmail.addEventListener('input',()=>{if(coEmail.value.trim().toLowerCase()!==recFor)rec.hidden=true;});
     coRecBtn.addEventListener('click',()=>BT_auth(coEmail.value.trim()));
     if(coEmail.value.trim())coEmail.dispatchEvent(new Event('blur'));

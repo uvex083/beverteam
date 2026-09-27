@@ -53,7 +53,9 @@ switch ((string)$req->getPost('action')) {
     case 'check':
         $email = mb_strtolower(trim((string)$req->getPost('email')));
         $found = check_email($email, true) ? UserTable::getList(['filter' => ['=EMAIL' => $email], 'select' => ['ID', 'ACTIVE'], 'limit' => 1])->fetch() : null;
-        $out(['ok' => true, 'exists' => (bool)($found && $allowed($found))]);
+        $ok = $found && $allowed($found);
+        $out(['ok' => true, 'exists' => (bool)$ok, 'orders' => $ok && \Bitrix\Main\Loader::includeModule('sale')
+            && \Bitrix\Sale\Internals\OrderTable::getCount(['=USER_ID' => (int)$found['ID']]) > 0]);
 
     case 'send':
         if ($USER->IsAuthorized()) {
