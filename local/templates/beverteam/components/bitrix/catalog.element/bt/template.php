@@ -31,7 +31,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
         <div class="swiper gal__thumbs" id="thumbs"><div class="swiper-wrapper">
           <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide" role="button" tabindex="0" aria-label="Фото <?= $i + 1 ?> из <?= count($photos) ?>"><span><img src="<?= $ph['th'] ?>" alt="" loading="lazy" width="58" height="58"></span></div><?php endforeach ?>
         </div></div>
-        <button class="gal__ar" id="thDn" type="button" aria-label="Следующие фото"<?= count($photos) > 1 ? '' : ' style="visibility:hidden"' ?>><svg viewBox="0 0 24 24"><path d="m5 9 7 7-7-7"/></svg></button>
+        <button class="gal__ar" id="thDn" type="button" aria-label="Следующие фото"<?= count($photos) > 1 ? '' : ' style="visibility:hidden"' ?>><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
       </div>
       <div class="gal__main">
         <div class="gal__badges"><?php foreach ($m['badges'] ?? [] as $b): ?><span class="badge"><?= $e($b) ?></span><?php endforeach ?><?php if ($arResult['BT_Q']): ?><span class="badge badge--dark">Q <?= $e($arResult['BT_Q']) ?></span><?php endif ?></div>
