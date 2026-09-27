@@ -38,7 +38,7 @@ function bt_bill_file(Sale\Order $order): int
         return (int)$fid;
     }
     $service = Sale\PaySystem\Manager::getObjectById($payment->getPaymentSystemId());
-    $file = $service ? $service->getFile($payment) : null;
+    $file = $service && $service->isAffordPdf() ? $service->getPdf($payment) : null;
     if (empty($file['ID'])) {
         return 0;
     }
