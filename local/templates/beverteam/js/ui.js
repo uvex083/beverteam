@@ -119,6 +119,11 @@ window.BT_authPost = data => { const fd=new FormData(); Object.entries(data).for
 window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
 /* выход: из кабинета — на главную, с остальных страниц — та же страница уже гостем */
 window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ if(document.querySelector('.accp')) location.href='/'; else location.reload(); });
+/* вход через сервисы (header.php → BT_IDP): только настроенные в модуле «Социальные сервисы», переход сразу — правило 11 */
+const IDP=window.BT_IDP||[];
+window.BT_idpHtml = label => { const back=encodeURIComponent(location.pathname+location.search.replace(/[?&]auth_service_(id|error)=[^&]*/g,'').replace(/^&/,'?'));
+  return `<div class="idp--row">${label?`<b>${label}</b>`:''}<div class="idp">${IDP.map(p=>
+  `<a class="${p.cls}" href="/local/ajax/oauth.php?go=${p.id}&amp;back=${back}" rel="nofollow" title="${p.t}" aria-label="Войти через ${p.t}">${p.m}</a>`).join('')}</div></div>`; };
 window.BT_authUpdate = () => {
   const a=document.querySelector('.hact[href="/personal/"]'); if(!a) return;
   const l=a.querySelector('span:not(.cnt)');
@@ -475,7 +480,8 @@ function authModal(){
     <!-- шаг 1: e-mail или телефон -->
     <form data-step="pick" novalidate>
       <h3 class="display" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</h3>
-      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: пришлём код на почту.</p>
+      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'войдите через сервис или получите код на почту':'пришлём код на почту'}.</p>
+      ${IDP.length?BT_idpHtml('')+'<div class="or">или получить код</div>':''}
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
@@ -920,6 +926,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* toast + add to cart */
   const t=document.getElementById('toast');let tm;
   window.BT_toast=msg=>{t.innerHTML=msg;t.classList.add('show');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('show'),3200);};
+  /* вернулись от сервиса входа с ошибкой: причина — тостом, окно входа — сразу */
+  if(/[?&]auth_service_error=/.test(location.search)){
+    history.replaceState(null,'',location.pathname+location.search.replace(/[?&]auth_service_(id|error)=[^&]*/g,'').replace(/^&/,'?')+location.hash);
+    const e=window.BT_AUTH_ERR||{};
+    if(!USER){ BT_auth(); const n=document.getElementById('aNote'), i=document.getElementById('aLogin');
+      n.hidden=false; n.textContent=e.msg||'Не получилось войти через сервис. Попробуйте ещё раз или получите код на почту.';
+      if(e.email){ i.value=e.email; i.dispatchEvent(new Event('input')); } }
+  }
+  if(!USER&&IDP.length) document.querySelectorAll('[data-idp-row]').forEach(el=>{ el.innerHTML=BT_idpHtml(el.dataset.idpRow); const b=el.closest('[hidden]'); if(b) b.hidden=false; });
   BT_cartUpdate(false);
   BT_cmpUpdate();
   const rerender = id => {

@@ -60,6 +60,7 @@ $co = bt_contacts();
     <div>
       <div class="blk">
         <h2><b>1</b>Получатель</h2>
+        <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div><p class="muted">Войдите, чтобы не заполнять данные и видеть историю заказов, или <a class="link" href="#auth" data-auth>получите код на почту</a>. Можно оформить и без входа.</p></div><?php endif ?>
         <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="false" data-t="UR">Юрлицо или ИП</button></div>
         <div id="urFields" hidden style="margin-top:18px">
           <div class="f2">
