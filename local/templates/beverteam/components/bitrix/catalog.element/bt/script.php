@@ -32,9 +32,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(tiers&&PM.bulk){ const p=BT_perKg(PM,kg,q); [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',p===+r.cells[1].textContent.replace(/\D/g,''))); }
     if(PM.bulk) pPacks.innerHTML=BT_packs(PM,true);
     const inCart=BT_CART[key()]||0;
-    if(inCart){
+    // кнопку не пересобираем без нужды: уход фокуса из поля количества перерисовал бы её под курсором и съел клик
+    if(pAdd.dataset.st===String(inCart)){}
+    else if(inCart){ pAdd.dataset.st=inCart;
       pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} шт → оформить</a>`;
-    } else {
+    } else { pAdd.dataset.st=0;
       pAdd.innerHTML=`<button class="btn" id="pBuy" type="button">В корзину</button>`;
       document.getElementById('pBuy').addEventListener('click',()=>{
         BT_cartSet(key(),Math.max(1,parseInt(qty.value,10)||1));
