@@ -10,7 +10,7 @@ $smartPath = preg_match('~/filter/(.+)/apply/$~', $sefUrl, $m) ? $m[1] : '';
 $keep = array_intersect_key($_GET, ['sort' => 1]);
 // условия пришли параметрами (фоновая загрузка, старая ссылка) или ЧПУ записан не так, как его строит фильтр
 // (пустой, другой порядок, значения не из этого раздела) — постоянный редирект на понятный адрес
-$curPage = (string)$APPLICATION->GetCurPage();
+$curPage = (string)$APPLICATION->GetCurPage(false);
 if (isset($_GET['set_filter']) || (str_contains($curPage, '/filter/') && $curPage !== $sefUrl)) {
     LocalRedirect($sefUrl . ($keep ? '?' . http_build_query($keep) : ''), true, '301 Moved permanently');
 }

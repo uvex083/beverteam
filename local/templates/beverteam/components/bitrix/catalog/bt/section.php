@@ -30,12 +30,13 @@ $sorts = [
     'za' => ['По названию Я–А', 'NAME', 'DESC'],
 ];
 $sortKey = isset($sorts[$_GET['sort'] ?? '']) ? $_GET['sort'] : 'pop';
-$sectionUrl = $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['section'];
+$folder = isset($GLOBALS['BT_ROOT_FILTER']) ? '/catalog/' : $arResult['FOLDER'];
+$sectionUrl = $folder . $arResult['URL_TEMPLATES']['section'];
 $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_GROUPS' => 'N'];
 
 // ЧПУ фильтра: /catalog/<раздел>/filter/<условия>/apply/, в корне — /catalog/filter/<условия>/apply/
 $smartPath = (string)($arResult['VARIABLES']['SMART_FILTER_PATH'] ?? $GLOBALS['BT_ROOT_FILTER'] ?? '');
-$sefRule = $arResult['FOLDER'] . ($section ? $arResult['URL_TEMPLATES']['smart_filter'] : 'filter/#SMART_FILTER_PATH#/apply/');
+$sefRule = $folder . ($section ? $arResult['URL_TEMPLATES']['smart_filter'] : 'filter/#SMART_FILTER_PATH#/apply/');
 // старые адреса с условиями в параметрах (?btFilter_…): компонент их прочитает, шаблон фильтра перенаправит на ЧПУ
 if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET))) {
     $_GET['set_filter'] = $_REQUEST['set_filter'] = 'Y';
@@ -83,7 +84,7 @@ if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET)))
           'SET_TITLE' => $section ? 'Y' : 'N', 'SET_BROWSER_TITLE' => 'Y', 'SET_META_DESCRIPTION' => 'Y', 'ADD_SECTIONS_CHAIN' => $section ? 'Y' : 'N',
           'SET_STATUS_404' => 'Y', 'SHOW_404' => 'Y', 'SET_LAST_MODIFIED' => 'Y', 'CACHE_FILTER' => 'Y',
           'DISPLAY_TOP_PAGER' => 'N', 'DISPLAY_BOTTOM_PAGER' => 'N', 'HIDE_NOT_AVAILABLE' => 'N', 'COMPATIBLE_MODE' => 'N',
-          'SECTION_URL' => $sectionUrl, 'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['element'],
+          'SECTION_URL' => $sectionUrl, 'DETAIL_URL' => $folder . $arResult['URL_TEMPLATES']['element'],
       ] + $cache, $component, ['HIDE_ICONS' => 'Y']) ?>
     </div>
   </div>
@@ -92,7 +93,7 @@ if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET)))
 // страница фильтра не из посадочных — не индексируем, canonical на раздел
 if ($smartPath !== '' && !bt_landing()) {
     $APPLICATION->SetPageProperty('robots', 'noindex, follow');
-    $APPLICATION->SetPageProperty('canonical', 'https://beverteam.ru' . $arResult['FOLDER'] . (($cp = (string)($arResult['VARIABLES']['SECTION_CODE_PATH'] ?? '')) !== '' ? $cp . '/' : ''));
+    $APPLICATION->SetPageProperty('canonical', 'https://beverteam.ru' . $folder . (($cp = (string)($arResult['VARIABLES']['SECTION_CODE_PATH'] ?? '')) !== '' ? $cp . '/' : ''));
 }
 // крошки и H1 выводим после компонентов: только тогда в цепочке и заголовке уже есть раздел
 $APPLICATION->AddViewContent('bt_crumbs', $APPLICATION->GetNavChain(false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false));
