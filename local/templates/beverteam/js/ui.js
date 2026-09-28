@@ -291,7 +291,8 @@ window.BT_cartUpdate = pulse => {
 const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const isWork = d => d.getDay()!==0 && d.getDay()!==6;
 const nextWork = (d,n) => { const x=new Date(d); while(n>0){ x.setDate(x.getDate()+1); if(isWork(x)) n--; } return x; };
-window.BT_fmtDate = (d,short) => d.getDate()+' '+(short?MONTHS[d.getMonth()].slice(0,3):MONTHS[d.getMonth()]);
+const MONTHS_S=['янв.','февр.','марта','апр.','мая','июня','июля','авг.','сент.','окт.','нояб.','дек.'];
+window.BT_fmtDate = (d,short) => d.getDate()+' '+(short?MONTHS_S:MONTHS)[d.getMonth()];
 window.BT_dates = (days) => {
   const now=new Date(); let pack=new Date(now);
   if(!isWork(now)||now.getHours()>=17) pack=nextWork(now,1);           /* после 17:00 и в выходные — первый рабочий день */
