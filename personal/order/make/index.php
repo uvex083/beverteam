@@ -150,7 +150,7 @@ $co = bt_contacts();
       <?php endforeach ?></div>
       <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
-      <div class="l t"><span>К оплате</span><span id="sTot" data-label="К оплате"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>

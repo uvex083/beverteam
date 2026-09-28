@@ -1842,10 +1842,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 window.BT_mbar=(btn,sumEl,onTap)=>{
   if(!btn||!('IntersectionObserver' in window))return;
   const bar=document.createElement('div');bar.className='mbar';bar.hidden=true;
-  bar.innerHTML=`<div class="mbar__s"><small>${sumEl.dataset.label||'Итого'}</small><b></b></div><button type="button" class="btn"></button>`;
+  bar.innerHTML=`<button type="button" class="btn"><span></span><b></b></button>`;
   document.body.appendChild(bar);
-  const b=bar.querySelector('button'),s=bar.querySelector('b');
-  const sync=()=>{s.textContent=sumEl.textContent;b.textContent=btn.textContent;b.classList.toggle('is-off',!!btn.disabled);};
+  const b=bar.querySelector('button'),s=bar.querySelector('b'),t=bar.querySelector('span');
+  const sync=()=>{s.textContent=sumEl.textContent;t.textContent=btn.textContent;b.classList.toggle('is-off',!!btn.disabled);};
   new MutationObserver(sync).observe(sumEl,{childList:true,characterData:true,subtree:true});
   new MutationObserver(sync).observe(btn,{childList:true,attributes:true,attributeFilter:['disabled']});
   b.addEventListener('click',()=>onTap?onTap():btn.click());
