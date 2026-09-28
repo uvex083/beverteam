@@ -17,6 +17,11 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
 }, (string)$arResult['~DETAIL_TEXT']);
 // таблица — в прокручиваемой обёртке: на телефоне листается сама, на широком экране тянется во всю колонку
 $body = preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $body);
+// товары из статьи — карточки каталога (выключенные и удалённые товары пропускаются)
+$prods = array_values(array_filter(array_map(fn($id) => bt_product((string)$id), (array)($arResult['PROPERTIES']['PRODUCTS']['VALUE'] ?? []))));
+if ($prods) {
+    $toc[] = ['prods', 'Товары из статьи'];
+}
 $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']['ID'] ?? 0), 1600, 1600);
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
@@ -32,6 +37,12 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     </div>
     <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>" itemprop="image"></figure><?php endif ?>
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>
+    <?php if ($prods): ?>
+    <section class="post__prods" id="prods" aria-labelledby="prodsT">
+      <h2 class="display h3" id="prodsT">Товары из статьи</h2>
+      <div class="grid g3"><?php foreach ($prods as $m) echo bt_card($m) ?></div>
+    </section>
+    <?php endif ?>
     <?php if ($tags): ?><div class="jtags jtags--post"><?php foreach ($tags as $t): ?><a href="<?= $e(bt_tag_url($t)) ?>">#<?= $e($t) ?></a><?php endforeach ?><meta itemprop="keywords" content="<?= $e(implode(', ', $tags)) ?>"></div><?php endif ?>
     <div class="row" style="margin-top:32px;gap:12px">
       <a class="btn" href="/magazin/kofe/">Выбрать зерно</a>

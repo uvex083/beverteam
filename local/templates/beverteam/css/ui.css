@@ -569,6 +569,8 @@ input,textarea{caret-color:var(--ink)}
 .post__body tbody tr:last-child td{border-bottom:0}
 .post__body tbody tr:hover td{background:#FAFAF7}
 .post__body hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.post__prods{margin-top:36px;scroll-margin-top:130px}.post__prods h2{margin-bottom:16px}
+@media(max-width:900px){.post__prods .g3{grid-template-columns:1fr 1fr}}@media(max-width:520px){.post__prods .g3{grid-template-columns:1fr}}
 .post__body em{color:var(--gray)}
 .post__body figure{margin:26px 0}
 .post__body figure img{border-radius:var(--rad);width:100%;max-height:520px;object-fit:cover}
