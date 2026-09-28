@@ -6,16 +6,9 @@ $rubrics = array_values(bt_blog_rubrics());
 $aMenuLinks = array_merge([
     ['Каталог', '/catalog/', [], $a, ''],
     ['Аренда кофемашин', '/arenda-kofemashin/', [], $a, ''],
-    ['Для офиса', '/arenda-kofemashin/', [], $sub, ''],
-    ['Для кафе и HoReCa', '/arenda-kofemashin/', [], $sub, ''],
-    ['На мероприятие', '/arenda-kofemashin/#event', [], $sub, ''],
-    ['Рассчитать стоимость аренды', '/arenda-kofemashin/#calc', [], $sub, ''],
-    ['Сервис и ремонт', '/servis/', [], $a, ''],
+    ['Услуги', '/servis/', [], $a, ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
-    ['Плановое ТО и чистка', '/servis/#price', [], $sub, ''],
-    ['Продажа оборудования', '/catalog/professionalnye-kofemashiny/', [], $sub, ''],
-    ['Вызвать инженера', '/servis/remont-kofemashin/#form', [], $sub, ''],
-    ['Кофе по подписке', '/podpiska/', [], $a, ''],
+    ['Кофе по подписке', '/podpiska/', [], $sub, ''],
     ['Журнал', '/blog/', [], $a, ''],
 ], count($rubrics) > 1 ? array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], $rubrics) : [], [
     ['Подбор кофе', '/podbor-kofe/', [], $a + ['badge' => 'за минуту'], ''],
