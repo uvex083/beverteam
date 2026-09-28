@@ -1919,3 +1919,7 @@ form[data-form]{position:relative}
 .lbox:focus,.modal__p:focus{outline:none;box-shadow:none}
 /* описание товара — стили текста статьи, в колонке вкладки */
 .pdesc{max-width:none;font-size:15.5px;line-height:1.75}
+/* разделы в окне поиска — иконки из каталога в лаймовом круге */
+.srch__ic{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--lime);display:grid;place-items:center}
+.srch__ic svg{width:20px;height:20px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.srch__ic .ico-badge{fill:var(--lime)}

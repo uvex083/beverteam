@@ -595,6 +595,30 @@ function bt_br_list(string $html): string
     return preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $html);
 }
 
+// Иконки разделов каталога (плитки каталога и окно поиска): спрайт выводится один раз в футере, иконка — <use href="#ico-…">.
+// viewBox — по границам рисунка плюс половина линии: иконка стоит ровно по центру круга
+function bt_cat_sprite(): string
+{
+    return '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>   <symbol id="ico-tea" viewBox="3.25 3.25 17.5 17.5"><path d="M4 20C4 11 10 5 20 4c-1 10-7 16-16 16z"/><path d="M4 20c3-6 7-9 12-11"/></symbol>   <symbol id="ico-bean" viewBox="4.38 2.9 15.24 18.2"><ellipse cx="12" cy="12" rx="6" ry="9" transform="rotate(-30 12 12)"/><path d="M8.5 6.5c-2 5 6 8 4 12"/></symbol>   <symbol id="ico-machine" viewBox="4.25 2.25 15.5 19.5"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="4" rx="1"/><path d="M12 13v2M9 18h6"/></symbol>   <symbol id="ico-rent" viewBox="3.25 2.25 20 21"><rect x="4" y="3" width="13" height="16" rx="2"/><rect x="7" y="6" width="7" height="3.5" rx="1"/><circle cx="18" cy="18" r="4.5" class="ico-badge"/><path d="M16.6 20v-4h1.6a1.2 1.2 0 0 1 0 2.4h-2.2M16.2 19.2h2"/></symbol>   <symbol id="ico-cup" viewBox="3.25 7.25 18 13.5"><path d="M5 8h11v6a5.5 5.5 0 0 1-11 0z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M4 20h14"/></symbol> </defs></svg>';
+}
+
+// Окно поиска: «Часто ищут», карточки «Предложения», разделы каталога — всё из админки
+function bt_search_cfg(): array
+{
+    $styles = ['Лаймовый' => 'lime', 'Кофейный' => 'esp', 'Чёрный' => 'dark'];
+    $promos = [];
+    foreach (bt_blocks('search_promos') as $b) {
+        $p = !empty($b['product']) ? bt_product((string)$b['product']) : null;
+        $promos[] = ['k' => $b['caption'] ?? '', 't' => $b['name'], 's' => $b['text'] ?? '', 'u' => ($b['link'] ?? '') ?: ($p['url'] ?? '/catalog/'),
+            'c' => $styles[$b['style'] ?? ''] ?? 'dark', 'img' => $b['pic'] ?: ($p['img'] ?? ''), 'w' => ($b['show'] ?? '') === 'Когда поиск ничего не нашёл' ? 'none' : 'empty'];
+    }
+    return [
+        'hints' => array_column(bt_blocks('search_hints'), 'name'),
+        'promos' => $promos,
+        'secs' => array_map(fn($t) => ['t' => $t['name'], 'u' => $t['url'], 'i' => $t['icon'] ?? 'cup'], bt_home_tiles()),
+    ];
+}
+
 // Иконка из файла: SVG встраиваем (цвет — от родителя через currentColor), PNG — картинкой
 function bt_svg(int $fileId): string
 {

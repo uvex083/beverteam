@@ -22,6 +22,7 @@ if (!empty($about['title'])) {
 }
 $jour = bt_block('main_journal');
 $seo = bt_block('main_seo');
+$map = bt_block('main_map');
 $rent = bt_rent_models();
 $data = bt_catalog_data();
 $head = fn(array $b, string $link = '') => '<div class="sec__head" data-rv><div><h2 class="display h2">' . $e($b['title'] ?? '') . '</h2>'
@@ -127,7 +128,7 @@ $c0 = $chips[$cur] ?? null;
 </div></section>
 
 <section class="sec sec--t0" id="rent"><div class="wrap">
-  <?= $head($rentB, '<div class="pill-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-tab="rent">Аренда кофемашин</button><button type="button" role="tab" aria-selected="false" data-tab="machines">Продажа кофемашин</button></div>') ?>
+  <?= $head($rentB, '<div class="pill-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-tab="rent">' . $e(($rentB['tab_rent'] ?? '') ?: 'Аренда кофемашин') . '</button><button type="button" role="tab" aria-selected="false" data-tab="machines">' . $e(($rentB['tab_sale'] ?? '') ?: 'Продажа кофемашин') . '</button></div>') ?>
   <div class="grid g4" data-rv data-tabpane="rent"><?php foreach ($data['rent'] as $m) echo bt_card($m) ?></div>
   <div class="grid g4" data-tabpane="machines" hidden><?php foreach ($data['machines'] as $m) echo bt_card($m) ?></div>
   <div class="row" style="justify-content:center;margin-top:28px">
@@ -210,7 +211,7 @@ if ($bp):
       <div class="row" style="margin-top:24px"><?= bt_btn($about['btn_text'] ?? '', $about['btn_link'] ?? '', 'btn btn--line') ?><?= bt_btn($about['btn2_text'] ?? '', $about['btn2_link'] ?? '', 'btn btn--line') ?></div>
     </div>
     <form class="wr__f" data-form="contact" novalidate>
-      <div class="hd"><i aria-hidden="true">✍</i><div><b>НАПИШИТЕ НАМ</b><small><?= $e($about['caption'] ?? '') ?></small></div></div>
+      <div class="hd"><i aria-hidden="true">✍</i><div><b><?= $e(mb_strtoupper(($about['form_title'] ?? '') ?: 'Напишите нам')) ?></b><small><?= $e($about['caption'] ?? '') ?></small></div></div>
       <input type="hidden" name="topic" value="Сообщение с главной страницы">
       <div class="field"><label>Ваше имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div>
       <div class="field"><label>E-mail</label><input name="email" type="email" placeholder="mail@company.ru" maxlength="100"></div>
@@ -237,7 +238,7 @@ if ($bp):
 <section class="sec sec--t0"><div class="wrap">
   <div class="ymap" data-ymap>
     <div class="pin"></div><div class="cap">Яндекс Карты · <?= $e($co['street'] ?? '') ?></div>
-    <div class="addr"><b>Склад и самовывоз</b><?= $e($co['zip'] ?? '') ?>, <?= $e($co['city'] ?? '') ?>,<br><?= $e($co['street'] ?? '') ?><br><span class="muted"><?= $e($co['hours'] ?? '') ?></span><br><a class="link" href="/kontakty/" style="font-size:13px">Как добраться →</a></div>
+    <div class="addr"><b><?= $e(($map['title'] ?? '') ?: 'Склад и самовывоз') ?></b><?= $e($co['zip'] ?? '') ?>, <?= $e($co['city'] ?? '') ?>,<br><?= $e($co['street'] ?? '') ?><br><span class="muted"><?= $e($co['hours'] ?? '') ?></span><?php if (!empty($map['btn_text'])): ?><br><a class="link" href="<?= $e(($map['btn_link'] ?? '') ?: '/kontakty/') ?>" style="font-size:13px"><?= $e($map['btn_text']) ?></a><?php endif ?></div>
   </div>
 </div></section>
 </div>

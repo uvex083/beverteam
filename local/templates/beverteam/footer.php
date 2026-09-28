@@ -16,6 +16,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
   </div>
 </div>
 <?php endif ?>
+<?= bt_cat_sprite() ?>
 <footer class="ftr"><div class="wrap">
   <div class="ftr__g">
     <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>

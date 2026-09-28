@@ -483,7 +483,6 @@ function footer(){
   </div></footer>`;
 }
 /* Полноэкранный поиск: пустое состояние с подсказками и промо, живые результаты при вводе */
-const SRCH_HINTS=['Эфиопия Оромия','кофе для офиса','аренда кофемашины','Jetinno JL15','чай Эрл Грей','ремонт кофемашины','кофе оптом','дрип-пакеты'];
 function searchPanel(){
   return `<div class="srch" id="srch" role="dialog" aria-modal="true" aria-label="Поиск по сайту">
     <div class="srch__top"><div class="wrap srch__in">
@@ -768,33 +767,22 @@ document.addEventListener('DOMContentLoaded',()=>{
   const closeSearch=()=>{ sp.classList.remove('open'); lock();
     if(sLast){sLast.focus();sLast=null;} };
 
-  // картинки промо — фото товаров каталога по символьному коду (не со старого сайта)
-  const byCode=code=>Object.values(BT_PRODUCTS).flat().find(x=>x.code===code);
+  const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // подсказки, предложения и разделы — из админки (header.php → BT_SRCH)
+  const SR=window.BT_SRCH||{hints:[],promos:[],secs:[]};
+  const promoHtml=p=>`<a class="spromo spromo--${p.c}" href="${esc(p.u)}"><span class="k">${esc(p.k)}</span><b>${esc(p.t)}</b><span>${esc(p.s)}</span>${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}</a>`;
   function paintEmpty(){
-    const rec=recent();
+    const rec=recent(), pr=SR.promos.filter(p=>p.w==='empty');
     sinner.innerHTML=`<div class="srch__grid">
       <div>
-        ${rec.length?`<h4>Вы искали</h4><div class="srch__chips">${rec.map(q=>`<button class="rec" data-q="${q}">${q}</button>`).join('')}</div>`:''}
-        <h4>Часто ищут</h4>
-        <div class="srch__chips">${SRCH_HINTS.map(q=>`<button data-q="${q}">${q}</button>`).join('')}</div>
-        <h4>Разделы</h4>
-        <div class="srch__secs">${CATS.map(c=>`<a href="${c.h}">${c.promo?`<img src="${c.promo.img}" alt="" loading="lazy">`:''}${c.t}</a>`).join('')}</div>
+        ${rec.length?`<h4>Вы искали</h4><div class="srch__chips">${rec.map(q=>`<button class="rec" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+        ${SR.hints.length?`<h4>Часто ищут</h4><div class="srch__chips">${SR.hints.map(q=>`<button data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+        ${SR.secs.length?`<h4>Разделы</h4><div class="srch__secs">${SR.secs.map(c=>`<a href="${esc(c.u)}"><span class="srch__ic" aria-hidden="true"><svg><use href="#ico-${esc(c.i)}"/></svg></span>${esc(c.t)}</a>`).join('')}</div>`:''}
       </div>
-      <div class="srch__promo">
-        <h4>Предложения</h4>
-        <a class="spromo spromo--lime" href="/podpiska/">
-          <span class="k">Подписка</span><b>Кофемашина бесплатно</b><span>При заказе от 3 кг кофе в месяц. Обслуживание и ремонт наши.</span>
-          ${byCode('jetinno-jl-05')?`<img src="${byCode('jetinno-jl-05').img}" alt="" loading="lazy">`:''}</a>
-        <a class="spromo spromo--esp" href="${byCode('botanica-efiopiya-oromiya')?.url||'/catalog/kofe/'}">
-          <span class="k">Зерно месяца</span><b>Эфиопия Оромия, Q 82,5</b><span>2 687 ₽ за кг, от 30 кг — 1 940 ₽</span>
-          ${byCode('botanica-efiopiya-oromiya')?`<img src="${byCode('botanica-efiopiya-oromiya').img}" alt="" loading="lazy">`:''}</a>
-        <a class="spromo spromo--dark" href="/arenda-kofemashin/#calc">
-          <span class="k">Калькулятор</span><b>Подберём машину под нагрузку</b><span>Ответьте на 4 вопроса и увидите цену аренды</span></a>
-      </div>
+      ${pr.length?`<div class="srch__promo"><h4>Предложения</h4>${pr.map(promoHtml).join('')}</div>`:''}
     </div>`;
   }
 
-  const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const mark=(t,q)=>{const i=t.toLowerCase().indexOf(q.toLowerCase());
     return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length));};
 
@@ -819,9 +807,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       ${posts.length?`<h4>Журнал</h4><div class="sres">${posts.map(p=>
         `<a href="${BT_postUrl(p)}"><span><span class="n">${mark(p.t,q)}</span><span class="p">${BT_postDate(p.d)} · ${esc(p.cat)}</span></span></a>`).join('')}</div>`:''}
       </div>
-      <div class="srch__promo"><h4>Не нашли нужное?</h4>
-        <a class="spromo spromo--dark" href="/kontakty/#form"><span class="k">Подбор</span><b>Спросите менеджера</b><span>Ответим за 5 минут в рабочее время и подберём под задачу</span></a>
-      </div></div>`;
+      ${SR.promos.some(p=>p.w==='none')?`<div class="srch__promo"><h4>Не нашли нужное?</h4>${SR.promos.filter(p=>p.w==='none').map(promoHtml).join('')}</div>`:''}</div>`;
   }
 
   let sTimer;
