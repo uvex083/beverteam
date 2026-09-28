@@ -1845,6 +1845,13 @@ form[data-form]{position:relative}
 .cart__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .cart__clear{background:none;border:0;padding:0 0 4px;font:600 14px/1.4 Manrope,sans-serif;color:var(--gray);cursor:pointer}
 .cart__clear:hover{color:var(--err,#C0392B)}
+.cart__acts{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.cart__share{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:0 0 4px;font:600 14px/1.4 Manrope,sans-serif;color:var(--ink);cursor:pointer}
+.cart__share svg{width:17px;height:17px}
+.cart__share:hover{color:var(--gray)}
+.cshared{border:1.5px solid var(--lime);background:var(--lime-soft);margin-bottom:16px;display:grid;gap:12px}
+.cshared ul{margin:0;padding-left:18px;font-size:14px;color:var(--ink-3)}
+.cshared .row{gap:10px;flex-wrap:wrap}
 /* окно подтверждения (BT_confirm) */
 .modal--confirm .modal__p{max-width:420px}
 .modal--confirm h3{font-size:20px;margin:0 28px 10px 0}

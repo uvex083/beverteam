@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     e.stopPropagation();
     if(navigator.share&&matchMedia('(pointer:coarse)').matches){ navigator.share({title:document.title,url:location.href}).catch(()=>{}); return; }
     const u=encodeURIComponent(location.href), t=encodeURIComponent(document.querySelector('h1')?.textContent.trim()||document.title);
-    const links={tg:`https://t.me/share/url?url=${u}&text=${t}`,wa:`https://wa.me/?text=${t}%20${u}`,vk:`https://vk.com/share.php?url=${u}`,mail:`mailto:?subject=${t}&body=${u}`};
+    const links={tg:`https://t.me/share/url?url=${u}&text=${t}`,wa:`https://wa.me/?text=${t}%20${u}`,vk:`https://vk.com/share.php?url=${u}`};
     shM.querySelectorAll('[data-share]').forEach(a=>{ if(links[a.dataset.share]) a.href=links[a.dataset.share]; });
     shOpen(shM.hidden);
   });

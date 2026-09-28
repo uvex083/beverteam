@@ -7,8 +7,9 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 ?>
 <div class="wrap cartp">
   <nav class="crumbs" aria-label="Хлебные крошки"><a href="/">Главная</a><span>Корзина</span></nav>
-  <div class="pagehead cart__head"><h1 class="display h1">Корзина</h1><button type="button" class="link cart__clear" id="clearCart" hidden>Очистить корзину</button></div>
+  <div class="pagehead cart__head"><h1 class="display h1">Корзина</h1><div class="cart__acts"><button type="button" class="cart__share" id="shareCart" hidden><?= bt_icon('share') ?>Поделиться корзиной</button><button type="button" class="link cart__clear" id="clearCart" hidden>Очистить корзину</button></div></div>
 
+  <div class="card cshared" id="shared" hidden></div>
   <div id="tl"></div>
   <div class="cartl" id="cartl">
     <div id="items"></div>
@@ -51,7 +52,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="ci__r">${line(c)}<button type="button" class="del" data-id="${c.key}">Удалить</button></div>
     </div>`).join('');
     totals();
-    tl.hidden=sumBox.hidden=clearCart.hidden=!cart.length; cartl.classList.toggle('is-empty',!cart.length);
+    tl.hidden=sumBox.hidden=clearCart.hidden=shareCart.hidden=!cart.length; cartl.classList.toggle('is-empty',!cart.length);
   }
   // удаление — только после подтверждения; «Вернуть» в уведомлении остаётся
   const remove=id=>{const q=BT_CART[id],m=BT_find(BT_kid(id)),n=esc((m?m.n:'Товар')+(BT_kkg(id)?`, фасовка ${BT_kkg(id)} кг`:''));
@@ -66,6 +67,28 @@ document.addEventListener('DOMContentLoaded',()=>{
       Object.keys(was).forEach(id=>set(id,0)); render();
       BT_toast('Корзина очищена · <a href="#" id="undoClear">Вернуть</a>');
       document.getElementById('undoClear').onclick=ev=>{ev.preventDefault();Object.entries(was).forEach(([id,q])=>set(id,q));render();BT_toast('Вернули товары в корзину');};});});
+  // «Поделиться корзиной»: ссылка ?share=ключ*кол-во,… — у получателя товары добавляются в его корзину
+  shareCart.addEventListener('click',()=>{
+    const u=location.origin+'/personal/cart/?share='+Object.entries(BT_CART).map(([k,q])=>k+'*'+q).join(',');
+    if(navigator.share&&matchMedia('(pointer:coarse)').matches){ navigator.share({title:'Корзина BEVERTEAM',url:u}).catch(()=>{}); return; }
+    (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(
+      ()=>BT_toast('Ссылка на корзину скопирована — отправьте её, получатель сможет добавить эти товары к себе'),
+      ()=>BT_toast('Не удалось скопировать ссылку: '+esc(u)));
+  });
+  const got=(new URLSearchParams(location.search).get('share')||'').split(',').map(x=>{const [k,q]=x.split('*');return {k,q:Math.max(1,parseInt(q,10)||1)};})
+    .filter(x=>x.k&&BT_find(BT_kid(x.k)));
+  const dropShare=()=>history.replaceState(null,'',location.pathname);
+  const addShared=()=>{ got.forEach(x=>set(x.k,x.q)); shared.hidden=true; dropShare(); render(); };
+  if(got.length&&!Object.keys(BT_CART).length){ addShared(); BT_toast('Добавили в корзину товары по ссылке'); }
+  else if(got.length){
+    const sum=got.reduce((a,x)=>{const m=BT_find(BT_kid(x.k));return a+BT_piece(m,BT_kkg(x.k)||1,x.q)*x.q;},0);
+    shared.innerHTML=`<div><b>Вам поделились корзиной</b> — ${got.length} ${plural(got.length,['товар','товара','товаров'])} на ${fmt(sum)}</div>
+      <ul>${got.map(x=>{const m=BT_find(BT_kid(x.k));return `<li>${esc(m.n)}${BT_kkg(x.k)?`, ${BT_kkg(x.k)} кг`:''} — ${x.q} шт</li>`;}).join('')}</ul>
+      <div class="row"><button type="button" class="btn btn--sm" id="sharedAdd">Добавить в мою корзину</button><button type="button" class="btn btn--line btn--sm" id="sharedNo">Не нужно</button></div>`;
+    shared.hidden=false;
+    sharedAdd.onclick=()=>{ addShared(); BT_toast('Товары добавлены в корзину'); };
+    sharedNo.onclick=()=>{ shared.hidden=true; dropShare(); };
+  } else if(location.search.includes('share=')) dropShare();
   // количество меняем точечно: строка и итог, без пересборки списка
   items.addEventListener('change',e=>{const i=e.target.closest('input[data-id]');if(!i)return;
     const q=Math.max(1,parseInt(i.value,10)||1);i.value=q;set(i.dataset.id,q);

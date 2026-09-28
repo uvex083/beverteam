@@ -56,7 +56,6 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
               <a href="#" role="menuitem" data-share="tg" target="_blank" rel="noopener"><?= bt_icon('tg') ?>Telegram</a>
               <a href="#" role="menuitem" data-share="wa" target="_blank" rel="noopener"><?= bt_icon('wa') ?>WhatsApp</a>
               <a href="#" role="menuitem" data-share="vk" target="_blank" rel="noopener"><?= bt_icon('vk') ?>ВКонтакте</a>
-              <a href="#" role="menuitem" data-share="mail"><?= bt_icon('mail') ?>Почта</a>
             </div>
           </div>
           <button id="bCmp" aria-pressed="false" title="Сравнить" aria-label="Сравнить"><span id="iCmp"><?= bt_icon('compare') ?></span></button>
