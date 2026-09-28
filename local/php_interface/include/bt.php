@@ -1186,7 +1186,7 @@ function bt_menu_cache_reset($fields): void
 {
     static $done = false;
     $ib = (int)(is_array($fields) ? ($fields['IBLOCK_ID'] ?? 0) : 0);
-    if ($done || !in_array($ib, [bt_iblock('catalog'), bt_iblock('journal'), bt_iblock('rent')], true)) {
+    if ($done || !in_array($ib, [bt_iblock('catalog'), bt_iblock('journal'), bt_iblock('rent'), bt_iblock('socials')], true)) {
         return;
     }
     $done = true;
