@@ -445,7 +445,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .alert--info{background:var(--lime-soft)}.alert--ok{background:var(--ok-s);color:var(--ok)}.alert--err{background:var(--err-s);color:var(--err)}
 .empty{text-align:center;padding:60px 20px;color:var(--gray)}
 /* панель администратора Битрикса задаёт div.empty{width:1px} — у админа пустые состояния сжимались в полоску */
-.wrap .empty{width:auto;height:auto;background-image:none}   /* панель администратора Битрикса задаёт div.empty 10×21px с картинкой */
+.wrap .empty{width:auto;height:auto;overflow:visible;background-image:none}   /* под панелью администратора Битрикс подключает pubstyles.css: div.empty{width:1px;height:1px;overflow:hidden} */
 .empty .display{font-size:22px;color:var(--ink);margin-bottom:10px}
 
 /* footer */
