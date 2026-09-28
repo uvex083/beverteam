@@ -14,11 +14,15 @@ document.addEventListener('DOMContentLoaded',()=>{
       navigation:{prevEl:'#thUp',nextEl:'#thDn'},
       breakpoints:{0:{direction:'horizontal',slidesPerView:'auto',spaceBetween:8},900:{direction:'vertical',spaceBetween:10}}
     });
-    new Swiper('#galBig',{
+    const big=new Swiper('#galBig',{
       slidesPerView:1, spaceBetween:20, speed:380, keyboard:{enabled:true},
       thumbs:{swiper:swThumbs}, a11y:{prevSlideMessage:'Предыдущее фото',nextSlideMessage:'Следующее фото'},
       on:{slideChange(){ galN.textContent=(this.activeIndex+1)+' / '+P.photos; }}
     });
+    /* клик по фото — просмотр на весь экран */
+    const imgs=[...document.querySelectorAll('#galBig img[data-full]')];
+    imgs.forEach((im,i)=>im.addEventListener('click',()=>{ if(!big.allowClick) return;
+      BT_lightbox(imgs.map(x=>({src:x.dataset.full||x.src})),i); }));
   }
 
   /* ---- фасовка, количество (шт) и корзина: один источник истины ---- */

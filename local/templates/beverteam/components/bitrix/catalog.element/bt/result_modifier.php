@@ -13,6 +13,7 @@ $arResult['BT'] = bt_product((string)$id) ?? [];
 $files = array_filter(array_merge([$arResult['DETAIL_PICTURE']['ID'] ?? 0], (array)($pr['MORE_PHOTO']['VALUE'] ?? [])));
 $arResult['BT_PHOTOS'] = array_map(fn($f) => [
     'big' => bt_img($f, 900, 900),
+    'full' => bt_img($f, 1800, 1800),
     'th' => bt_img($f, 116, 116, BX_RESIZE_IMAGE_EXACT),
     'og' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900])['src'] ?? '',
 ], array_values($files));

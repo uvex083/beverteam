@@ -1715,3 +1715,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id)); };
   addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
 });
+
+/* Просмотр фото на весь экран: BT_lightbox([{src, cap}], index). Листание стрелками, свайпом и клавишами, двойной клик — увеличение, Esc/фон — закрыть */
+window.BT_lightbox=(items,start=0)=>{
+  const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const many=items.length>1, back=document.activeElement;
+  const el=document.createElement('div'); el.className='lbox'; el.dataset.overlay=''; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','Просмотр фото');
+  el.innerHTML=`<button class="lbox__x" type="button" aria-label="Закрыть">×</button>
+    <div class="swiper lbox__sw"><div class="swiper-wrapper">${items.map(x=>`<div class="swiper-slide"><div class="swiper-zoom-container"><img src="${esc(x.src)}" alt="${esc(x.cap)}"></div>${x.cap?`<p class="lbox__cap">${esc(x.cap)}</p>`:''}</div>`).join('')}</div></div>
+    ${many?`<button class="lbox__ar lbox__ar--p" type="button" aria-label="Предыдущее фото"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button><button class="lbox__ar lbox__ar--n" type="button" aria-label="Следующее фото"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button><span class="lbox__n"></span>`:''}`;
+  document.body.appendChild(el);
+  const n=el.querySelector('.lbox__n'), setN=s=>{ if(n) n.textContent=(s.activeIndex+1)+' / '+items.length; };
+  const sw=new Swiper(el.querySelector('.lbox__sw'),{initialSlide:start,spaceBetween:24,speed:300,zoom:{maxRatio:2.5},keyboard:{enabled:true},
+    navigation:many?{prevEl:el.querySelector('.lbox__ar--p'),nextEl:el.querySelector('.lbox__ar--n')}:false,on:{init:setN,slideChange:setN}});
+  const close=()=>{ sw.destroy(); el.remove(); document.removeEventListener('keydown',key); BT_lock(); back&&back.focus&&back.focus(); };
+  const key=e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown',key);
+  el.addEventListener('click',e=>{ if(e.target.closest('.lbox__x')||(!e.target.closest('img,.lbox__ar,.lbox__cap'))) close(); });
+  requestAnimationFrame(()=>{ el.classList.add('open'); el.querySelector('.lbox__x').focus(); });
+};
