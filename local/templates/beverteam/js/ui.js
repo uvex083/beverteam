@@ -1686,3 +1686,16 @@ document.addEventListener('click',e=>{
 /* плитки разделов каталога: на узком экране активная плитка при загрузке — в зоне видимости */
 document.addEventListener('DOMContentLoaded',()=>{ const a=document.querySelector('.rootcats .rootcat.cur');
   if(a&&innerWidth<=1050){ const r=a.parentElement; r.scrollLeft=a.offsetLeft-(r.clientWidth-a.offsetWidth)/2; } });
+
+/* журнал: «Показать ещё» дописывает следующую страницу в сетку без перезагрузки; блок счётчика заменяется блоком из ответа */
+document.addEventListener('click',e=>{
+  const a=e.target.closest('.jmore a[href]'); if(!a||e.ctrlKey||e.metaKey) return; e.preventDefault();
+  const box=a.closest('.jmore'); if(box.classList.contains('is-loading')) return; box.classList.add('is-loading'); a.textContent='Загружаем…';
+  fetch(a.href,{credentials:'same-origin'}).then(r=>r.text()).then(h=>{
+    const d=new DOMParser().parseFromString(h,'text/html'), cards=d.querySelectorAll('.news > .ncard');
+    let grid=box.parentElement.querySelector(':scope > .news');
+    if(!grid){ grid=document.createElement('div'); grid.className='news'; box.before(grid); }
+    cards.forEach(c=>grid.appendChild(document.importNode(c,true)));
+    const next=d.querySelector('.jmore'); next?box.replaceWith(document.importNode(next,true)):box.remove();
+  }).catch(()=>{ location.href=a.href; });
+});

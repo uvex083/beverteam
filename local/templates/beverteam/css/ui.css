@@ -571,7 +571,7 @@ input,textarea{caret-color:var(--ink)}
 .post__body hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .post__body em{color:var(--gray)}
 .post__body figure{margin:26px 0}
-.post__body figure img{border-radius:var(--rad);width:100%}
+.post__body figure img{border-radius:var(--rad);width:100%;max-height:520px;object-fit:cover}
 .post__body figcaption{font-size:13px;color:var(--gray);margin-top:8px}
 .post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}
 .post__toc{position:sticky;top:130px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px;font-size:14px}
@@ -1611,7 +1611,7 @@ form[data-form]{position:relative}
 .journalp .jfilter a:hover{border-color:var(--ink)}
 .journalp .jfilter a[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .journalp .post__meta .tag{background:var(--lime-soft);border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono';font-size:11px;color:#4E5A12}
-.journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%}
+.journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%;aspect-ratio:16/9;object-fit:cover}
 .journalp .post__body h3,.journalp .post__body h4{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
 .journalp .post__body h2{scroll-margin-top:130px}
 .journalp .post__body ol{margin:0 0 20px}.journalp .post__body ol li{margin-bottom:9px}
