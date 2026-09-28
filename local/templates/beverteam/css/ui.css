@@ -1251,7 +1251,7 @@ input,textarea{caret-color:var(--ink)}
 .buy__row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
 .buy__row .btn{flex:1;min-width:190px}
 /* «В корзину» живёт в обёртке #pAdd — растягиваем её на всё оставшееся место, кнопку — на всю обёртку */
-.buy__row #pAdd{flex:1;display:flex;min-width:0}
+.buy__row #pAdd{flex:1 1 190px;display:flex}
 .buy__row #pAdd .btn{flex:1;min-width:0}
 .buy .btn--line{width:100%;margin-top:10px}
 .ship{display:grid;gap:7px;font-size:13.5px;color:#3A3A34}
