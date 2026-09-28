@@ -625,34 +625,7 @@ function bt_rent_models(): array
     return $list;
 }
 
-// Пэкшот раздела для плитки: первый товар, у фото которого белые углы (фон вырезается multiply) — ['src', 'cut' => true];
-// белого фото в разделе нет — первое фото как есть, 'cut' => false (выводится скруглённой карточкой)
-function bt_pack_shot(int $sectionId): array
-{
-    $first = 0;
-    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'SECTION_ID' => $sectionId, 'INCLUDE_SUBSECTIONS' => 'Y', 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false],
-        false, ['nTopCount' => 30], ['PREVIEW_PICTURE']);
-    while ($el = $r->Fetch()) {
-        $id = (int)$el['PREVIEW_PICTURE'];
-        $first = $first ?: $id;
-        $small = \CFile::ResizeImageGet($id, ['width' => 40, 'height' => 40], BX_RESIZE_IMAGE_EXACT)['src'] ?? '';
-        $im = $small !== '' ? @imagecreatefromstring((string)@file_get_contents($_SERVER['DOCUMENT_ROOT'] . $small)) : false;
-        if (!$im) {
-            continue;
-        }
-        $light = true;
-        foreach ([[1, 1], [imagesx($im) - 2, 1], [1, imagesy($im) - 2], [imagesx($im) - 2, imagesy($im) - 2]] as [$x, $y]) {
-            $c = imagecolorsforindex($im, imagecolorat($im, $x, $y));
-            $light = $light && min($c['red'], $c['green'], $c['blue']) >= 247;
-        }
-        if ($light) {
-            return ['src' => bt_img($id, 240, 360), 'cut' => true];
-        }
-    }
-    return ['src' => $first ? bt_img($first, 240, 360) : '', 'cut' => false];
-}
-
-// Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и пэкшотом + аренда
+// Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и иконкой + аренда
 function bt_home_tiles(): array
 {
     $catId = bt_iblock('catalog');
@@ -666,12 +639,14 @@ function bt_home_tiles(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('rent'));
     $plural = fn(int $n, array $w) => $n . ' ' . $w[($n % 10 === 1 && $n % 100 !== 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
     $tiles = [];
-    $r = \CIBlockSection::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'DEPTH_LEVEL' => 1, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'PICTURE', 'SECTION_PAGE_URL', 'LEFT_MARGIN', 'RIGHT_MARGIN']);
+    $r = \CIBlockSection::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'DEPTH_LEVEL' => 1, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'CODE', 'NAME', 'PICTURE', 'SECTION_PAGE_URL', 'LEFT_MARGIN', 'RIGHT_MARGIN']);
+    // иконка плитки в каталоге — по символьному коду раздела; новый раздел получит чашку
+    $icons = ['chay' => 'tea', 'kofe' => 'bean', 'professionalnye-kofemashiny' => 'machine', 'aksessuary' => 'cup'];
     while ($s = $r->GetNext()) {
         $subs = (int)(($s['RIGHT_MARGIN'] - $s['LEFT_MARGIN'] - 1) / 2);
         $tiles[] = [
             'id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'],
-            'img' => bt_img($s['PICTURE'], 400, 300), 'pack' => bt_pack_shot((int)$s['ID']),
+            'img' => bt_img($s['PICTURE'], 400, 300), 'icon' => $icons[$s['CODE']] ?? 'cup',
             'note' => $subs ? $plural($subs, ['категория', 'категории', 'категорий']) : $plural((int)$s['ELEMENT_CNT'], ['модель', 'модели', 'моделей']),
         ];
     }
@@ -679,7 +654,7 @@ function bt_home_tiles(): array
     if ($rent) {
         // аренда — после кофемашин, как в меню
         array_splice($tiles, min(3, count($tiles)), 0, [[
-            'id' => 0, 'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'], 'pack' => ['src' => $rent[0]['img'], 'cut' => true],
+            'id' => 0, 'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'], 'icon' => 'rent',
             'note' => 'от ' . bt_fmt(min(array_column($rent, 'price'))) . '/мес',
         ]]);
     }
