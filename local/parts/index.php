@@ -25,6 +25,10 @@ $seo = bt_block('main_seo');
 $map = bt_block('main_map');
 $rent = bt_rent_models();
 $data = bt_catalog_data();
+// на главной — только отмеченные галочкой «Показывать на главной»
+$onMain = fn(array $list, string $code, string $prefix = '') => array_values(array_filter($list, fn($m) => in_array((int)substr((string)$m['id'], strlen($prefix)), bt_main_ids($code), true)));
+$mainRent = $onMain($data['rent'], 'rent', 'r');
+$mainMachines = $onMain($data['machines'], 'catalog');
 $head = fn(array $b, string $link = '') => '<div class="sec__head" data-rv><div><h2 class="display h2">' . $e($b['title'] ?? '') . '</h2>'
     . (($b['subtitle'] ?? '') !== '' ? '<p>' . $e($b['subtitle']) . '</p>' : '') . '</div>' . $link . '</div>';
 
@@ -129,8 +133,8 @@ $c0 = $chips[$cur] ?? null;
 
 <section class="sec sec--t0" id="rent"><div class="wrap">
   <?= $head($rentB, '<div class="pill-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-tab="rent">' . $e(($rentB['tab_rent'] ?? '') ?: 'Аренда кофемашин') . '</button><button type="button" role="tab" aria-selected="false" data-tab="machines">' . $e(($rentB['tab_sale'] ?? '') ?: 'Продажа кофемашин') . '</button></div>') ?>
-  <div class="grid g4" data-rv data-tabpane="rent"><?php foreach ($data['rent'] as $m) echo bt_card($m) ?></div>
-  <div class="grid g4" data-tabpane="machines" hidden><?php foreach ($data['machines'] as $m) echo bt_card($m) ?></div>
+  <div class="grid g4" data-rv data-tabpane="rent"><?php foreach ($mainRent as $m) echo bt_card($m) ?></div>
+  <div class="grid g4" data-tabpane="machines" hidden><?php foreach ($mainMachines as $m) echo bt_card($m) ?></div>
   <div class="row" style="justify-content:center;margin-top:28px">
     <?= bt_btn($rentB['btn_text'] ?? '', $rentB['btn_link'] ?? '', 'btn btn--line', ' data-tabpane="rent"') ?>
     <?= bt_btn($rentB['btn2_text'] ?? '', $rentB['btn2_link'] ?? '', 'btn btn--line', ' data-tabpane="machines" hidden') ?>
@@ -178,11 +182,11 @@ if ($bp):
 </div></section>
 <?php endif ?>
 
-<?php if ($revs = bt_reviews()): ?>
+<?php if ($revs = $onMain(bt_reviews(), 'reviews')): ?>
 <section class="sec sec--t0"><div class="wrap">
   <?= $head($revB, bt_btn($revB['btn_text'] ?? '', $revB['btn_link'] ?? '', 'link')) ?>
   <div class="grid g3 revs" data-rv>
-    <?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?>
+    <?php foreach ($revs as $r) echo bt_rev_card($r) ?>
   </div>
 </div></section>
 <?php endif ?>

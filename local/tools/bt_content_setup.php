@@ -92,7 +92,7 @@ $journalId = bt_iblock_ensure([
 ], $apply, $say, $fail);
 
 $reviewsId = bt_iblock_ensure([
-    'IBLOCK_TYPE_ID' => 'about', 'CODE' => 'reviews', 'API_CODE' => 'Reviews', 'NAME' => 'Отзывы', 'SORT' => 20,
+    'IBLOCK_TYPE_ID' => 'site', 'CODE' => 'reviews', 'API_CODE' => 'Reviews', 'NAME' => 'Отзывы', 'SORT' => 20,
     'LIST_PAGE_URL' => '/otzyvy-o-nas/', 'INDEX_ELEMENT' => 'N',
 ], [
     'RATING' => ['Оценка, 1–5', 'N', []],

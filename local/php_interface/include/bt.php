@@ -542,7 +542,7 @@ function bt_reviews(): array
                 'cap' => trim((string)($p['LETTER']['DESCRIPTION'][$i] ?? '')) ?: 'Благодарственное письмо'];
         }
         $list[] = [
-            'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
+            'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
             'date' => $ts ? FormatDate('j F Y', $ts) : '', 'iso' => $ts ? date('Y-m-d', $ts) : '',
             'company' => trim((string)($p['COMPANY']['VALUE'] ?? '')),
             'logo' => bt_img((int)($p['LOGO']['VALUE'] ?? 0), 96, 96),
@@ -552,6 +552,30 @@ function bt_reviews(): array
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
     $cache->endDataCache($list);
     return $list;
+}
+
+// ID элементов с галочкой «Показывать на главной» (кофемашины каталога, модели аренды, отзывы)
+function bt_main_ids(string $code): array
+{
+    $ibId = bt_iblock($code);
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_main_ids_' . $code, '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $ids = [];
+    $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'PROPERTY_SHOW_MAIN_VALUE' => 'Да'], false, false, ['ID']);
+    while ($x = $r->Fetch()) {
+        $ids[] = (int)$x['ID'];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($ids);
+    return $ids;
 }
 
 // Карточка отзыва — одна на все страницы. Длинный текст обрезается, «Читать полностью» открывает окно (ui.js)
