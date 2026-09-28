@@ -573,8 +573,9 @@ input,textarea{caret-color:var(--ink)}
 .jlead>.ncard p{font-size:14.5px}
 .jside{gap:10px}
 .jside a{gap:7px;padding:16px 18px}
-.jside{display:grid;gap:12px;align-content:start}
-.jside a{display:grid;gap:5px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 16px;align-content:start}
+.jside{display:flex;flex-direction:column;gap:10px}
+.jside__t{font-family:Unbounded;font-weight:700;font-size:16px;text-transform:uppercase;margin:2px 0 4px}
+.jside a{flex:1;display:flex;flex-direction:column;justify-content:center;gap:5px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 16px;text-decoration:none;color:var(--ink)}
 .jside a:hover{border-color:var(--ink)}
 .jside b{font-size:14px;line-height:1.35}
 .post{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
