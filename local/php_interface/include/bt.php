@@ -625,8 +625,9 @@ function bt_rent_models(): array
     return $list;
 }
 
-// Пэкшот раздела для плитки: первый товар, у фото которого светлые углы (фон вырезается multiply), иначе просто первый с фото
-function bt_pack_shot(int $sectionId): string
+// Пэкшот раздела для плитки: первый товар, у фото которого белые углы (фон вырезается multiply) — ['src', 'cut' => true];
+// белого фото в разделе нет — первое фото как есть, 'cut' => false (выводится скруглённой карточкой)
+function bt_pack_shot(int $sectionId): array
 {
     $first = 0;
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'SECTION_ID' => $sectionId, 'INCLUDE_SUBSECTIONS' => 'Y', 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false],
@@ -642,13 +643,13 @@ function bt_pack_shot(int $sectionId): string
         $light = true;
         foreach ([[1, 1], [imagesx($im) - 2, 1], [1, imagesy($im) - 2], [imagesx($im) - 2, imagesy($im) - 2]] as [$x, $y]) {
             $c = imagecolorsforindex($im, imagecolorat($im, $x, $y));
-            $light = $light && min($c['red'], $c['green'], $c['blue']) >= 232;
+            $light = $light && min($c['red'], $c['green'], $c['blue']) >= 247;
         }
         if ($light) {
-            return bt_img($id, 240, 360);
+            return ['src' => bt_img($id, 240, 360), 'cut' => true];
         }
     }
-    return $first ? bt_img($first, 240, 360) : '';
+    return ['src' => $first ? bt_img($first, 240, 360) : '', 'cut' => false];
 }
 
 // Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и пэкшотом + аренда
@@ -678,7 +679,7 @@ function bt_home_tiles(): array
     if ($rent) {
         // аренда — после кофемашин, как в меню
         array_splice($tiles, min(3, count($tiles)), 0, [[
-            'id' => 0, 'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'], 'pack' => $rent[0]['img'],
+            'id' => 0, 'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'], 'pack' => ['src' => $rent[0]['img'], 'cut' => true],
             'note' => 'от ' . bt_fmt(min(array_column($rent, 'price'))) . '/мес',
         ]]);
     }

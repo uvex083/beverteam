@@ -9,7 +9,7 @@ $e = fn($v) => htmlspecialcharsbx((string)$v);
   <a class="rootcat<?= $on ? ' cur' : '' ?>" href="<?= $e($t['url']) ?>"<?= $on ? ' aria-current="page"' : '' ?>>
     <span class="rootcat__n"><?= $e($t['name']) ?></span>
     <?php if (($t['note'] ?? '') !== ''): ?><span class="rootcat__c"><?= $e($t['note']) ?></span><?php endif ?>
-    <?php if (!empty($t['pack'])): ?><img class="rootcat__img" src="<?= $e($t['pack']) ?>" alt="" loading="lazy" decoding="async"<?= bt_img_wh($t['pack']) ?>><?php endif ?>
+    <?php if (!empty($t['pack']['src'])): ?><img class="rootcat__img<?= $t['pack']['cut'] ? '' : ' rootcat__img--ph' ?>" src="<?= $e($t['pack']['src']) ?>" alt="" loading="lazy" decoding="async"<?= bt_img_wh($t['pack']['src']) ?>><?php endif ?>
   </a>
 <?php endforeach ?>
 </nav>
