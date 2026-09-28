@@ -544,7 +544,7 @@ function bt_reviews(): array
         $list[] = [
             'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
             'date' => $ts ? FormatDate('j F Y', $ts) : '', 'iso' => $ts ? date('Y-m-d', $ts) : '',
-            'company' => trim((string)($p['COMPANY']['VALUE'] ?? '')),
+            'company' => trim((string)($p['COMPANY']['VALUE'] ?? '')), 'rating' => (int)($p['RATING']['VALUE'] ?? 0),
             'logo' => bt_img((int)($p['LOGO']['VALUE'] ?? 0), 96, 96),
             'docs' => $docs,
         ];
@@ -578,6 +578,13 @@ function bt_main_ids(string $code): array
     return $ids;
 }
 
+// Разметка без микроданных schema.org: карточки товаров, которые на странице не главные (рекомендации к товару)
+function bt_nomicro(string $html): string
+{
+    $html = preg_replace('~<(meta|link)\s+itemprop="[^"]*"[^>]*>~i', '', $html);
+    return preg_replace('~\s(itemscope|itemtype="[^"]*"|itemprop="[^"]*"|itemid="[^"]*")~i', '', $html);
+}
+
 // Карточка отзыва — одна на все страницы. Длинный текст обрезается, «Читать полностью» открывает окно (ui.js)
 function bt_rev_card(array $r): string
 {
@@ -591,8 +598,15 @@ function bt_rev_card(array $r): string
             ? '<a class="rev__doc rev__doc--pdf" href="' . $e($d['src']) . '" target="_blank" rel="noopener"><span>PDF</span>' . $e($d['cap']) . '</a>'
             : '<a class="rev__doc" href="' . $e($d['src']) . '" data-lbox><img src="' . $e($d['th']) . '" alt="" loading="lazy">' . $e($d['cap']) . '</a>';
     }
-    return '<article class="rev" itemscope itemtype="https://schema.org/Review"><meta itemprop="itemReviewed" content="BEVERTEAM">'
-        . '<header class="rev__hd">' . $av . '<div class="rev__who"><b itemprop="author">' . $e($r['name']) . '</b>'
+    // отзыв о компании: организация — та же, что в разметке LocalBusiness на всех страницах (itemid = @id)
+    $co = bt_contacts();
+    $org = '<div hidden itemprop="itemReviewed" itemscope itemtype="https://schema.org/LocalBusiness" itemid="https://beverteam.ru/#org"><meta itemprop="name" content="BEVERTEAM">'
+        . (($co['phone1'] ?? '') !== '' ? '<meta itemprop="telephone" content="' . $e($co['phone1']) . '">' : '')
+        . '<div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><meta itemprop="streetAddress" content="' . $e($co['street'] ?? '') . '">'
+        . '<meta itemprop="addressLocality" content="' . $e($co['city'] ?? '') . '"><meta itemprop="postalCode" content="' . $e($co['zip'] ?? '') . '"></div></div>'
+        . (($r['rating'] ?? 0) > 0 ? '<div hidden itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating"><meta itemprop="ratingValue" content="' . (int)$r['rating'] . '"><meta itemprop="bestRating" content="5"></div>' : '');
+    return '<article class="rev" itemscope itemtype="https://schema.org/Review">' . $org
+        . '<header class="rev__hd">' . $av . '<div class="rev__who"><b itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="name">' . $e($r['name']) . '</span></b>'
         . ($r['company'] !== '' ? '<span>' . $e($r['company']) . '</span>' : '') . '</div>'
         . ($r['date'] !== '' ? '<time datetime="' . $r['iso'] . '" itemprop="datePublished">' . $e($r['date']) . '</time>' : '') . '</header>'
         . '<div class="rev__txt" itemprop="reviewBody">' . nl2br($e($r['text'])) . '</div>'

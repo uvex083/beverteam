@@ -158,7 +158,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
   <?php if ($arResult['BT_REC']): ?>
   <section class="sec">
     <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Рекомендуем к нему</h2><a class="link" href="<?= $e($back) ?>">Весь раздел →</a></div>
-    <div class="grid g4" id="rec"><?php foreach ($arResult['BT_REC'] as $r) { echo bt_card($r); } ?></div>
+    <div class="grid g4" id="rec"><?php foreach ($arResult['BT_REC'] as $r) { echo bt_nomicro(bt_card($r)); } ?></div>
   </section>
   <?php endif ?>
 <script>window.BT_PAGE=<?= Json::encode(['id' => (string)$arResult['ID'], 'name' => $name, 'unit' => $unit, 'photos' => count($photos), 'reviews' => $reviews]) ?>;</script>
