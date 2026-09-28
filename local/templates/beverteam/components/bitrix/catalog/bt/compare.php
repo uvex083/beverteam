@@ -74,8 +74,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="swiper cmp-head" id="cHead"><div class="swiper-wrapper">${head}</div></div>
       ${BT_sliderBtns()}
       <div class="cmp__opts">
-        <label class="opt" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
-          <input type="checkbox" id="cDiff" ${onlyDiff?'checked':''}> Показывать только отличия</label>
+        <label class="tgl"><input type="checkbox" role="switch" id="cDiff" ${onlyDiff?'checked':''}><span>Показывать только отличия</span></label>
       </div>
       ${rows||'<p class="muted" style="padding:20px 0">Все характеристики совпадают.</p>'}
     </div>`;
