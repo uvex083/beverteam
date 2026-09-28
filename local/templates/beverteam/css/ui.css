@@ -2035,3 +2035,8 @@ form[data-form]{position:relative}
 .pop{animation:bbpop .22s cubic-bezier(.16,1,.3,1)}
 @keyframes bbpop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pop{animation:none}}
+/* оценка в карточке каталога: «★ 4,5 · 2 отзыва» — ведёт на вкладку отзывов */
+.pc__rv{display:inline-flex;align-items:center;gap:5px;margin:-2px 0 8px;font-size:13px;color:var(--gray);text-decoration:none;align-self:flex-start}
+.pc__rv svg{width:14px;height:14px;fill:#E8B400;stroke:none}
+.pc__rv b{color:var(--ink);font-weight:700}
+@media(hover:hover){.pc__rv:hover span{color:var(--ink)}}

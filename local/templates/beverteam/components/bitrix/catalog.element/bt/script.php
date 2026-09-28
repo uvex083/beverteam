@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         reviewRating:{'@type':'Rating',ratingValue:String(r.r),bestRating:'5'},reviewBody:r.t}))});
     document.head.appendChild(ld);
   }
+  if(location.hash==='#reviews'){ document.getElementById('tabRev').click(); setTimeout(()=>document.querySelector('.tabsblock')?.scrollIntoView({block:'start'}),50); }
   rTop.addEventListener('click',e=>{e.preventDefault();document.getElementById('tabRev').click();
     document.querySelector('.tabsblock').scrollIntoView({behavior:'smooth',block:'start'});});
 

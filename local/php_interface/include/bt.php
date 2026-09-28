@@ -184,6 +184,8 @@ function bt_card(array $m, bool $eager = false): string
         . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
         . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '"' . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async">' : '') . '</a>'
         . '<h3><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></h3>'
+        . (!empty($m['rv']) ? '<a class="pc__rv" href="' . $e($m['url']) . '#reviews">' . bt_icon('star') . '<b>' . str_replace('.', ',', (string)$m['rv'][0]) . '</b><span>· ' . $m['rv'][1] . ' '
+            . (($m['rv'][1] % 10 === 1 && $m['rv'][1] % 100 !== 11) ? 'отзыв' : (($m['rv'][1] % 10 >= 2 && $m['rv'][1] % 10 <= 4 && ($m['rv'][1] % 100 < 10 || $m['rv'][1] % 100 >= 20)) ? 'отзыва' : 'отзывов')) . '</span></a>' : '')
         . '<p class="pc__par">' . $e($m['par']) . '</p>'
         . $scales . $packs
         . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span>'
@@ -431,6 +433,27 @@ function bt_catalog_data(): array
             'n' => $f['NAME'], 'p' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'unit' => 'в месяц', 'rent' => 1, 'stock' => 1,
             'par' => implode(' · ', array_filter([$f['PROPERTY_AUDIENCE_VALUE'], $f['PROPERTY_CUPS_PER_DAY_VALUE'] ? 'до ' . $f['PROPERTY_CUPS_PER_DAY_VALUE'] . ' чашек/день' : '', $f['PROPERTY_FREE_FROM_KG_VALUE'] ? 'бесплатно от ' . $f['PROPERTY_FREE_FROM_KG_VALUE'] . ' кг кофе' : ''])),
         ];
+    }
+
+    // отзывы о товарах: средняя оценка и число опубликованных — для строки «★ 4,5 · 2 отзыва» в карточке
+    if ($revId = bt_iblock('reviews')) {
+        $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $revId);
+        $rv = [];
+        $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $revId, 'ACTIVE' => 'Y', '!PROPERTY_PRODUCT' => false], false, false, ['ID', 'PROPERTY_PRODUCT', 'PROPERTY_RATING']);
+        while ($x = $r->Fetch()) {
+            $pid = (string)$x['PROPERTY_PRODUCT_VALUE'];
+            $rv[$pid][0] = ($rv[$pid][0] ?? 0) + max(1, min(5, (int)$x['PROPERTY_RATING_VALUE']));
+            $rv[$pid][1] = ($rv[$pid][1] ?? 0) + 1;
+        }
+        foreach ($data as &$list) {
+            foreach ($list as &$m) {
+                if (isset($rv[$m['id']])) {
+                    $m['rv'] = [round($rv[$m['id']][0] / $rv[$m['id']][1], 1), $rv[$m['id']][1]];
+                }
+            }
+            unset($m);
+        }
+        unset($list);
     }
 
     $GLOBALS['CACHE_MANAGER']->EndTagCache();

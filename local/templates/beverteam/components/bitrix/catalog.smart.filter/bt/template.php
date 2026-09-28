@@ -89,6 +89,8 @@ $FMORE = 6;
         } ?>
       <div class="fgrp fsw">
       <?php foreach ($item['VALUES'] as $v): $off = !empty($v['DISABLED']) && empty($v['CHECKED']);
+          // из меток в фильтре только «Скидка» и «Новинка»: «Хит» и «Топ продаж» — оформление карточки, не критерий выбора
+          if (!$yes && !in_array($v['URL_ID'] ?? '', ['sale', 'new'], true)) { continue; }
           if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $yes ? 'да' : $v['VALUE'], [$v['CONTROL_NAME']]]; } ?>
         <label class="opt opt--sw"><?= $e($yes ? $item['NAME'] : $v['VALUE']) ?><input type="checkbox" role="switch" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>></label>
       <?php endforeach ?>
