@@ -64,7 +64,10 @@ $FMORE = 6;
   <div class="filters__body">
     <?php
     // порядок групп как в макете: цена, фасовка, страна, вкус, действие…; «Метки» — в конце
-    $order = ['PRICE' => 0, 'NET_WEIGHT' => 1, 'PACKING' => 2, 'ROAST' => 3, 'COUNTRY' => 4, 'TEA_KIND' => 5, 'TASTE' => 6, 'EFFECT' => 7, 'PROCESSING' => 8, 'BADGES' => 99];
+    $order = ['PRICE' => 0, 'NET_WEIGHT' => 1, 'PACKING' => 2, 'ROAST' => 3, 'COUNTRY' => 4, 'TEA_KIND' => 5, 'TASTE' => 6, 'EFFECT' => 7, 'PROCESSING' => 8,
+        'WATER_TANK' => 10, 'BEAN_HOPPER' => 11, 'MATERIAL' => 12, 'VOLUME' => 13, 'COLOR' => 14, 'FILTER_SIZE' => 15, 'BADGES' => 99];
+    // свойство с единственным значением «Да» (код yes) — переключатель с названием свойства
+    $isYes = fn($it) => count($it['VALUES'] ?? []) === 1 && (reset($it['VALUES'])['URL_ID'] ?? '') === 'yes';
     $items = $arResult['ITEMS'];
     uasort($items, fn($a, $b) => ($order[isset($a['PRICE']) ? 'PRICE' : $a['CODE']] ?? 50) <=> ($order[isset($b['PRICE']) ? 'PRICE' : $b['CODE']] ?? 50));
     if (count($catList) > 1): ?>
@@ -78,15 +81,16 @@ $FMORE = 6;
       <?php if ($i > $FMORE): ?><button class="fmore" type="button">Посмотреть все</button><?php endif ?>
       </div>
     <?php endif;
-    // «Метки» — переключателями сверху, как «Распродажа» на Озоне
+    // «Метки» и свойства «да / нет» — переключателями сверху, как «Распродажа» на Озоне
     foreach ($items as $item) {
-        if (($item['CODE'] ?? '') !== 'BADGES' || !$item['VALUES']) {
+        $yes = $isYes($item);
+        if ((($item['CODE'] ?? '') !== 'BADGES' && !$yes) || !$item['VALUES']) {
             continue;
         } ?>
       <div class="fgrp fsw">
       <?php foreach ($item['VALUES'] as $v): $off = !empty($v['DISABLED']) && empty($v['CHECKED']);
-          if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $v['VALUE'], [$v['CONTROL_NAME']]]; } ?>
-        <label class="opt opt--sw"><?= $e($v['VALUE']) ?><input type="checkbox" role="switch" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>></label>
+          if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $yes ? 'да' : $v['VALUE'], [$v['CONTROL_NAME']]]; } ?>
+        <label class="opt opt--sw"><?= $e($yes ? $item['NAME'] : $v['VALUE']) ?><input type="checkbox" role="switch" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>></label>
       <?php endforeach ?>
       </div>
     <?php }
@@ -121,7 +125,7 @@ $FMORE = 6;
             $grams = fn($v) => (float)str_replace(',', '.', $v['VALUE']) * (str_contains($v['VALUE'], 'кг') ? 1000 : 1);
             uasort($values, fn($a, $b) => $grams($a) <=> $grams($b));
         }
-        if ($item['CODE'] === 'BADGES') {
+        if ($item['CODE'] === 'BADGES' || $isYes($item)) {
             continue;
         }
         foreach ($values as $v) {
