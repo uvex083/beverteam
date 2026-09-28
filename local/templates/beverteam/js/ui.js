@@ -697,8 +697,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.BT_lock=lock;
   /* страховка: любой элемент, получивший класс open, пересчитывает блокировку */
   new MutationObserver(()=>lock()).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+  /* фокус при открытии и возврат после закрытия — только с мышью и клавиатурой: на телефоне фокус рисует кольцо и выдвигает клавиатуру */
   const watch=(el,focusSel)=>{
     new MutationObserver(()=>{const o=el.classList.contains('open');lock();
+      if(TOUCH) return;
       if(o){lastFocus=document.activeElement;const f=el.querySelector(focusSel);if(f)setTimeout(()=>f.focus(),30);}
       else if(lastFocus&&!anyOpen()){lastFocus.focus();lastFocus=null;}
     }).observe(el,{attributes:true,attributeFilter:['class']});
@@ -842,7 +844,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(location.hash==='#search') BT_search();
 
   /* ---------- авторизация: e-mail или телефон → код на почту → вход; новый e-mail — ещё имя ---------- */
-  const au=document.getElementById('auth');watch(au,'input,button');
+  const au=document.getElementById('auth');watch(au,'input:not([type=checkbox]):not([type=hidden])');
   const $a=s=>au.querySelector(s);
   const step = n => { au.querySelectorAll('[data-step]').forEach(x=>x.hidden=x.dataset.step!==n);
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
