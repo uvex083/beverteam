@@ -580,7 +580,7 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:1000px){.jlead{grid-template-columns:1fr}
   .jlead>.ncard{grid-template-columns:1fr;min-height:0}
   .jlead>.ncard>img{height:auto;aspect-ratio:16/10}
-  .post{grid-template-columns:1fr}.post__toc{position:static}}
+  .post{grid-template-columns:minmax(0,1fr)}.post__toc{position:static}}
 
 /* ================= Подписка ================= */
 .subg{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
