@@ -7,6 +7,35 @@ $sort = isset($_GET['sort']) ? htmlspecialcharsbx($_GET['sort']) : '';
 $chips = [];
 $group = 0;
 $e = fn($s) => htmlspecialcharsbx((string)$s);
+
+// «Разделы»: подразделы текущего раздела (в корне каталога — корневые, в разделе без подразделов — соседние с отметкой текущего).
+// Ссылки, а не галочки: раздел — это страница со своим заголовком и SEO; выбранные условия фильтра переносятся в адрес
+$sid = (int)($arParams['SECTION_ID'] ?? 0);
+$secQuery = preg_replace('~(^|&)(PAGEN_\d+|bxajaxid|ajax|clear_cache)=[^&]*~', '', (string)($_SERVER['QUERY_STRING'] ?? ''));
+$secQuery = trim($secQuery, '&');
+$secList = function (int $parent) use ($arParams): array {
+    $out = [];
+    $r = CIBlockSection::GetList(['SORT' => 'ASC', 'NAME' => 'ASC'], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y',
+        'SECTION_ID' => $parent ?: false, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'SECTION_PAGE_URL', 'IBLOCK_SECTION_ID']);
+    while ($s = $r->GetNext()) {
+        if ((int)$s['ELEMENT_CNT'] > 0) {
+            $out[] = ['id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'], 'n' => (int)$s['ELEMENT_CNT']];
+        }
+    }
+    return $out;
+};
+$secs = $secList($sid);
+$secAll = null;
+if ($sid && !$secs) {
+    $cur = CIBlockSection::GetList([], ['ID' => $sid], false, ['IBLOCK_SECTION_ID'])->Fetch();
+    $parent = (int)($cur['IBLOCK_SECTION_ID'] ?? 0);
+    $secs = $secList($parent);
+    if ($parent) {
+        $p = CIBlockSection::GetList([], ['ID' => $parent], false, ['NAME', 'SECTION_PAGE_URL'])->GetNext();
+        $secAll = $p ? ['name' => 'Все: ' . $p['~NAME'], 'url' => $p['~SECTION_PAGE_URL']] : null;
+    }
+}
+$secHref = fn(string $url) => $url . ($secQuery !== '' ? '?' . $secQuery : '');
 ?>
 <aside class="filters" id="filters">
   <form method="get" action="<?= $e($reset) ?>">
@@ -24,6 +53,14 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
     $order = ['PRICE' => 0, 'NET_WEIGHT' => 1, 'PACKING' => 2, 'ROAST' => 3, 'COUNTRY' => 4, 'TEA_KIND' => 5, 'TASTE' => 6, 'EFFECT' => 7, 'PROCESSING' => 8, 'BADGES' => 99];
     $items = $arResult['ITEMS'];
     uasort($items, fn($a, $b) => ($order[isset($a['PRICE']) ? 'PRICE' : $a['CODE']] ?? 50) <=> ($order[isset($b['PRICE']) ? 'PRICE' : $b['CODE']] ?? 50));
+    if (count($secs) > 1): ?>
+      <details open class="fsec"><summary>Разделы</summary>
+      <?php if ($secAll): ?><a class="opt opt--sec" href="<?= $e($secHref($secAll['url'])) ?>"><i></i><?= $e($secAll['name']) ?></a><?php endif ?>
+      <?php foreach ($secs as $s): $on = $s['id'] === $sid; ?>
+        <a class="opt opt--sec<?= $on ? ' is-on' : '' ?>" href="<?= $e($secHref($s['url'])) ?>"<?= $on ? ' aria-current="page"' : '' ?>><i></i><?= $e($s['name']) ?><span class="n"><?= $s['n'] ?></span></a>
+      <?php endforeach ?>
+      </details>
+    <?php endif;
     foreach ($items as $item):
         if (isset($item['PRICE'])):
             $min = $item['VALUES']['MIN'];

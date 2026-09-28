@@ -1703,6 +1703,10 @@ document.addEventListener('click',e=>{
 /* оглавление статьи: подсвечиваем раздел, до которого дочитали (последний заголовок выше линии под шапкой) */
 document.addEventListener('DOMContentLoaded',()=>{
   const links=[...document.querySelectorAll('.post__toc a[href^="#"]')]; if(!links.length) return;
+  // оглавление начинается вровень с верхом главной картинки (или текста, если картинки нет), а не с заголовком
+  const aside=document.querySelector('.post>aside'), top=document.querySelector('.post .post__ph, .post .post__body');
+  const align=()=>{ if(!aside||!top) return; aside.style.paddingTop=innerWidth>900?Math.max(0,top.getBoundingClientRect().top-aside.parentElement.getBoundingClientRect().top)+'px':''; };
+  align(); addEventListener('resize',align); addEventListener('load',align);
   const hs=links.map(a=>document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
   let raf=0;
   const spy=()=>{ raf=0; const line=(document.querySelector('.hdr')?.offsetHeight||0)+40;

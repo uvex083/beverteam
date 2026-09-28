@@ -265,6 +265,12 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .chipx[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
 .filters .opt input{accent-color:var(--ink);width:16px;height:16px}
 .filters .opt span.n{margin-left:auto;color:var(--gray);font-size:12px}
+/* «Разделы» в фильтре — ссылки-переключатели: кружок, выбранный раздел — тёмный кружок с лаймовой точкой */
+.filters .opt--sec{text-decoration:none}
+.filters .opt--sec i{flex-shrink:0;width:16px;height:16px;border-radius:50%;border:1.5px solid #B9B9AF;background:var(--white);transition:border-color .15s}
+.filters .opt--sec:hover i{border-color:var(--ink)}
+.filters .opt--sec.is-on{color:var(--ink);font-weight:600}
+.filters .opt--sec.is-on i{border-color:var(--ink);background:radial-gradient(circle,var(--lime) 0 3px,var(--ink) 3.5px)}
 .filters .range{display:flex;gap:8px;margin-top:10px}
 .filters .range input{width:100%;border:1px solid var(--line);border-radius:var(--rad-xs);padding:8px 10px;background:var(--paper)}
 .toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
