@@ -625,7 +625,33 @@ function bt_rent_models(): array
     return $list;
 }
 
-// Плитка разделов на главной: корневые разделы каталога с картинкой раздела + аренда
+// Пэкшот раздела для плитки: первый товар, у фото которого светлые углы (фон вырезается multiply), иначе просто первый с фото
+function bt_pack_shot(int $sectionId): string
+{
+    $first = 0;
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'SECTION_ID' => $sectionId, 'INCLUDE_SUBSECTIONS' => 'Y', 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false],
+        false, ['nTopCount' => 30], ['PREVIEW_PICTURE']);
+    while ($el = $r->Fetch()) {
+        $id = (int)$el['PREVIEW_PICTURE'];
+        $first = $first ?: $id;
+        $small = \CFile::ResizeImageGet($id, ['width' => 40, 'height' => 40], BX_RESIZE_IMAGE_EXACT)['src'] ?? '';
+        $im = $small !== '' ? @imagecreatefromstring((string)@file_get_contents($_SERVER['DOCUMENT_ROOT'] . $small)) : false;
+        if (!$im) {
+            continue;
+        }
+        $light = true;
+        foreach ([[1, 1], [imagesx($im) - 2, 1], [1, imagesy($im) - 2], [imagesx($im) - 2, imagesy($im) - 2]] as [$x, $y]) {
+            $c = imagecolorsforindex($im, imagecolorat($im, $x, $y));
+            $light = $light && min($c['red'], $c['green'], $c['blue']) >= 232;
+        }
+        if ($light) {
+            return bt_img($id, 240, 360);
+        }
+    }
+    return $first ? bt_img($first, 240, 360) : '';
+}
+
+// Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и пэкшотом + аренда
 function bt_home_tiles(): array
 {
     $catId = bt_iblock('catalog');
@@ -643,8 +669,8 @@ function bt_home_tiles(): array
     while ($s = $r->GetNext()) {
         $subs = (int)(($s['RIGHT_MARGIN'] - $s['LEFT_MARGIN'] - 1) / 2);
         $tiles[] = [
-            'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'],
-            'img' => bt_img($s['PICTURE'], 400, 300),
+            'id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'],
+            'img' => bt_img($s['PICTURE'], 400, 300), 'pack' => bt_pack_shot((int)$s['ID']),
             'note' => $subs ? $plural($subs, ['категория', 'категории', 'категорий']) : $plural((int)$s['ELEMENT_CNT'], ['модель', 'модели', 'моделей']),
         ];
     }
@@ -652,7 +678,7 @@ function bt_home_tiles(): array
     if ($rent) {
         // аренда — после кофемашин, как в меню
         array_splice($tiles, min(3, count($tiles)), 0, [[
-            'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'],
+            'id' => 0, 'name' => 'Аренда кофемашин', 'url' => '/arenda-kofemashin/', 'img' => $rent[0]['img'], 'pack' => $rent[0]['img'],
             'note' => 'от ' . bt_fmt(min(array_column($rent, 'price'))) . '/мес',
         ]]);
     }

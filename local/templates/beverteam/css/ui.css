@@ -1092,18 +1092,31 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:700px){.sw-btn{display:none}}
 
 /* ---------- страница раздела каталога (catalog.html) ---------- */
-.rootcats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:26px}
-.rootcats a{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:10px 12px;font-weight:600;font-size:13.5px}
-.rootcats a img{width:40px;height:40px;border-radius:8px;object-fit:cover}
-.rootcats a.cur{border-color:var(--ink)}
+.rootcats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:22px}
+/* плитка раздела: крупный пэкшот срезан правым нижним краем, активный раздел — лаймовый */
+.rootcat{position:relative;overflow:hidden;display:block;height:170px;padding:18px;border-radius:var(--rad);background:var(--paper);border:1px solid var(--line);
+  color:var(--ink);transition:background-color .25s,border-color .25s}
+.rootcat__n{position:relative;z-index:1;display:block;max-width:78%;font-family:Unbounded,sans-serif;font-weight:800;font-size:14px;line-height:1.2;text-transform:uppercase;overflow-wrap:anywhere;hyphens:auto}
+.rootcat__c{position:relative;z-index:1;display:block;margin-top:6px;font-size:12px;color:var(--gray)}
+.rootcat__img{position:absolute;right:-8px;bottom:-14px;width:auto;height:auto;max-width:58%;max-height:118px;object-fit:contain;mix-blend-mode:multiply;
+  transform-origin:70% 90%;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.rootcat:hover{background:var(--white);border-color:#C2C2B6}
+.rootcat:hover .rootcat__img{transform:rotate(-6deg) scale(1.07)}
+.rootcat.cur{background:var(--lime);border-color:var(--lime)}
+.rootcat.cur .rootcat__c{color:var(--ink)}
+@media(hover:none){.rootcat:hover{background:var(--paper);border-color:var(--line)}.rootcat.cur:hover{background:var(--lime);border-color:var(--lime)}.rootcat:hover .rootcat__img{transform:none}}
+@media(prefers-reduced-motion:reduce){.rootcat,.rootcat__img{transition:none}}
 .cat .seo{margin-top:40px}
 .mob-f{display:none}
-@media(max-width:1050px){.rootcats{grid-template-columns:repeat(3,1fr)}.mob-f{display:inline-flex}}
+@media(max-width:1050px){.mob-f{display:inline-flex}
+  /* лента со снапом во всю ширину экрана: поля — как у .wrap */
+  .rootcats{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:150px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin-inline:calc(-1 * clamp(16px,4vw,40px));padding-inline:clamp(16px,4vw,40px);scroll-padding-inline:clamp(16px,4vw,40px)}
+  .rootcats::-webkit-scrollbar{display:none}
+  .rootcat{height:130px;padding:14px;scroll-snap-align:start}.rootcat__n{font-size:12px}.rootcat__img{max-height:88px}}
 @media(max-width:640px){
   /* первый экран на мобильных: сразу видны товары с ценами */
-  .rootcats{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-bottom:16px}
-  .rootcats a{flex:0 0 auto;scroll-snap-align:start;padding:7px 12px 7px 8px;font-size:12.5px}
-  .rootcats a img{width:28px;height:28px}
+  .rootcats{gap:8px;margin-bottom:16px}
   .subcats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
   .subcats a{flex:0 0 auto;padding:7px 12px;font-size:12.5px}
   .cat-page .pagehead{padding:10px 0 14px}

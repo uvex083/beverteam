@@ -1682,3 +1682,7 @@ document.addEventListener('click',e=>{
   d._a=d.animate({height:[from+'px',to+'px']},{duration:280,easing:'cubic-bezier(.2,.7,.2,1)'});
   d._a.onfinish=()=>{ d._a=null; d.style.overflow=''; if(closing) d.open=false; };
 });
+
+/* плитки разделов каталога: на узком экране активная плитка при загрузке — в зоне видимости */
+document.addEventListener('DOMContentLoaded',()=>{ const a=document.querySelector('.rootcats .rootcat.cur');
+  if(a&&innerWidth<=1050){ const r=a.parentElement; r.scrollLeft=a.offsetLeft-(r.clientWidth-a.offsetWidth)/2; } });
