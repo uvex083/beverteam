@@ -139,6 +139,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     const links={tg:`https://t.me/share/url?url=${u}&text=${t}`,wa:`https://wa.me/?text=${t}%20${u}`,vk:`https://vk.com/share.php?url=${u}`};
     shM.querySelectorAll('[data-share]').forEach(a=>{ if(links[a.dataset.share]) a.href=links[a.dataset.share]; });
     shOpen(shM.hidden);
+    /* иконки нарисованы с разными полями — подгоняем рамку каждой по контуру, чтобы все были одного размера */
+    if(!shM.hidden&&!shM.dataset.fit){ shM.dataset.fit=1; shM.querySelectorAll('svg').forEach(v=>{
+      const b=v.getBBox(), pad=v.getAttribute('stroke')?1:0, m=Math.max(b.width,b.height)+pad*2;
+      v.setAttribute('viewBox',`${b.x-(m-b.width)/2} ${b.y-(m-b.height)/2} ${m} ${m}`); }); }
   });
   shM.addEventListener('click',e=>{
     const a=e.target.closest('[data-share]'); if(!a) return;
