@@ -1932,3 +1932,16 @@ form[data-form]{position:relative}
   font:600 13.5px/1.2 Manrope,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 8px 24px rgba(14,14,12,.18);animation:fhint .2s ease-out}
 .fhint:hover{background:var(--ink-3)}
 @keyframes fhint{from{opacity:0;transform:translate(-6px,-50%)}}
+/* «Заказы по счёту» на телефоне — карточками: дата и сумма, номер и оплата, счёт отдельной строкой */
+@media(max-width:640px){
+  .docs,.docs tbody{display:block}.docs thead{display:none}
+  .docs tr{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .docs tr:last-child{border-bottom:0}
+  .docs td{padding:0;border:0}
+  .docs td:nth-child(1){grid-area:1/1;color:var(--gray);font-size:13px}
+  .docs td:nth-child(2){grid-area:2/1}
+  .docs td:nth-child(3){grid-area:1/2;text-align:right;font-weight:700}
+  .docs td:nth-child(4){grid-area:2/2;justify-self:end}
+  .docs td:nth-child(5){grid-area:3/1/4/3;text-align:left!important}
+  .docs td:nth-child(5):empty{display:none}
+}
