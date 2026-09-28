@@ -1547,7 +1547,7 @@ input,textarea{caret-color:var(--ink)}
 .home .svc__list li i{font-style:normal;color:var(--lime);font-family:'JetBrains Mono';font-size:12.5px;white-space:nowrap}
 .home .svc__r{background:#fff;display:grid;place-items:center;padding:26px}
 .home .svc__r img{max-height:420px;width:100%;height:auto;object-fit:contain}
-.home .btn--inv{color:#fff;border-color:#fff}
+.home .btn--inv,.rep2 .btn--inv{color:#fff;border-color:#fff}
 .home .bean{background:var(--espresso);color:#F3EDE7;border-radius:var(--rad);display:grid;grid-template-columns:.9fr 1.1fr;overflow:hidden}
 .home .bean__ph{background:#4B372B;display:grid;place-items:center;padding:40px;position:relative}
 .home .bean__ph img{max-height:330px;width:100%;height:auto;object-fit:contain}
