@@ -763,7 +763,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const recent=()=>{try{return JSON.parse(localStorage.getItem('bt_recent')||'[]')}catch(e){return []}};
   const pushRecent=q=>{try{const r=recent().filter(x=>x!==q);r.unshift(q);localStorage.setItem('bt_recent',JSON.stringify(r.slice(0,5)));}catch(e){}};
 
-  window.BT_search=()=>{ sLast=document.activeElement; sp.style.setProperty('--hdrh',(document.querySelector('.hdr')?.offsetHeight||0)+'px'); sp.classList.add('open'); lock(true);
+  window.BT_search=()=>{ sLast=document.activeElement; document.documentElement.style.setProperty('--hdrh',(document.querySelector('.hdr')?.offsetHeight||0)+'px'); sp.classList.add('open'); lock(true);
     sq.value=''; sclr.classList.remove('show'); paintEmpty(); setTimeout(()=>sq.focus(),60); };
   const closeSearch=()=>{ sp.classList.remove('open'); lock();
     if(sLast){sLast.focus();sLast=null;} };

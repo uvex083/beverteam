@@ -444,6 +444,8 @@ html{scrollbar-gutter:stable}
 /* скролл держит html, поэтому запираем и его — иначе фон едет под попапом */
 html.is-locked,body.is-locked{overflow:hidden!important;overscroll-behavior:none;touch-action:none}
 body.is-locked{padding-right:var(--sbw,0)}
+/* место под полосу прокрутки остаётся пустым, пока открыт поиск, — красим его как поиск: тёмная полоса шапки, дальше фон */
+html.is-locked:has(.srch.open){background:linear-gradient(var(--ink) 0 var(--hdrh,112px),var(--paper) var(--hdrh,112px))}
 body.is-locked .hdr{padding-right:var(--sbw,0)}
 /* под блокировкой прокрутки sticky-шапка уезжает к началу страницы — пока открыто мобильное меню, держим её fixed */
 body:has(.drawer.open) .hdr{position:fixed;top:0;left:0;right:0}
