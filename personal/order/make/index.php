@@ -77,7 +77,7 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>1</b>Получатель</h2>
         <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div></div>
-        <div class="field" style="margin-bottom:18px"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>">
+        <div class="field" style="margin-bottom:18px"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="mail@company.ru" value="<?= $e($u['email']) ?>">
           <span class="hint">Сюда придёт подтверждение заказа</span></div>
         <div class="corec" id="coRec" hidden><div><b id="coRecT"></b><span id="coRecD"></span></div><button type="button" class="btn btn--dark" id="coRecBtn">Войти по коду</button></div>
         <?php endif ?>
