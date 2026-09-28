@@ -46,7 +46,7 @@ $minMachine = $machinePrices ? min($machinePrices) : 0;
     <h2 class="display h2" style="margin-bottom:8px"><?= $e($brandsB['title'] ?? 'Ремонт по маркам') ?></h2>
     <?php if (!empty($brandsB['subtitle'])): ?><p class="muted" style="margin:0 0 20px;max-width:60ch"><?= $e($brandsB['subtitle']) ?></p><?php endif ?>
     <div class="brands">
-      <?php foreach ($brands as $b): ?><a href="/servis/remont-kofemashin/<?= $e($b['code']) ?>/"><b><?= $e($b['name']) ?></b><small><?= $e($b['models']) ?></small><?php if ($b['authorized'] !== ''): ?><span class="badge badge--ok">Авторизованный сервис</span><?php endif ?></a><?php endforeach ?>
+      <?php foreach ($brands as $b): ?><a href="/servis/remont-kofemashin/#types"><b><?= $e($b['name']) ?></b><small><?= $e($b['models']) ?></small><?php if ($b['authorized'] !== ''): ?><span class="badge badge--ok">Авторизованный сервис</span><?php endif ?></a><?php endforeach ?>
     </div>
   </section>
   <?php endif ?>

@@ -1208,7 +1208,7 @@ function bt_sitemap_build(): string
     foreach (bt_blog_rubrics() as $rub) {
         $urls[] = $rub['url'];
     }
-    foreach (['catalog', 'journal', 'repair_brands'] as $code) {
+    foreach (['catalog', 'journal'] as $code) {
         $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock($code), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'DETAIL_PAGE_URL', 'TIMESTAMP_X']);
         while ($e = $r->GetNext()) {
             $urls[] = [$e['DETAIL_PAGE_URL'], date('Y-m-d', MakeTimeStamp($e['TIMESTAMP_X']))];
