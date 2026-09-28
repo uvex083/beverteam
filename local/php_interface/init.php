@@ -23,6 +23,11 @@ require_once __DIR__ . '/include/bt_bill.php';
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_bill_attach');
 AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contacts');
 
+// посадочные страницы для SEO: свои title, description, H1 и SEO-текст по адресу
+require_once __DIR__ . '/include/bt_seo.php';
+AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
+AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
+
 // вход через Яндекс ID, VK ID, T-Bank, Сбер, Альфа (модуль «Социальные сервисы»)
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, array_fill_keys(['BtOAuth', 'BtOAuthBank', 'BtOAuthTbank', 'BtOAuthSber', 'BtOAuthAlfa'], '/local/php_interface/include/bt_oauth.php'));
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);

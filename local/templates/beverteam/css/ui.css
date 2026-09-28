@@ -1913,3 +1913,5 @@ form[data-form]{position:relative}
 .share__m a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;font-size:14px;color:var(--ink);text-decoration:none;transition:background-color .15s}
 .share__m a:hover{background:var(--paper)}
 .share__m svg{width:22px;height:22px;flex-shrink:0;display:block}
+/* SEO-текст посадочной страницы, если на странице нет своего блока текста */
+.seo-landing .seo{font-size:14.5px;color:#4A515B;max-width:900px}
