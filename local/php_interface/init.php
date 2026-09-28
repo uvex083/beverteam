@@ -23,6 +23,10 @@ require_once __DIR__ . '/include/bt_bill.php';
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_bill_attach');
 AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contacts');
 
+// админка: раздел «Страницы сайта» — блоки главной, «О компании» и других страниц отдельными пунктами
+require_once __DIR__ . '/include/bt_admin.php';
+AddEventHandler('main', 'OnBuildGlobalMenu', 'bt_admin_menu');
+
 // посадочные страницы для SEO: свои title, description, H1 и SEO-текст по адресу
 require_once __DIR__ . '/include/bt_seo.php';
 AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
