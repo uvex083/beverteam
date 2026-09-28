@@ -1889,3 +1889,5 @@ form[data-form]{position:relative}
 .modal--rev .rev__hd{padding-right:40px}
 .modal--rev .rev__txt{display:block;overflow:visible;font-size:15px}
 .modal--rev .rev__more{display:none}
+
+.lead__prod input{background:var(--paper);color:var(--ink);cursor:default}
