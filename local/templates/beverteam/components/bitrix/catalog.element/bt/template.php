@@ -40,12 +40,18 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       </div>
     </div>
     <div>
-      <?php if ($section): ?><div class="mono muted" style="margin-bottom:12px"><?= $e($section['~NAME']) ?></div><?php endif ?>
+      <div class="pkick"><?php if ($section): ?><span class="mono muted"><?= $e($section['~NAME']) ?></span><?php endif ?><span class="bb__st" id="pSt">В наличии</span></div>
       <h1 class="display h1"><?= $e($h1) ?></h1>
       <div class="pmeta">
         <a href="#reviews" id="rTop" class="row" style="gap:8px;text-decoration:none"></a>
-        <span class="pc__stock" style="margin:0">В наличии</span>
-        <div class="ptools">
+      </div>
+      <div class="buy bb" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        <meta itemprop="price" content="<?= $first ?>"><meta itemprop="priceCurrency" content="RUB"><link itemprop="availability" href="https://schema.org/InStock">
+        <div id="pPacks"></div>
+        <div class="bb__price"><b class="bb__sum" id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?><div class="bb__per" id="pPer"><?= $bulk ? bt_fmt($first) . ' за кг' : 'за 1 шт' ?></div></div>
+        <div class="bb__grid">
+          <div class="bb__main" id="pAdd" aria-live="polite"></div>
+        <div class="bb__ic">
           <div class="share">
             <button id="bShare" title="Поделиться" aria-label="Поделиться" aria-haspopup="menu" aria-expanded="false"><span id="iShare"><?= bt_icon('share') ?></span></button>
             <div class="share__m" id="shareMenu" role="menu" hidden>
@@ -57,16 +63,8 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
           </div>
           <button id="bCmp" aria-pressed="false" title="Сравнить" aria-label="Сравнить"><span id="iCmp"><?= bt_icon('compare') ?></span></button>
           <button id="bFav" aria-pressed="false" title="В избранное" aria-label="В избранное"><span id="iFav"><?= bt_icon('heart') ?></span></button>
-        </div>
-      </div>
-      <div class="buy" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-        <meta itemprop="price" content="<?= $first ?>"><meta itemprop="priceCurrency" content="RUB"><link itemprop="availability" href="https://schema.org/InStock">
-        <div class="buy__price"><b id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><span class="per" id="pPer"><?= $bulk ? bt_fmt($first) . ' за кг · ' . $bulk[0]['kg'] . ' кг' : 'за 1 шт' ?></span><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?></div>
-        <div id="pPacks"></div>
-        <div class="buy__row">
-          <div class="qty"><button data-d="-" aria-label="Уменьшить">−</button><input id="qty" value="1" inputmode="numeric" aria-label="Количество, <?= $unit ?>"><button data-d="+" aria-label="Увеличить">+</button></div>
-          <span id="pAdd"></span>
-          <button class="btn btn--line" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в один клик</button>
+          </div>
+          <div class="bb__sub"><button class="bb__one" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в 1 клик</button></div>
         </div>
         <div class="dship" id="dship"></div>
       </div>

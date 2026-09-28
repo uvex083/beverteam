@@ -25,42 +25,35 @@ document.addEventListener('DOMContentLoaded',()=>{
       BT_lightbox(imgs.map(x=>({src:x.dataset.full||x.src})),i); }));
   }
 
-  /* ---- фасовка, количество (шт) и корзина: один источник истины ---- */
-  const key = () => BT_keyOf(PM);
-  function sync(from){
-    const q=Math.max(1,parseInt(qty.value,10)||1), kg=BT_packOf(PM);
-    if(String(q)!==qty.value) qty.value=q;
-    const pc=BT_piece(PM,kg,q);
-    if(PM.p){ pTotal.textContent=BT_fmt(pc*q);
-      pPer.textContent = PM.bulk ? `${BT_fmt(BT_perKg(PM,kg,q))} за кг · ${kg} кг${q>1?` × ${q} шт`:''}` : (q>1 ? `${BT_fmt(pc)} × ${q} шт` : 'за 1 шт'); }
+  /* ---- блок покупки: фасовка → «В корзину»; в корзине — «− N +» и переход в корзину с суммой ---- */
+  const key = () => BT_keyOf(PM), pSt=document.getElementById('pSt');
+  const label=(kg,q)=>PM.bulk?`${+(kg*q).toFixed(2)} кг`:`${q} шт`;
+  function sync(anim){
+    const kg=BT_packOf(PM), inCart=BT_CART[key()]||0, q=inCart||1, pc=BT_piece(PM,kg,q), sum=pc*q;
+    if(PM.p){ pTotal.textContent=BT_fmt(sum);
+      if(PM.bulk){ const per=BT_perKg(PM,kg,q), base=PM.bulk[0].p, tot=kg*q, pct=Math.round((1-per/base)*100);
+        pPer.innerHTML=`${BT_fmt(per)} за кг${tot>1?` × ${+tot.toFixed(2)} кг`:''}${pct>0?`<b>выгода ${pct}% · ${BT_fmt(Math.round((base-per)*tot))}</b>`:''}`; }
+      else pPer.textContent = q>1 ? `${BT_fmt(pc)} × ${q} шт` : 'за 1 шт'; }
     if(tiers&&PM.bulk){ const p=BT_perKg(PM,kg,q); [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',p===+r.cells[1].textContent.replace(/\D/g,''))); }
     if(PM.bulk) pPacks.innerHTML=BT_packs(PM,true);
-    const inCart=BT_CART[key()]||0;
-    // кнопку не пересобираем без нужды: уход фокуса из поля количества перерисовал бы её под курсором и съел клик
-    if(pAdd.dataset.st===String(inCart)){}
-    else if(inCart){ pAdd.dataset.st=inCart;
-      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} шт</a>`;
-    } else { pAdd.dataset.st=0;
-      pAdd.innerHTML=`<button class="btn" id="pBuy" type="button">В корзину</button>`;
-      document.getElementById('pBuy').addEventListener('click',()=>{
-        BT_cartSet(key(),Math.max(1,parseInt(qty.value,10)||1));
-        sync('cart');
-        BT_toast(`${qty.value} шт${PM.bulk?` по ${BT_packOf(PM)} кг`:''} в корзине · <a href="/personal/cart/">Оформить</a>`);
-      });
-    }
-    /* если эта фасовка уже в корзине, степпер правит корзину */
-    if(inCart && from==='qty' && inCart!==q){ BT_cartSet(key(),q); sync('cart'); }
+    const pop=anim?' pop':'';
+    pAdd.innerHTML = !inCart
+      ? `<button class="bb__add" type="button" data-add>В корзину</button>`
+      : `<div class="bb__step${pop}" role="group" aria-label="Количество в корзине"><button type="button" data-q="-" aria-label="Уменьшить">−</button><output>${label(kg,q)}</output><button type="button" data-q="+" aria-label="Увеличить">+</button></div>
+         <a class="bb__go${pop}" href="/personal/cart/"><span>В корзину <svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><b>${BT_fmt(sum)}</b></a>`;
+    pSt.textContent=inCart?'В корзине':'В наличии'; pSt.classList.toggle('is-in',!!inCart);
   }
-  // фасовка: счётчик переключается на её количество в корзине (или 1)
-  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return;
-    BT_packSet(PID,+b.dataset.kg); qty.value=BT_CART[key()]||1; sync('packs'); });
-  if(BT_CART[key()]) qty.value=BT_CART[key()];
-  qty.addEventListener('change',()=>sync('qty'));
-  /* «−» на единице: убираем товар из корзины и возвращаем кнопку «В корзину» */
-  qty.addEventListener('bt:qtyzero',()=>{ if(BT_CART[key()]){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } sync('cart'); });
-  qty.addEventListener('input',()=>{ if(/^\d+$/.test(qty.value)) sync('qty'); });
-  document.addEventListener('bt:cart',e=>{ if(e.detail&&e.detail.id===PID) sync('ext'); });
-  sync('init');
+  pAdd.addEventListener('click',e=>{
+    if(e.target.closest('[data-add]')){ BT_cartSet(key(),1); sync(true); BT_toast(`${label(BT_packOf(PM),1)} в корзине · <a href="/personal/cart/">Оформить</a>`); return; }
+    const s=e.target.closest('[data-q]'); if(!s) return;
+    const n=(BT_CART[key()]||0)+(s.dataset.q==='+'?1:-1);
+    if(n<1){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } else BT_cartSet(key(),n);
+    sync();
+  });
+  // фасовка: блок показывает, сколько этой фасовки уже в корзине
+  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_packSet(PID,+b.dataset.kg); sync(); });
+  document.addEventListener('bt:cart',e=>{ if(e.detail&&String(e.detail.id).split(':')[0]===String(PID)) sync(); });
+  sync();
 
   const dd=BT_dates(); dship.innerHTML=`${BT_ICONS.truck}<span>Екатеринбург — <b>${dd.relDeliver?dd.relDeliver+', ':''}${BT_fmtDate(dd.deliver)}</b><br><small class="muted">По России — СДЭК, 2–7 дней</small></span>`;
   ptabs.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;[...ptabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));
