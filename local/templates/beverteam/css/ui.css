@@ -91,6 +91,10 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .badge--err{background:var(--err-s);color:var(--err)}
 .badge--warn{background:var(--warn-s);color:var(--warn)}
 .badge--dark{background:var(--ink);color:var(--lime)}
+/* метки товара: скидка — красная, хит — оранжевая, топ продаж — фиолетовая, новинка — лаймовая (как обычный .badge) */
+.badge--sale{background:#E5364B;color:#fff}
+.badge--hit{background:#FF6B1A;color:#fff}
+.badge--top{background:#6B4EFF;color:#fff}
 
 /* header */
 .hdr{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff}

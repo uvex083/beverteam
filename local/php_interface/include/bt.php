@@ -147,11 +147,18 @@ function bt_fmt(float $n): string
     return number_format($n, 0, '', "\u{00A0}") . "\u{00A0}₽";
 }
 
+// Метка товара («Метки» в каталоге): у каждой свой цвет, чтобы выделялась на фото
+function bt_badge(string $b): string
+{
+    $mod = ['хит' => 'hit', 'скидка' => 'sale', 'распродажа' => 'sale', 'новинка' => 'new', 'топ продаж' => 'top'][mb_strtolower(trim($b))] ?? '';
+    return '<span class="badge' . ($mod ? ' badge--' . $mod : '') . '">' . htmlspecialcharsbx($b) . '</span>';
+}
+
 // Карточка товара — серверная копия BT_card() из ui.js в состоянии «не в корзине»; разметку менять в обоих местах
 function bt_card(array $m, bool $eager = false): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
-    $badges = !empty($m['badges']) ? '<div class="pc__badges">' . implode('', array_map(fn($b) => '<span class="badge">' . $e($b) . '</span>', $m['badges'])) . '</div>' : '';
+    $badges = !empty($m['badges']) ? '<div class="pc__badges">' . implode('', array_map('bt_badge', $m['badges'])) . '</div>' : '';
     $scales = !empty($m['sc']) ? '<div class="pc__scales">' . implode('', array_map(fn($x) => '<div class="pc__scale"><span>' . $e($x[0]) . '</span><i style="--v:' . (int)$x[1] . '%"></i></div>', $m['sc'])) . '</div>' : '';
     $packs = '';
     if (!empty($m['bulk'])) {

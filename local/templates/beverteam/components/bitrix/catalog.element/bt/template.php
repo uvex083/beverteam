@@ -31,7 +31,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
         <button class="gal__ar" id="thDn" type="button" aria-label="Следующие фото"<?= count($photos) > 1 ? '' : ' style="visibility:hidden"' ?>><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
       </div>
       <div class="gal__main">
-        <div class="gal__badges"><?php foreach ($m['badges'] ?? [] as $b): ?><span class="badge"><?= $e($b) ?></span><?php endforeach ?><?php if ($arResult['BT_Q']): ?><span class="badge badge--dark">Q <?= $e($arResult['BT_Q']) ?></span><?php endif ?></div>
+        <div class="gal__badges"><?php foreach ($m['badges'] ?? [] as $b) echo bt_badge($b) ?><?php if ($arResult['BT_Q']): ?><span class="badge badge--dark">Q <?= $e($arResult['BT_Q']) ?></span><?php endif ?></div>
         <div class="swiper gal__big" id="galBig"><div class="swiper-wrapper">
           <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide"><img src="<?= $ph['big'] ?>" data-full="<?= $ph['full'] ?>" alt="<?= $e($name) ?> — фото <?= $i + 1 ?>"<?= $i ? ' loading="lazy" decoding="async"' : ' itemprop="image" fetchpriority="high"' ?>></div><?php endforeach ?>
           <?php if (!$photos): ?><div class="swiper-slide"><div class="ph">Фото товара<br>(нужен файл от клиента)</div></div><?php endif ?>

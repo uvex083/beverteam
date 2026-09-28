@@ -359,7 +359,7 @@ window.BT_card = function(m){
   const tools = '';
   return `<article class="pc" data-pc="${m.id}" itemscope itemtype="https://schema.org/Product">
     <meta itemprop="name" content="${m.n}"><meta itemprop="image" content="${m.img}"><meta itemprop="description" content="${m.par}">
-    ${m.badges?`<div class="pc__badges">${m.badges.map(b=>`<span class="badge">${b}</span>`).join('')}</div>`:''}
+    ${m.badges?`<div class="pc__badges">${m.badges.map(b=>`<span class="badge badge--${({'хит':'hit','скидка':'sale','распродажа':'sale','новинка':'new','топ продаж':'top'})[b.toLowerCase()]||'x'}">${b}</span>`).join('')}</div>`:''}
     ${tiers}
     <div class="pc__acts">
       <button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">${I.heart}</button>
