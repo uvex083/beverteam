@@ -874,6 +874,7 @@ input,textarea{caret-color:var(--ink)}
   .filters{position:fixed;inset:0;width:100%;height:100dvh;z-index:90;margin:0;border:0;border-radius:0;padding:0;
     background:var(--white);overflow:hidden;display:none;grid-template-rows:auto 1fr auto}
   .filters.open{display:grid}
+  .filters>form{display:contents}   /* шапка, список и кнопка — строки сетки шторки, кнопка прижата к низу */
   .filters__hd{display:flex;align-items:center;gap:14px;background:var(--white);
     border-bottom:1px solid var(--line);padding:16px 18px}
   .filters__hd b{font-family:Unbounded;font-weight:700;font-size:17px}
