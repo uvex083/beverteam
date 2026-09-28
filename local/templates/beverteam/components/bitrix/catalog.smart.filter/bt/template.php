@@ -259,9 +259,9 @@ foreach ($arResult['ITEMS'] as $it) {
 foreach ($chips as [$name, $value, $params]) {
     $rest = array_diff_key($cur, array_flip($params));
     $url = $reset . (($q = http_build_query(($rest ? $rest + ['set_filter' => 'Y'] : []) + $keep)) !== '' ? '?' . $q : '');
-    $html .= '<span class="chip"><b>' . $e($name) . ':</b> ' . $e(mb_strtolower($value)) . ' <a href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" aria-label="Убрать">×</a></span>';
+    $html .= '<a class="chip" href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" title="Убрать условие">' . $e($name) . ': ' . $e(mb_strtolower($value)) . '<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
 }
 if ($chips) {
-    $html .= '<a class="chip chip--reset" href="' . $e($reset) . '" data-freset>Сбросить все</a>';
+    $html .= '<a class="chip chip--reset" href="' . $e($reset) . '" data-freset>Сбросить все<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
 }
 $APPLICATION->AddViewContent('bt_cat_chips', $html . '</div>');

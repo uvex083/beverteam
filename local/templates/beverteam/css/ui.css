@@ -286,7 +286,6 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .fslider input{position:absolute;inset:0;width:100%;height:20px;margin:0;appearance:none;background:none;pointer-events:none}
 .fslider input::-webkit-slider-thumb{appearance:none;pointer-events:auto;width:20px;height:20px;border-radius:50%;background:var(--white);border:2px solid var(--ink);cursor:grab}
 .fslider input::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:var(--white);border:2px solid var(--ink);cursor:grab}
-.chip--reset{background:none;border-color:transparent;font-weight:600;color:var(--ink);text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:2px;text-underline-offset:4px}
 .filters .opt input,.symp input,.vol input,.radio-card input,.check input{cursor:pointer}
 .filters summary,.faq summary,.drawer .acc summary,.symp label,.vol,.check,.radio-card label,label.check{cursor:pointer}
 .subcats a,.chip button,.pager a,.jfilter button,.pill-tabs button,.tabs button,.chipx,.opts button{cursor:pointer}
@@ -300,9 +299,15 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .toolbar>.sel{margin-left:auto}
 .field .sel{display:block;width:100%}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.chip{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
-.chip b{color:var(--gray);font-weight:400}
-.chip button,.chip a{border:0;background:none;color:var(--gray);padding:0;font-size:15px}
+/* выбранные условия фильтра, как на Озоне: заливка фирменным цветом, крестик в кружке, весь чипс — ссылка «убрать» */
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:var(--ink);border:1px solid var(--lime);border-radius:999px;padding:7px 8px 7px 14px;font-size:13.5px;font-weight:600;line-height:1.2;transition:background .15s,border-color .15s}
+.chip i{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ink);flex:none}
+.chip i svg{width:12px;height:12px;fill:none;stroke:var(--lime);stroke-width:2;stroke-linecap:round}
+.chip:hover{background:var(--lime-d);border-color:var(--lime-d)}
+.chip--reset{background:var(--white);border-color:var(--line)}
+.chip--reset i{background:var(--gray-2)}
+.chip--reset i svg{stroke:#fff}
+.chip--reset:hover{background:var(--white);border-color:var(--ink)}
 .pager{display:flex;gap:6px;justify-content:center;margin-top:32px}
 .pager a,.pager span{min-width:40px;height:40px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--line);background:var(--white);font-weight:600;font-size:14px;padding:0 12px}
 .pager .cur{background:var(--ink);color:var(--lime);border-color:var(--ink)}
