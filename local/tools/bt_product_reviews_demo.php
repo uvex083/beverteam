@@ -28,11 +28,12 @@ $product = fn(string $code) => CIBlockElement::GetList([], ['IBLOCK_ID' => $catI
 // фото к отзыву — копии картинок товара; у пачек кофе белый фон, поэтому для наглядности — живые фото чая
 $photos = function (array $p, int $n) use ($catId, $product): array {
     $p = str_contains($p['NAME'], 'BOTANICA') ? ($product('alpijskij-koktejl') ?: $p) : $p;
-    $ids = array_filter([(int)$p['DETAIL_PICTURE'], (int)$p['PREVIEW_PICTURE']]);
+    $ids = [];
     $r = CIBlockElement::GetProperty($catId, $p['ID'], [], ['CODE' => 'MORE_PHOTO']);
     while ($x = $r->Fetch()) {
         $x['VALUE'] and $ids[] = (int)$x['VALUE'];
     }
+    $ids = $ids ?: array_filter([(int)$p['DETAIL_PICTURE']]);
     return array_map(fn($id) => ['VALUE' => CFile::MakeFileArray($id)], array_slice(array_values(array_unique($ids)), 0, $n));
 };
 $yes = (int)(CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'VERIFIED', 'XML_ID' => 'Y'])->Fetch()['ID'] ?? 0);
