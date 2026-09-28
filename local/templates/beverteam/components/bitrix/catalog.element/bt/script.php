@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded',()=>{
         <time class="muted" style="font-size:12.5px" datetime="${r.d}">${BT_postDate(r.d)}</time>
         ${r.ok?'<span class="rev__ok">Покупка подтверждена</span>':''}</div>
       <p>${esc(r.t)}</p>${r.m?`<p class="muted" style="font-size:13px;margin-top:8px">Машина: ${esc(r.m)}</p>`:''}
-      ${(r.ph||[]).length?`<div class="rev__ph">${r.ph.map((f,i)=>`<button type="button" data-rv="${esc(r.id)}" data-i="${i}" aria-label="Фото к отзыву"><img src="${esc(f.s)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}</article>`).join('');
-    revList.addEventListener('click',e=>{ const b=e.target.closest('[data-rv]'); if(!b) return; const r=RV.find(x=>String(x.id)===b.dataset.rv);
+      ${(r.ph||[]).length?`<div class="rev__ph">${r.ph.map((f,i)=>`<button type="button" data-rev="${esc(r.id)}" data-i="${i}" aria-label="Фото к отзыву"><img src="${esc(f.s)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}</article>`).join('');
+    revList.addEventListener('click',e=>{ const b=e.target.closest('[data-rev]'); if(!b) return; const r=RV.find(x=>String(x.id)===b.dataset.rev);
       r&&BT_lightbox(r.ph.map(f=>({src:f.f,cap:r.a})),+b.dataset.i); });
     /* разметка отзывов — только для реальных отзывов */
     const ld=document.createElement('script');ld.type='application/ld+json';
