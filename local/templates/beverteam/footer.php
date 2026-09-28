@@ -17,6 +17,15 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
 </div>
 <?php endif ?>
 <?= bt_cat_sprite() ?>
+<?php if (str_starts_with($APPLICATION->GetCurDir(), '/personal/order/make/')): ?>
+<footer class="ftr ftr--s"><div class="wrap">
+  <div class="ftr__s">
+    <div class="ftr__c"><a href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a><a href="mailto:<?= $co['email'] ?? '' ?>"><?= $co['email'] ?? '' ?></a><span><?= $co['hours'] ?? '' ?></span></div>
+    <div class="ftr__c"><a href="/oplata-i-dostavka/" target="_blank">Оплата и доставка</a><a href="/vozvrat-i-obmen/" target="_blank">Возврат и обмен</a><a href="/politika-konfidencialnosti/" target="_blank">Политика конфиденциальности</a></div>
+  </div>
+  <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span></div>
+</div></footer>
+<?php else: ?>
 <footer class="ftr"><div class="wrap">
   <div class="ftr__g">
     <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>
@@ -36,6 +45,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
   </div>
   <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ОГРНИП <?= $co['ogrnip'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/sitemap/">Карта сайта</a></span></div>
 </div></footer>
+<?php endif ?>
 <div class="modal" id="lead" role="dialog" aria-modal="true" aria-labelledby="leadTitle">
   <div class="modal__bg" data-close></div>
   <div class="modal__p">
