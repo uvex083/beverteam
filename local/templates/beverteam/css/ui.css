@@ -2020,8 +2020,9 @@ form[data-form]{position:relative}
 .bb .dship{margin-top:16px}
 .pkick{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
 @media(hover:hover){.bb__add:hover{background:var(--lime-d)}.bb__step button:hover{background:var(--paper)}.bb__go:hover{background:#2A2A26}.bb__ic>button:hover,.bb__ic .share>button:hover{border-color:var(--line-h);color:var(--ink)}}
-/* телефон: кнопка на всю ширину, иконки — строкой ниже рядом со статусом */
-@media(max-width:480px){.bb__grid{grid-template-areas:"main main" "sub ic"}.bb__go{padding:0 16px}.bb__sum{font-size:28px}}
+/* до 1099px — мобильная раскладка: кнопка на всю ширину, иконки строкой ниже рядом с «Купить в 1 клик» */
+@media(max-width:1099px){.bb__grid{grid-template-areas:"main main" "sub ic"}.bb__go{padding:0 16px}}
+@media(max-width:480px){.bb__sum{font-size:28px}}
 .pop{animation:bbpop .22s cubic-bezier(.16,1,.3,1)}
 @keyframes bbpop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pop{animation:none}}
