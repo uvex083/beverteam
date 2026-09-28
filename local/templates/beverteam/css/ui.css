@@ -1952,3 +1952,15 @@ form[data-form]{position:relative}
 /* обводка при наведении — серая и плавная, как у выпадающего списка */
 .pc__acts button,.subcats a,.soc a,.idp a,.jfilter a,.jtags--post a,.jside a,.quiz__opts button,.brands a,.srch__chips button,.srch__secs a,.sres a,
 .spage__pages a,.ptools button,.drop,.nfp .links a,.chipx{transition:border-color .15s,background-color .15s,color .15s}
+/* отзывы о товаре: пустой блок оценки скрыт, призыв оставить первый отзыв, фото, «спасибо» */
+.rating:empty{display:none}
+.rev-empty{display:flex;align-items:center;gap:14px;background:var(--lime-soft);border:1px solid var(--lime);border-radius:var(--rad);padding:16px 20px;color:var(--ink);text-decoration:none;font-size:14px;line-height:1.5;transition:border-color .15s}
+.rev-empty:hover{border-color:var(--lime-d)}
+.rev-empty svg{width:28px;height:28px;flex:none;fill:var(--ink)}
+.rev-empty b{display:block;font-size:16px}
+.rev__ph{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.rev__ph button{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:none;cursor:zoom-in;width:84px;height:84px;transition:border-color .15s}
+.rev__ph button:hover{border-color:var(--line-h)}
+.rev__ph img{width:100%;height:100%;object-fit:cover;display:block}
+.rev-sent{background:var(--lime-soft);border-radius:var(--rad);padding:20px 22px;font-size:14.5px;line-height:1.6}
+.rev-sent b{display:block;font-size:17px;margin-bottom:4px}

@@ -66,11 +66,20 @@ $arResult['BT_REC'] = array_values(array_filter(array_map('bt_product', $rec)));
 // отзывы о товаре
 $arResult['BT_REVIEWS'] = [];
 $r = CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'], ['IBLOCK_ID' => bt_iblock('reviews'), 'ACTIVE' => 'Y', 'PROPERTY_PRODUCT' => $id], false, false,
-    ['ID', 'NAME', 'PREVIEW_TEXT', 'ACTIVE_FROM', 'DATE_CREATE', 'PROPERTY_RATING', 'PROPERTY_MACHINE', 'PROPERTY_VERIFIED']);
+    ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'ACTIVE_FROM', 'DATE_CREATE', 'PROPERTY_RATING', 'PROPERTY_MACHINE', 'PROPERTY_VERIFIED']);
 while ($e = $r->Fetch()) {
-    $arResult['BT_REVIEWS'][] = ['a' => $e['NAME'], 'r' => (int)$e['PROPERTY_RATING_VALUE'], 't' => $e['PREVIEW_TEXT'],
-        'd' => ConvertDateTime($e['ACTIVE_FROM'] ?: $e['DATE_CREATE'], 'YYYY-MM-DD'), 'm' => $e['PROPERTY_MACHINE_VALUE'], 'ok' => (bool)$e['PROPERTY_VERIFIED_VALUE']];
+    $ph = [];
+    $pr = CIBlockElement::GetProperty($e['IBLOCK_ID'], $e['ID'], [], ['CODE' => 'PHOTOS']);
+    while ($x = $pr->Fetch()) {
+        if ($x['VALUE'] && ($f = CFile::GetFileArray($x['VALUE']))) {
+            $ph[] = ['s' => CFile::ResizeImageGet($f, ['width' => 240, 'height' => 240], BX_RESIZE_IMAGE_EXACT)['src'], 'f' => CFile::ResizeImageGet($f, ['width' => 1600, 'height' => 1600])['src']];
+        }
+    }
+    $arResult['BT_REVIEWS'][] = ['id' => (int)$e['ID'], 'a' => $e['NAME'], 'r' => (int)$e['PROPERTY_RATING_VALUE'], 't' => $e['PREVIEW_TEXT'],
+        'd' => ConvertDateTime($e['ACTIVE_FROM'] ?: $e['DATE_CREATE'], 'YYYY-MM-DD'), 'm' => $e['PROPERTY_MACHINE_VALUE'], 'ok' => (bool)$e['PROPERTY_VERIFIED_VALUE'], 'ph' => $ph];
 }
+// отзыв опубликовали в админке — кэш карточки сбрасывается по тегу ИБ отзывов
+defined('BX_COMP_MANAGED_CACHE') && $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('reviews'));
 
 // бренд для разметки Product и данные для Open Graph (component_epilog работает и при кеше)
 $arResult['BT_BRAND'] = preg_match('/botanica/i', $arResult['~NAME']) ? 'BOTANICA' : (preg_match('/jetinno/i', $arResult['~NAME']) ? 'Jetinno' : '');

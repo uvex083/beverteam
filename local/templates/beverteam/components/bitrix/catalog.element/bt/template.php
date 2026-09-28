@@ -122,7 +122,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
     <?php if ($arResult['BT_BREW']): ?><div class="pane prose" data-pane="brew" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_BREW']) ?></div></div><?php endif ?>
     <div class="pane" data-pane="rev" hidden id="reviews">
       <div class="rating" id="rating"></div>
-      <div id="revList"><?php if (!$revN): ?><p class="muted">Отзывов пока нет — станьте первым.</p><?php endif ?></div>
+      <div id="revList"><?php if (!$revN): ?><a class="rev-empty" href="#revform"><?= bt_icon('star') ?><span><b>Отзывов пока нет — станьте первым!</b>Расскажите, как вам <?= $e($name) ?>: оценка и пара слов помогут другим покупателям.</span></a><?php endif ?></div>
       <div class="card" id="revform" style="margin-top:18px;scroll-margin-top:130px">
         <h3 class="h3" style="margin-bottom:6px">Оставить отзыв</h3>
         <p class="muted" style="margin:0 0 18px;font-size:14px">Отзывы публикуем после проверки заказа: пишут только те, кто покупал. Фото помогают другим покупателям.</p>
@@ -132,8 +132,8 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
             <button type="button" class="btn btn--ghost btn--xs" data-r="3">3</button><button type="button" class="btn btn--ghost btn--xs" data-r="4">4</button>
             <button type="button" class="btn btn--xs" data-r="5">5</button></div></div>
           <div class="f2"><div class="field"><label for="rName">Имя *</label><input id="rName" name="name" autocomplete="name"></div><div class="field"><label for="rEmail">E-mail</label><input id="rEmail" name="email" type="email" autocomplete="email"><span class="muted" style="font-size:12px">Не публикуется</span></div></div>
-          <div class="field"><label>На какой машине готовили</label><input placeholder="Например, Jetinno JL15 VIVA"></div>
-          <div class="field"><label>Комментарий *</label><textarea rows="4" placeholder="Как раскрылся вкус, какой помол выставили, с молоком или без"></textarea></div>
+          <div class="field"><label for="rMachine">На какой машине готовили</label><input id="rMachine" name="machine" placeholder="Например, Jetinno JL15 VIVA"></div>
+          <div class="field"><label for="rText">Комментарий *</label><textarea id="rText" name="text" rows="4" maxlength="3000" placeholder="Как раскрылся вкус, какой помол выставили, с молоком или без"></textarea></div>
           <div class="field"><label>Фото <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">— до 5, JPG или PNG</span></label>
             <label class="drop" id="drop">
               <input type="file" id="rFiles" accept="image/png,image/jpeg" multiple hidden>
@@ -142,7 +142,10 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
             </label>
             <div class="thumbs" id="rThumbs"></div>
           </div>
+          <label class="check check--top" style="margin:4px 0 18px"><input type="checkbox" id="rAgree"> <span>Согласен с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">обработкой персональных данных</a></span></label>
+          <input type="text" id="rWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
           <button class="btn" type="button" id="rSend">Отправить отзыв</button>
+          <p class="err-form" id="rErr" role="alert"></p>
         </div>
       </div>
     </div>

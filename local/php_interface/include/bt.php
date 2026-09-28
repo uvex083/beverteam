@@ -527,7 +527,7 @@ function bt_reviews(): array
     $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $list = [];
-    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'DATE_CREATE']);
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'PROPERTY_PRODUCT' => false], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'DATE_CREATE']);
     while ($ob = $r->GetNextElement()) {
         $f = $ob->GetFields();
         $p = $ob->GetProperties();

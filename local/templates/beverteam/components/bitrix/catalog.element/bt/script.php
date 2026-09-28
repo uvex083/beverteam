@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const inp=document.getElementById('rFiles'), zone=document.getElementById('drop'), box=document.getElementById('rThumbs');
     if(!inp) return;
     let files=[];
+    inp.btFiles=()=>files; inp.btClear=()=>{ files=[]; paint(); };
     const paint=()=>{
       box.innerHTML=files.map((f,i)=>`<figure><img src="${window.URL.createObjectURL(f)}" alt="">
         <button type="button" data-i="${i}" aria-label="Удалить ${f.name}">×</button>
@@ -114,7 +115,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="rev__h"><span class="rev__av">${esc(r.a[0])}</span><b>${esc(r.a)}</b>${BT_stars(r.r)}
         <time class="muted" style="font-size:12.5px" datetime="${r.d}">${BT_postDate(r.d)}</time>
         ${r.ok?'<span class="rev__ok">Покупка подтверждена</span>':''}</div>
-      <p>${esc(r.t)}</p></article>`).join('');
+      <p>${esc(r.t)}</p>${r.m?`<p class="muted" style="font-size:13px;margin-top:8px">Машина: ${esc(r.m)}</p>`:''}
+      ${(r.ph||[]).length?`<div class="rev__ph">${r.ph.map((f,i)=>`<button type="button" data-rv="${esc(r.id)}" data-i="${i}" aria-label="Фото к отзыву"><img src="${esc(f.s)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}</article>`).join('');
+    revList.addEventListener('click',e=>{ const b=e.target.closest('[data-rv]'); if(!b) return; const r=RV.find(x=>String(x.id)===b.dataset.rv);
+      r&&BT_lightbox(r.ph.map(f=>({src:f.f,cap:r.a})),+b.dataset.i); });
     /* разметка отзывов — только для реальных отзывов */
     const ld=document.createElement('script');ld.type='application/ld+json';
     ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:P.name,
@@ -131,7 +135,38 @@ document.addEventListener('DOMContentLoaded',()=>{
   const rFill=u=>{ if(!u) return; const n=document.getElementById('rName'), m=document.getElementById('rEmail');
     if(n&&!n.value&&u.name) n.value=u.name; if(m&&!m.value&&u.email) m.value=u.email; };
   rFill(window.BT_USER); document.addEventListener('bt:auth',e=>rFill(e.detail));
-  document.getElementById('rSend').addEventListener('click',()=>BT_toast('Приём отзывов подключается — скоро заработает'));
+  /* отправка отзыва: на проверку, опубликует менеджер */
+  (function(){
+    const send=document.getElementById('rSend'), agree=document.getElementById('rAgree'), errBox=document.getElementById('rErr');
+    try{ if(localStorage.getItem('bt_agree')==='1') agree.checked=true; }catch(e){}
+    const fld={name:'rName',email:'rEmail',text:'rText',machine:'rMachine'};
+    const setErr=(el,msg)=>{ const f=el.closest('.field')||el.closest('.check'); if(!f) return; f.classList.toggle('is-err',!!msg);
+      if(f.classList.contains('check')) return; let s=f.querySelector('.err'); if(!s){s=document.createElement('span');s.className='err';f.appendChild(s);} s.textContent=msg||''; };
+    const rules={rName:v=>v.trim().length<2?'Как вас подписать? Минимум 2 символа':'', rEmail:v=>v.trim()&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'Проверьте адрес: нужен формат mail@company.ru':'',
+      rText:v=>v.trim().length<10?'Расскажите чуть подробнее — хотя бы пару слов':''};
+    Object.keys(rules).forEach(id=>{ const el=document.getElementById(id);
+      el.addEventListener('blur',()=>{ if(el.value.trim()||id==='rText') setErr(el,rules[id](el.value)); });
+      el.addEventListener('input',()=>{ if(el.closest('.field').classList.contains('is-err')) setErr(el,rules[id](el.value)); }); });
+    agree.addEventListener('change',()=>agree.checked&&setErr(agree,''));
+    send.addEventListener('click',()=>{
+      let bad=null; Object.keys(rules).forEach(id=>{ const el=document.getElementById(id), m=rules[id](el.value); setErr(el,m); if(m&&!bad) bad=el; });
+      if(!agree.checked){ setErr(agree,'Нужно согласие'); bad=bad||agree; }
+      if(bad){ bad.focus(); return; }
+      const fd=new FormData(); fd.append('sessid',window.BT_SID||''); fd.append('product',P.id);
+      fd.append('rating',document.querySelector('#rPick .btn:not(.btn--ghost)')?.dataset.r||'5'); fd.append('agree','Y'); fd.append('website',document.getElementById('rWebsite').value);
+      Object.entries(fld).forEach(([k,id])=>fd.append(k,document.getElementById(id).value));
+      const inp=document.getElementById('rFiles'); (inp&&inp.btFiles?inp.btFiles():[]).forEach(f=>fd.append('photos[]',f,f.name));
+      send.disabled=true; send.textContent='Отправляем…'; errBox.textContent='';
+      fetch('/local/ajax/review.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
+        if(d.ok){ try{localStorage.setItem('bt_agree','1');}catch(e){}
+          document.querySelector('#revform .revform').innerHTML='<div class="rev-sent"><b>Спасибо, отзыв отправлен!</b>Он появится на странице после проверки — обычно в течение рабочего дня.</div>'; return; }
+        Object.entries(d.errors||{}).forEach(([k,m])=>{ const el=document.getElementById(fld[k]||''); el?setErr(el,m):(errBox.textContent=m); });
+        if(d.message) errBox.textContent=d.message;
+        if(!d.errors&&!d.message) errBox.textContent='Не получилось отправить. Обновите страницу и попробуйте ещё раз.';
+      }).catch(()=>{ errBox.textContent='Нет связи с сервером. Попробуйте ещё раз.'; })
+      .finally(()=>{ if(document.body.contains(send)){ send.disabled=false; send.textContent='Отправить отзыв'; } });
+    });
+  })();
 
   /* «Поделиться»: на телефоне — системное окно, на компьютере — своё меню (системное окно Windows непонятное) */
   const shM=document.getElementById('shareMenu');
