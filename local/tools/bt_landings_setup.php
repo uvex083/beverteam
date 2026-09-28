@@ -1,5 +1,5 @@
 <?php
-// Инфоблок «SEO: посадочные страницы» (тип «Сайт: общие блоки») и пример — страница фильтра «Скидка» в каталоге.
+// Инфоблок «Посадочные страницы» (тип «SEO») и пример — страница фильтра «Скидка» в каталоге.
 // Пример помечен XML_ID «bt-demo». Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_landings_setup.php [show|apply]. Повторный запуск ничего не дублирует.
 
 if (PHP_SAPI !== 'cli') {
@@ -14,13 +14,24 @@ CModule::IncludeModule('iblock');
 $apply = ($argv[1] ?? 'show') === 'apply';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 
+// свой тип «SEO» в «Контенте» — чтобы SEO-специалист видел посадочные отдельно от блоков страниц
+if (!CIBlockType::GetByID('seo')->Fetch()) {
+    $say('тип инфоблоков «SEO»');
+    $apply and ((new CIBlockType())->Add(['ID' => 'seo', 'SECTIONS' => 'N', 'IN_RSS' => 'N', 'SORT' => 800,
+        'LANG' => ['ru' => ['NAME' => 'SEO', 'ELEMENT_NAME' => 'Посадочная страница']]]) or die("ошибка типа SEO
+"));
+}
 $ib = CIBlock::GetList([], ['=CODE' => 'seo_landings', 'CHECK_PERMISSIONS' => 'N'])->Fetch();
 $id = (int)($ib['ID'] ?? 0);
+if ($id && $ib['IBLOCK_TYPE_ID'] !== 'seo') {
+    $say('инфоблок «SEO: посадочные страницы» → тип «SEO»');
+    $apply and (new CIBlock())->Update($id, ['IBLOCK_TYPE_ID' => 'seo', 'NAME' => 'Посадочные страницы', 'SORT' => 10]);
+}
 if (!$id) {
     $say('инфоблок «SEO: посадочные страницы»');
     if ($apply) {
         $o = new CIBlock();
-        $id = (int)$o->Add(['IBLOCK_TYPE_ID' => 'site', 'CODE' => 'seo_landings', 'API_CODE' => 'SeoLandings', 'NAME' => 'SEO: посадочные страницы', 'SORT' => 900,
+        $id = (int)$o->Add(['IBLOCK_TYPE_ID' => 'seo', 'CODE' => 'seo_landings', 'API_CODE' => 'SeoLandings', 'NAME' => 'Посадочные страницы', 'SORT' => 10,
             'SITE_ID' => ['s1'], 'ACTIVE' => 'Y', 'GROUP_ID' => ['2' => 'R'], 'VERSION' => 2, 'INDEX_ELEMENT' => 'N',
             'DESCRIPTION' => 'Свои title, description, H1 и SEO-текст для любого адреса сайта. Адрес — без домена, например /catalog/kofe/ или /catalog/?btFilter_40_2322626082=Y (страница фильтра). Метки utm и номер страницы указывать не нужно.',
             'DESCRIPTION_TYPE' => 'text'])
