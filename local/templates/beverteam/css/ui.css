@@ -1301,7 +1301,7 @@ input,textarea{caret-color:var(--ink)}
 .cop .blk{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;margin-bottom:16px}
 .cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .cop .coemail{margin-bottom:18px;align-items:end}.cop .coemail .field{margin-bottom:0}
-.cop .coemail__note{margin:0 0 5px;font-size:13px;line-height:1.5}
+.cop .coemail__note{margin:0 0 25px;font-size:13px;line-height:1.5}
 @media(max-width:700px){.cop .coemail{row-gap:8px}.cop .coemail__note{margin:0}}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
 /* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
