@@ -379,7 +379,9 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .modal.open{display:flex}
 .modal__bg{position:absolute;inset:0;background:rgba(14,14,12,.62)}
 .modal__p{position:relative;background:var(--white);border-radius:var(--rad);width:min(440px,100%);padding:28px;max-height:92vh;overflow:auto}
-.modal__x{position:absolute;top:14px;right:14px;background:none;border:0;font-size:22px;color:var(--gray)}
+/* крестик окна: зона нажатия 44×44, сам знак остаётся на прежнем месте */
+.modal__x{position:absolute;top:3px;right:3px;width:44px;height:44px;display:grid;place-items:center;padding:0;background:none;border:0;border-radius:50%;font-size:22px;line-height:1;color:var(--gray);cursor:pointer;transition:color .15s}
+.modal__x:hover{color:var(--ink)}
 .soc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .soc a{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:var(--rad-s);padding:11px;font-weight:600;font-size:13.5px}
 .soc a:hover{border-color:var(--line-h)}
