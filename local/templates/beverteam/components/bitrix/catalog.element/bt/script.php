@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelector('.tabsblock').scrollIntoView({behavior:'smooth',block:'start'});});
   /* покупатель вошёл — имя и почту в форме отзыва подставляем сами (данные из BT_USER, не из кэшируемого шаблона) */
   const rFill=u=>{ if(!u) return; const n=document.getElementById('rName'), m=document.getElementById('rEmail');
-    if(n&&!n.value&&u.name) n.value=u.name; if(m&&!m.value&&u.email) m.value=u.email; };
+    if(n&&!n.value&&u.name) n.value=u.name.split(' ')[0]; if(m&&!m.value&&u.email) m.value=u.email; };
   rFill(window.BT_USER); document.addEventListener('bt:auth',e=>rFill(e.detail));
   /* отправка отзыва: на проверку, опубликует менеджер */
   (function(){
