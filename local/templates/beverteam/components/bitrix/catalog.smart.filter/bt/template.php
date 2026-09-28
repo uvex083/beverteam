@@ -200,6 +200,17 @@ document.addEventListener('DOMContentLoaded',()=>{
       rg.forEach((i,k)=>i.value=k?i.max:i.min); syncSlider(); load(buildUrl(),true); }
   });
   addEventListener('popstate',e=>{ if(e.state&&e.state.bt) location.reload(); });
+  /* длинный фильтр на десктопе прокручивается вместе с товарами и встаёт, когда показался его низ; вверх — сразу едет вверх до шапки (как на Озоне) */
+  const topGap=parseFloat(getComputedStyle(filters).top)||0, desk=matchMedia('(min-width:1051px)');
+  let lastY=scrollY, off=topGap;
+  const stick=()=>{
+    if(!desk.matches){ filters.style.top=''; return; }
+    const minTop=Math.min(topGap, innerHeight-filters.offsetHeight-20);
+    off=Math.max(minTop, Math.min(topGap, off-(scrollY-lastY))); lastY=scrollY;
+    filters.style.top=off+'px';
+  };
+  addEventListener('scroll',stick,{passive:true}); addEventListener('resize',stick);
+  new ResizeObserver(stick).observe(filters);
 });
 </script>
 <?php
