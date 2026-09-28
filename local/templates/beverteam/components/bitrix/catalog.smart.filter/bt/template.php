@@ -35,8 +35,8 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
                 $chips[] = ['Цена', trim(($min['HTML_VALUE'] !== '' ? 'от ' . $min['HTML_VALUE'] : '') . ' ' . ($max['HTML_VALUE'] !== '' ? 'до ' . $max['HTML_VALUE'] : '')) . ' ₽', [$min['CONTROL_NAME'], $max['CONTROL_NAME']]];
             } ?>
       <details open><summary>Цена, ₽</summary><div class="range">
-        <input name="<?= $min['CONTROL_NAME'] ?>" value="<?= $min['HTML_VALUE'] ?>" placeholder="от <?= bt_fmt((float)($min['FILTERED_VALUE'] ?? $min['VALUE'])) ?>" aria-label="Цена от" inputmode="numeric" autocomplete="off">
-        <input name="<?= $max['CONTROL_NAME'] ?>" value="<?= $max['HTML_VALUE'] ?>" placeholder="до <?= bt_fmt((float)($max['FILTERED_VALUE'] ?? $max['VALUE'])) ?>" aria-label="Цена до" inputmode="numeric" autocomplete="off">
+        <input name="<?= $min['CONTROL_NAME'] ?>" value="<?= $min['HTML_VALUE'] ?>" placeholder="от <?= bt_fmt((float)(($min['FILTERED_VALUE'] ?? 0) ?: $min['VALUE'])) ?>" aria-label="Цена от" inputmode="numeric" autocomplete="off">
+        <input name="<?= $max['CONTROL_NAME'] ?>" value="<?= $max['HTML_VALUE'] ?>" placeholder="до <?= bt_fmt((float)(($max['FILTERED_VALUE'] ?? 0) ?: $max['VALUE'])) ?>" aria-label="Цена до" inputmode="numeric" autocomplete="off">
       </div></details>
         <?php continue;
         endif;
