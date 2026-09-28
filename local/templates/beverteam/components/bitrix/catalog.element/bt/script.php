@@ -129,9 +129,25 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelector('.tabsblock').scrollIntoView({behavior:'smooth',block:'start'});});
   document.getElementById('rSend').addEventListener('click',()=>BT_toast('Приём отзывов подключается — скоро заработает'));
 
-  bShare.addEventListener('click',()=>{
-    if(navigator.share){navigator.share({title:document.title,url:location.href}).catch(()=>{});}
-    else if(navigator.clipboard){navigator.clipboard.writeText(location.href).then(()=>BT_toast('Ссылка на товар скопирована'));}});
+  /* «Поделиться»: на телефоне — системное окно, на компьютере — своё меню (системное окно Windows непонятное) */
+  const shM=document.getElementById('shareMenu');
+  const shOpen=on=>{ shM.hidden=!on; bShare.setAttribute('aria-expanded',on); };
+  bShare.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(navigator.share&&matchMedia('(pointer:coarse)').matches){ navigator.share({title:document.title,url:location.href}).catch(()=>{}); return; }
+    const u=encodeURIComponent(location.href), t=encodeURIComponent(document.querySelector('h1')?.textContent.trim()||document.title);
+    const links={tg:`https://t.me/share/url?url=${u}&text=${t}`,wa:`https://wa.me/?text=${t}%20${u}`,vk:`https://vk.com/share.php?url=${u}`,mail:`mailto:?subject=${t}&body=${u}`};
+    shM.querySelectorAll('[data-share]').forEach(a=>{ if(links[a.dataset.share]) a.href=links[a.dataset.share]; });
+    shOpen(shM.hidden);
+  });
+  shM.addEventListener('click',e=>{
+    const a=e.target.closest('[data-share]'); if(!a) return;
+    if(a.dataset.share==='copy'){ e.preventDefault();
+      (navigator.clipboard?navigator.clipboard.writeText(location.href):Promise.reject()).then(()=>BT_toast('Ссылка на товар скопирована'),()=>BT_toast('Не удалось скопировать — скопируйте адрес из строки браузера')); }
+    shOpen(false);
+  });
+  document.addEventListener('click',e=>{ if(!shM.hidden&&!e.target.closest('.share')) shOpen(false); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!shM.hidden){ shOpen(false); bShare.focus(); } });
   /* сравнение — общий список BT_CMP, как у карточек в каталоге */
   bCmp.setAttribute('aria-pressed',BT_cmpHas(PID));
   bCmp.addEventListener('click',()=>{BT_cmpToggle(PID);const on=BT_cmpHas(PID);

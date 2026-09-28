@@ -49,7 +49,16 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
         <a href="#reviews" id="rTop" class="row" style="gap:8px;text-decoration:none"></a>
         <span class="pc__stock" style="margin:0">В наличии</span>
         <div class="ptools">
-          <button id="bShare" title="Поделиться" aria-label="Поделиться"><span id="iShare"><?= bt_icon('share') ?></span></button>
+          <div class="share">
+            <button id="bShare" title="Поделиться" aria-label="Поделиться" aria-haspopup="menu" aria-expanded="false"><span id="iShare"><?= bt_icon('share') ?></span></button>
+            <div class="share__m" id="shareMenu" role="menu" hidden>
+              <a href="#" role="menuitem" data-share="copy"><?= bt_icon('doc') ?>Скопировать ссылку</a>
+              <a href="#" role="menuitem" data-share="tg" target="_blank" rel="noopener"><?= bt_icon('tg') ?>Telegram</a>
+              <a href="#" role="menuitem" data-share="wa" target="_blank" rel="noopener"><?= bt_icon('wa') ?>WhatsApp</a>
+              <a href="#" role="menuitem" data-share="vk" target="_blank" rel="noopener"><?= bt_icon('vk') ?>ВКонтакте</a>
+              <a href="#" role="menuitem" data-share="mail"><?= bt_icon('mail') ?>Почта</a>
+            </div>
+          </div>
           <button id="bCmp" aria-pressed="false" title="Сравнить" aria-label="Сравнить"><span id="iCmp"><?= bt_icon('compare') ?></span></button>
           <button id="bFav" aria-pressed="false" title="В избранное" aria-label="В избранное"><span id="iFav"><?= bt_icon('heart') ?></span></button>
         </div>

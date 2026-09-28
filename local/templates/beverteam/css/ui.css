@@ -1897,3 +1897,11 @@ form[data-form]{position:relative}
 
 .lead__prod input{background:var(--paper);color:var(--ink);cursor:default}
 .auth__agree{margin:4px 0 16px;font-size:12.5px}
+/* меню «Поделиться» в карточке товара */
+.share{position:relative}
+.share__m{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:220px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);
+  box-shadow:0 12px 32px rgba(14,14,12,.12);padding:6px}
+.share__m[hidden]{display:none}
+.share__m a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;font-size:14px;color:var(--ink);text-decoration:none;transition:background-color .15s}
+.share__m a:hover{background:var(--paper)}
+.share__m svg{width:18px;height:18px;flex-shrink:0}
