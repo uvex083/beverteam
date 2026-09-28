@@ -839,8 +839,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   let pending=null, timer=null, busy=false;
 
   /* без явного согласия с правилами — ни кода, ни входа через сервис */
-  const agree=$a('#aAgree'), agreeOk=()=>{ if(agree.checked) return true;
+  /* согласие запоминаем на устройстве после первого явного — при следующем входе галочка уже стоит */
+  const agree=$a('#aAgree'), agreeOk=()=>{ if(agree.checked){ try{localStorage.setItem('bt_agree','1');}catch(e){} return true; }
     agree.closest('.check').classList.add('is-err'); agree.focus(); BT_toast('Отметьте согласие с условиями'); return false; };
+  try{ agree.checked=localStorage.getItem('bt_agree')==='1'; }catch(e){}
   agree.addEventListener('change',()=>agree.closest('.check').classList.remove('is-err'));
   au.addEventListener('click',e=>{ if(e.target.closest('.idp a')&&!agreeOk()) e.preventDefault(); });
 
