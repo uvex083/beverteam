@@ -35,7 +35,7 @@ $sectionUrl = $folder . $arResult['URL_TEMPLATES']['section'];
 $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_GROUPS' => 'N'];
 
 // ЧПУ фильтра: /catalog/<раздел>/filter/<условия>/apply/, в корне — /catalog/filter/<условия>/apply/
-$smartPath = (string)($arResult['VARIABLES']['SMART_FILTER_PATH'] ?? $GLOBALS['BT_ROOT_FILTER'] ?? '');
+$smartPath = (string)($GLOBALS['BT_ROOT_FILTER'] ?? $arResult['VARIABLES']['SMART_FILTER_PATH'] ?? '');
 $sefRule = $folder . ($section ? $arResult['URL_TEMPLATES']['smart_filter'] : 'filter/#SMART_FILTER_PATH#/apply/');
 // старые адреса с условиями в параметрах (?btFilter_…): компонент их прочитает, шаблон фильтра перенаправит на ЧПУ
 if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET))) {
