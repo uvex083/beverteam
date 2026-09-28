@@ -25,8 +25,9 @@ if (CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=XML_ID' => $mark], []))
 }
 
 $product = fn(string $code) => CIBlockElement::GetList([], ['IBLOCK_ID' => $catId, '=CODE' => $code], false, false, ['ID', 'NAME', 'DETAIL_PICTURE', 'PREVIEW_PICTURE'])->Fetch();
-// фото к отзыву — копии картинок товара
-$photos = function (array $p, int $n) use ($catId): array {
+// фото к отзыву — копии картинок товара; у пачек кофе белый фон, поэтому для наглядности — живые фото чая
+$photos = function (array $p, int $n) use ($catId, $product): array {
+    $p = str_contains($p['NAME'], 'BOTANICA') ? ($product('alpijskij-koktejl') ?: $p) : $p;
     $ids = array_filter([(int)$p['DETAIL_PICTURE'], (int)$p['PREVIEW_PICTURE']]);
     $r = CIBlockElement::GetProperty($catId, $p['ID'], [], ['CODE' => 'MORE_PHOTO']);
     while ($x = $r->Fetch()) {
@@ -37,7 +38,7 @@ $photos = function (array $p, int $n) use ($catId): array {
 $yes = (int)(CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'VERIFIED', 'XML_ID' => 'Y'])->Fetch()['ID'] ?? 0);
 
 $list = [
-    ['botanica-braziliya-santos', 'Марина Коваленко', 5, 'Jetinno JL15 VIVA', 2, true, '-3 days',
+    ['botanica-braziliya-santos', 'Марина Коваленко', 5, 'Jetinno JL15 VIVA', 3, true, '-3 days',
         'Беру уже третий раз для офиса. Мягкий, с ореховой сладостью, без кислинки — капучино получается как в кофейне. Помол поставили на 4, крепость на максимум. Зёрна свежие, дата обжарки на пачке — неделя назад.'],
     ['botanica-braziliya-santos', 'Алексей', 4, '', 0, false, '-9 days',
         'Хороший кофе на каждый день, в эспрессо немного горчит, в американо и с молоком — отлично. Доставили на следующий день.'],
