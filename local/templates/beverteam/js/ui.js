@@ -511,8 +511,8 @@ function authModal(){
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
       <div class="alert alert--info auth__note" id="aNote" hidden></div>
+      <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Я принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a></span></label>
       <button class="btn btn--block" id="aSend" type="submit">Продолжить</button>
-      <p class="muted" style="margin:14px 0 0;font-size:12px;line-height:1.5">Продолжая, вы принимаете <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a>.</p>
     </form>
 
     <!-- шаг 2: код -->
@@ -851,8 +851,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
   let pending=null, timer=null, busy=false;
 
+  /* без явного согласия с правилами — ни кода, ни входа через сервис */
+  const agree=$a('#aAgree'), agreeOk=()=>{ if(agree.checked) return true;
+    agree.closest('.check').classList.add('is-err'); agree.focus(); BT_toast('Отметьте согласие с условиями'); return false; };
+  agree.addEventListener('change',()=>agree.closest('.check').classList.remove('is-err'));
+  au.addEventListener('click',e=>{ if(e.target.closest('.idp a')&&!agreeOk()) e.preventDefault(); });
+
   window.BT_auth=login=>{ au.classList.add('open');
-    if(typeof login==='string'&&login&&!USER){ $a('#aLogin').value=login; step('pick'); send(login); return; }
+    if(typeof login==='string'&&login&&!USER){ $a('#aLogin').value=login; step('pick'); if(agree.checked) send(login); else setTimeout(()=>agree.focus(),60); return; }
     step(USER?'done':'pick'); if(USER) fillDone(); };
   au.addEventListener('click',e=>{if(e.target.closest('[data-close]'))au.classList.remove('open');});
 
@@ -878,7 +884,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   function send(login,again){
     if(busy) return; busy=true; $a('#aSend').disabled=true;
-    BT_authPost({action:'send',login}).then(r=>{
+    BT_authPost({action:'send',login,agree:agree.checked?'Y':''}).then(r=>{
       if(r.ok){
         pending={login,to:r.to}; $a('#aTo').textContent=r.to; $a('#aCodeErr').textContent='';
         cells.forEach(i=>i.value=''); step('code'); tick(r.wait||59);
@@ -887,6 +893,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(r.wait&&pending&&pending.login===login){ step('code'); tick(r.wait); return; }
       if(again){ $a('#aCodeErr').textContent=r.message||'Не получилось отправить код'; return; }
       if(r.need==='email'){ const i=$a('#aLogin'); i.value=''; i.dispatchEvent(new Event('input')); note(r.message); i.focus(); return; }
+      if(r.errors&&r.errors.agree){ agreeOk(); return; }
       if(r.errors&&r.errors.login) loginErr(r.errors.login); else loginErr(r.message||'Не получилось отправить код');
     }).catch(()=>loginErr('Нет связи с сервером — попробуйте ещё раз'))
       .finally(()=>{busy=false;$a('#aSend').disabled=false;});
@@ -919,6 +926,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const bad=e.defaultPrevented; e.preventDefault(); if(bad) return;
     const inp=$a('#aLogin'), v=inp.value.trim();
     if(!v){ loginErr('Введите e-mail или телефон'); inp.focus(); return; }
+    if(!agreeOk()) return;
     note(''); send(v,false);
   });
   $a('#aBack').addEventListener('click',()=>{clearInterval(timer);step('pick');});

@@ -61,6 +61,9 @@ switch ((string)$req->getPost('action')) {
         if ($USER->IsAuthorized()) {
             $out(['ok' => false, 'message' => 'Вы уже вошли. Обновите страницу.']);
         }
+        if ($req->getPost('agree') !== 'Y') {
+            $out(['ok' => false, 'errors' => ['agree' => 'Нужно согласие с условиями']]);
+        }
         $in = trim((string)$req->getPost('login'));
         $phone = '';
         $hint = '';
