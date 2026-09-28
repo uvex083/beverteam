@@ -92,8 +92,8 @@ $FMORE = 6;
             } ?>
       <div class="fgrp fprice"><b class="fgrp__t">Цена, ₽</b>
         <div class="range">
-          <label><span>от</span><input name="<?= $min['CONTROL_NAME'] ?>" value="<?= $min['HTML_VALUE'] ?>" placeholder="<?= bt_fmt((float)(($min['FILTERED_VALUE'] ?? 0) ?: $min['VALUE'])) ?>" aria-label="Цена от" inputmode="numeric" autocomplete="off"></label>
-          <label><span>до</span><input name="<?= $max['CONTROL_NAME'] ?>" value="<?= $max['HTML_VALUE'] ?>" placeholder="<?= bt_fmt((float)(($max['FILTERED_VALUE'] ?? 0) ?: $max['VALUE'])) ?>" aria-label="Цена до" inputmode="numeric" autocomplete="off"></label>
+          <label><span>от</span><input name="<?= $min['CONTROL_NAME'] ?>" value="<?= $min['HTML_VALUE'] ?>" placeholder="<?= number_format((float)(($min['FILTERED_VALUE'] ?? 0) ?: $min['VALUE']), 0, '', "\u{00A0}") ?>" aria-label="Цена от" inputmode="numeric" autocomplete="off"></label>
+          <label><span>до</span><input name="<?= $max['CONTROL_NAME'] ?>" value="<?= $max['HTML_VALUE'] ?>" placeholder="<?= number_format((float)(($max['FILTERED_VALUE'] ?? 0) ?: $max['VALUE']), 0, '', "\u{00A0}") ?>" aria-label="Цена до" inputmode="numeric" autocomplete="off"></label>
         </div>
         <div class="fslider"><i></i>
           <input type="range" tabindex="-1" aria-hidden="true" min="<?= floor($min['VALUE']) ?>" max="<?= ceil($max['VALUE']) ?>" value="<?= $min['HTML_VALUE'] !== '' ? (float)$min['HTML_VALUE'] : floor($min['VALUE']) ?>">
