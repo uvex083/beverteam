@@ -3,8 +3,6 @@
 $sub = ['DEPTH_LEVEL' => 2];
 $aMenuLinks = [
     ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
-    ['Отзывы о нас', '/otzyvy-o-nas/', [], $sub, ''],
-    ['Написать нам', '/kontakty/#form', [], $sub, ''],
     ['Магазин', '/catalog/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Кофе', '/catalog/kofe/', [], $sub, ''],
     ['Чай', '/catalog/chay/', [], $sub, ''],
@@ -24,10 +22,10 @@ $aMenuLinks = [
     ['Журнал', '/blog/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Все материалы', '/blog/', [], $sub, ''],
     ...array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], array_values(bt_blog_rubrics())),
+    ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], $sub, ''],
-    ['О компании', '/o-kompanii/', [], $sub, ''],
-    ['Контакты', '/kontakty/', [], $sub, ''],
+    ['Отзывы о нас', '/otzyvy-o-nas/', [], $sub, ''],
     ['Карта сайта', '/sitemap/', [], $sub, ''],
 ];
