@@ -2057,3 +2057,15 @@ form[data-form]{position:relative}
 .symp input[type=checkbox]:checked{background-color:var(--ink);border-color:var(--ink);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' fill='none' stroke='%23D7E85C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 /* iOS Safari приближает страницу при фокусе на поле со шрифтом меньше 16px и не возвращает масштаб — на сенсорных экранах поля не мельче 16px */
 @media(hover:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not(.srch__f input),select,textarea{font-size:16px!important}}
+/* мобильная панель оформления (корзина, чекаут) */
+.mbar{display:none}
+@media(max-width:900px){
+  .mbar:not([hidden]){display:flex;align-items:center;gap:14px;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--white);border-top:1px solid var(--line);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.06);animation:mbarIn .2s ease-out}
+  .mbar__s{display:grid;line-height:1.2}.mbar__s small{font-size:12px;color:var(--gray)}
+  .mbar__s b{font-family:Unbounded;font-weight:800;font-size:17px;white-space:nowrap}
+  .mbar .btn{flex:1}.mbar .btn.is-off{opacity:.5}
+  body.has-mbar{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  body.has-mbar .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+@keyframes mbarIn{from{transform:translateY(100%)}}

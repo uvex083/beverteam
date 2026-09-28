@@ -150,7 +150,7 @@ $co = bt_contacts();
       <?php endforeach ?></div>
       <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
-      <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <div class="l t"><span>К оплате</span><span id="sTot" data-label="К оплате"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
@@ -322,6 +322,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     return !miss.length;
   }
   form.addEventListener('input',ready); form.addEventListener('change',ready);
+  BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit));
 
   form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||!ready()) return;
     sending=true; submit.disabled=true; submit.textContent='Оформляем…'; sErr.textContent='';

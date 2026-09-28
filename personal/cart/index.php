@@ -19,7 +19,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
       <div class="l"><span>Скидка</span><span id="disc" style="color:var(--ok)"></span></div>
       <div class="l"><span>Доставка</span><span class="muted">рассчитаем при оформлении</span></div>
       <div class="l t"><span>Итого</span><span id="tot"></span></div>
-      <a class="btn btn--block" href="/personal/order/make/" style="margin-top:14px">Оформить заказ</a>
+      <a class="btn btn--block" id="goOrder" href="/personal/order/make/" style="margin-top:14px">Оформить заказ</a>
       <p class="muted" style="font-size:12.5px;margin:12px 0 0;text-align:center">Юрлицам — оплата по счёту, закрывающие документы</p>
     </aside>
   </div>
@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // добавили из «С этим берут» или сервер откатил количество — перерисовать список
   document.addEventListener('bt:cart',()=>{if(!busy)render();});
   render();
+  BT_mbar(goOrder,tot);
   const inCart=new Set(Object.keys(BT_CART));
   rec.innerHTML=[...BT_PRODUCTS.coffee,...BT_PRODUCTS.tea].filter(m=>!inCart.has(m.id)&&m.p).slice(0,4).map(BT_card).join('');
   BT_favUpdate(); BT_cmpUpdate();
