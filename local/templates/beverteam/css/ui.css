@@ -1026,11 +1026,7 @@ input,textarea{caret-color:var(--ink)}
   font-family:'JetBrains Mono';font-size:9.5px;font-weight:700;padding:3px 7px;line-height:1.2;white-space:nowrap}
 
 /* — страница товара: перелистывание, поделиться, сравнить — */
-.pnav{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px;font-size:13.5px;font-weight:600}
-.pnav a{display:inline-flex;align-items:center;gap:8px;color:var(--gray)}
-.pnav a:hover{color:var(--ink)}
-.pnav a svg{width:15px;height:15px;display:block}
-.pnav a span{display:grid;place-items:center}
+.pline{border-top:1px solid var(--line);margin:18px 0 20px}
 .ptools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .ptools button{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--gray)}
 .ptools button svg{width:15px;height:15px}
@@ -1829,7 +1825,7 @@ form[data-form]{position:relative}
 /* узкие телефоны: УТП раздела в одну колонку; в шапке 5 иконок не помещаются — «Сравнение» уходит в мобильное меню */
 .cat .utp{grid-template-columns:repeat(2,1fr)}
 @media(max-width:640px){.cat .utp{grid-template-columns:1fr}}
-@media(max-width:374px){.hdr__acts .hact--cmp{display:none}.pnav{font-size:12px;gap:8px}.pnav a{gap:4px}.btn{white-space:normal;max-width:100%;text-align:center}.home .hero__title{font-size:27px}.home .svc__list li i{white-space:normal;text-align:right}}
+@media(max-width:374px){.hdr__acts .hact--cmp{display:none}.btn{white-space:normal;max-width:100%;text-align:center}.home .hero__title{font-size:27px}.home .svc__list li i{white-space:normal;text-align:right}}
 /* реквизиты в «Контактах» */
 .req{margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}
 .req__hd{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}

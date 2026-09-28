@@ -47,17 +47,9 @@ $arResult['BT_BREW'] = implode('', array_filter([
 ]));
 $arResult['BT_TECH'] = $html('TECH_SPECS');
 
-// раздел товара и соседи по разделу для «Предыдущий / Следующий»
+// раздел товара
 $sectionId = (int)$arResult['IBLOCK_SECTION_ID'];
 $arResult['BT_SECTION'] = $sectionId ? CIBlockSection::GetList([], ['ID' => $sectionId], false, ['NAME', 'SECTION_PAGE_URL'])->GetNext() : null;
-$ids = [];
-$r = CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'SECTION_ID' => $sectionId, 'ACTIVE' => 'Y'], false, false, ['ID']);
-while ($e = $r->Fetch()) {
-    $ids[] = (string)$e['ID'];
-}
-$pos = array_search((string)$id, $ids, true);
-$arResult['BT_PREV'] = $pos !== false && $pos > 0 ? bt_product($ids[$pos - 1]) : null;
-$arResult['BT_NEXT'] = $pos !== false && $pos < count($ids) - 1 ? bt_product($ids[$pos + 1]) : null;
 
 // «Рекомендуем»: заданные вручную или товары той же группы
 $rec = array_map('strval', (array)($pr['RECOMMEND']['VALUE'] ?: []));

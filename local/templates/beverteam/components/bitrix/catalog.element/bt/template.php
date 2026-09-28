@@ -17,11 +17,7 @@ $revN = count($reviews);
 $co = bt_contacts();
 $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
 ?>
-  <nav class="pnav" style="margin-top:18px">
-    <a href="<?= $e($arResult['BT_PREV']['url'] ?? $back) ?>" id="pPrev"><span id="iPrev"><?= bt_icon('arrL') ?></span> Предыдущий товар</a>
-    <a href="<?= $e($back) ?>">Вернуться в раздел</a>
-    <a href="<?= $e($arResult['BT_NEXT']['url'] ?? $back) ?>" id="pNext">Следующий товар <span id="iNext"><?= bt_icon('arrR') ?></span></a>
-  </nav>
+  <div class="pline"></div>
   <div class="prod" itemscope itemtype="https://schema.org/Product">
     <meta itemprop="name" content="<?= $e($name) ?>">
     <meta itemprop="description" content="<?= $e(TruncateText(trim(preg_replace('/\s+/u', ' ', strip_tags(($arResult['~PREVIEW_TEXT'] ?? '') ?: ($arResult['~DETAIL_TEXT'] ?? '')))) ?: $name, 300)) ?>">
