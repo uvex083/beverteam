@@ -2055,3 +2055,5 @@ form[data-form]{position:relative}
 /* симптомы на странице ремонта — наш чекбокс вместо браузерного */
 .symp input[type=checkbox]{appearance:none;width:18px;height:18px;border:1.5px solid #C2C2B6;border-radius:5px;background:var(--white) center/11px no-repeat;transition:border-color .15s,background-color .15s}
 .symp input[type=checkbox]:checked{background-color:var(--ink);border-color:var(--ink);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' fill='none' stroke='%23D7E85C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+/* iOS Safari приближает страницу при фокусе на поле со шрифтом меньше 16px и не возвращает масштаб — на сенсорных экранах поля не мельче 16px */
+@media(hover:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not(.srch__f input),select,textarea{font-size:16px!important}}
