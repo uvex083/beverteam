@@ -494,6 +494,72 @@ function bt_list(string $code): array
     return $list;
 }
 
+// Отзывы о компании: дата, компания, логотип, благодарственные письма (картинки — в просмотр, PDF — ссылкой)
+function bt_reviews(): array
+{
+    $ibId = bt_iblock('reviews');
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_reviews', '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT']);
+    while ($ob = $r->GetNextElement()) {
+        $f = $ob->GetFields();
+        $p = $ob->GetProperties();
+        $ts = ($p['DATE']['VALUE'] ?? '') !== '' ? MakeTimeStamp($p['DATE']['VALUE']) : 0;
+        $docs = [];
+        foreach ((array)($p['LETTER']['VALUE'] ?? []) as $i => $fid) {
+            $file = $fid ? \CFile::GetFileArray($fid) : null;
+            if (!$file) {
+                continue;
+            }
+            $pdf = str_ends_with(strtolower($file['FILE_NAME']), '.pdf');
+            $docs[] = ['pdf' => $pdf, 'src' => $pdf ? $file['SRC'] : bt_img($fid, 1800, 1800), 'th' => $pdf ? '' : bt_img($fid, 160, 220),
+                'cap' => trim((string)($p['LETTER']['DESCRIPTION'][$i] ?? '')) ?: 'Благодарственное письмо'];
+        }
+        $list[] = [
+            'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
+            'date' => $ts ? FormatDate('j F Y', $ts) : '', 'iso' => $ts ? date('Y-m-d', $ts) : '',
+            'company' => trim((string)($p['COMPANY']['VALUE'] ?? '')),
+            'logo' => bt_img((int)($p['LOGO']['VALUE'] ?? 0), 96, 96),
+            'docs' => $docs,
+        ];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
+    return $list;
+}
+
+// Карточка отзыва — одна на все страницы. Длинный текст обрезается, «Читать полностью» открывает окно (ui.js)
+function bt_rev_card(array $r): string
+{
+    $e = fn($s) => htmlspecialcharsbx((string)$s);
+    $av = $r['logo'] !== ''
+        ? '<img class="rev__av" src="' . $e($r['logo']) . '" alt="" width="44" height="44" loading="lazy">'
+        : '<span class="rev__av" aria-hidden="true">' . $e(mb_substr($r['name'], 0, 1)) . '</span>';
+    $docs = '';
+    foreach ($r['docs'] as $d) {
+        $docs .= $d['pdf']
+            ? '<a class="rev__doc rev__doc--pdf" href="' . $e($d['src']) . '" target="_blank" rel="noopener"><span>PDF</span>' . $e($d['cap']) . '</a>'
+            : '<a class="rev__doc" href="' . $e($d['src']) . '" data-lbox><img src="' . $e($d['th']) . '" alt="" loading="lazy">' . $e($d['cap']) . '</a>';
+    }
+    return '<article class="rev" itemscope itemtype="https://schema.org/Review"><meta itemprop="itemReviewed" content="BEVERTEAM">'
+        . '<header class="rev__hd">' . $av . '<div class="rev__who"><b itemprop="author">' . $e($r['name']) . '</b>'
+        . ($r['company'] !== '' ? '<span>' . $e($r['company']) . '</span>' : '') . '</div>'
+        . ($r['date'] !== '' ? '<time datetime="' . $r['iso'] . '" itemprop="datePublished">' . $e($r['date']) . '</time>' : '') . '</header>'
+        . '<div class="rev__txt" itemprop="reviewBody">' . nl2br($e($r['text'])) . '</div>'
+        . '<button class="rev__more" type="button" hidden>Читать полностью</button>'
+        . ($docs !== '' ? '<div class="rev__docs">' . $docs . '</div>' : '')
+        . '</article>';
+}
+
 // Иконка из файла: SVG встраиваем (цвет — от родителя через currentColor), PNG — картинкой
 function bt_svg(int $fileId): string
 {

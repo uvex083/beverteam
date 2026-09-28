@@ -7,7 +7,7 @@ $intro = bt_block('about_intro');
 $work = bt_block('about_work');
 $cert = bt_block('about_cert');
 $team = bt_list('about_team');
-$revs = bt_list('reviews');
+$revs = bt_reviews();
 ?>
 <div class="wrap aboutp">
   <?php bt_crumbs() ?>
@@ -45,7 +45,7 @@ $revs = bt_list('reviews');
   <?php if ($revs): ?>
   <section class="sec sec--t0" id="reviews">
     <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Отзывы клиентов</h2><a class="link" href="/otzyvy-o-nas/">Все отзывы →</a></div>
-    <div class="grid g3"><?php foreach (array_slice($revs, 0, 3) as $r): ?><div class="rev"><p><?= $e($r['text']) ?></p><div class="who"><b><?= $e($r['name']) ?></b></div></div><?php endforeach ?></div>
+    <div class="grid g3 revs"><?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?></div>
   </section>
   <?php endif ?>
 </div>

@@ -1728,9 +1728,30 @@ window.BT_lightbox=(items,start=0)=>{
   const n=el.querySelector('.lbox__n'), setN=s=>{ if(n) n.textContent=(s.activeIndex+1)+' / '+items.length; };
   const sw=new Swiper(el.querySelector('.lbox__sw'),{initialSlide:start,spaceBetween:24,speed:300,zoom:{maxRatio:2.5},keyboard:{enabled:true},
     navigation:many?{prevEl:el.querySelector('.lbox__ar--p'),nextEl:el.querySelector('.lbox__ar--n')}:false,on:{init:setN,slideChange:setN}});
-  const close=()=>{ sw.destroy(); el.remove(); document.removeEventListener('keydown',key); BT_lock(); back&&back.focus&&back.focus(); };
-  const key=e=>{ if(e.key==='Escape') close(); };
-  document.addEventListener('keydown',key);
+  const close=()=>{ sw.destroy(); el.remove(); document.removeEventListener('keydown',key,true); BT_lock(); back&&back.focus&&back.focus(); };
+  const key=e=>{ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
+  document.addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{ if(e.target.closest('.lbox__x')||(!e.target.closest('img,.lbox__ar,.lbox__cap'))) close(); });
   requestAnimationFrame(()=>{ el.classList.add('open'); el.querySelector('.lbox__x').focus(); });
 };
+
+/* Отзывы: «Читать полностью» — только у обрезанного текста, открывает отзыв в окне; письма-картинки — в просмотр */
+document.addEventListener('DOMContentLoaded',()=>{
+  const cards=[...document.querySelectorAll('.rev')]; if(!cards.length) return;
+  const check=()=>cards.forEach(c=>{ const t=c.querySelector('.rev__txt'), b=c.querySelector('.rev__more'); if(t&&b) b.hidden=t.scrollHeight<=t.clientHeight+2; });
+  check(); addEventListener('resize',()=>{ clearTimeout(check.t); check.t=setTimeout(check,150); });
+  document.addEventListener('click',e=>{
+    const more=e.target.closest('.rev__more');
+    if(more){
+      let m=document.getElementById('revModal');
+      if(!m){ document.body.insertAdjacentHTML('beforeend','<div class="modal modal--rev" id="revModal" role="dialog" aria-modal="true" aria-label="Отзыв"><div class="modal__bg" data-close></div><div class="modal__p"><button class="modal__x" type="button" data-close aria-label="Закрыть">×</button><div class="revModal__b"></div></div></div>');
+        m=document.getElementById('revModal'); m.addEventListener('click',ev=>{ if(ev.target.closest('[data-close]')){ m.classList.remove('open'); more.focus&&more.focus(); } }); }
+      const card=more.closest('.rev').cloneNode(true); card.removeAttribute('itemscope'); card.querySelectorAll('[itemprop],meta').forEach(n=>n.tagName==='META'?n.remove():n.removeAttribute('itemprop'));
+      m.querySelector('.revModal__b').replaceChildren(card); m.classList.add('open'); setTimeout(()=>m.querySelector('.modal__x').focus(),30);
+      return;
+    }
+    const doc=e.target.closest('.rev__doc[data-lbox]');
+    if(doc){ e.preventDefault(); const all=[...doc.closest('.rev').querySelectorAll('.rev__doc[data-lbox]')];
+      BT_lightbox(all.map(a=>({src:a.getAttribute('href'),cap:a.textContent.trim()})),all.indexOf(doc)); }
+  });
+});

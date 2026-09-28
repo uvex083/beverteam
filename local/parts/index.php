@@ -177,11 +177,11 @@ if ($bp):
 </div></section>
 <?php endif ?>
 
-<?php if ($revs = bt_list('reviews')): ?>
+<?php if ($revs = bt_reviews()): ?>
 <section class="sec sec--t0"><div class="wrap">
   <?= $head($revB, bt_btn($revB['btn_text'] ?? '', $revB['btn_link'] ?? '', 'link')) ?>
-  <div class="grid g3" data-rv>
-    <?php foreach (array_slice($revs, 0, 3) as $r): ?><div class="rcard"><p><?= $e($r['text']) ?></p><footer><span class="av" aria-hidden="true"><?= $e(mb_substr($r['name'], 0, 1)) ?></span><span><b><?= $e($r['name']) ?></b></span></footer></div><?php endforeach ?>
+  <div class="grid g3 revs" data-rv>
+    <?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?>
   </div>
 </div></section>
 <?php endif ?>
