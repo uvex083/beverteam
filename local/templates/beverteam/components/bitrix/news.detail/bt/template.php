@@ -16,7 +16,7 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
     return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
 }, (string)$arResult['~DETAIL_TEXT']);
 // таблица — в прокручиваемой обёртке: на телефоне листается сама, на широком экране тянется во всю колонку
-$body = preg_replace(['~<table~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $body);
+$body = preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $body);
 $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']['ID'] ?? 0), 1600, 1600);
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
