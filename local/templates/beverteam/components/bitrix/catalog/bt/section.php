@@ -32,6 +32,14 @@ $sorts = [
 $sortKey = isset($sorts[$_GET['sort'] ?? '']) ? $_GET['sort'] : 'pop';
 $sectionUrl = $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['section'];
 $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_GROUPS' => 'N'];
+
+// ЧПУ фильтра: /catalog/<раздел>/filter/<условия>/apply/, в корне — /catalog/filter/<условия>/apply/
+$smartPath = (string)($arResult['VARIABLES']['SMART_FILTER_PATH'] ?? $GLOBALS['BT_ROOT_FILTER'] ?? '');
+$sefRule = $arResult['FOLDER'] . ($section ? $arResult['URL_TEMPLATES']['smart_filter'] : 'filter/#SMART_FILTER_PATH#/apply/');
+// старые адреса с условиями в параметрах (?btFilter_…): компонент их прочитает, шаблон фильтра перенаправит на ЧПУ
+if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET))) {
+    $_GET['set_filter'] = $_REQUEST['set_filter'] = 'Y';
+}
 ?>
 <div class="wrap cat-page">
   <?php $APPLICATION->ShowViewContent('bt_crumbs') ?>
@@ -54,7 +62,7 @@ $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CA
     <?php $APPLICATION->IncludeComponent('bitrix:catalog.smart.filter', 'bt', [
         'IBLOCK_TYPE' => $arParams['IBLOCK_TYPE'], 'IBLOCK_ID' => $arParams['IBLOCK_ID'], 'SECTION_ID' => $section['ID'] ?? 0,
         'FILTER_NAME' => $arParams['FILTER_NAME'], 'PRICE_CODE' => $arParams['PRICE_CODE'], 'SAVE_IN_SESSION' => 'N',
-        'DISPLAY_ELEMENT_COUNT' => 'Y', 'SEF_MODE' => 'N', 'INSTANT_RELOAD' => 'N', 'XML_EXPORT' => 'N',
+        'DISPLAY_ELEMENT_COUNT' => 'Y', 'SEF_MODE' => 'Y', 'SEF_RULE' => $sefRule, 'SMART_FILTER_PATH' => $smartPath, 'INSTANT_RELOAD' => 'N', 'XML_EXPORT' => 'N',
         'HIDE_NOT_AVAILABLE' => 'N', 'CONVERT_CURRENCY' => 'N',
     ] + $cache, $component, ['HIDE_ICONS' => 'Y']) ?>
 
@@ -81,6 +89,11 @@ $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CA
   </div>
 </div>
 <?php
+// страница фильтра не из посадочных — не индексируем, canonical на раздел
+if ($smartPath !== '' && !bt_landing()) {
+    $APPLICATION->SetPageProperty('robots', 'noindex, follow');
+    $APPLICATION->SetPageProperty('canonical', 'https://beverteam.ru' . $arResult['FOLDER'] . (($cp = (string)($arResult['VARIABLES']['SECTION_CODE_PATH'] ?? '')) !== '' ? $cp . '/' : ''));
+}
 // крошки и H1 выводим после компонентов: только тогда в цепочке и заголовке уже есть раздел
 $APPLICATION->AddViewContent('bt_crumbs', $APPLICATION->GetNavChain(false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false));
 $APPLICATION->AddViewContent('bt_h1', htmlspecialcharsbx($APPLICATION->GetTitle(false)));

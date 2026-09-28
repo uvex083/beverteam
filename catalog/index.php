@@ -14,6 +14,7 @@ $APPLICATION->IncludeComponent('bitrix:catalog', 'bt', [
     'SEF_URL_TEMPLATES' => [
         'sections' => '',
         'section' => '#SECTION_CODE_PATH#/',
+        'smart_filter' => '#SECTION_CODE_PATH#/filter/#SMART_FILTER_PATH#/apply/',
         'element' => 'product/#ELEMENT_CODE#/',
         'compare' => 'compare/',
     ],

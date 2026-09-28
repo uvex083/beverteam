@@ -55,6 +55,7 @@ function bt_enum(int $ibId, string $code, string $value, bool $apply): ?int
     $lk = mb_strtolower($value);
     if (!isset($cache[$key]['v'][$lk])) {
         $id = $apply ? (int)(new CIBlockPropertyEnum())->Add(['PROPERTY_ID' => $cache[$key]['prop'], 'VALUE' => $value, 'SORT' => 100 + 10 * count($cache[$key]['v'])]) : -1;
+        $apply && bt_enum_codes($cache[$key]['prop']);
         $cache[$key]['v'][$lk] = $id;
     }
     return $cache[$key]['v'][$lk];

@@ -2,7 +2,16 @@
 /** @var array $arResult */
 /** @global CMain $APPLICATION */
 // Фильтр в разметке catalog.html: применяется сразу при выборе (фоновая загрузка страницы), без кнопки; выбранное — чипсами
-$reset = strtok($arResult['FORM_ACTION'], '?');
+// ЧПУ: адрес раздела без условий и адрес с выбранными условиями; «filter/clear/apply/» — это «без условий»
+$reset = preg_replace('~filter/clear/apply/$~', '', (string)($arResult['SEF_DEL_FILTER_URL'] ?? strtok($arResult['FORM_ACTION'], '?')));
+$sefUrl = (string)($arResult['SEF_SET_FILTER_URL'] ?? '');
+$sefUrl = $sefUrl === '' || str_ends_with($sefUrl, 'filter/clear/apply/') ? $reset : $sefUrl;
+$smartPath = preg_match('~/filter/(.+)/apply/$~', $sefUrl, $m) ? $m[1] : '';
+$keep = array_intersect_key($_GET, ['sort' => 1]);
+// условия пришли параметрами (фоновая загрузка, старая ссылка) или «пустой» ЧПУ — постоянный редирект на понятный адрес
+if (isset($_GET['set_filter']) || str_ends_with((string)$APPLICATION->GetCurPage(), '/filter/clear/apply/')) {
+    LocalRedirect($sefUrl . ($keep ? '?' . http_build_query($keep) : ''), true, '301 Moved permanently');
+}
 $sort = isset($_GET['sort']) ? htmlspecialcharsbx($_GET['sort']) : '';
 $chips = [];
 $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -10,8 +19,7 @@ $e = fn($s) => htmlspecialcharsbx((string)$s);
 // «Категория» как на Озоне: цепочка родителей «‹», текущий раздел подсвечен, под ним подразделы (в конечном разделе — соседние).
 // Выбранные условия фильтра переносятся в адрес раздела
 $sid = (int)($arParams['SECTION_ID'] ?? 0);
-$secQuery = trim(preg_replace('~(^|&)(PAGEN_\d+|bxajaxid|ajax|clear_cache)=[^&]*~', '', (string)($_SERVER['QUERY_STRING'] ?? '')), '&');
-$secHref = fn(string $url) => $url . ($secQuery !== '' ? '?' . $secQuery : '');
+$secHref = fn(string $url) => $url . ($smartPath !== '' ? 'filter/' . $smartPath . '/apply/' : '') . ($keep ? '?' . http_build_query($keep) : '');
 $secList = function (int $parent) use ($arParams): array {
     $out = [];
     $r = CIBlockSection::GetList(['SORT' => 'ASC', 'NAME' => 'ASC'], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y',
@@ -169,8 +177,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     ctrl&&ctrl.abort(); ctrl=new AbortController(); dropHint();
     if(col&&!filters.classList.contains('open')) col.style.minHeight=col.offsetHeight+'px';
     const cards=document.getElementById('cards'); if(cards) cards.style.opacity='.45';
+    let to=u; /* сервер перенаправляет на ЧПУ — в строку браузера пишем его */
     return fetch(u,{signal:ctrl.signal,credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest'}})
-      .then(r=>r.text()).then(html=>{
+      .then(r=>{ to=r.url||u; return r.text(); }).then(html=>{
         const d=new DOMParser().parseFromString(html,'text/html');
         ['#cards','#cardsEmpty','#fChips'].forEach(sel=>{const a=document.querySelector(sel),b=d.querySelector(sel);if(a&&b)a.replaceWith(b);});
         const cnt=document.querySelector('.toolbar .cnt'), cnt2=d.querySelector('.toolbar .cnt'); if(cnt&&cnt2) cnt.textContent=cnt2.textContent;
@@ -182,7 +191,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         /* ссылки «Разделов» несут текущие условия фильтра — берём их из ответа */
         const ns=d.querySelectorAll('.fcat a'); form.querySelectorAll('.fcat a').forEach((a,i)=>{ if(ns[i]) a.href=ns[i].getAttribute('href'); });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
-        if(push) history.pushState({bt:1},'',u); else history.replaceState({bt:1},'',u);
+        if(push) history.pushState({bt:1},'',to); else history.replaceState({bt:1},'',to);
         /* начало списка выше экрана — страницу не двигаем, показываем кнопку к товарам */
         const tb=document.querySelector('.toolbar');
         if(tb&&!filters.classList.contains('open')&&tb.getBoundingClientRect().top<0) showHint('Показать '+(cnt2?cnt2.textContent.trim():'товары'));

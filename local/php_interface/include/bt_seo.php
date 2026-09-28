@@ -88,3 +88,31 @@ function bt_landing_body(&$content): void
     }
     $content = preg_replace('~<footer class="ftr"~', '<section class="sec sec--t0 seo-landing"><div class="wrap"><div class="seo post__body">' . bt_br_list($l['text']) . '</div></div></section>$0', $content, 1);
 }
+
+// Понятные коды значений списка для ЧПУ фильтра (/filter/country-is-efiopiya/apply/): Битрикс сам ставит хеш — меняем его на транслит названия
+function bt_enum_codes(int $propId): int
+{
+    $used = $fix = [];
+    $r = \CIBlockPropertyEnum::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['PROPERTY_ID' => $propId]);
+    while ($x = $r->Fetch()) {
+        preg_match('~^[0-9a-f]{32}$~', (string)$x['XML_ID']) ? $fix[] = $x : $used[mb_strtolower((string)$x['XML_ID'])] = true;
+    }
+    foreach ($fix as $x) {
+        $base = \CUtil::translit((string)$x['VALUE'], 'ru', ['max_len' => 50, 'change_case' => 'L', 'replace_space' => '-', 'replace_other' => '-', 'delete_repeat_replace' => true]);
+        $base = trim($base, '-') ?: 'v' . $x['ID'];
+        for ($code = $base, $i = 2; isset($used[$code]); $i++) {
+            $code = $base . '-' . $i;
+        }
+        $used[$code] = true;
+        \CIBlockPropertyEnum::Update($x['ID'], ['XML_ID' => $code]);
+    }
+    return count($fix);
+}
+
+// OnAfterIBlockPropertyAdd / OnAfterIBlockPropertyUpdate: значения, добавленные в админке
+function bt_enum_codes_on_save(array $f): void
+{
+    if (($f['PROPERTY_TYPE'] ?? '') === 'L' && (int)($f['ID'] ?? 0) > 0) {
+        bt_enum_codes((int)$f['ID']);
+    }
+}
