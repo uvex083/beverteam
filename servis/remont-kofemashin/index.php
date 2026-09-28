@@ -6,9 +6,12 @@ if ((string)($_GET['BRAND'] ?? '') !== '') {
     LocalRedirect('/servis/remont-kofemashin/', false, '301 Moved permanently');
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
-$APPLICATION->SetPageProperty('title', 'Ремонт кофемашин в Екатеринбурге — сервисный центр, выезд инженера | BEVERTEAM');
-$APPLICATION->SetPageProperty('description', 'Ремонт и обслуживание кофемашин всех марок в Екатеринбурге и Свердловской области: домашние, офисные, профессиональные и вендинговые. Выезд инженера, диагностика, гарантия, договор для юрлиц. Авторизованный сервисный центр Jetinno.');
-$APPLICATION->SetPageProperty('keywords', 'ремонт кофемашин Екатеринбург, ремонт кофемашин, сервис кофемашин, обслуживание кофемашин, ремонт кофемашин Jetinno');
-$APPLICATION->SetTitle('Ремонт кофемашин в Екатеринбурге');
+// title, description и H1 — вкладка SEO элемента «Первый экран» в ИБ «Ремонт кофемашин»
+$top = bt_block('repair_top');
+$seo = $top ? (new \Bitrix\Iblock\InheritedProperty\ElementValues(bt_iblock('repair_top'), $top['id']))->getValues() : [];
+$APPLICATION->SetPageProperty('title', ($seo['ELEMENT_META_TITLE'] ?? '') ?: 'Ремонт кофемашин в Екатеринбурге | BEVERTEAM');
+$APPLICATION->SetPageProperty('description', $seo['ELEMENT_META_DESCRIPTION'] ?? '');
+$APPLICATION->SetPageProperty('keywords', $seo['ELEMENT_META_KEYWORDS'] ?? '');
+$APPLICATION->SetTitle(($seo['ELEMENT_PAGE_TITLE'] ?? '') ?: 'Ремонт кофемашин в Екатеринбурге');
 require $_SERVER['DOCUMENT_ROOT'] . '/local/parts/remont-kofemashin.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

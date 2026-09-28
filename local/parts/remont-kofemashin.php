@@ -139,7 +139,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
       <div class="row" style="gap:12px"><?= bt_btn($contract['btn_text'] ?? '', $contract['btn_link'] ?? '') ?>
         <?php if (!empty($contract['btn2_text'])): ?><?= !empty($contract['file'])
             ? '<a class="btn btn--line btn--inv" href="' . $e($contract['file']) . '" target="_blank" rel="noopener">' . $e($contract['btn2_text']) . ', PDF</a>'
-            : '<a class="btn btn--line btn--inv" href="#form">Запросить: ' . $e(mb_strtolower($contract['btn2_text'])) . '</a>' ?><?php endif ?></div></div>
+            : '<a class="btn btn--line btn--inv" href="#form">Запросить ' . $e(mb_strtolower($contract['btn2_text'])) . '</a>' ?><?php endif ?></div></div>
     <?php if ($contractItems): ?><ul class="r2list"><?php foreach ($contractItems as $c): ?><li><?= $e($c) ?></li><?php endforeach ?></ul><?php endif ?>
   </div></section>
   <?php endif ?>
@@ -203,7 +203,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php if ($faq): ?>
   <section class="sec sec--t0">
     <h2 class="display h2" style="margin-bottom:20px"><?= bt_title($faqH['title'] ?? '') ?></h2>
-    <div class="faq"><?php foreach ($faq as $i => $q): ?><details<?= $i ? '' : ' open' ?>><summary><?= $e($q['name']) ?></summary><div class="faq__a"><p><?= $q['html'] ?></p></div></details><?php endforeach ?></div>
+    <div class="faq"><?php foreach ($faq as $i => $q): ?><details<?= $i ? '' : ' open' ?>><summary><?= $e($q['name']) ?></summary><div class="faq__a"><?= str_starts_with(ltrim($q['html']), '<') ? $q['html'] : '<p>' . $q['html'] . '</p>' ?></div></details><?php endforeach ?></div>
   </section>
   <?php endif ?>
 
