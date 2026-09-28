@@ -21,5 +21,4 @@ $aMenuLinks = [
     ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], $sub, ''],
-    ['Карта сайта', '/sitemap/', [], $sub, ''],
 ];
