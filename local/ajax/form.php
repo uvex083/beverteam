@@ -105,7 +105,7 @@ $_SESSION['BT_FORM_LAST'] = time();
 
 $host = (\CMain::IsHTTPS() ? 'https://' : 'http://') . $req->getHttpHost();
 CEvent::Send('BT_FORM_REQUEST', SITE_ID, [
-    'EMAIL_TO' => Option::get('sale', 'order_email') ?: Option::get('main', 'email_from'),
+    'EMAIL_TO' => bt_notify_email(),
     'TOPIC' => $d['topic'], 'CLIENT_NAME' => $d['name'] ?: '—', 'PHONE' => $d['phone'] ?: '—', 'EMAIL' => $d['email'] ?: '—',
     'MESSAGE' => $d['message'] ?: '—', 'PAGE' => $d['page'] ? $host . $d['page'] : '—',
     'ADMIN_URL' => $host . '/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=' . $ibId . '&type=forms&ID=' . $id . '&lang=ru',

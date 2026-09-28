@@ -4,6 +4,30 @@
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
 
+// Куда слать уведомления менеджеру (копии заказов, заявки, отзывы). Отправитель писем — отдельно: main.email_from / sale.order_email
+function bt_notify_email(): string
+{
+    return \Bitrix\Main\Config\Option::get('bt', 'notify_email') ?: \Bitrix\Main\Config\Option::get('sale', 'order_email') ?: \Bitrix\Main\Config\Option::get('main', 'email_from');
+}
+
+// main:OnBeforeEventSend — отправитель noreply, а копии заказов, «Ответить» и письма «на адрес по умолчанию» — на адрес уведомлений
+function bt_mail_route(array &$fields, array &$message): void
+{
+    $to = bt_notify_email();
+    if ($to === '' || $to === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
+        return;
+    }
+    if (($fields['BCC'] ?? '') === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
+        $fields['BCC'] = $to;
+    }
+    if (trim((string)($message['EMAIL_TO'] ?? '')) === '#DEFAULT_EMAIL_FROM#') {
+        $message['EMAIL_TO'] = $to;
+    }
+    if (trim((string)($message['REPLY_TO'] ?? '')) === '') {
+        $message['REPLY_TO'] = $to;
+    }
+}
+
 // main:OnBeforeEventSend — дописывает поля заказа, если событие SALE_* передало ORDER_REAL_ID
 function bt_mail_before_send(array &$fields, array &$message): void
 {

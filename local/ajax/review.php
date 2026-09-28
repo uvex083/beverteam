@@ -112,7 +112,7 @@ $_SESSION['BT_REVIEW_LAST'] = time();
 
 $host = (\CMain::IsHTTPS() ? 'https://' : 'http://') . $req->getHttpHost();
 CEvent::Send('BT_FORM_REQUEST', SITE_ID, [
-    'EMAIL_TO' => Option::get('sale', 'order_email') ?: Option::get('main', 'email_from'),
+    'EMAIL_TO' => bt_notify_email(),
     'TOPIC' => ($product ? 'Отзыв о товаре' : 'Отзыв о компании') . ' — ждёт проверки', 'CLIENT_NAME' => $d['name'], 'PHONE' => '—', 'EMAIL' => $d['email'] ?: '—',
     'MESSAGE' => ($product ? 'Товар: ' . $product['~NAME'] . "\n" : ($d['company'] !== '' ? 'Компания: ' . $d['company'] . "\n" : '')) . 'Оценка: ' . $d['rating'] . ' из 5' . ($d['machine'] !== '' ? "\nМашина: " . $d['machine'] : '')
         . ($photos ? "\nФайлов: " . count($photos) : '') . ($verified ? "\nПокупка подтверждена" : '') . "\n\n" . $d['text'],
