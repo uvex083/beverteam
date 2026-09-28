@@ -1381,8 +1381,9 @@ input,textarea{caret-color:var(--ink)}
 .cmp__grp>summary::after{content:"";width:10px;height:10px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);
   transform:rotate(-135deg);margin-top:4px;transition:transform .2s}
 .cmp__grp:not([open])>summary::after{transform:rotate(45deg);margin-top:-2px}
-.cmp__r{border-radius:12px;padding:0 2px}
-.cmp__r.diff{background:#F4F8E4}
+.cmp__r{border-radius:12px;padding:0 2px;transition:background-color .15s}
+/* строку подсвечиваем только под курсором — чтобы глазом пройти её через все товары */
+@media(hover:hover){.cmp__r:hover{background:#F4F8E4}}
 .cmp__r .lbl{font-size:12.5px;color:var(--gray);padding:10px 20px 0}
 .cmp__r .swiper-slide{padding:2px 18px 12px;font-size:14px;color:var(--ink);min-width:0;overflow-wrap:anywhere;height:auto;
   position:relative}
