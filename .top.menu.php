@@ -22,10 +22,10 @@ $aMenuLinks = [
     ['Все материалы', '/blog/', [], $sub, ''],
     ...array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], array_values(bt_blog_rubrics())),
     ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Отзывы', '/otzyvy-o-nas/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], $sub, ''],
-    ['Отзывы о нас', '/otzyvy-o-nas/', [], $sub, ''],
     ['Карта сайта', '/sitemap/', [], $sub, ''],
 ];
