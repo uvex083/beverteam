@@ -118,11 +118,11 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <?php endif ?>
       <?php if (trim($arResult['~DETAIL_TEXT']) !== ''): ?>
         <h3 class="h3" style="margin:0 0 12px">Описание</h3>
-        <div class="post__body pdesc"><?= preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $arResult['~DETAIL_TEXT']) ?></div>
+        <div class="post__body pdesc"><?= bt_br_list($arResult['~DETAIL_TEXT']) ?></div>
       <?php endif ?>
     </div>
-    <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><?= $arResult['BT_TECH'] ?></div><?php endif ?>
-    <?php if ($arResult['BT_BREW']): ?><div class="pane prose" data-pane="brew" hidden><?= $arResult['BT_BREW'] ?></div><?php endif ?>
+    <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_TECH']) ?></div></div><?php endif ?>
+    <?php if ($arResult['BT_BREW']): ?><div class="pane prose" data-pane="brew" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_BREW']) ?></div></div><?php endif ?>
     <div class="pane" data-pane="rev" hidden id="reviews">
       <div class="rating" id="rating"></div>
       <div id="revList"><?php if (!$revN): ?><p class="muted">Отзывов пока нет — станьте первым.</p><?php endif ?></div>

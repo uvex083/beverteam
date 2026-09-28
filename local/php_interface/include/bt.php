@@ -560,6 +560,24 @@ function bt_rev_card(array $r): string
         . '</article>';
 }
 
+// Текст товара для вывода: строки через <br> (от трёх коротких подряд) — маркированным списком, таблицы — в обёртке с прокруткой
+function bt_br_list(string $html): string
+{
+    $list = function (string $chunk): string {
+        $items = array_values(array_filter(array_map('trim', preg_split('~<br\s*/?>~i', $chunk)), fn($s) => trim(strip_tags(str_replace('&nbsp;', ' ', $s))) !== ''));
+        if (count($items) < 3 || max(array_map(fn($s) => mb_strlen(strip_tags($s)), $items)) > 160) {
+            return '';
+        }
+        return "<ul>\n" . implode("\n", array_map(fn($s) => '<li>' . $s . '</li>', $items)) . "\n</ul>";
+    };
+    $html = preg_replace_callback('~<p\b[^>]*>((?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*)</p>~isu', fn($m) => $list($m[1]) ?: $m[0], $html);
+    // текст вообще без абзацев, только строки через <br>
+    if (!preg_match('~<(p|ul|ol|table|div|h\d)\b~i', $html) && ($ul = $list($html)) !== '') {
+        $html = $ul;
+    }
+    return preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $html);
+}
+
 // Иконка из файла: SVG встраиваем (цвет — от родителя через currentColor), PNG — картинкой
 function bt_svg(int $fileId): string
 {
