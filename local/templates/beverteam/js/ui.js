@@ -796,7 +796,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead).toLowerCase().includes(ql)).slice(0,3);
     if(!prods.length&&!pages.length&&!posts.length){
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>
-        <p>Попробуйте короче или загляните в <a class="link" href="/catalog/">каталог</a>. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p></div>`;
+        <p>Попробуйте короче или загляните в <a class="link" href="/catalog/">каталог</a>. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p>
+        ${SR.promos.some(p=>p.w==='none')?`<div class="srch__promo" style="margin-top:24px;max-width:520px">${SR.promos.filter(p=>p.w==='none').map(promoHtml).join('')}</div>`:''}</div>`;
       return;
     }
     sinner.innerHTML=`<div class="srch__grid"><div>

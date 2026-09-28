@@ -610,7 +610,7 @@ function bt_search_cfg(): array
     foreach (bt_blocks('search_promos') as $b) {
         $p = !empty($b['product']) ? bt_product((string)$b['product']) : null;
         $promos[] = ['k' => $b['caption'] ?? '', 't' => $b['name'], 's' => $b['text'] ?? '', 'u' => ($b['link'] ?? '') ?: ($p['url'] ?? '/catalog/'),
-            'c' => $styles[$b['style'] ?? ''] ?? 'dark', 'img' => $b['pic'] ?: ($p['img'] ?? ''), 'w' => ($b['show'] ?? '') === 'Когда поиск ничего не нашёл' ? 'none' : 'empty'];
+            'c' => $styles[$b['style'] ?? ''] ?? 'dark', 'img' => $b['pic'] ?: ($p['img'] ?? ''), 'w' => str_starts_with($b['show'] ?? '', 'Рядом') ? 'none' : 'empty'];
     }
     return [
         'hints' => array_column(bt_blocks('search_hints'), 'name'),

@@ -54,7 +54,7 @@ if ($empty($hints)) {
 
 // «Предложения»: карточки справа в окне поиска
 $promos = $ensureIb('site', 'search_promos', 'Поиск: предложения', 40,
-    'Карточки справа в окне поиска. Заголовок — название элемента. Картинка — «Картинка для анонса» или фото выбранного товара. «Когда показывать»: пока ничего не введено или когда поиск ничего не нашёл.');
+    'Карточки справа в окне поиска. Заголовок — название элемента. Картинка — «Картинка для анонса» или фото выбранного товара. «Когда показывать»: пока ничего не введено или рядом с результатами поиска.');
 $ensureProp($promos, 'CAPTION', ['NAME' => 'Надпись над заголовком', 'PROPERTY_TYPE' => 'S', 'SORT' => 110]);
 $ensureProp($promos, 'TEXT', ['NAME' => 'Текст', 'PROPERTY_TYPE' => 'S', 'ROW_COUNT' => 2, 'COL_COUNT' => 60, 'SORT' => 120]);
 $ensureProp($promos, 'LINK', ['NAME' => 'Ссылка (если пусто — на выбранный товар)', 'PROPERTY_TYPE' => 'S', 'COL_COUNT' => 60, 'SORT' => 130]);
@@ -62,7 +62,7 @@ $ensureProp($promos, 'PRODUCT', ['NAME' => 'Товар (фото и ссылка
 $ensureProp($promos, 'STYLE', ['NAME' => 'Цвет карточки', 'PROPERTY_TYPE' => 'L', 'SORT' => 150, 'VALUES' => [
     ['XML_ID' => 'lime', 'VALUE' => 'Лаймовый', 'SORT' => 10, 'DEF' => 'Y'], ['XML_ID' => 'esp', 'VALUE' => 'Кофейный', 'SORT' => 20], ['XML_ID' => 'dark', 'VALUE' => 'Чёрный', 'SORT' => 30]]]);
 $ensureProp($promos, 'SHOW', ['NAME' => 'Когда показывать', 'PROPERTY_TYPE' => 'L', 'SORT' => 160, 'VALUES' => [
-    ['XML_ID' => 'empty', 'VALUE' => 'Пока ничего не введено', 'SORT' => 10, 'DEF' => 'Y'], ['XML_ID' => 'none', 'VALUE' => 'Когда поиск ничего не нашёл', 'SORT' => 20]]]);
+    ['XML_ID' => 'empty', 'VALUE' => 'Пока ничего не введено', 'SORT' => 10, 'DEF' => 'Y'], ['XML_ID' => 'none', 'VALUE' => 'Рядом с результатами поиска', 'SORT' => 20]]]);
 if ($empty($promos)) {
     $enum = fn(string $code, string $xml) => (int)(CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $promos, 'CODE' => $code, 'XML_ID' => $xml])->Fetch()['ID'] ?? 0);
     $prod = fn(string $code) => (int)(CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('catalog'), '=CODE' => $code], false, false, ['ID'])->Fetch()['ID'] ?? 0);
