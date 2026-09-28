@@ -546,7 +546,30 @@ input,textarea{caret-color:var(--ink)}
 .post__body{max-width:68ch;font-size:16.5px;line-height:1.8}
 .post__body h2{font-family:Unbounded;font-weight:700;font-size:21px;margin:34px 0 12px}
 .post__body p{margin:0 0 16px}
-.post__body ul{padding-left:20px;margin:0 0 16px}.post__body li{margin-bottom:7px}
+.post__body ul,.post__body ol{list-style:none;padding:0;margin:0 0 20px}
+.post__body li{position:relative;margin-bottom:9px;padding-left:30px}
+.post__body ul>li::before{content:"";position:absolute;left:9px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.post__body ol{counter-reset:li}
+.post__body ol>li{counter-increment:li}
+.post__body ol>li::before{content:counter(li);position:absolute;left:0;top:.2em;width:22px;height:22px;border-radius:50%;background:var(--lime);
+  font:700 11.5px/22px 'JetBrains Mono',monospace;text-align:center}
+.post__body a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:2px;text-underline-offset:3px}
+.post__body a:hover{text-decoration-color:var(--ink)}
+.post__body strong,.post__body b{font-weight:700;color:var(--ink)}
+.post__body blockquote{margin:30px 0;padding:22px 26px;background:var(--white);border-left:4px solid var(--lime);border-radius:0 var(--rad) var(--rad) 0;
+  font-size:18px;line-height:1.6;font-weight:500;color:var(--ink)}
+.post__body blockquote p{margin:0}
+.post__body blockquote cite{display:block;margin-top:10px;font-size:13px;font-style:normal;font-weight:400;color:var(--gray)}
+.post__body blockquote cite::before{content:"— "}
+/* таблица: на узком экране листается сама, страница не расползается */
+.post__body table{display:block;max-width:100%;overflow-x:auto;border-collapse:separate;border-spacing:0;margin:24px 0;font-size:14.5px;line-height:1.5;
+  background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s)}
+.post__body th,.post__body td{padding:11px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);white-space:normal;min-width:120px}
+.post__body th{background:var(--paper);font-weight:700;font-size:13px}
+.post__body tbody tr:last-child td{border-bottom:0}
+.post__body tbody tr:hover td{background:#FAFAF7}
+.post__body hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.post__body em{color:var(--gray)}
 .post__body figure{margin:26px 0}
 .post__body figure img{border-radius:var(--rad);width:100%}
 .post__body figcaption{font-size:13px;color:var(--gray);margin-top:8px}
@@ -1591,7 +1614,7 @@ form[data-form]{position:relative}
 .journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%}
 .journalp .post__body h3,.journalp .post__body h4{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
 .journalp .post__body h2{scroll-margin-top:130px}
-.journalp .post__body ol{padding-left:22px;margin:0 0 16px}.journalp .post__body ol li{margin-bottom:7px}
+.journalp .post__body ol{margin:0 0 20px}.journalp .post__body ol li{margin-bottom:9px}
 .journalp .post h1{overflow-wrap:anywhere;hyphens:auto}
 .nfp .spage__f{margin-bottom:14px}
 
