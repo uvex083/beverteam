@@ -543,7 +543,7 @@ input,textarea{caret-color:var(--ink)}
 .jside a:hover{border-color:var(--ink)}
 .jside b{font-size:14px;line-height:1.35}
 .post{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
-.post__body{max-width:68ch;font-size:16.5px;line-height:1.8}
+.post__body{font-size:16.5px;line-height:1.8}
 .post__body h2{font-family:Unbounded;font-weight:700;font-size:21px;margin:34px 0 12px}
 .post__body p{margin:0 0 16px}
 .post__body ul,.post__body ol{list-style:none;padding:0;margin:0 0 20px}
@@ -576,7 +576,9 @@ input,textarea{caret-color:var(--ink)}
 .post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}
 .post__toc{position:sticky;top:130px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px;font-size:14px}
 .post__toc b{display:block;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:12px}
-.post__toc a{display:block;padding:6px 0;color:#3A3A34}.post__toc a:hover{color:var(--ink)}
+.post>aside{align-self:stretch}   /* колонка во всю высоту статьи — оглавление внутри неё липнет при прокрутке */
+.post__toc a{display:block;padding:6px 0 6px 12px;margin-left:-12px;border-left:3px solid transparent;color:#3A3A34;transition:color .15s,border-color .15s}
+.post__toc a.on{color:var(--ink);font-weight:600;border-left-color:var(--lime)}.post__toc a:hover{color:var(--ink)}
 @media(max-width:1000px){.jlead{grid-template-columns:1fr}
   .jlead>.ncard{grid-template-columns:1fr;min-height:0}
   .jlead>.ncard>img{height:auto;aspect-ratio:16/10}

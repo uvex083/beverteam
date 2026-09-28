@@ -1699,3 +1699,15 @@ document.addEventListener('click',e=>{
     const next=d.querySelector('.jmore'); next?box.replaceWith(document.importNode(next,true)):box.remove();
   }).catch(()=>{ location.href=a.href; });
 });
+
+/* оглавление статьи: подсвечиваем раздел, до которого дочитали (последний заголовок выше линии под шапкой) */
+document.addEventListener('DOMContentLoaded',()=>{
+  const links=[...document.querySelectorAll('.post__toc a[href^="#"]')]; if(!links.length) return;
+  const hs=links.map(a=>document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  let raf=0;
+  const spy=()=>{ raf=0; const line=(document.querySelector('.hdr')?.offsetHeight||0)+40;
+    let cur=hs[0]; hs.forEach(h=>{ if(h.getBoundingClientRect().top<=line) cur=h; });
+    if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) cur=hs[hs.length-1];
+    links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id)); };
+  addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
+});
