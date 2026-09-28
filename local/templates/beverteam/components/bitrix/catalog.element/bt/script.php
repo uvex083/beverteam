@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       ? `<button class="bb__add" type="button" data-add>В корзину</button>`
       : `<div class="bb__step${pop}" role="group" aria-label="Количество в корзине"><button type="button" data-q="-" aria-label="Уменьшить">−</button><output>${label(kg,q)}</output><button type="button" data-q="+" aria-label="Увеличить">+</button></div>
          <a class="bb__go${pop}" href="/personal/cart/"><span>В корзину <svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><b>${BT_fmt(sum)}</b></a>`;
-    pSt.textContent=inCart?'В корзине':'В наличии'; pSt.classList.toggle('is-in',!!inCart);
+    pSt.hidden=!inCart;
   }
   pAdd.addEventListener('click',e=>{
     if(e.target.closest('[data-add]')){ BT_cartSet(key(),1); sync(true); BT_toast(`${label(BT_packOf(PM),1)} в корзине · <a href="/personal/cart/">Оформить</a>`); return; }

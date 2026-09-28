@@ -40,7 +40,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       </div>
     </div>
     <div>
-      <div class="pkick"><?php if ($section): ?><span class="mono muted"><?= $e($section['~NAME']) ?></span><?php endif ?><span class="bb__st" id="pSt">В наличии</span></div>
+      <div class="pkick"><?php if ($section): ?><span class="mono muted"><?= $e($section['~NAME']) ?></span><?php endif ?><span class="bb__st">В наличии</span></div>
       <h1 class="display h1"><?= $e($h1) ?></h1>
       <div class="pmeta">
         <a href="#reviews" id="rTop" class="row" style="gap:8px;text-decoration:none"></a>
@@ -64,7 +64,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
           <button id="bCmp" aria-pressed="false" title="Сравнить" aria-label="Сравнить"><span id="iCmp"><?= bt_icon('compare') ?></span></button>
           <button id="bFav" aria-pressed="false" title="В избранное" aria-label="В избранное"><span id="iFav"><?= bt_icon('heart') ?></span></button>
           </div>
-          <div class="bb__sub"><button class="bb__one" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в 1 клик</button></div>
+          <div class="bb__sub"><span class="bb__st is-in" id="pSt" hidden>В корзине</span><button class="bb__one" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в 1 клик</button></div>
         </div>
         <div class="dship" id="dship"></div>
       </div>
