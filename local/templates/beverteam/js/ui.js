@@ -491,7 +491,7 @@ function searchPanel(){
         <input id="sq" type="search" autocomplete="off" spellcheck="false" placeholder="Что ищем? Кофе, чай, кофемашину или услугу" aria-label="Поисковый запрос" aria-controls="sbody" aria-autocomplete="list">
         <button class="srch__clr" id="sclr" aria-label="Очистить">×</button>
       </div>
-      <button class="srch__x" id="sx">Закрыть<kbd>Esc</kbd></button>
+      <button class="srch__x" id="sx" aria-label="Закрыть поиск"><span>Закрыть</span><kbd>Esc</kbd><i aria-hidden="true">×</i></button>
     </div></div>
     <div class="srch__body" id="sbody"><div class="wrap" id="sinner"></div></div>
   </div>`;
@@ -775,9 +775,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pushRecent=q=>{try{const r=recent().filter(x=>x!==q);r.unshift(q);localStorage.setItem('bt_recent',JSON.stringify(r.slice(0,5)));}catch(e){}};
 
   window.BT_search=()=>{ sLast=document.activeElement; document.documentElement.style.setProperty('--hdrh',(document.querySelector('.hdr')?.offsetHeight||0)+'px'); sp.classList.add('open'); lock(true);
-    sq.value=''; sclr.classList.remove('show'); paintEmpty(); setTimeout(()=>sq.focus(),60); };
+    /* фокус сразу, в том же касании: iOS открывает клавиатуру только так; повтор — если панель ещё не успела показаться */
+    sq.value=''; sclr.classList.remove('show'); paintEmpty(); sq.focus({preventScroll:true}); setTimeout(()=>document.activeElement!==sq&&sq.focus({preventScroll:true}),60); };
   const closeSearch=()=>{ sp.classList.remove('open'); lock();
-    if(sLast){sLast.focus();sLast=null;} };
+    if(sLast&&!matchMedia('(hover:none)').matches) sLast.focus(); sLast=null; };
 
   const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   // подсказки, предложения и разделы — из админки (header.php → BT_SRCH)
