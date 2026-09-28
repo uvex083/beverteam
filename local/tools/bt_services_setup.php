@@ -157,11 +157,7 @@ $def = [
     'servis_price' => ['servis', 'Прайс на обслуживание', 30, true, []],
     'servis_brands' => ['servis', 'Ремонт по маркам: заголовок', 40, true, []],
     'repair_brands' => ['servis', 'Ремонт по маркам: бренды', 50, false, null],
-    'repair_top' => ['servis', 'Ремонт: первый экран', 60, true, []],
-    'repair_strip' => ['servis', 'Ремонт: полоса преимуществ', 70, false, $iconProp],
-    'repair_symptoms' => ['servis', 'Ремонт: симптомы', 80, false, []],
-    'repair_faq' => ['servis', 'Ремонт: вопросы и ответы', 90, false, []],
-    'repair_form' => ['servis', 'Ремонт: форма вызова инженера', 100, true, []],
+    // блоки страницы «Ремонт кофемашин» — в bt_repair_setup.php
 ];
 foreach ($def as $code => [$type, $name, $sort, $single, $extra]) {
     $ibs[$code] = bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => $code, 'NAME' => $name, 'SORT' => $sort],
@@ -301,24 +297,6 @@ $one('servis_price', [
     'BTN_TEXT' => 'Оставить заявку на ремонт', 'BTN_LINK' => '/servis/remont-kofemashin/#form',
 ]);
 $one('servis_brands', ['TITLE' => 'Ремонт по маркам', 'SUBTITLE' => 'Авторизованный сервисный центр Jetinno в Екатеринбурге.']);
-$one('repair_top', [
-    'SUBTITLE' => 'Ремонт и обслуживание автоматических кофемашин в офисах, кафе и на дому.',
-    'BTN_TEXT' => 'Вызвать инженера', 'BTN_LINK' => '#form',
-]);
-$list('repair_strip', [
-    ['Авторизованный сервисный центр Jetinno', '', ['ICON' => bt_icon_file('uTool')]],
-    ['Ремонт и обслуживание в офисе, кафе и на дому', '', ['ICON' => bt_icon_file('uTruck')]],
-    ['Консультация специалиста при неисправности', '', ['ICON' => bt_icon_file('uSwap')]],
-    ['Договор с ИП и юрлицами, оплата по счёту', '', ['ICON' => bt_icon_file('uPrice')]],
-]);
-$list('repair_symptoms', array_map(fn($s) => [$s], ['Не наливает кофе или течёт мимо', 'Шумит помпа, гудит при заваривании', 'Не взбивает молоко',
-    'Течёт вода под машину', 'Горит ошибка на экране', 'Слабый напор, кофе еле капает', 'Не мелет зерно', 'Нужно плановое ТО и чистка']));
-$one('repair_form', [
-    'TITLE' => 'Вызвать инженера',
-    'SUBTITLE' => 'Перезвоним в течение 5 минут в рабочее время, уточним симптомы и согласуем время выезда.',
-    'BTN_TEXT' => 'Вызвать инженера',
-]);
-
 foreach ($ibs as $id) {
     $id and CIBlock::clearIblockTagCache($id);
 }
