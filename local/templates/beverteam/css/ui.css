@@ -202,7 +202,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pagehead .sub{color:var(--gray);margin:10px 0 0;max-width:none}
 
 /* product card */
-.pc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px;display:flex;flex-direction:column;position:relative;transition:border-color .18s,transform .18s}
+.pc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px;display:flex;flex-direction:column;position:relative;transition:border-color .18s}
 .pc:hover{border-color:#C2C2B6}
 .pc h3 a{background-image:linear-gradient(180deg,transparent 30%,var(--lime) 30%,var(--lime) 96%,transparent 96%);
   background-repeat:no-repeat;background-size:0% 100%;background-position:0 0;
@@ -683,8 +683,8 @@ input,textarea{caret-color:var(--ink)}
 /* промо в пустом поиске */
 .srch__promo{display:grid;gap:12px}
 .spromo{display:block;border-radius:var(--rad);overflow:hidden;position:relative;padding:24px;min-height:150px;
-  display:flex;flex-direction:column;justify-content:center;transition:transform .18s}
-.spromo:hover{transform:translateY(-3px)}
+  display:flex;flex-direction:column;justify-content:center;transition:filter .18s}
+.spromo:hover{filter:brightness(1.06)}
 .spromo--dark{background:var(--ink);color:#fff}
 .spromo--lime{background:var(--lime);color:var(--ink)}
 .spromo--esp{background:var(--espresso);color:#F3EDE7}
@@ -908,7 +908,9 @@ input,textarea{caret-color:var(--ink)}
 /* — блок «Новости и статьи» с датой публикации — */
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .ncard{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;display:flex;flex-direction:column;transition:.18s}
-.ncard:hover{border-color:#C2C2B6;transform:translateY(-3px)}
+.ncard:hover{border-color:#C2C2B6}
+.ncard h3{text-decoration:underline 2px transparent;text-underline-offset:4px;transition:text-decoration-color .18s}
+.ncard:hover h3{text-decoration-color:var(--lime)}
 .ncard img{width:100%;aspect-ratio:16/10;height:auto;object-fit:cover;display:block;background:var(--paper-2)}
 .ncard__b{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
 .ncard__m{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;color:var(--gray)}
@@ -1298,6 +1300,8 @@ input,textarea{caret-color:var(--ink)}
 .cop .co{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
 .cop .blk{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;margin-bottom:16px}
 .cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.cop .coemail{margin-bottom:18px;align-items:end}
+.cop .coemail__note{margin:0 0 14px;font-size:13px;line-height:1.5}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
 /* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
 .cop .corec{display:flex;align-items:center;gap:16px;margin:-6px 0 20px;padding:16px 18px;border-radius:var(--rad-s);background:var(--lime-soft);border:1px solid var(--lime)}

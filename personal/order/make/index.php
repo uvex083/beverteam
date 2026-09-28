@@ -77,8 +77,8 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>1</b>Получатель</h2>
         <?php if (!$USER->IsAuthorized()): ?><div class="coidp" hidden><div data-idp-row="Войти через:"></div></div>
-        <div class="field" style="margin-bottom:18px"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="mail@company.ru" value="<?= $e($u['email']) ?>">
-          <span class="hint">Сюда придёт подтверждение заказа</span></div>
+        <div class="f2 coemail"><div class="field"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="mail@company.ru" value="<?= $e($u['email']) ?>"></div>
+          <p class="coemail__note muted">Сюда придёт подтверждение заказа. Если вы уже покупали у нас — предложим войти и заполним данные сами.</p></div>
         <div class="corec" id="coRec" hidden><div><b id="coRecT"></b><span id="coRecD"></span></div><button type="button" class="btn btn--dark" id="coRecBtn">Войти по коду</button></div>
         <?php endif ?>
         <div class="pill-tabs" id="ptypeTabs" role="tablist"><button type="button" role="tab" aria-selected="<?= $ptDef === 'FIZ' ? 'true' : 'false' ?>" data-t="FIZ">Физическое лицо</button><button type="button" role="tab" aria-selected="<?= $ptDef === 'UR' ? 'true' : 'false' ?>" data-t="UR">Юрлицо или ИП</button></div>
