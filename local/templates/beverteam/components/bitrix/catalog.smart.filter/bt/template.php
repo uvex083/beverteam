@@ -8,8 +8,10 @@ $sefUrl = (string)($arResult['SEF_SET_FILTER_URL'] ?? '');
 $sefUrl = $sefUrl === '' || str_ends_with($sefUrl, 'filter/clear/apply/') ? $reset : $sefUrl;
 $smartPath = preg_match('~/filter/(.+)/apply/$~', $sefUrl, $m) ? $m[1] : '';
 $keep = array_intersect_key($_GET, ['sort' => 1]);
-// условия пришли параметрами (фоновая загрузка, старая ссылка) или «пустой» ЧПУ — постоянный редирект на понятный адрес
-if (isset($_GET['set_filter']) || str_ends_with((string)$APPLICATION->GetCurPage(), '/filter/clear/apply/')) {
+// условия пришли параметрами (фоновая загрузка, старая ссылка) или ЧПУ записан не так, как его строит фильтр
+// (пустой, другой порядок, значения не из этого раздела) — постоянный редирект на понятный адрес
+$curPage = (string)$APPLICATION->GetCurPage();
+if (isset($_GET['set_filter']) || (str_contains($curPage, '/filter/') && $curPage !== $sefUrl)) {
     LocalRedirect($sefUrl . ($keep ? '?' . http_build_query($keep) : ''), true, '301 Moved permanently');
 }
 $sort = isset($_GET['sort']) ? htmlspecialcharsbx($_GET['sort']) : '';

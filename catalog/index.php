@@ -6,13 +6,19 @@ $APPLICATION->SetTitle('Магазин чая и кофе');
 $APPLICATION->SetPageProperty('title', 'Интернет-магазин чая и кофе в Екатеринбурге | Beverteam');
 $APPLICATION->SetPageProperty('description', 'Купить чай и кофе в интернет-магазине Beverteam в Екатеринбурге. В каталоге — кофе, разные виды чая, кофемашины JETINNO и аксессуары для дома и бизнеса');
 $APPLICATION->SetPageProperty('keywords', 'Интернет-магазин чая и кофе');
+// фильтр в корне каталога (/catalog/filter/<условия>/apply/): у компонента нет такого шаблона адреса — отдаём его как страницу «все товары»
+$sefSections = '';
+if (preg_match('~^/catalog/filter/(.+)/apply/$~', $APPLICATION->GetCurPage(), $m)) {
+    $GLOBALS['BT_ROOT_FILTER'] = $m[1];
+    $sefSections = 'filter/' . $m[1] . '/apply/';
+}
 $APPLICATION->IncludeComponent('bitrix:catalog', 'bt', [
     'IBLOCK_TYPE' => 'catalog',
     'IBLOCK_ID' => bt_iblock('catalog'),
     'SEF_MODE' => 'Y',
     'SEF_FOLDER' => '/catalog/',
     'SEF_URL_TEMPLATES' => [
-        'sections' => '',
+        'sections' => $sefSections,
         'section' => '#SECTION_CODE_PATH#/',
         'smart_filter' => '#SECTION_CODE_PATH#/filter/#SMART_FILTER_PATH#/apply/',
         'element' => 'product/#ELEMENT_CODE#/',
