@@ -2111,7 +2111,7 @@ form[data-form]{position:relative}
 .r2tbl td:last-child,.r2tbl th:last-child{text-align:right;white-space:nowrap}
 .r2foot{font-size:13px;margin:12px 0 0}
 .r2list{list-style:none;margin:0;padding:0;border-top:1px solid #2C2C27}
-.r2list li{position:relative;padding:13px 0 13px 26px;border-bottom:1px solid #2C2C27;font-size:14.5px}
+.rep2 .pl .r2list li{display:block;position:relative;padding:13px 0 13px 26px;border-bottom:1px solid #2C2C27;font-size:14.5px}
 .r2list li::before{content:"";position:absolute;left:0;top:19px;width:9px;height:9px;border-radius:50%;background:var(--lime)}
 .r2err{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .r2err .card{padding:20px;display:grid;gap:10px;align-content:start}

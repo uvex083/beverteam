@@ -4,7 +4,8 @@
 
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $co = bt_contacts();
-$icons = array_column(bt_list('repair_strip'), 'icon');
+$strip = array_column(bt_list('repair_strip'), 'icon');
+$icons = [$strip[0] ?? '', bt_icon('star'), bt_icon('box'), bt_icon('repeat'), bt_icon('doc'), $strip[2] ?? ''];
 
 $hero = ['Авторизованный сервисный центр Jetinno', 'Оригинальные запчасти', 'Подменная кофемашина на время ремонта', 'Договор, оплата по счёту, закрывающие документы'];
 $facts = [['с 2010', 'работаем с кофемашинами в Екатеринбурге'], ['Jetinno', 'авторизованный сервис: продаём, сдаём в аренду и чиним'], ['0 ₽', 'диагностика, если ремонтируем у нас'], ['до 6 мес.', 'гарантия на работы и запчасти']];
@@ -162,7 +163,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <section class="sec sec--t0">
     <h2 class="display h2">Почему доверяют BEVERTEAM</h2>
-    <div class="r2why"><?php foreach ($why as $i => [$t, $d]): ?><div class="card"><?php if (!empty($icons[$i % max(1, count($icons))])): ?><span class="ic"><?= $icons[$i % count($icons)] ?></span><?php endif ?><b><?= $e($t) ?></b><p><?= $e($d) ?></p></div><?php endforeach ?></div>
+    <div class="r2why"><?php foreach ($why as $i => [$t, $d]): ?><div class="card"><?php if (!empty($icons[$i])): ?><span class="ic"><?= $icons[$i] ?></span><?php endif ?><b><?= $e($t) ?></b><p><?= $e($d) ?></p></div><?php endforeach ?></div>
   </section>
 
   <?php if ($revs): ?>
