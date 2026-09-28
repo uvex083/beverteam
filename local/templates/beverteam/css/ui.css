@@ -1300,8 +1300,9 @@ input,textarea{caret-color:var(--ink)}
 .cop .co{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
 .cop .blk{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;margin-bottom:16px}
 .cop .blk h2{font-family:Unbounded;font-weight:700;font-size:16px;display:flex;align-items:center;gap:12px;margin-bottom:18px}
-.cop .coemail{margin-bottom:18px;align-items:end}
-.cop .coemail__note{margin:0 0 14px;font-size:13px;line-height:1.5}
+.cop .coemail{margin-bottom:18px;align-items:end}.cop .coemail .field{margin-bottom:0}
+.cop .coemail__note{margin:0 0 5px;font-size:13px;line-height:1.5}
+@media(max-width:700px){.cop .coemail{row-gap:8px}.cop .coemail__note{margin:0}}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
 /* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
 .cop .corec{display:flex;align-items:center;gap:16px;margin:-6px 0 20px;padding:16px 18px;border-radius:var(--rad-s);background:var(--lime-soft);border:1px solid var(--lime)}
