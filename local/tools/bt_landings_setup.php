@@ -27,16 +27,19 @@ if ($id && $ib['IBLOCK_TYPE_ID'] !== 'seo') {
     $say('инфоблок «SEO: посадочные страницы» → тип «SEO»');
     $apply and (new CIBlock())->Update($id, ['IBLOCK_TYPE_ID' => 'seo', 'NAME' => 'Посадочные страницы', 'SORT' => 10]);
 }
+$ibDesc = 'Свои title, description, H1 и SEO-текст для любого адреса сайта. Адрес — без домена, например /catalog/kofe/ или /catalog/filter/badges-is-sale/apply/ (страница фильтра: выберите условия в каталоге и скопируйте адрес из строки браузера). Метки utm, сортировку и номер страницы указывать не нужно.';
 if (!$id) {
     $say('инфоблок «SEO: посадочные страницы»');
     if ($apply) {
         $o = new CIBlock();
         $id = (int)$o->Add(['IBLOCK_TYPE_ID' => 'seo', 'CODE' => 'seo_landings', 'API_CODE' => 'SeoLandings', 'NAME' => 'Посадочные страницы', 'SORT' => 10,
             'SITE_ID' => ['s1'], 'ACTIVE' => 'Y', 'GROUP_ID' => ['2' => 'R'], 'VERSION' => 2, 'INDEX_ELEMENT' => 'N',
-            'DESCRIPTION' => 'Свои title, description, H1 и SEO-текст для любого адреса сайта. Адрес — без домена, например /catalog/kofe/ или /catalog/?btFilter_40_2322626082=Y (страница фильтра). Метки utm и номер страницы указывать не нужно.',
-            'DESCRIPTION_TYPE' => 'text'])
+            'DESCRIPTION' => $ibDesc, 'DESCRIPTION_TYPE' => 'text'])
             or die('ошибка инфоблока: ' . $o->LAST_ERROR . "\n");
     }
+} elseif (CIBlock::GetArrayByID($id, 'DESCRIPTION') !== $ibDesc) {
+    $say('описание инфоблока: адрес фильтра в виде ЧПУ');
+    $apply and (new CIBlock())->Update($id, ['DESCRIPTION' => $ibDesc, 'DESCRIPTION_TYPE' => 'text']);
 }
 $props = [
     'URL' => ['Адрес страницы (без домена, например /catalog/kofe/)', 'S', ['IS_REQUIRED' => 'Y', 'COL_COUNT' => 80]],
@@ -66,11 +69,16 @@ foreach ($props as $code => [$name, $type, $extra]) {
     }
 }
 
-// пример: страница фильтра «Метки: скидка» в корне каталога; имя поля смарт-фильтра — btFilter_<ID свойства>_<crc32 ID значения>
+// пример: страница фильтра «Метки: скидка» в корне каталога (ЧПУ: код свойства -is- код значения)
 $cat = bt_iblock('catalog');
 $prop = CIBlockProperty::GetList([], ['IBLOCK_ID' => $cat, 'CODE' => 'BADGES'])->Fetch();
 $enum = $prop ? CIBlockPropertyEnum::GetList([], ['PROPERTY_ID' => $prop['ID'], 'VALUE' => 'Скидка'])->Fetch() : null;
-$filter = $enum ? '/catalog/?btFilter_' . $prop['ID'] . '_' . abs(crc32((string)$enum['ID'])) . '=Y' : '';
+$filter = $enum ? '/catalog/filter/badges-is-' . mb_strtolower($enum['XML_ID']) . '/apply/' : '';
+// пример со старым адресом фильтра (?btFilter_…) — переводим на ЧПУ
+if ($id && $filter && ($old = CIBlockElement::GetList([], ['IBLOCK_ID' => $id, '=XML_ID' => 'bt-demo', '%PROPERTY_URL' => 'btFilter_'], false, false, ['ID'])->Fetch())) {
+    $say("пример: адрес → {$filter}");
+    $apply and CIBlockElement::SetPropertyValuesEx($old['ID'], $id, ['URL' => $filter]);
+}
 if ($id && $filter && !CIBlockElement::GetList([], ['IBLOCK_ID' => $id, '=XML_ID' => 'bt-demo'], [])) {
     $say("пример: {$filter}");
     if ($apply) {
