@@ -167,6 +167,9 @@ document.addEventListener('DOMContentLoaded',()=>{
         const ns=d.querySelectorAll('.fcat a'); form.querySelectorAll('.fcat a').forEach((a,i)=>{ if(ns[i]) a.href=ns[i].getAttribute('href'); });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
         if(push) history.pushState({bt:1},'',u); else history.replaceState({bt:1},'',u);
+        /* список ушёл выше экрана (прокрутили вниз, а выбрали в фильтре) — возвращаемся к началу товаров */
+        const tb=document.querySelector('.toolbar');
+        if(tb&&!filters.classList.contains('open')&&tb.getBoundingClientRect().top<0) scrollTo({top:scrollY+tb.getBoundingClientRect().top-topGap,behavior:'smooth'});
         /* новые карточки: степперы корзины, сравнение, избранное */
         Object.keys(BT_CART).forEach(id=>document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q:BT_CART[id]}})));
         BT_cmpUpdate(); window.BT_favUpdate&&BT_favUpdate();
