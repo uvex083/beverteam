@@ -2,7 +2,6 @@
 // Верхнее меню шапки: DEPTH_LEVEL 2 — пункты выпадающего списка
 $sub = ['DEPTH_LEVEL' => 2];
 $aMenuLinks = [
-    ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Магазин', '/catalog/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Кофе', '/catalog/kofe/', [], $sub, ''],
     ['Чай', '/catalog/chay/', [], $sub, ''],
@@ -22,6 +21,7 @@ $aMenuLinks = [
     ['Журнал', '/blog/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Все материалы', '/blog/', [], $sub, ''],
     ...array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], array_values(bt_blog_rubrics())),
+    ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
