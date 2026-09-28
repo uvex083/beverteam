@@ -232,7 +232,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pc__ph img{max-height:160px;width:auto;mix-blend-mode:multiply}
 .pc h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;font-family:Manrope}
 .pc__par{font-size:12.5px;color:var(--gray);margin:0 0 10px;flex:1}
-.pc__stock{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600;margin:auto 0 10px;align-self:flex-start}
+.pc__stock{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600;margin:0 0 0 auto;white-space:nowrap}
+.pc__meta{display:flex;align-items:center;gap:8px;margin:auto 0 10px;min-height:20px}
 .pc__stock::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .pc__stock--no{color:var(--gray)}.pc__stock--no::before{background:var(--gray-2)}
 .pc__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);
@@ -2036,7 +2037,7 @@ form[data-form]{position:relative}
 @keyframes bbpop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pop{animation:none}}
 /* оценка в карточке каталога: «★ 4,5 · 2 отзыва» — ведёт на вкладку отзывов */
-.pc__rv{display:inline-flex;align-items:center;gap:5px;margin:-2px 0 8px;font-size:13px;color:var(--gray);text-decoration:none;align-self:flex-start}
+.pc__rv{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--gray);text-decoration:none;white-space:nowrap;min-width:0}
 .pc__rv svg{width:14px;height:14px;fill:#E8B400;stroke:none}
 .pc__rv b{color:var(--ink);font-weight:700}
 @media(hover:hover){.pc__rv:hover span{color:var(--ink)}}

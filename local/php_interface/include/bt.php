@@ -184,11 +184,12 @@ function bt_card(array $m, bool $eager = false): string
         . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
         . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '"' . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async">' : '') . '</a>'
         . '<h3><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></h3>'
-        . (!empty($m['rv']) ? '<a class="pc__rv" href="' . $e($m['url']) . '#reviews">' . bt_icon('star') . '<b>' . str_replace('.', ',', (string)$m['rv'][0]) . '</b><span>· ' . $m['rv'][1] . ' '
-            . (($m['rv'][1] % 10 === 1 && $m['rv'][1] % 100 !== 11) ? 'отзыв' : (($m['rv'][1] % 10 >= 2 && $m['rv'][1] % 10 <= 4 && ($m['rv'][1] % 100 < 10 || $m['rv'][1] % 100 >= 20)) ? 'отзыва' : 'отзывов')) . '</span></a>' : '')
         . '<p class="pc__par">' . $e($m['par']) . '</p>'
         . $scales . $packs
-        . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span>'
+        // строка над ценой: оценка слева, наличие справа — как на маркетплейсах, без отдельной строки под каждое
+        . '<div class="pc__meta">' . (!empty($m['rv']) ? '<a class="pc__rv" href="' . $e($m['url']) . '#reviews">' . bt_icon('star') . '<b>' . str_replace('.', ',', (string)$m['rv'][0]) . '</b><span>· ' . $m['rv'][1] . ' '
+            . (($m['rv'][1] % 10 === 1 && $m['rv'][1] % 100 !== 11) ? 'отзыв' : (($m['rv'][1] % 10 >= 2 && $m['rv'][1] % 10 <= 4 && ($m['rv'][1] % 100 < 10 || $m['rv'][1] % 100 >= 20)) ? 'отзыва' : 'отзывов')) . '</span></a>' : '')
+        . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span></div>'
         . '<div class="pc__foot" itemprop="offers" itemscope itemtype="https://schema.org/Offer">'
         . '<meta itemprop="priceCurrency" content="RUB">' . ($m['p'] ? '<meta itemprop="price" content="' . $m['p'] . '">' : '')
         . '<link itemprop="availability" href="https://schema.org/' . ($stock ? 'InStock' : 'PreOrder') . '">'

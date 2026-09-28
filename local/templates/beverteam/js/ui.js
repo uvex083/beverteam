@@ -367,11 +367,10 @@ window.BT_card = function(m){
     </div>
     <a class="pc__ph" href="${m.url}"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
     <h3><a href="${m.url}" itemprop="url">${m.n}</a></h3>
-    ${m.rv?`<a class="pc__rv" href="${m.url}#reviews">${I.star}<b>${String(m.rv[0]).replace('.',',')}</b><span>· ${m.rv[1]} ${m.rv[1]%10===1&&m.rv[1]%100!==11?'отзыв':(m.rv[1]%10>=2&&m.rv[1]%10<=4&&(m.rv[1]%100<10||m.rv[1]%100>=20)?'отзыва':'отзывов')}</span></a>`:''}
     <p class="pc__par">${m.par}</p>
     ${scales}
     ${BT_packs(m)}
-    <span class="pc__stock${m.stock?'':' pc__stock--no'}">${m.stock?'В наличии':'Под заказ'}</span>
+    <div class="pc__meta">${m.rv?`<a class="pc__rv" href="${m.url}#reviews">${I.star}<b>${String(m.rv[0]).replace('.',',')}</b><span>· ${m.rv[1]} ${m.rv[1]%10===1&&m.rv[1]%100!==11?'отзыв':(m.rv[1]%10>=2&&m.rv[1]%10<=4&&(m.rv[1]%100<10||m.rv[1]%100>=20)?'отзыва':'отзывов')}</span></a>`:''}<span class="pc__stock${m.stock?'':' pc__stock--no'}">${m.stock?'В наличии':'Под заказ'}</span></div>
     ${tools}
     <div class="pc__foot" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
       <meta itemprop="priceCurrency" content="RUB">${m.p?`<meta itemprop="price" content="${m.p}">`:''}
