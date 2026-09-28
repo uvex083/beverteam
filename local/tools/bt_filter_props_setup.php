@@ -30,15 +30,15 @@ $props = [
     'FILTER_SIZE' => ['Размер бумажного фильтра', 730, $acc, [['№2', 'n2'], ['№4', 'n4']]],
 ];
 
-// товар (символьный код) => свойство => код значения (у «Да» — yes)
+// кофемашина (ID) => свойство => код значения (у «Да» — yes)
 $values = [
-    'kofemashina-jetinno-bravo' => ['BEAN_HOPPER' => '2-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'TELEMETRY' => 'yes'],
-    'kofemashina-jetinno-jl-03' => ['WATER_TANK' => '1-6-l', 'BEAN_HOPPER' => 'do-500-g'],
-    'kofemashina-jetinno-jl-05' => ['WATER_TANK' => '0-6-l', 'BEAN_HOPPER' => 'do-500-g'],
-    'kofemashina-jetinno-jl-15-viva' => ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '2-l', 'BEAN_HOPPER' => 'do-500-g', 'TOUCHSCREEN' => 'yes', 'TELEMETRY' => 'yes', 'MDB' => 'yes'],
-    'kofemashina-jetinno-jl-32' => ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '4-l', 'BEAN_HOPPER' => '1-1-5-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'MDB' => 'yes'],
-    'kofemashina-jetinno-jl33' => ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '4-l', 'BEAN_HOPPER' => '2-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'TELEMETRY' => 'yes'],
-    'kofemashina-jetinno-jl36' => ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '2-l', 'BEAN_HOPPER' => '1-1-5-kg', 'TOUCHSCREEN' => 'yes', 'TELEMETRY' => 'yes', 'MDB' => 'yes'],
+    345 => /* BRAVO */ ['BEAN_HOPPER' => '2-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'TELEMETRY' => 'yes'],
+    346 => /* JL 03 */ ['WATER_TANK' => '1-6-l', 'BEAN_HOPPER' => 'do-500-g'],
+    347 => /* JL 05 */ ['WATER_TANK' => '0-6-l', 'BEAN_HOPPER' => 'do-500-g'],
+    348 => /* JL 15 VIVA */ ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '2-l', 'BEAN_HOPPER' => 'do-500-g', 'TOUCHSCREEN' => 'yes', 'TELEMETRY' => 'yes', 'MDB' => 'yes'],
+    349 => /* JL 32 */ ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '4-l', 'BEAN_HOPPER' => '1-1-5-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'MDB' => 'yes'],
+    350 => /* JL 33 */ ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '4-l', 'BEAN_HOPPER' => '2-kg', 'TOUCHSCREEN' => 'yes', 'INSTANT' => 'yes', 'TELEMETRY' => 'yes'],
+    351 => /* JL 36 */ ['WATER_SUPPLY' => 'yes', 'WATER_TANK' => '2-l', 'BEAN_HOPPER' => '1-1-5-kg', 'TOUCHSCREEN' => 'yes', 'TELEMETRY' => 'yes', 'MDB' => 'yes'],
 ];
 // аксессуары ищем по названию: коды у них транслитом длинные
 $accValues = [
@@ -88,9 +88,9 @@ $enumId = function (string $code, string $xml) use ($pid): int {
 };
 $fill = function (array $el, array $set) use ($ib, $apply, $say, $enumId): void {
     $cur = [];
-    $r = CIBlockElement::GetProperty($ib, $el['ID'], [], ['CODE' => array_keys($set)]);
+    $r = CIBlockElement::GetProperty($ib, $el['ID'], [], []);
     while ($x = $r->Fetch()) {
-        $x['VALUE'] and $cur[$x['CODE']] = true;
+        isset($set[$x['CODE']]) && $x['VALUE'] and $cur[$x['CODE']] = true;
     }
     foreach ($set as $code => $xml) {
         if (empty($cur[$code])) {
@@ -99,9 +99,9 @@ $fill = function (array $el, array $set) use ($ib, $apply, $say, $enumId): void 
         }
     }
 };
-foreach ($values as $code => $set) {
-    $el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, '=CODE' => $code], false, false, ['ID', 'NAME'])->Fetch();
-    $el ? $fill($el, $set) : $say("нет товара {$code}");
+foreach ($values as $id => $set) {
+    $el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, 'ID' => $id, 'SECTION_ID' => $machines, 'INCLUDE_SUBSECTIONS' => 'Y'], false, false, ['ID', 'NAME'])->Fetch();
+    $el ? $fill($el, $set) : $say("нет кофемашины {$id}");
 }
 foreach ($accValues as $name => $set) {
     $el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, 'SECTION_ID' => $acc, 'INCLUDE_SUBSECTIONS' => 'Y', 'NAME' => $name . '%'], false, false, ['ID', 'NAME'])->Fetch();
