@@ -18,8 +18,8 @@ $asset->addJs(SITE_TEMPLATE_PATH . '/js/ui.js');
 
 $msgr = function (string $cls = '') {
     $html = '';
-    foreach (bt_messengers() as [$code, $name, $href]) {
-        $html .= '<a href="' . htmlspecialcharsbx($href ?: '#') . '" title="' . $name . '" aria-label="' . $name . '" rel="nofollow noopener" target="_blank">' . bt_icon($code) . '</a>';
+    foreach (bt_messengers() as [, $name, $href, $svg]) {
+        $html .= '<a href="' . htmlspecialcharsbx($href) . '" title="' . htmlspecialcharsbx($name) . '" aria-label="' . htmlspecialcharsbx($name) . '" rel="nofollow noopener" target="_blank">' . $svg . '</a>';
     }
     return '<div class="msgr ' . $cls . '">' . $html . '</div>';
 };

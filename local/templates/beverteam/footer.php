@@ -7,8 +7,8 @@ $menu = fn(string $type) => $APPLICATION->IncludeComponent('bitrix:menu', 'bt_fo
     'MENU_CACHE_TYPE' => 'A', 'MENU_CACHE_TIME' => 3600, 'MENU_CACHE_USE_GROUPS' => 'N', 'DELAY' => 'N', 'ALLOW_MULTI_SELECT' => 'N',
 ], false, ['HIDE_ICONS' => 'Y']);
 $msgr = '';
-foreach (bt_messengers() as [$code, $name, $href]) {
-    $msgr .= '<a href="' . htmlspecialcharsbx($href ?: '#') . '" title="' . $name . '" aria-label="' . $name . '" rel="nofollow noopener" target="_blank">' . bt_icon($code) . '</a>';
+foreach (bt_messengers() as [, $name, $href, $svg]) {
+    $msgr .= '<a href="' . htmlspecialcharsbx($href) . '" title="' . htmlspecialcharsbx($name) . '" aria-label="' . htmlspecialcharsbx($name) . '" rel="nofollow noopener" target="_blank">' . $svg . '</a>';
 }
 ?>
 <?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): ?>

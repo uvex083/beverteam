@@ -7,8 +7,8 @@ $co = bt_contacts();
 $how = bt_list('contacts_how');
 $photos = bt_list('contacts_photos');
 $msgr = '';
-foreach (bt_messengers() as [$code, $name, $href]) {
-    $msgr .= '<a href="' . $e($href ?: '#') . '" title="' . $name . '" aria-label="' . $name . '" rel="nofollow noopener" target="_blank">' . bt_icon($code) . '</a>';
+foreach (bt_messengers() as [, $name, $href, $svg]) {
+    $msgr .= '<a href="' . $e($href) . '" title="' . $e($name) . '" aria-label="' . $e($name) . '" rel="nofollow noopener" target="_blank">' . $svg . '</a>';
 }
 ?>
 <div class="wrap contp">

@@ -93,13 +93,30 @@ function bt_contacts(): array
 }
 
 // Мессенджеры из контактов: [код иконки, название, ссылка], пустые ссылки не выводятся
+// Соцсети и мессенджеры из ИБ socials: [код иконки, название, ссылка, SVG]. Выключенные и без ссылки не выводятся
 function bt_messengers(): array
 {
-    $co = bt_contacts();
-    $list = [];
-    foreach (['tg' => 'Telegram', 'wa' => 'WhatsApp', 'max' => 'MAX', 'vk' => 'ВКонтакте'] as $code => $name) {
-        $list[] = [$code, $name, $co[$code] ?? ''];
+    $ibId = bt_iblock('socials');
+    if (!$ibId) {
+        return [];
     }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_socials', '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', '!PROPERTY_LINK' => false], false, false,
+        ['ID', 'IBLOCK_ID', 'NAME', 'PROPERTY_LINK', 'PROPERTY_ICON_SET', 'PROPERTY_ICON']);
+    while ($x = $r->Fetch()) {
+        $code = (string)($x['PROPERTY_ICON_SET_ENUM_ID'] ? (\CIBlockPropertyEnum::GetByID($x['PROPERTY_ICON_SET_ENUM_ID'])['XML_ID'] ?? '') : '');
+        $svg = bt_svg((int)$x['PROPERTY_ICON_VALUE']) ?: bt_icon($code);
+        $list[] = [$code, $x['NAME'], trim((string)$x['PROPERTY_LINK_VALUE']), $svg ?: '<b>' . htmlspecialcharsbx(mb_substr($x['NAME'], 0, 1)) . '</b>'];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
     return $list;
 }
 
