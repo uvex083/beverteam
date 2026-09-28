@@ -1670,3 +1670,15 @@ window.BT_addrSuggest=(inp,opt={})=>{
     if(e.key==='Escape'&&ul.classList.contains('open')){e.preventDefault();show([]);}});
 };
 document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('input[name=company_adr]').forEach(i=>BT_addrSuggest(i,{full:true})));
+
+/* Плавное раскрытие и скрытие вопросов-ответов (details): высота анимируется, без анимации — если пользователь её отключил */
+document.addEventListener('click',e=>{
+  const s=e.target.closest('.faq details>summary'); if(!s||matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const d=s.parentElement; e.preventDefault();
+  if(d._a){ d._a.cancel(); d._a=null; }
+  const from=d.offsetHeight, closing=d.open;
+  d.open=true; if(closing) d.open=false;
+  const to=d.offsetHeight; d.open=true; d.style.overflow='hidden';
+  d._a=d.animate({height:[from+'px',to+'px']},{duration:280,easing:'cubic-bezier(.2,.7,.2,1)'});
+  d._a.onfinish=()=>{ d._a=null; d.style.overflow=''; if(closing) d.open=false; };
+});

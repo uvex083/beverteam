@@ -411,6 +411,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .alert{border-radius:var(--rad-s);padding:14px 16px;font-size:14px;display:flex;gap:12px;align-items:flex-start}
 .alert--info{background:var(--lime-soft)}.alert--ok{background:var(--ok-s);color:var(--ok)}.alert--err{background:var(--err-s);color:var(--err)}
 .empty{text-align:center;padding:60px 20px;color:var(--gray)}
+/* панель администратора Битрикса задаёт div.empty{width:1px} — у админа пустые состояния сжимались в полоску */
+.wrap .empty{width:auto}
 .empty .display{font-size:22px;color:var(--ink);margin-bottom:10px}
 
 /* footer */
@@ -681,7 +683,7 @@ input,textarea{caret-color:var(--ink)}
 /* промо в пустом поиске */
 .srch__promo{display:grid;gap:12px}
 .spromo{display:block;border-radius:var(--rad);overflow:hidden;position:relative;padding:24px;min-height:150px;
-  display:flex;flex-direction:column;justify-content:flex-end;transition:transform .18s}
+  display:flex;flex-direction:column;justify-content:center;transition:transform .18s}
 .spromo:hover{transform:translateY(-3px)}
 .spromo--dark{background:var(--ink);color:#fff}
 .spromo--lime{background:var(--lime);color:var(--ink)}
