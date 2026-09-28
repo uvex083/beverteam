@@ -150,8 +150,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     return u;
   };
   let ctrl=null;
+  /* фильтр при выборе остаётся на месте (как на Озоне): высоту колонки товаров держим, рядом с пунктом — «Показать N товаров» */
+  let lastEl=null, hint=null;
+  const col=document.querySelector('.toolbar')?.parentElement;
+  const dropHint=()=>{ hint&&hint.remove(); hint=null; };
+  const showHint=text=>{
+    dropHint(); if(!lastEl||!document.contains(lastEl)) return;
+    const r=lastEl.getBoundingClientRect(), fr=filters.getBoundingClientRect();
+    hint=document.createElement('button'); hint.type='button'; hint.className='fhint'; hint.textContent=text;
+    hint.style.cssText=`left:${fr.right+scrollX+10}px;top:${r.top+scrollY+r.height/2}px`;
+    hint.addEventListener('click',()=>{ const tb=document.querySelector('.toolbar'); dropHint();
+      tb&&scrollTo({top:scrollY+tb.getBoundingClientRect().top-topGap,behavior:'smooth'}); });
+    document.body.appendChild(hint);
+  };
+  addEventListener('scroll',()=>{ const tb=document.querySelector('.toolbar');
+    if(tb&&tb.getBoundingClientRect().top>=0){ dropHint(); if(col) col.style.minHeight=''; } },{passive:true});
   const load=(u,push)=>{
-    ctrl&&ctrl.abort(); ctrl=new AbortController();
+    ctrl&&ctrl.abort(); ctrl=new AbortController(); dropHint();
+    if(col&&!filters.classList.contains('open')) col.style.minHeight=col.offsetHeight+'px';
     const cards=document.getElementById('cards'); if(cards) cards.style.opacity='.45';
     return fetch(u,{signal:ctrl.signal,credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest'}})
       .then(r=>r.text()).then(html=>{
@@ -167,9 +183,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         const ns=d.querySelectorAll('.fcat a'); form.querySelectorAll('.fcat a').forEach((a,i)=>{ if(ns[i]) a.href=ns[i].getAttribute('href'); });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
         if(push) history.pushState({bt:1},'',u); else history.replaceState({bt:1},'',u);
-        /* список ушёл выше экрана (прокрутили вниз, а выбрали в фильтре) — возвращаемся к началу товаров */
+        /* начало списка выше экрана — страницу не двигаем, показываем кнопку к товарам */
         const tb=document.querySelector('.toolbar');
-        if(tb&&!filters.classList.contains('open')&&tb.getBoundingClientRect().top<0) scrollTo({top:scrollY+tb.getBoundingClientRect().top-topGap,behavior:'smooth'});
+        if(tb&&!filters.classList.contains('open')&&tb.getBoundingClientRect().top<0) showHint('Показать '+(cnt2?cnt2.textContent.trim():'товары'));
+        else if(col) col.style.minHeight='';
         /* новые карточки: степперы корзины, сравнение, избранное */
         Object.keys(BT_CART).forEach(id=>document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q:BT_CART[id]}})));
         BT_cmpUpdate(); window.BT_favUpdate&&BT_favUpdate();
@@ -191,7 +208,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     [fMin,fMax].forEach(f=>f.addEventListener('input',()=>{ a.value=fMin.value||a.min; b.value=fMax.value||b.max; syncSlider(); }));
     syncSlider();
   }
-  form.addEventListener('change',e=>{ if(e.target.type==='checkbox') load(buildUrl(),true); });
+  form.addEventListener('change',e=>{ lastEl=e.target.closest('.opt,.fprice')||e.target; if(e.target.type==='checkbox') load(buildUrl(),true); });
   let pt; form.addEventListener('input',e=>{ if(e.target.type==='checkbox'||e.target.type==='range') return; clearTimeout(pt); pt=setTimeout(()=>load(buildUrl(),true),700); });
   form.addEventListener('submit',e=>{ e.preventDefault(); load(buildUrl(),true); });
   /* снять одно условие чипсом или сбросить всё — тоже без перезагрузки */

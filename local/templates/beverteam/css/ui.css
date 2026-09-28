@@ -296,7 +296,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .chipx:hover{border-color:#C2C2B6}
 .chipx[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
 .toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
-.toolbar .cnt{color:var(--gray);font-size:13.5px}
+.toolbar .cnt{color:var(--ink);font-size:13.5px;font-weight:600}
 .toolbar>.sel{margin-left:auto}
 .field .sel{display:block;width:100%}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
@@ -1926,3 +1926,9 @@ form[data-form]{position:relative}
 /* SEO-тексты (разделы каталога, посадочные, главная, аренда) — стили текста статьи, на всю ширину колонки */
 .seo.post__body,.seo .post__body{font-size:16.5px;color:var(--ink-3);max-width:none}
 .seo.post__body>:first-child,.seo .post__body>:first-child{margin-top:0}
+/* подсказка у фильтра: «Показать N товаров» — ведёт к началу списка */
+.fhint{position:absolute;z-index:40;transform:translateY(-50%);background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 16px;
+  font:600 13.5px/1.2 Manrope,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 8px 24px rgba(14,14,12,.18);animation:fhint .2s ease-out}
+.fhint::before{content:"";position:absolute;left:-5px;top:50%;width:10px;height:10px;background:var(--ink);transform:translateY(-50%) rotate(45deg);border-radius:2px}
+.fhint:hover{background:var(--ink-3)}
+@keyframes fhint{from{opacity:0;transform:translate(-6px,-50%)}}
