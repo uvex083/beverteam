@@ -16,7 +16,7 @@ foreach (bt_mega_cats() as $c) {
         $shop[] = [$c['t'], $c['h'], array_map(fn($s) => [$s[0], $s[1]], $c['sub'])];
     }
 }
-$shop[] = ['Сравнение товаров', '/magazin/compare/'];
+$shop[] = ['Сравнение товаров', '/catalog/compare/'];
 $rent = array_map(fn($m) => [$m['model'] . ' — ' . mb_strtolower($m['audience']), '/arenda-kofemashin/'], bt_rent_models());
 $services = [
     ['Аренда кофемашин', '/arenda-kofemashin/', $rent],

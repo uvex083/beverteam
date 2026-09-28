@@ -279,8 +279,8 @@ function bt_mega_cats(): array
     $cats[] = ['t' => 'Аренда кофемашин', 'h' => '/arenda-kofemashin/', 'sub' => [['Для офиса', '/arenda-kofemashin/'], ['Для кафе и HoReCa', '/arenda-kofemashin/'], ['На мероприятие', '/arenda-kofemashin/#event'], ['Кофе по подписке', '/podpiska/']],
         'promo' => $rent ? ['img' => $rent[0]['img'], 'b' => $rent[0]['n'], 't' => 'от ' . bt_fmt(min(array_column($rent, 'p'))) . ' в месяц', 'h' => '/arenda-kofemashin/'] : null];
     // порядок как в макете: Чай, Кофе, Кофемашины, Аренда, Аксессуары
-    $acc = array_filter($cats, fn($c) => $c['h'] === '/magazin/aksessuary/');
-    $cats = array_values(array_merge(array_filter($cats, fn($c) => $c['h'] !== '/magazin/aksessuary/'), $acc));
+    $acc = array_filter($cats, fn($c) => $c['h'] === '/catalog/aksessuary/');
+    $cats = array_values(array_merge(array_filter($cats, fn($c) => $c['h'] !== '/catalog/aksessuary/'), $acc));
 
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
     $cache->endDataCache($cats);
@@ -963,7 +963,7 @@ function bt_sitemap_build(): string
 {
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
-    $urls = ['/', '/magazin/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
+    $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
         '/o-kompanii/', '/otzyvy-o-nas/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);

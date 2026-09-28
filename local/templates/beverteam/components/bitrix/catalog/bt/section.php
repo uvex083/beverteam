@@ -5,7 +5,7 @@
  * @var CBitrixComponent $component
  * @global CMain $APPLICATION
  */
-// Раздел каталога и корень /magazin/ (sections.php подключает этот же файл без раздела)
+// Раздел каталога и корень /catalog/ (sections.php подключает этот же файл без раздела)
 $sectionCode = $arResult['VARIABLES']['SECTION_CODE'] ?? '';
 $section = $rootSection = null;
 if ($sectionCode !== '') {

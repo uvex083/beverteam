@@ -386,7 +386,7 @@ const CATS = window.BT_CATS || [];
    Пункт «Главная» не выводим (дубль логотипа), «Аренда кофемашин» — отдельный пункт. */
 const NAV = [
   {t:'О компании', h:'/o-kompanii/', sub:[['Отзывы о нас','/o-kompanii/#reviews'],['Написать нам','/kontakty/#form']]},
-  {t:'Магазин', h:'/magazin/', sub:[['Кофе','/magazin/'],['Чай','/magazin/'],['Кофемашины','/magazin/'],['Аксессуары','/magazin/']]},
+  {t:'Магазин', h:'/catalog/', sub:[['Кофе','/catalog/'],['Чай','/catalog/'],['Кофемашины','/catalog/'],['Аксессуары','/catalog/']]},
   {t:'Аренда кофемашин', h:'/arenda-kofemashin/', sub:[['Для офиса','/arenda-kofemashin/'],['Для кафе и HoReCa','/arenda-kofemashin/'],['На мероприятие','/arenda-kofemashin/'],['Кофе по подписке','/podpiska/']]},
   {t:'Сервис', h:'/servis/', sub:[['Ремонт кофемашин','/servis/remont-kofemashin/'],['Плановое ТО и чистка','/servis/#price'],['Продажа оборудования','/servis/'],['Вызвать инженера','/servis/remont-kofemashin/#form']]},
   {t:'Журнал', h:'/blog/', sub:[['Все материалы','/blog/']]},
@@ -411,7 +411,7 @@ function header(){
       <button class="hact" id="srchBtn" aria-label="Поиск по сайту" aria-haspopup="dialog">${I.search}<span>Поиск</span></button>
       <a class="hact" href="/personal/">${I.user}<span>Кабинет</span></a>
       <a class="hact" href="#" onclick="BT_toast('Избранное — в прототипе не реализовано');return false">${I.heart}<span>Избранное</span></a>
-      <a class="hact hact--cmp" href="/magazin/compare/" aria-label="Сравнение товаров">${I.compare}<span class="cnt" hidden>0</span><span>Сравнение</span></a>
+      <a class="hact hact--cmp" href="/catalog/compare/" aria-label="Сравнение товаров">${I.compare}<span class="cnt" hidden>0</span><span>Сравнение</span></a>
       <a class="hact" href="/personal/cart/" aria-label="Корзина">${I.cart}<span class="cnt"${cartCnt?'':' hidden'}>${cartCnt}</span><span>Корзина</span></a>
     </div>
   </div>
@@ -468,8 +468,8 @@ function footer(){
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. ${CO.city}, с 2010 года.</p>
       <div class="ftr__soc" style="margin-top:14px">${msgrHtml()}</div>
       <div class="ftr__hours"><b>Время работы</b>Офис: ${CO.hours}<br>${CO.hoursSvc}<br>Сб–Вс — выходные</div></div>
-    <div><h5>Каталог</h5><ul><li><a href="/magazin/">Чай</a></li><li><a href="/magazin/">Кофе BOTANICA</a></li><li><a href="/magazin/">Автоматические кофемашины JETINNO</a></li><li><a href="/magazin/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
-    <div><h5>Услуги</h5><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/magazin/">Кофе оптом</a></li></ul></div>
+    <div><h5>Каталог</h5><ul><li><a href="/catalog/">Чай</a></li><li><a href="/catalog/">Кофе BOTANICA</a></li><li><a href="/catalog/">Автоматические кофемашины JETINNO</a></li><li><a href="/catalog/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
+    <div><h5>Услуги</h5><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/catalog/">Кофе оптом</a></li></ul></div>
     <div><h5>Покупателям</h5><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/blog/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
     <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><h5>Контакты</h5><ul>
       <li><a href="tel:${CO.tel1}" itemprop="telephone">${CO.tel1f}</a></li>
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <a class="spromo spromo--lime" href="/podpiska/">
           <span class="k">Подписка</span><b>Кофемашина бесплатно</b><span>При заказе от 3 кг кофе в месяц. Обслуживание и ремонт наши.</span>
           ${byCode('jetinno-jl-05')?`<img src="${byCode('jetinno-jl-05').img}" alt="" loading="lazy">`:''}</a>
-        <a class="spromo spromo--esp" href="${byCode('botanica-efiopiya-oromiya')?.url||'/magazin/kofe/'}">
+        <a class="spromo spromo--esp" href="${byCode('botanica-efiopiya-oromiya')?.url||'/catalog/kofe/'}">
           <span class="k">Зерно месяца</span><b>Эфиопия Оромия, Q 82,5</b><span>2 687 ₽ за кг, от 30 кг — 1 940 ₽</span>
           ${byCode('botanica-efiopiya-oromiya')?`<img src="${byCode('botanica-efiopiya-oromiya').img}" alt="" loading="lazy">`:''}</a>
         <a class="spromo spromo--dark" href="/arenda-kofemashin/#calc">
@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead).toLowerCase().includes(ql)).slice(0,3);
     if(!prods.length&&!pages.length&&!posts.length){
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>
-        <p>Попробуйте короче или загляните в <a class="link" href="/magazin/">каталог</a>. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p></div>`;
+        <p>Попробуйте короче или загляните в <a class="link" href="/catalog/">каталог</a>. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p></div>`;
       return;
     }
     sinner.innerHTML=`<div class="srch__grid"><div>
@@ -1022,7 +1022,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('click',e=>{const c=e.target.closest('.pc__cmpi');if(!c)return;
     const pc=c.closest('[data-pc]'); if(!pc) return;
     const on=BT_cmpToggle(pc.dataset.pc);
-    BT_toast(on?'Товар добавлен к сравнению · <a href="/magazin/compare/">Сравнить</a>':'Товар убран из сравнения');});
+    BT_toast(on?'Товар добавлен к сравнению · <a href="/catalog/compare/">Сравнить</a>':'Товар убран из сравнения');});
 
   /* счётчик цифр: <b data-count="16">16 лет</b> — один проход при появлении, reduced-motion → сразу итог */
   const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1450,7 +1450,7 @@ window.BT_SPEC_GROUPS = {
     ['Основное',[['Вес/объём','w']]]
   ]
 };
-// характеристики для сравнения отдаёт сервер на странице /magazin/compare/
+// характеристики для сравнения отдаёт сервер на странице /catalog/compare/
 window.BT_SPECS = window.BT_SPECS || {};
 window.BT_cmpCat = id => BT_PRODUCTS.coffee.some(x=>x.id===id)?'coffee'
   : BT_PRODUCTS.tea.some(x=>x.id===id)?'tea'

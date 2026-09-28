@@ -36,7 +36,7 @@ a{color:#0E0E0C}
         <td style="padding-left:11px;font-family:Unbounded,'Arial Black',Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;letter-spacing:1px;color:#FFFFFF;white-space:nowrap">BEVERTEAM</td>
       </tr></table></a>
     </td>
-    <td align="right" valign="middle" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;color:#C9C9C2;white-space:nowrap"><a href="<?= $host ?>/magazin/" style="color:#D7E85C;text-decoration:none;font-weight:700">Каталог</a></td>
+    <td align="right" valign="middle" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;color:#C9C9C2;white-space:nowrap"><a href="<?= $host ?>/catalog/" style="color:#D7E85C;text-decoration:none;font-weight:700">Каталог</a></td>
   </tr></table>
 </td></tr>
 <tr><td class="bt-p" bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:36px 36px 32px;font-family:Manrope,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#0E0E0C">

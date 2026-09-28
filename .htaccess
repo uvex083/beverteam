@@ -10,10 +10,12 @@ ErrorDocument 404 /404.php
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
   # адреса старого сайта (конструктор) → новые, чтобы не потерять позиции в поиске
-  RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/magazin/aksessuary/$1/ [R=301,L]
-  RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/magazin/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
+  RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/catalog/aksessuary/$1/ [R=301,L]
+  RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/catalog/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
   RewriteRule ^magazin/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
   RewriteRule ^magazin/product/(jl-05-arenda|jl-15-viva-arenda|jl-36-arenda)/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
+  # магазин переехал на /catalog/ — все старые адреса /magazin/ одним прыжком
+  RewriteRule ^magazin(/.*?)?/?$ https://%{HTTP_HOST}/catalog$1/ [R=301,L]
   RewriteRule ^news/view/([^/]+)/?$ https://%{HTTP_HOST}/blog/$1/ [R=301,L]
   # журнал переехал с /news/ на /blog/
   RewriteRule ^news/?$ https://%{HTTP_HOST}/blog/ [R=301,L]

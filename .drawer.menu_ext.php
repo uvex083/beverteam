@@ -10,5 +10,5 @@ foreach (bt_mega_cats() as $c) {
         $catalog[] = [$name, $url, [], ['DEPTH_LEVEL' => 3], ''];
     }
 }
-$at = array_search('/magazin/', array_column($aMenuLinks, 1), true);
+$at = array_search('/catalog/', array_column($aMenuLinks, 1), true);
 array_splice($aMenuLinks, $at === false ? 0 : $at + 1, 0, $catalog);

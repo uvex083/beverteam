@@ -18,7 +18,7 @@ $APPLICATION->SetTitle('Страница не найдена');
       <a class="btn" href="/">На главную</a>
     </div>
     <div class="links">
-      <a href="/magazin/">Каталог чая и кофе <span>→</span></a>
+      <a href="/catalog/">Каталог чая и кофе <span>→</span></a>
       <a href="/arenda-kofemashin/">Аренда кофемашин <span>→</span></a>
       <a href="/servis/">Ремонт и обслуживание <span>→</span></a>
       <a href="/oplata-i-dostavka/">Оплата и доставка <span>→</span></a>

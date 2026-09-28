@@ -63,7 +63,7 @@ $hints = ['кофе в зёрнах', 'аренда кофемашины', 'ре
   <?php elseif ($q !== ''): ?>
     <div class="spage__empty">
       <b>По запросу «<?= $e($q) ?>» ничего не нашлось</b>
-      <p>Проверьте написание или сократите запрос. Можно заглянуть в <a class="link" href="/magazin/">каталог</a> или позвонить: <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a></p>
+      <p>Проверьте написание или сократите запрос. Можно заглянуть в <a class="link" href="/catalog/">каталог</a> или позвонить: <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a></p>
     </div>
   <?php endif ?>
   <?php if (!$total): ?>

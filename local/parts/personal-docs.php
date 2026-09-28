@@ -45,7 +45,7 @@ bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h
 <div class="card empty">
   <p class="display h3">Заказов по счёту пока нет</p>
   <p class="muted">При оформлении выберите «Юрлицо или ИП» и оплату по счёту — менеджер пришлёт счёт, после отгрузки — УПД.</p>
-  <a class="btn" href="/magazin/">Перейти в каталог</a>
+  <a class="btn" href="/catalog/">Перейти в каталог</a>
 </div>
 <?php endif ?>
 <div class="row" style="margin-top:18px;gap:10px">

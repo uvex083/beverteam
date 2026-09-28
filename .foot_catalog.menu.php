@@ -1,8 +1,8 @@
 <?php
 $aMenuLinks = [
-    ['Чай', '/magazin/chay/', [], [], ''],
-    ['Кофе BOTANICA', '/magazin/kofe/', [], [], ''],
-    ['Автоматические кофемашины JETINNO', '/magazin/professionalnye-kofemashiny/', [], [], ''],
-    ['Аксессуары', '/magazin/aksessuary/', [], [], ''],
+    ['Чай', '/catalog/chay/', [], [], ''],
+    ['Кофе BOTANICA', '/catalog/kofe/', [], [], ''],
+    ['Автоматические кофемашины JETINNO', '/catalog/professionalnye-kofemashiny/', [], [], ''],
+    ['Аксессуары', '/catalog/aksessuary/', [], [], ''],
     ['Аренда кофемашин', '/arenda-kofemashin/', [], [], ''],
 ];

@@ -24,7 +24,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
   </div>
 
   <section class="sec">
-    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">С этим берут</h2><a class="link" href="/magazin/">В каталог →</a></div>
+    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">С этим берут</h2><a class="link" href="/catalog/">В каталог →</a></div>
     <div class="grid g4" id="rec"></div>
   </section>
 </div>
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     free.innerHTML=BT_freeBar(t.sum);};
   function render(){
     const cart=BT_cartItems();
-    if(!cart.length){items.innerHTML=`<div class="card empty"><div class="display">Корзина пуста</div><p>Добавьте кофе, чай или оборудование из каталога.</p><a class="btn" href="/magazin/">В каталог</a></div>`;}
+    if(!cart.length){items.innerHTML=`<div class="card empty"><div class="display">Корзина пуста</div><p>Добавьте кофе, чай или оборудование из каталога.</p><a class="btn" href="/catalog/">В каталог</a></div>`;}
     else items.innerHTML=cart.map(c=>`<div class="ci">
       <a class="ci__ph" href="${esc(c.url)}" aria-label="${esc(c.n)}">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy" width="90" height="90">`:''}</a>
       <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Фасовка <b>${c.kg} кг</b> · ${fmt(BT_perKg(c,c.kg,c.q))} за кг</p>`:''}<p class="par">${esc(c.par)}</p>

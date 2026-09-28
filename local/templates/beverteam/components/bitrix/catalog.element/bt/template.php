@@ -15,7 +15,7 @@ $section = $arResult['BT_SECTION'];
 $reviews = $arResult['BT_REVIEWS'];
 $revN = count($reviews);
 $co = bt_contacts();
-$back = $section['SECTION_PAGE_URL'] ?? '/magazin/';
+$back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
 ?>
   <nav class="pnav" style="margin-top:18px">
     <a href="<?= $e($arResult['BT_PREV']['url'] ?? $back) ?>" id="pPrev"><span id="iPrev"><?= bt_icon('arrL') ?></span> Предыдущий товар</a>

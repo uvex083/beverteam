@@ -104,8 +104,8 @@ $html = ['DEFAULT_VALUE' => ['TYPE' => 'HTML', 'TEXT' => '']];
 // ---------- каталог ----------
 $catId = bt_ensure_iblock([
     'IBLOCK_TYPE_ID' => 'catalog', 'CODE' => 'catalog', 'API_CODE' => 'Catalog', 'NAME' => 'Каталог товаров', 'SORT' => 10,
-    'LIST_PAGE_URL' => '/magazin/', 'SECTION_PAGE_URL' => '/magazin/#SECTION_CODE_PATH#/',
-    'DETAIL_PAGE_URL' => '/magazin/product/#ELEMENT_CODE#/', 'INDEX_ELEMENT' => 'Y', 'INDEX_SECTION' => 'Y',
+    'LIST_PAGE_URL' => '/catalog/', 'SECTION_PAGE_URL' => '/catalog/#SECTION_CODE_PATH#/',
+    'DETAIL_PAGE_URL' => '/catalog/product/#ELEMENT_CODE#/', 'INDEX_ELEMENT' => 'Y', 'INDEX_SECTION' => 'Y',
     'FIELDS' => ['CODE' => ['IS_REQUIRED' => 'Y', 'DEFAULT_VALUE' => ['UNIQUE' => 'Y', 'TRANSLITERATION' => 'Y', 'TRANS_LEN' => 100, 'TRANS_CASE' => 'L', 'TRANS_SPACE' => '-', 'TRANS_OTHER' => '-', 'TRANS_EAT' => 'Y']],
         'SECTION_CODE' => ['IS_REQUIRED' => 'Y', 'DEFAULT_VALUE' => ['UNIQUE' => 'Y', 'TRANSLITERATION' => 'Y', 'TRANS_LEN' => 100, 'TRANS_CASE' => 'L', 'TRANS_SPACE' => '-', 'TRANS_OTHER' => '-', 'TRANS_EAT' => 'Y']]],
 ], $apply, $say, $fail);

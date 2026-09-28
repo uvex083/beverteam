@@ -16,7 +16,7 @@ $co = bt_contacts();
       <b>Пока ждёте</b>
       <ul>
         <li><a class="link" href="/arenda-kofemashin/">Сравните модели Jetinno по нагрузке</a></li>
-        <li><a class="link" href="/magazin/kofe/">Посмотрите кофе BOTANICA под вашу машину</a></li>
+        <li><a class="link" href="/catalog/kofe/">Посмотрите кофе BOTANICA под вашу машину</a></li>
         <li><a class="link" href="/oplata-i-dostavka/">Условия оплаты и доставки</a></li>
       </ul>
     </div>

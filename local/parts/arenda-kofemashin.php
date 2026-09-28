@@ -70,7 +70,7 @@ $maxCups = $byCups ? max(array_column($byCups, 'cups')) : 100;
 
   <?php if ($data['rent']): ?>
   <section class="sec" id="models">
-    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Модели в аренду</h2><a class="link" href="/magazin/professionalnye-kofemashiny/">Купить в собственность →</a></div>
+    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Модели в аренду</h2><a class="link" href="/catalog/professionalnye-kofemashiny/">Купить в собственность →</a></div>
     <div class="grid g3"><?php foreach ($data['rent'] as $m) echo bt_card($m) ?></div>
   </section>
 

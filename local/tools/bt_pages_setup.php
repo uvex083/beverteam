@@ -217,7 +217,7 @@ $one('main_hero', [
     'BTN_TEXT' => 'Рассчитать аренду', 'BTN_LINK' => '/arenda-kofemashin/',
     'BTN2_TEXT' => 'Заказать дегустацию', 'BTN2_LINK' => $lead,
     'BTN3_TEXT' => 'Получить персональное предложение', 'BTN3_LINK' => $lead,
-    'LINK_TEXT' => 'Смотреть каталог →', 'LINK_URL' => '/magazin/',
+    'LINK_TEXT' => 'Смотреть каталог →', 'LINK_URL' => '/catalog/',
 ]);
 $list('main_facts', [
     ['16 лет', 'работаем с кофе и оборудованием'],
@@ -250,12 +250,12 @@ $list('main_utp_items', [
 ]);
 $one('main_catalog', [
     'TITLE' => 'Каталог', 'SUBTITLE' => 'Кофе собственной обжарки BOTANICA, чай, кофемашины и аксессуары. Бесплатная доставка по Екатеринбургу от 3 000 ₽.',
-    'BTN_TEXT' => 'Весь каталог →', 'BTN_LINK' => '/magazin/',
+    'BTN_TEXT' => 'Весь каталог →', 'BTN_LINK' => '/catalog/',
 ]);
 $one('main_rent', [
     'TITLE' => 'Аренда и продажа кофемашин', 'SUBTITLE' => 'Одни и те же модели можно арендовать или купить. В аренде сервисное обслуживание уже включено.',
     'BTN_TEXT' => 'Перейти в раздел «Аренда кофемашин»', 'BTN_LINK' => '/arenda-kofemashin/',
-    'BTN2_TEXT' => 'Перейти в раздел «Продажа кофемашин»', 'BTN2_LINK' => '/magazin/professionalnye-kofemashiny/',
+    'BTN2_TEXT' => 'Перейти в раздел «Продажа кофемашин»', 'BTN2_LINK' => '/catalog/professionalnye-kofemashiny/',
 ]);
 $one('main_service', [
     'CAPTION' => 'Сервисный центр', 'TITLE' => "Сервис кофемашин\nJetinno", 'HIGHLIGHT' => 'Jetinno',
@@ -267,7 +267,7 @@ $oromia = CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('catalog'), '=CO
 $one('main_bean', [
     'CAPTION' => 'Продажа кофе · зерно месяца', 'TITLE' => "Эфиопия\nОромия",
     'SUBTITLE' => 'Сладкий кофе с нотами чёрного чая, сухофруктов, лимона и шоколадным послевкусием. Подходит для любых кофемашин.',
-    'PRODUCT' => $oromia['ID'] ?? false, 'BTN2_TEXT' => 'Перейти в раздел «Кофе»', 'BTN2_LINK' => '/magazin/kofe/',
+    'PRODUCT' => $oromia['ID'] ?? false, 'BTN2_TEXT' => 'Перейти в раздел «Кофе»', 'BTN2_LINK' => '/catalog/kofe/',
 ]);
 $one('main_steps', [
     'TITLE' => 'Как проходит аренда',
@@ -294,7 +294,7 @@ $one('main_journal', ['TITLE' => 'Журнал', 'SUBTITLE' => 'Как ухаж�
 $one('main_seo', [
     'TITLE' => 'Чай, кофе и кофемашины в Екатеринбурге',
     'TEXT' => '<p>BEVERTEAM — магазин чая, кофе и кофейного оборудования, работающий с 2010 года. Мы продаём обжаренный кофе в зёрнах BOTANICA, чай и аксессуары, поставляем и обслуживаем автоматические кофемашины Jetinno.</p>'
-        . '<p>Основные направления: <a href="/arenda-kofemashin/">аренда кофемашин</a> для дома, офиса и кафе от 3 500 ₽ в месяц, <a href="/magazin/professionalnye-kofemashiny/">продажа оборудования</a> и <a href="/servis/">ремонт кофемашин</a> в собственном авторизованном сервисном центре. Доставляем по Екатеринбургу и всей России.</p>',
+        . '<p>Основные направления: <a href="/arenda-kofemashin/">аренда кофемашин</a> для дома, офиса и кафе от 3 500 ₽ в месяц, <a href="/catalog/professionalnye-kofemashiny/">продажа оборудования</a> и <a href="/servis/">ремонт кофемашин</a> в собственном авторизованном сервисном центре. Доставляем по Екатеринбургу и всей России.</p>',
 ]);
 
 // «О компании»

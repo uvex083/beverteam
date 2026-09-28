@@ -12,7 +12,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
   <div class="cmp__empty" id="favEmpty" hidden>
     <p class="display h3" style="margin:0 0 10px">В избранном пока пусто</p>
     <p class="muted" style="margin:0 0 20px">Отмечайте товары сердечком в каталоге — они соберутся здесь.</p>
-    <a class="btn" href="/magazin/">Перейти в каталог</a>
+    <a class="btn" href="/catalog/">Перейти в каталог</a>
   </div>
 </div>
 <script>

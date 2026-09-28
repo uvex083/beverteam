@@ -39,7 +39,7 @@ if (!$orders): ?>
   <div class="card empty">
     <p class="display h3">Заказов пока нет</p>
     <p class="muted">Здесь появятся заказы, оформленные с вашим e-mail: статус, состав и повтор в один клик.</p>
-    <a class="btn" href="/magazin/">Перейти в каталог</a>
+    <a class="btn" href="/catalog/">Перейти в каталог</a>
   </div>
 <?php else: ?>
   <?php if ($repeat): ?>

@@ -4,7 +4,7 @@ $a = ['DEPTH_LEVEL' => 1, 'accent' => 'Y'];
 $sub = ['DEPTH_LEVEL' => 2];
 $rubrics = array_values(bt_blog_rubrics());
 $aMenuLinks = array_merge([
-    ['Каталог', '/magazin/', [], $a, ''],
+    ['Каталог', '/catalog/', [], $a, ''],
     ['Аренда кофемашин', '/arenda-kofemashin/', [], $a, ''],
     ['Для офиса', '/arenda-kofemashin/', [], $sub, ''],
     ['Для кафе и HoReCa', '/arenda-kofemashin/', [], $sub, ''],
@@ -13,7 +13,7 @@ $aMenuLinks = array_merge([
     ['Сервис и ремонт', '/servis/', [], $a, ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
     ['Плановое ТО и чистка', '/servis/#price', [], $sub, ''],
-    ['Продажа оборудования', '/magazin/professionalnye-kofemashiny/', [], $sub, ''],
+    ['Продажа оборудования', '/catalog/professionalnye-kofemashiny/', [], $sub, ''],
     ['Вызвать инженера', '/servis/remont-kofemashin/#form', [], $sub, ''],
     ['Кофе по подписке', '/podpiska/', [], $a, ''],
     ['Журнал', '/blog/', [], $a, ''],

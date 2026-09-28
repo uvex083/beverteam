@@ -45,7 +45,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     <?php endif ?>
     <?php if ($tags): ?><div class="jtags jtags--post"><?php foreach ($tags as $t): ?><a href="<?= $e(bt_tag_url($t)) ?>">#<?= $e($t) ?></a><?php endforeach ?><meta itemprop="keywords" content="<?= $e(implode(', ', $tags)) ?>"></div><?php endif ?>
     <div class="row" style="margin-top:32px;gap:12px">
-      <a class="btn" href="/magazin/kofe/">Выбрать зерно</a>
+      <a class="btn" href="/catalog/kofe/">Выбрать зерно</a>
       <a class="btn btn--line" href="/podbor-kofe/">Подобрать кофе за минуту</a>
     </div>
   </div>

@@ -70,7 +70,7 @@ foreach (bt_messengers() as [$code, $name, $href]) {
       </a>
       <div class="dn__tiles">
         <a href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span><b data-dcnt="fav"></b></a>
-        <a href="/magazin/compare/"><?= bt_icon('compare') ?><span>Сравнение</span><b data-dcnt="cmp"></b></a>
+        <a href="/catalog/compare/"><?= bt_icon('compare') ?><span>Сравнение</span><b data-dcnt="cmp"></b></a>
       </div>
     </div>
     <div class="dn__ct">

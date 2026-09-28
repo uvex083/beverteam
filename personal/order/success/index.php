@@ -32,7 +32,7 @@ if (!$order) {
   <div class="ok"><div class="ok__hd">
     <h1 class="display h1">Заказ не найден</h1>
     <p>Страница заказа доступна только в том браузере, где его оформляли. Статус заказа можно узнать у менеджера по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</p>
-    <div class="row" style="justify-content:center;margin-top:28px"><a class="btn" href="/magazin/">В каталог</a></div>
+    <div class="row" style="justify-content:center;margin-top:28px"><a class="btn" href="/catalog/">В каталог</a></div>
   </div></div>
 <?php else:
     $props = [];
@@ -114,7 +114,7 @@ if (!$order) {
       <div><b>Изменить заказ</b><span>Позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a> до отправки</span></div>
       <div><b>Нужен документ?</b><span><?= $pCode === 'bill' ? 'Счёт и УПД пришлём на e‑mail' : 'Чек выдадим при получении, УПД — по запросу' ?></span></div>
     </div>
-    <div class="row" style="justify-content:center;margin-top:28px;gap:12px"><a class="btn btn--line" href="/magazin/">Продолжить покупки</a></div>
+    <div class="row" style="justify-content:center;margin-top:28px;gap:12px"><a class="btn btn--line" href="/catalog/">Продолжить покупки</a></div>
   </div>
 <?php endif ?>
 </div>

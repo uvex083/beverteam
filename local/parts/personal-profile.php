@@ -28,7 +28,7 @@ bt_acc_start('profile', '<h1 class="display h1">Личный кабинет</h1>
   <?php if ($last): [$st, $cls] = bt_order_status($last) ?>
   <a class="card" href="/personal/orders/<?= (int)$last['ID'] ?>/"><span class="mono muted">Последний заказ</span><b class="kpi">№ <?= $e($last['ACCOUNT_NUMBER']) ?></b><span class="status <?= $cls ?>"><?= $e($st) ?></span></a>
   <?php else: ?>
-  <a class="card" href="/magazin/"><span class="mono muted">Заказы</span><b class="kpi">Пока нет</b><span class="link" style="font-size:13.5px">Перейти в каталог</span></a>
+  <a class="card" href="/catalog/"><span class="mono muted">Заказы</span><b class="kpi">Пока нет</b><span class="link" style="font-size:13.5px">Перейти в каталог</span></a>
   <?php endif ?>
   <a class="card" href="/personal/addresses/"><span class="mono muted">Адрес доставки</span>
     <?php if ($addr): ?><b class="kpi"><?= $e($addr['city']) ?></b><span class="muted" style="font-size:13px"><?= $e($addr['street']) ?></span>

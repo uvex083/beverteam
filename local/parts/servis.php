@@ -21,7 +21,7 @@ $minMachine = $machinePrices ? min($machinePrices) : 0;
         $p = $d['price'];
         if ($p === '' && $link === '/arenda-kofemashin/' && $minRent) {
             $p = 'от ' . bt_fmt($minRent);
-        } elseif ($p === '' && str_starts_with($link, '/magazin/') && $minMachine) {
+        } elseif ($p === '' && str_starts_with($link, '/catalog/') && $minMachine) {
             $p = 'от ' . bt_fmt($minMachine);
         }
     ?>

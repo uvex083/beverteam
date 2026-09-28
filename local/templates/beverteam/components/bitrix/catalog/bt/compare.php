@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       cmpBody.innerHTML=`<div class="cmp__empty">
         <p class="display h3" style="margin:0 0 10px">Пока нечего сравнивать</p>
         <p class="muted" style="margin:0 0 20px">Добавьте товары кнопкой сравнения в каталоге — она в правом верхнем углу карточки.</p>
-        <a class="btn" href="/magazin/">Перейти в каталог</a></div>`;
+        <a class="btn" href="/catalog/">Перейти в каталог</a></div>`;
       cmpStickRow.innerHTML=''; cmpStick.classList.remove('on'); return;
     }
     const groups=BT_SPEC_GROUPS[cat]||[];

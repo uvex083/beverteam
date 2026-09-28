@@ -50,7 +50,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
       <button class="hact" id="srchBtn" aria-label="Поиск по сайту" aria-haspopup="dialog"><?= bt_icon('search') ?><span>Поиск</span></button>
       <a class="hact" href="/personal/"><?= bt_icon('user') ?><span>Кабинет</span></a>
       <a class="hact" href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span></a>
-      <a class="hact hact--cmp" href="/magazin/compare/" aria-label="Сравнение товаров"><?= bt_icon('compare') ?><span class="cnt" hidden>0</span><span>Сравнение</span></a>
+      <a class="hact hact--cmp" href="/catalog/compare/" aria-label="Сравнение товаров"><?= bt_icon('compare') ?><span class="cnt" hidden>0</span><span>Сравнение</span></a>
       <a class="hact" href="/personal/cart/" aria-label="Корзина"><?= bt_icon('cart') ?><span class="cnt" hidden>0</span><span>Корзина</span></a>
     </div>
   </div>
