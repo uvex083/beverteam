@@ -45,7 +45,6 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <div class="pmeta">
         <a href="#reviews" id="rTop" class="row" style="gap:8px;text-decoration:none"></a>
       </div>
-      </div>
       <div class="buy bb" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
         <meta itemprop="price" content="<?= $first ?>"><meta itemprop="priceCurrency" content="RUB"><link itemprop="availability" href="https://schema.org/InStock">
         <div id="pPacks"></div>
@@ -64,7 +63,8 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
           </div>
           <button id="bCmp" aria-pressed="false" title="Сравнить" aria-label="Сравнить"><span id="iCmp"><?= bt_icon('compare') ?></span></button>
           <button id="bFav" aria-pressed="false" title="В избранное" aria-label="В избранное"><span id="iFav"><?= bt_icon('heart') ?></span></button>
-            <div class="bb__sub"><span class="bb__st" id="pSt">В наличии</span><button class="bb__one" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в 1 клик</button></div>
+          </div>
+          <div class="bb__sub"><span class="bb__st" id="pSt">В наличии</span><button class="bb__one" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в 1 клик</button></div>
         </div>
         <div class="dship" id="dship"></div>
       </div>
