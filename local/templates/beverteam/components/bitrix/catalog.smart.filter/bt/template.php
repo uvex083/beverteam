@@ -54,7 +54,7 @@ $FMORE = 6;
 ?>
 <aside class="filters" id="filters">
   <form method="get" action="<?= $e($reset) ?>">
-  <?php foreach ($arResult['HIDDEN'] as $h): ?><input type="hidden" name="<?= $h['CONTROL_NAME'] ?>" value="<?= $h['HTML_VALUE'] ?>"><?php endforeach ?>
+  <?php foreach ($arResult['HIDDEN'] as $h): if ($h['CONTROL_NAME'] === 'sort') continue; ?><input type="hidden" name="<?= $h['CONTROL_NAME'] ?>" value="<?= $h['HTML_VALUE'] ?>"><?php endforeach ?>
   <?php if ($sort): ?><input type="hidden" name="sort" value="<?= $sort ?>"><?php endif ?>
   <div class="filters__hd">
     <b>Фильтр</b>
@@ -247,8 +247,18 @@ document.addEventListener('DOMContentLoaded',()=>{
 <?php
 // чипсы выбранных условий; контейнер выводится всегда — его подменяет фоновая загрузка
 $html = '<div class="chips" id="fChips"' . ($chips ? '' : ' style="display:none"') . '>';
+// выбранные условия полем → значение: ссылка «×» ведёт на раздел с остальными условиями, сервер перенаправит на ЧПУ
+$cur = [];
+foreach ($arResult['ITEMS'] as $it) {
+    foreach ($it['VALUES'] as $k => $v) {
+        if (in_array($k, ['MIN', 'MAX'], true) ? ($v['HTML_VALUE'] ?? '') !== '' : !empty($v['CHECKED'])) {
+            $cur[$v['CONTROL_NAME']] = $v['HTML_VALUE'];
+        }
+    }
+}
 foreach ($chips as [$name, $value, $params]) {
-    $url = $APPLICATION->GetCurPageParam('', array_merge($params, ['set_filter']));
+    $rest = array_diff_key($cur, array_flip($params));
+    $url = $reset . (($q = http_build_query(($rest ? $rest + ['set_filter' => 'Y'] : []) + $keep)) !== '' ? '?' . $q : '');
     $html .= '<span class="chip"><b>' . $e($name) . ':</b> ' . $e(mb_strtolower($value)) . ' <a href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" aria-label="Убрать">×</a></span>';
 }
 if ($chips) {
