@@ -118,7 +118,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <?php endif ?>
       <?php if (trim($arResult['~DETAIL_TEXT']) !== ''): ?>
         <h3 class="h3" style="margin:0 0 12px">Описание</h3>
-        <?= $arResult['~DETAIL_TEXT'] ?>
+        <div class="post__body pdesc"><?= preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $arResult['~DETAIL_TEXT']) ?></div>
       <?php endif ?>
     </div>
     <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><?= $arResult['BT_TECH'] ?></div><?php endif ?>

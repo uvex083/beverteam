@@ -4,7 +4,7 @@
 
 $id = (int)$arResult['ID'];
 $pr = $arResult['PROPERTIES'];
-$val = fn(string $code) => is_array($pr[$code]['VALUE'] ?? null) ? implode(', ', $pr[$code]['VALUE']) : trim((string)($pr[$code]['VALUE'] ?? ''));
+$val = fn(string $code) => is_array($pr[$code]['~VALUE'] ?? null) ? implode(', ', $pr[$code]['~VALUE']) : trim((string)($pr[$code]['~VALUE'] ?? ''));
 $html = fn(string $code) => trim((string)($pr[$code]['~VALUE']['TEXT'] ?? ''));
 
 $arResult['BT'] = bt_product((string)$id) ?? [];

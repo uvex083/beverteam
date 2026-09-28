@@ -1647,14 +1647,14 @@ form[data-form]{position:relative}
 .journalp .jfilter a[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .journalp .post__meta .tag{background:var(--lime-soft);border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono';font-size:11px;color:#4E5A12}
 .journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%;aspect-ratio:16/9;object-fit:cover}
-.journalp .post__body h3,.journalp .post__body h4{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
+.post__body h3,.post__body h4{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
 /* лестница заголовков в тексте статьи: H1 страницы один, заголовок первого уровня из редактора выглядит крупнее H2 */
-.journalp .post__body h1{font-family:Unbounded;font-weight:800;font-size:26px;line-height:1.2;margin:38px 0 14px;scroll-margin-top:130px}
-.journalp .post__body h4{font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin:24px 0 8px}
-.journalp .post__body h5,.journalp .post__body h6{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:22px 0 8px}
-.journalp .post__body>:first-child{margin-top:0}
-.journalp .post__body h2{scroll-margin-top:130px}
-.journalp .post__body ol{margin:0 0 20px}.journalp .post__body ol li{margin-bottom:9px}
+.post__body h1{font-family:Unbounded;font-weight:800;font-size:26px;line-height:1.2;margin:38px 0 14px;scroll-margin-top:130px}
+.post__body h4{font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin:24px 0 8px}
+.post__body h5,.post__body h6{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:22px 0 8px}
+.post__body>:first-child{margin-top:0}
+.post__body h2{scroll-margin-top:130px}
+.post__body ol{margin:0 0 20px}.post__body ol li{margin-bottom:9px}
 .journalp .post h1{overflow-wrap:anywhere;hyphens:auto}
 .nfp .spage__f{margin-bottom:14px}
 
@@ -1917,3 +1917,5 @@ form[data-form]{position:relative}
 .seo-landing .seo{font-size:14.5px;color:#4A515B;max-width:900px}
 /* окно получает фокус само (для Esc и клавиатуры) — без рамки */
 .lbox:focus,.modal__p:focus{outline:none;box-shadow:none}
+/* описание товара — стили текста статьи, в колонке вкладки */
+.pdesc{max-width:none;font-size:15.5px;line-height:1.75}
