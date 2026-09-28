@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     // кнопку не пересобираем без нужды: уход фокуса из поля количества перерисовал бы её под курсором и съел клик
     if(pAdd.dataset.st===String(inCart)){}
     else if(inCart){ pAdd.dataset.st=inCart;
-      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} шт → оформить</a>`;
+      pAdd.innerHTML=`<a class="btn btn--dark" href="/personal/cart/">В корзине · ${inCart} шт</a>`;
     } else { pAdd.dataset.st=0;
       pAdd.innerHTML=`<button class="btn" id="pBuy" type="button">В корзину</button>`;
       document.getElementById('pBuy').addEventListener('click',()=>{
