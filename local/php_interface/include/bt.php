@@ -806,8 +806,10 @@ function bt_user_js(): ?array
     if (!is_object($USER) || !$USER->IsAuthorized()) {
         return null;
     }
-    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN']])->fetch();
-    return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN'])] : null;
+    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN', 'PERSONAL_PHONE', 'PERSONAL_MOBILE']])->fetch();
+    $phone = (string)($u['PERSONAL_PHONE'] ?: $u['PERSONAL_MOBILE']);
+    return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN']),
+        'phone' => $phone !== '' ? bt_phone_fmt($phone) : ''] : null;
 }
 
 // Кнопки входа через сервисы для ui.js: только включённые в модуле «Социальные сервисы» и с заполненными ключами

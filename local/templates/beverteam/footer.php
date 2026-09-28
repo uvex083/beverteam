@@ -45,7 +45,8 @@ foreach (bt_messengers() as [$code, $name, $href]) {
       <input type="hidden" name="topic" value="Оставить заявку">
       <div class="field"><label>Имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div>
       <div class="field"><label>Телефон *</label><input name="phone" placeholder="+7 ___ ___-__-__"></div>
-      <div class="field"><label>Комментарий</label><textarea name="message" rows="3" maxlength="2000" placeholder="Что нужно: модель, количество, адрес"></textarea></div>
+      <div class="field lead__prod" hidden><label>Товар</label><input name="product" readonly tabindex="-1"></div>
+      <div class="field lead__msg"><label>Комментарий</label><textarea name="message" rows="3" maxlength="2000" placeholder="Что нужно: модель, количество, адрес"></textarea></div>
       <?= bt_form_tail() ?>
     </form>
     <div class="lead__ok" hidden>

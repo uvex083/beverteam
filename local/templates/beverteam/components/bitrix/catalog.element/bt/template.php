@@ -61,7 +61,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
         <div class="buy__row">
           <div class="qty"><button data-d="-" aria-label="Уменьшить">−</button><input id="qty" value="1" inputmode="numeric" aria-label="Количество, <?= $unit ?>"><button data-d="+" aria-label="Увеличить">+</button></div>
           <span id="pAdd"></span>
-          <button class="btn btn--line" type="button" onclick="BT_toast('Менеджер перезвонит в течение 5 минут')">Купить в один клик</button>
+          <button class="btn btn--line" type="button" data-lead="Купить в один клик" data-product="<?= $e($name) ?>">Купить в один клик</button>
         </div>
         <div class="dship" id="dship"></div>
       </div>

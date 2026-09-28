@@ -1059,6 +1059,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       const topic=b.dataset.lead||'Оставить заявку', f=ld.querySelector('form');
       f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
       ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic;
+      /* «Купить в один клик»: имя, телефон и товар без комментария; вошедшему покупателю — его имя и телефон */
+      const prod=b.dataset.product||''; f.elements.product.value=prod;
+      ld.querySelector('.lead__prod').hidden=!prod; ld.querySelector('.lead__msg').hidden=!!prod; if(prod) f.elements.message.value='';
+      const u=window.BT_USER; if(u){ if(!f.elements.name.value&&u.name) f.elements.name.value=u.name; if(!f.elements.phone.value&&u.phone) f.elements.phone.value=u.phone; }
       document.getElementById('drawer')?.classList.remove('open');
       ld.classList.add('open');
       /* на десктопе каретка сразу в первом пустом поле, на мобильном — нет (клавиатура закроет форму) */

@@ -1,3 +1,3 @@
 <?php
-$sSectionName = 'Магазин';
+$sSectionName = 'Каталог';
 $arDirProperties = [];
