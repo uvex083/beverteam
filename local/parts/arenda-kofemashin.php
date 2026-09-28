@@ -104,7 +104,7 @@ $maxCups = $byCups ? max(array_column($byCups, 'cups')) : 100;
   <?php endif ?>
 
   <?php if (!empty($seo['text'])): ?>
-  <section class="sec sec--t0"><div class="seo"><?= $seo['text'] ?></div></section>
+  <section class="sec sec--t0"><div class="seo post__body"><?= bt_br_list($seo['text']) ?></div></section>
   <?php endif ?>
 
   <?php if ($faq = bt_blocks('rent_faq')): ?>

@@ -19,5 +19,5 @@
 </section>
 
 <?php if (trim($arResult['~DESCRIPTION'] ?? '') !== ''): ?>
-  <div class="seo prose"><?= $arResult['~DESCRIPTION'] ?></div>
+  <div class="seo post__body"><?= bt_br_list($arResult['~DESCRIPTION']) ?></div>
 <?php endif;

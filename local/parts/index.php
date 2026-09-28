@@ -234,7 +234,7 @@ if ($bp):
 <?php if ($seo): ?>
 <section class="sec sec--t0"><div class="wrap seo">
   <h2 class="display"><?= $e($seo['title'] ?? '') ?></h2>
-  <?= $seo['text'] ?? '' ?>
+  <div class="post__body"><?= bt_br_list($seo['text'] ?? '') ?></div>
 </div></section>
 <?php endif ?>
 

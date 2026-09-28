@@ -1914,7 +1914,7 @@ form[data-form]{position:relative}
 .share__m a:hover{background:var(--paper)}
 .share__m svg{width:22px;height:22px;flex-shrink:0;display:block}
 /* SEO-текст посадочной страницы, если на странице нет своего блока текста */
-.seo-landing .seo{font-size:14.5px;color:#4A515B;max-width:900px}
+.seo-landing .seo{margin:0}
 /* окно получает фокус само (для Esc и клавиатуры) — без рамки */
 .lbox:focus,.modal__p:focus{outline:none;box-shadow:none}
 /* описание товара — стили текста статьи, в колонке вкладки */
@@ -1923,3 +1923,6 @@ form[data-form]{position:relative}
 .srch__ic{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--lime);display:grid;place-items:center}
 .srch__ic svg{width:20px;height:20px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .srch__ic .ico-badge{fill:var(--lime)}
+/* SEO-тексты (разделы каталога, посадочные, главная, аренда) — стили текста статьи, на всю ширину колонки */
+.seo.post__body,.seo .post__body{font-size:16.5px;color:var(--ink-3);max-width:none}
+.seo.post__body>:first-child,.seo .post__body>:first-child{margin-top:0}
