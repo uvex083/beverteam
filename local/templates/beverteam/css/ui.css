@@ -1293,6 +1293,9 @@ input,textarea{caret-color:var(--ink)}
   padding:3px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* характеристики шире текстовой колонки */
 .pane .pspecs{max-width:860px}
+/* вкладка отзывов — одной ширины со «Характеристиками»: сводка, отзывы и форма ровно по одному краю */
+#reviews{max-width:860px}
+#reviews .revform{max-width:none}
 /* характеристики первым блоком в «Описании» — как на Tasty Coffee */
 .pspecs{margin:0 0 26px}
 .pspecs h3{font-family:Unbounded;font-weight:800;font-size:17px;margin:0 0 12px}
