@@ -2001,6 +2001,8 @@ form[data-form]{position:relative}
 .bb__go{flex:1;min-width:0;height:52px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 20px;font:700 14.5px Manrope,sans-serif;white-space:nowrap;transition:background-color .15s}
 .bb__go span{display:inline-flex;align-items:center;gap:8px}
 .bb__go b{font:800 16px/1 Unbounded,sans-serif;color:var(--lime);font-variant-numeric:tabular-nums}
+/* сумма на кнопке — только на широких экранах, уже она не помещается рядом со степпером и иконками */
+@media(max-width:1399px){.bb__go b{display:none}.bb__go{justify-content:center}}
 .bb__go svg{width:16px;height:16px;stroke:var(--lime);fill:none}
 .bb__ic{grid-area:ic;display:flex;gap:8px}
 .bb__ic>button,.bb__ic .share>button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--white);color:var(--gray);display:grid;place-items:center;padding:0;cursor:pointer;transition:border-color .15s,color .15s,background-color .15s}
