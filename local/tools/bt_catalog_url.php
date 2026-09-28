@@ -29,4 +29,24 @@ while ($x = $r->Fetch()) {
     // только тексты — свойства не передаём, чтобы не затереть их (Update с частичными свойствами стирает остальные)
     $apply and ($el->Update($x['ID'], ['PREVIEW_TEXT' => $fix($x['PREVIEW_TEXT']), 'DETAIL_TEXT' => $fix($x['DETAIL_TEXT'])]) or print('  ошибка: ' . $el->LAST_ERROR . "\n"));
 }
+
+// свойства-строки и HTML (кнопки, тексты блоков): меняем по одному свойству через SetPropertyValuesEx — остальные не трогаются
+$r = CIBlockElement::GetList([], ['CHECK_PERMISSIONS' => 'N'], false, false, ['ID', 'IBLOCK_ID', 'NAME']);
+while ($x = $r->Fetch()) {
+    $pr = CIBlockElement::GetProperty($x['IBLOCK_ID'], $x['ID'], [], ['PROPERTY_TYPE' => 'S']);
+    $vals = [];
+    while ($v = $pr->Fetch()) {
+        $vals[$v['CODE']][] = $v;
+    }
+    foreach ($vals as $code => $list) {
+        if (!str_contains(serialize(array_column($list, 'VALUE')), '/magazin/')) {
+            continue;
+        }
+        $say("свойство {$code}: {$x['ID']} {$x['NAME']}");
+        $new = array_map(fn($v) => is_array($v['VALUE'])
+            ? ['VALUE' => ['TEXT' => $fix($v['VALUE']['TEXT'] ?? ''), 'TYPE' => $v['VALUE']['TYPE'] ?? 'html'], 'DESCRIPTION' => $v['DESCRIPTION']]
+            : ['VALUE' => $fix($v['VALUE']), 'DESCRIPTION' => $v['DESCRIPTION']], $list);
+        $apply and CIBlockElement::SetPropertyValuesEx($x['ID'], $x['IBLOCK_ID'], [$code => $list[0]['MULTIPLE'] === 'Y' ? $new : $new[0]]);
+    }
+}
 echo "done\n";
