@@ -131,7 +131,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
             <button type="button" class="btn btn--ghost btn--xs" data-r="1">1</button><button type="button" class="btn btn--ghost btn--xs" data-r="2">2</button>
             <button type="button" class="btn btn--ghost btn--xs" data-r="3">3</button><button type="button" class="btn btn--ghost btn--xs" data-r="4">4</button>
             <button type="button" class="btn btn--xs" data-r="5">5</button></div></div>
-          <div class="f2"><div class="field"><label>Имя *</label><input></div><div class="field"><label>E-mail</label><input type="email"><span class="muted" style="font-size:12px">Не публикуется</span></div></div>
+          <div class="f2"><div class="field"><label for="rName">Имя *</label><input id="rName" name="name" autocomplete="name"></div><div class="field"><label for="rEmail">E-mail</label><input id="rEmail" name="email" type="email" autocomplete="email"><span class="muted" style="font-size:12px">Не публикуется</span></div></div>
           <div class="field"><label>На какой машине готовили</label><input placeholder="Например, Jetinno JL15 VIVA"></div>
           <div class="field"><label>Комментарий *</label><textarea rows="4" placeholder="Как раскрылся вкус, какой помол выставили, с молоком или без"></textarea></div>
           <div class="field"><label>Фото <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">— до 5, JPG или PNG</span></label>
