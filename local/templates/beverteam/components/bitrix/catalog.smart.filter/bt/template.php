@@ -137,6 +137,8 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(o.type==='checkbox'){ o.disabled=n.disabled; o.closest('.opt').querySelector('.n').textContent=n.closest('.opt').querySelector('.n').textContent; }
           else o.placeholder=n.placeholder;
         });
+        /* ссылки «Разделов» несут текущие условия фильтра — берём их из ответа */
+        const ns=d.querySelectorAll('.fsec a'); form.querySelectorAll('.fsec a').forEach((a,i)=>{ if(ns[i]) a.href=ns[i].getAttribute('href'); });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
         if(push) history.pushState({bt:1},'',u); else history.replaceState({bt:1},'',u);
         /* новые карточки: степперы корзины, сравнение, избранное */
