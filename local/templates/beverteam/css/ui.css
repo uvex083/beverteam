@@ -1256,11 +1256,16 @@ input,textarea{caret-color:var(--ink)}
 .buy .btn--line{width:100%;margin-top:10px}
 .ship{display:grid;gap:7px;font-size:13.5px;color:#3A3A34}
 .ship div{display:flex;gap:9px}.ship div::before{content:"✓";color:var(--ok);font-weight:700}
-.tiers{width:100%;border-collapse:collapse;font-size:13.5px}
-.tiers th,.tiers td{padding:8px 0;border-bottom:1px solid var(--line);text-align:left}
+.tiers{width:calc(100% + 24px);margin:0 -12px;border-collapse:separate;border-spacing:0;font-size:13.5px}
+.tiers th,.tiers td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;transition:background-color .2s,border-color .2s}
 .tiers th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
 .tiers tr:last-child td{border-bottom:0}
-.tiers tr.on td{color:var(--ink);font-weight:700}
+.tiers tr.on td{color:var(--ink);font-weight:700;background:var(--lime-soft)}
+/* текущая ступень — плашка со скруглёнными краями; линии вокруг неё прячем, чтобы не резали плашку */
+.tiers tr.on td:first-child{border-radius:10px 0 0 10px}
+.tiers tr.on td:last-child{border-radius:0 10px 10px 0}
+.tiers tr.on td,.tiers tbody tr:has(+ tr.on) td{border-bottom-color:transparent}
+.tiers tr.on .sv{color:var(--ok);font-weight:700}
 .tiers td:last-child,.tiers th:last-child{text-align:right}
 .tiers .sv{color:var(--ok);font-family:'JetBrains Mono';font-size:12px}
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:14px}
