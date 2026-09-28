@@ -1,5 +1,5 @@
 <?php
-// Описания товаров: абзац из строк через <br> (характеристики построчно) → маркированный список <ul><li>.
+// Описания товаров: абзац из коротких строк через <br> (характеристики построчно) → маркированный список <ul><li>.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_desc_lists.php [show|apply]. Повторный запуск ничего не меняет.
 
 if (PHP_SAPI !== 'cli') {
@@ -14,6 +14,10 @@ CModule::IncludeModule('iblock');
 $apply = ($argv[1] ?? 'show') === 'apply';
 $toList = fn(string $html) => preg_replace_callback('~<p\b[^>]*>((?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*)</p>~isu', function ($m) {
     $items = array_filter(array_map('trim', preg_split('~<br\s*/?>~i', $m[1])), fn($s) => trim(strip_tags(str_replace('&nbsp;', ' ', $s))) !== '');
+    // список — только строки-характеристики: от трёх коротких строк; переносы внутри обычного текста не трогаем
+    if (count($items) < 3 || max(array_map(fn($s) => mb_strlen(strip_tags($s)), $items)) > 120) {
+        return $m[0];
+    }
     return "<ul>\n" . implode("\n", array_map(fn($s) => '<li>' . $s . '</li>', $items)) . "\n</ul>";
 }, $html);
 
