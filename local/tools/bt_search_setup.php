@@ -25,9 +25,10 @@ $ensureIb = function (string $type, string $code, string $name, int $sort, strin
         return 0;
     }
     $o = new CIBlock();
-    return (int)$o->Add(['IBLOCK_TYPE_ID' => $type, 'CODE' => $code, 'NAME' => $name, 'SORT' => $sort, 'SITE_ID' => ['s1'], 'ACTIVE' => 'Y',
-        'GROUP_ID' => ['2' => 'R'], 'VERSION' => 2, 'INDEX_ELEMENT' => 'N', 'DESCRIPTION' => $desc, 'DESCRIPTION_TYPE' => 'text'])
-        or die("ошибка инфоблока {$code}: {$o->LAST_ERROR}\n");
+    $id = (int)$o->Add(['IBLOCK_TYPE_ID' => $type, 'CODE' => $code, 'NAME' => $name, 'SORT' => $sort, 'SITE_ID' => ['s1'], 'ACTIVE' => 'Y',
+        'GROUP_ID' => ['2' => 'R'], 'VERSION' => 2, 'INDEX_ELEMENT' => 'N', 'DESCRIPTION' => $desc, 'DESCRIPTION_TYPE' => 'text']);
+    $id or die("ошибка инфоблока {$code}: {$o->LAST_ERROR}\n");
+    return $id;
 };
 $ensureProp = function (int $ibId, string $code, array $f) use ($apply, $say): int {
     if (!$ibId) {
