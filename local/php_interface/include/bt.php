@@ -170,7 +170,8 @@ function bt_card(array $m, bool $eager = false): string
         : '<button class="btn btn--sm" data-add="' . $e($m['id'] . (!empty($m['bulk']) ? ':' . $m['bulk'][0]['kg'] : '')) . '">' . (!empty($m['pre']) ? 'Предзаказ' : 'В корзину') . '</button>';
     $stock = !empty($m['stock']);
     return '<article class="pc" data-pc="' . $e($m['id']) . '" itemscope itemtype="https://schema.org/Product">'
-        . '<meta itemprop="name" content="' . $e($m['n']) . '"><meta itemprop="image" content="' . $e($m['img']) . '"><meta itemprop="description" content="' . $e($m['par']) . '">'
+        . '<meta itemprop="name" content="' . $e($m['n']) . '">' . ($m['img'] !== '' ? '<meta itemprop="image" content="' . $e($m['img']) . '">' : '')
+        . '<meta itemprop="description" content="' . $e(trim((string)$m['par']) ?: $m['n']) . '">'
         . $badges
         . '<div class="pc__acts"><button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">' . bt_icon('heart') . '</button>'
         . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
@@ -526,7 +527,7 @@ function bt_reviews(): array
     $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $list = [];
-    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT']);
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'DATE_CREATE']);
     while ($ob = $r->GetNextElement()) {
         $f = $ob->GetFields();
         $p = $ob->GetProperties();
@@ -543,7 +544,7 @@ function bt_reviews(): array
         }
         $list[] = [
             'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
-            'date' => $ts ? FormatDate('j F Y', $ts) : '', 'iso' => $ts ? date('Y-m-d', $ts) : '',
+            'date' => $ts ? FormatDate('j F Y', $ts) : '', 'iso' => date('Y-m-d', $ts ?: MakeTimeStamp($f['DATE_CREATE'])),
             'company' => trim((string)($p['COMPANY']['VALUE'] ?? '')), 'rating' => (int)($p['RATING']['VALUE'] ?? 0),
             'logo' => bt_img((int)($p['LOGO']['VALUE'] ?? 0), 96, 96),
             'docs' => $docs,
@@ -605,7 +606,10 @@ function bt_rev_card(array $r): string
         . '<div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><meta itemprop="streetAddress" content="' . $e($co['street'] ?? '') . '">'
         . '<meta itemprop="addressLocality" content="' . $e($co['city'] ?? '') . '"><meta itemprop="postalCode" content="' . $e($co['zip'] ?? '') . '"></div></div>'
         . (($r['rating'] ?? 0) > 0 ? '<div hidden itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating"><meta itemprop="ratingValue" content="' . (int)$r['rating'] . '"><meta itemprop="bestRating" content="5"></div>' : '');
-    return '<article class="rev" itemscope itemtype="https://schema.org/Review">' . $org
+    // дата в разметке — всегда (без «Даты отзыва» — дата добавления, на странице её не показываем)
+    $org .= ($r['date'] === '' ? '<meta itemprop="datePublished" content="' . $r['iso'] . '">' : '')
+        . (!empty($r['id']) ? '<link itemprop="url" href="https://beverteam.ru/otzyvy-o-nas/#rev' . (int)$r['id'] . '">' : '');
+    return '<article class="rev"' . (!empty($r['id']) ? ' id="rev' . (int)$r['id'] . '"' : '') . ' itemscope itemtype="https://schema.org/Review">' . $org
         . '<header class="rev__hd">' . $av . '<div class="rev__who"><b itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="name">' . $e($r['name']) . '</span></b>'
         . ($r['company'] !== '' ? '<span>' . $e($r['company']) . '</span>' : '') . '</div>'
         . ($r['date'] !== '' ? '<time datetime="' . $r['iso'] . '" itemprop="datePublished">' . $e($r['date']) . '</time>' : '') . '</header>'

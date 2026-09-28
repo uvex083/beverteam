@@ -33,8 +33,7 @@ $head = fn(array $b, string $link = '') => '<div class="sec__head" data-rv><div>
     . (($b['subtitle'] ?? '') !== '' ? '<p>' . $e($b['subtitle']) . '</p>' : '') . '</div>' . $link . '</div>';
 
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'BEVERTEAM',
-    'url' => 'https://beverteam.ru/', 'potentialAction' => ['@type' => 'SearchAction', 'target' => 'https://beverteam.ru/search/?q={search_term_string}',
-    'query-input' => 'required name=search_term_string']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
+    'url' => 'https://beverteam.ru/'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
 
 // подбор кофемашины: модели аренды + пункты блока (мероприятие — по заявке)
 $chips = [];
