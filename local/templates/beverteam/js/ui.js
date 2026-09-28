@@ -1766,3 +1766,72 @@ document.addEventListener('DOMContentLoaded',()=>{
       BT_lightbox(all.map(a=>({src:a.getAttribute('href'),cap:a.textContent.trim()})),all.indexOf(doc)); }
   });
 });
+
+/* Форма отзыва (товар и компания, разметка — bt_review_form): оценка, файлы с превью, проверка полей, отправка на проверку */
+window.BT_reviewForm=root=>{
+  if(!root||root.dataset.ready) return; root.dataset.ready='1';
+  const q=s=>root.querySelector(s), F=n=>q(`[name="${n}"]`), pdf=(q('input[type=file]')?.accept||'').includes('pdf');
+  /* оценка */
+  q('[data-rpick]').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;
+    [...b.parentNode.children].forEach(x=>x.classList.add('btn--ghost'));b.classList.remove('btn--ghost');});
+  /* файлы: до 5, JPG/PNG (у отзыва о компании ещё PDF), до 10 МБ */
+  const inp=q('input[type=file]'), zone=inp.closest('.drop'), box=q('.thumbs'); let files=[];
+  const paint=()=>{
+    box.innerHTML=files.map((f,i)=>`<figure>${f.type==='application/pdf'?'<span class="thumbs__pdf">PDF</span>':`<img src="${window.URL.createObjectURL(f)}" alt="">`}
+      <button type="button" data-i="${i}" aria-label="Удалить ${f.name}">×</button><figcaption>${f.name}</figcaption></figure>`).join('');
+    zone.querySelector('.drop__t small').textContent=files.length?`Добавлено ${files.length} из 5 — можно добавить ещё`:`или нажмите, чтобы выбрать — до 5 файлов, ${pdf?'JPG, PNG или PDF':'JPG или PNG'}`;
+  };
+  const add=list=>{ [...list].forEach(f=>{
+    if(files.length>=5) return BT_toast('Можно приложить не больше 5 файлов');
+    if(!(/^image\/(png|jpeg)$/.test(f.type)||(pdf&&f.type==='application/pdf'))) return BT_toast(`${f.name}: подойдёт только ${pdf?'JPG, PNG или PDF':'JPG или PNG'}`);
+    if(f.size>10*1024*1024) return BT_toast(`${f.name}: файл больше 10 МБ`);
+    if(!files.some(x=>x.name===f.name&&x.size===f.size)) files.push(f); }); paint(); };
+  inp.addEventListener('change',()=>{add(inp.files);inp.value='';});
+  box.addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return;files.splice(+b.dataset.i,1);paint();});
+  ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('is-over');}));
+  ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('is-over');}));
+  zone.addEventListener('drop',e=>add(e.dataTransfer.files));
+  /* вошедшему — имя (без фамилии) и почта */
+  const fill=u=>{ if(!u) return; if(!F('name').value&&u.name) F('name').value=u.name.split(' ')[0]; if(!F('email').value&&u.email) F('email').value=u.email; };
+  fill(window.BT_USER); document.addEventListener('bt:auth',e=>fill(e.detail));
+  /* проверка: ошибка после ухода с поля или по кнопке, исправили — пропадает сразу */
+  const agree=q('[data-agree]'), send=q('[data-send]'), err=q('[data-err]');
+  try{ if(localStorage.getItem('bt_agree')==='1') agree.checked=true; }catch(e){}
+  const setErr=(el,msg)=>{ const f=el.closest('.field')||el.closest('.check'); if(!f) return; f.classList.toggle('is-err',!!msg);
+    if(f.classList.contains('check')) return; let s=f.querySelector('.err'); if(!s){s=document.createElement('span');s.className='err';f.appendChild(s);} s.textContent=msg||''; };
+  const rules={name:v=>v.trim().length<2?'Как вас подписать? Минимум 2 символа':'',
+    email:v=>v.trim()&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())?'Проверьте адрес: нужен формат mail@company.ru':'',
+    text:v=>v.trim().length<10?'Расскажите чуть подробнее — хотя бы пару слов':''};
+  Object.keys(rules).forEach(n=>{ const el=F(n);
+    el.addEventListener('blur',()=>{ if(el.value.trim()) setErr(el,rules[n](el.value)); });
+    el.addEventListener('input',()=>{ if(el.closest('.field').classList.contains('is-err')) setErr(el,rules[n](el.value)); }); });
+  agree.addEventListener('change',()=>agree.checked&&setErr(agree,''));
+  send.addEventListener('click',()=>{
+    let bad=null; Object.keys(rules).forEach(n=>{ const m=rules[n](F(n).value); setErr(F(n),m); if(m&&!bad) bad=F(n); });
+    if(!agree.checked){ setErr(agree,'Нужно согласие'); bad=bad||agree; }
+    if(bad){ bad.focus(); return; }
+    const fd=new FormData(); fd.append('sessid',window.BT_SID||''); fd.append('agree','Y');
+    if(root.dataset.product) fd.append('product',root.dataset.product);
+    fd.append('rating',q('[data-rpick] .btn:not(.btn--ghost)')?.dataset.r||'5');
+    ['name','email','text','machine','company','website'].forEach(n=>F(n)&&fd.append(n,F(n).value));
+    files.forEach(f=>fd.append('photos[]',f,f.name));
+    send.disabled=true; send.textContent='Отправляем…'; err.textContent='';
+    fetch('/local/ajax/review.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
+      if(d.ok){ try{localStorage.setItem('bt_agree','1');}catch(e){}
+        root.innerHTML='<div class="rev-sent"><b>Спасибо, отзыв отправлен!</b>Он появится на сайте после проверки — обычно в течение рабочего дня.</div>'; return; }
+      Object.entries(d.errors||{}).forEach(([k,m])=>{ const el=F(k); el?setErr(el,m):(err.textContent=m); });
+      if(d.message) err.textContent=d.message;
+      if(!d.errors&&!d.message) err.textContent='Не получилось отправить. Обновите страницу и попробуйте ещё раз.';
+    }).catch(()=>{ err.textContent='Нет связи с сервером. Попробуйте ещё раз.'; })
+      .finally(()=>{ if(root.contains(send)){ send.disabled=false; send.textContent='Отправить отзыв'; } });
+  });
+};
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('[data-review]').forEach(BT_reviewForm);
+  document.addEventListener('click',e=>{ const b=e.target.closest('[data-revmodal]'); if(!b) return; e.preventDefault();
+    const m=document.getElementById(b.dataset.revmodal); if(!m) return; m.classList.add('open');
+    matchMedia('(min-width:769px)').matches&&setTimeout(()=>m.querySelector('[name=name]')?.focus(),60); });
+  document.querySelectorAll('.modal--revf').forEach(m=>m.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) m.classList.remove('open'); }));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal--revf.open').forEach(m=>m.classList.remove('open')); });
+});
+

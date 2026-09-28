@@ -586,6 +586,33 @@ function bt_nomicro(string $html): string
     return preg_replace('~\s(itemscope|itemtype="[^"]*"|itemprop="[^"]*"|itemid="[^"]*")~i', '', $html);
 }
 
+// Форма отзыва (товар и компания): отправка — BT_reviewForm (ui.js) → /local/ajax/review.php, отзыв уходит на проверку
+function bt_review_form(array $o = []): string
+{
+    $e = fn($s) => htmlspecialcharsbx((string)$s);
+    $product = (int)($o['product'] ?? 0);
+    $pdf = !$product;
+    $pick = '';
+    foreach (range(1, 5) as $i) {
+        $pick .= '<button type="button" class="btn btn--xs' . ($i < 5 ? ' btn--ghost' : '') . '" data-r="' . $i . '">' . $i . '</button>';
+    }
+    $fileNote = $pdf ? 'до 5 файлов, JPG, PNG или PDF' : 'до 5 файлов, JPG или PNG';
+    return '<div class="revform" data-review' . ($product ? ' data-product="' . $product . '"' : '') . '>'
+        . '<div class="field"><label>Оценка *</label><div class="rpick" data-rpick>' . $pick . '</div></div>'
+        . '<div class="f2"><div class="field"><label>Имя *</label><input name="name" autocomplete="given-name" maxlength="100"></div>'
+        . '<div class="field"><label>E-mail</label><input name="email" type="email" autocomplete="email" maxlength="100"><span class="muted" style="font-size:12px">Не публикуется</span></div></div>'
+        . ($product ? '<div class="field"><label>На какой машине готовили</label><input name="machine" maxlength="150" placeholder="Например, Jetinno JL15 VIVA"></div>'
+            : '<div class="field"><label>Компания</label><input name="company" autocomplete="organization" maxlength="150" placeholder="Если пишете от организации"></div>')
+        . '<div class="field"><label>' . ($product ? 'Комментарий' : 'Отзыв') . ' *</label><textarea name="text" rows="4" maxlength="3000" placeholder="' . $e($o['placeholder'] ?? 'Что понравилось, что можно улучшить') . '"></textarea></div>'
+        . '<div class="field"><label>' . ($pdf ? 'Фото или благодарственное письмо' : 'Фото') . ' <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">— ' . $fileNote . '</span></label>'
+        . '<label class="drop"><input type="file" accept="image/png,image/jpeg' . ($pdf ? ',application/pdf' : '') . '" multiple hidden>'
+        . '<span class="drop__i">' . bt_icon('camera') . '</span><span class="drop__t"><b>Перетащите ' . ($pdf ? 'файлы' : 'фото') . ' сюда</b><small>или нажмите, чтобы выбрать — ' . $fileNote . '</small></span></label>'
+        . '<div class="thumbs"></div></div>'
+        . '<label class="check check--top" style="margin:4px 0 18px"><input type="checkbox" data-agree> <span>Согласен с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">обработкой персональных данных</a></span></label>'
+        . '<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">'
+        . '<button class="btn" type="button" data-send>Отправить отзыв</button><p class="err-form" data-err role="alert"></p></div>';
+}
+
 // Карточка отзыва — одна на все страницы. Длинный текст обрезается, «Читать полностью» открывает окно (ui.js)
 function bt_rev_card(array $r): string
 {

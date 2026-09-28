@@ -11,10 +11,19 @@ $word = ($n % 10 === 1 && $n % 100 !== 11) ? 'отзыв' : (($n % 10 >= 2 && $n
   <?php bt_crumbs() ?>
   <div class="pagehead row between" style="align-items:flex-end">
     <div><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1><p class="sub"><?= $n ?> <?= $word ?> клиентов — офисов, кафе и частных покупателей.</p></div>
-    <a class="btn" href="/kontakty/#form" data-lead="Отзыв о компании">Оставить отзыв</a>
+    <a class="btn" href="#revCompany" data-revmodal="revCompany">Оставить отзыв</a>
   </div>
   <div class="grid g3 revs">
     <?php foreach ($revs as $r) echo bt_rev_card($r) ?>
   </div>
   <?php if (!$revs): ?><p class="muted">Отзывов пока нет.</p><?php endif ?>
+</div>
+<div class="modal modal--revf" id="revCompany" role="dialog" aria-modal="true" aria-labelledby="revCompanyT">
+  <div class="modal__bg" data-close></div>
+  <div class="modal__p">
+    <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+    <h3 class="h3" id="revCompanyT" style="margin:0 0 6px;padding-right:36px">Отзыв о компании</h3>
+    <p class="muted" style="margin:0 0 18px;font-size:14px">Отзыв появится на сайте после проверки. Можно приложить фото или благодарственное письмо.</p>
+    <?= bt_review_form(['placeholder' => 'Как с нами работается: доставка, сервис, кофе']) ?>
+  </div>
 </div>
