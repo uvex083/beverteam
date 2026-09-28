@@ -2131,7 +2131,18 @@ form[data-form]{position:relative}
 .r2why p{margin:0;font-size:14px;color:#4A4A43;line-height:1.5}
 .r2geo{display:flex;flex-wrap:wrap;gap:8px}
 .r2geo span{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:14px}
+.r2types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.r2types .card{padding:22px;display:grid;gap:8px;align-content:start}
+.r2types b{font-family:Unbounded;font-weight:700;font-size:16px}
+.r2types p{margin:0;font-size:14px;color:#4A4A43;line-height:1.5}
+.r2geo.r2brands span:first-child{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+@media(max-width:900px){.r2types{grid-template-columns:1fr}}
 .r2geo span:first-child{background:var(--ink);color:#fff;border-color:var(--ink)}
+.r2dist span:first-child{background:var(--white);color:var(--ink);border-color:var(--line)}
+.r2cols{display:grid;grid-template-columns:1fr 1fr;gap:20px 40px;margin-top:22px}
+.r2cols h3{font-family:Unbounded;font-weight:700;font-size:16px;margin:0 0 10px}
+.r2cols p{margin:0;font-size:14.5px;line-height:1.6;color:#4A4A43}
+@media(max-width:900px){.r2cols{grid-template-columns:1fr}}
 .r2more{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .r2more .card{padding:22px;display:grid;gap:6px;transition:border-color .2s}
 @media(hover:hover){.r2more .card:hover{border-color:var(--line-h)}}
