@@ -2,7 +2,7 @@
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
 // мета журнала — только на его главной: у рубрик и статей свои (SEO-шаблоны инфоблока), иначе эти перекрыли бы их
-if ($APPLICATION->GetCurPage() === '/blog/') {
+if ($APPLICATION->GetCurDir() === '/blog/') {
     $APPLICATION->SetPageProperty('title', 'Журнал о кофе, чае и кофемашинах — статьи и новости | BEVERTEAM');
     $APPLICATION->SetPageProperty('description', 'Журнал BEVERTEAM: как выбрать зерно, настроить кофемашину и ухаживать за ней. Советы нашей обжарки и сервисного центра, новости магазина.');
 }
