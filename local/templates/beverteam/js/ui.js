@@ -1744,7 +1744,7 @@ window.BT_lightbox=(items,start=0)=>{
   const key=e=>{ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
   document.addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{ if(e.target.closest('.lbox__x')||(!e.target.closest('img,.lbox__ar,.lbox__cap'))) close(); });
-  requestAnimationFrame(()=>{ el.classList.add('open'); el.querySelector('.lbox__x').focus(); });
+  el.tabIndex=-1; requestAnimationFrame(()=>{ el.classList.add('open'); el.focus({preventScroll:true}); });
 };
 
 /* Отзывы: «Читать полностью» — только у обрезанного текста, открывает отзыв в окне; письма-картинки — в просмотр */
@@ -1759,7 +1759,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(!m){ document.body.insertAdjacentHTML('beforeend','<div class="modal modal--rev" id="revModal" role="dialog" aria-modal="true" aria-label="Отзыв"><div class="modal__bg" data-close></div><div class="modal__p"><button class="modal__x" type="button" data-close aria-label="Закрыть">×</button><div class="revModal__b"></div></div></div>');
         m=document.getElementById('revModal'); m.addEventListener('click',ev=>{ if(ev.target.closest('[data-close]')){ m.classList.remove('open'); more.focus&&more.focus(); } }); }
       const card=more.closest('.rev').cloneNode(true); card.removeAttribute('itemscope'); card.querySelectorAll('[itemprop],meta').forEach(n=>n.tagName==='META'?n.remove():n.removeAttribute('itemprop'));
-      m.querySelector('.revModal__b').replaceChildren(card); m.classList.add('open'); setTimeout(()=>m.querySelector('.modal__x').focus(),30);
+      m.querySelector('.revModal__b').replaceChildren(card); m.classList.add('open'); const mp=m.querySelector('.modal__p'); mp.tabIndex=-1; setTimeout(()=>mp.focus({preventScroll:true}),30);
       return;
     }
     const doc=e.target.closest('.rev__doc[data-lbox]');

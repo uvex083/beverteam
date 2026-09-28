@@ -59,7 +59,7 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 /* единый фокус сайта: лаймовая рамка у полей, лаймовое кольцо у кнопок и ссылок (только с клавиатуры) */
 input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select:focus{outline:none;border-color:var(--lime-d);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
 .field.is-err input:focus,.field.is-err textarea:focus,.field.is-err select:focus{border-color:var(--err);box-shadow:0 0 0 3px rgba(192,57,43,.12)}
-:focus-visible:not(input,textarea,select){outline:none;box-shadow:0 0 0 3px rgba(215,232,92,.7);border-radius:inherit}
+:focus-visible:not(input,textarea,select){outline:none;box-shadow:0 0 0 3px rgba(215,232,92,.7)}
 .pc:has(:focus-visible),.vol:focus-within,.radio-card:focus-within,.symp label:focus-within{border-color:#C2C2B6}
 [hidden]{display:none!important}
 
@@ -1915,3 +1915,5 @@ form[data-form]{position:relative}
 .share__m svg{width:22px;height:22px;flex-shrink:0;display:block}
 /* SEO-текст посадочной страницы, если на странице нет своего блока текста */
 .seo-landing .seo{font-size:14.5px;color:#4A515B;max-width:900px}
+/* окно получает фокус само (для Esc и клавиатуры) — без рамки */
+.lbox:focus,.modal__p:focus{outline:none;box-shadow:none}
