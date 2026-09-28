@@ -679,14 +679,20 @@ document.addEventListener('DOMContentLoaded',()=>{
      Считаем по факту открытых слоёв, чтобы закрытие одного не разблокировало страницу под другим. */
   const OVERLAYS='.drawer.open,.modal.open,.srch.open,.filters.open,[data-overlay].open';
   const anyOpen=()=>!!document.querySelector(OVERLAYS);
+  const TOUCH=matchMedia('(pointer:coarse)').matches; let lockY=0;
   const lock=on=>{
     const want = on===undefined ? anyOpen() : (on || anyOpen());
     if(want&&!document.body.classList.contains('is-locked')){
       const sbw=window.innerWidth-document.documentElement.clientWidth;
       document.documentElement.style.setProperty('--sbw',(CSS.supports&&CSS.supports('scrollbar-gutter','stable')?0:sbw)+'px');
     }
+    const was=document.body.classList.contains('is-locked');
+    /* iOS Safari не держит overflow:hidden у body — на сенсорных экранах фиксируем body и возвращаем прокрутку на место */
+    if(TOUCH&&want&&!was){ lockY=scrollY; const h=document.querySelector('.hdr')?.offsetHeight||0;
+      Object.assign(document.body.style,{position:'fixed',top:-lockY+'px',left:'0',right:'0',width:'100%',paddingTop:h+'px'}); document.body.classList.add('is-tlock'); }
     document.body.classList.toggle('is-locked',want);
     document.documentElement.classList.toggle('is-locked',want);
+    if(TOUCH&&!want&&was){ document.body.classList.remove('is-tlock'); Object.assign(document.body.style,{position:'',top:'',left:'',right:'',width:'',paddingTop:''}); scrollTo({top:lockY,behavior:'instant'}); }
   };
   window.BT_lock=lock;
   /* страховка: любой элемент, получивший класс open, пересчитывает блокировку */
