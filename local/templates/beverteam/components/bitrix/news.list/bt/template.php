@@ -26,7 +26,7 @@ if ($page === 1):
     // «Популярное»: самые просматриваемые материалы (в рубрике — из неё), кроме крупной карточки
     $side = [];
     $r = CIBlockElement::GetList(['SHOW_COUNTER' => 'DESC', 'ACTIVE_FROM' => 'DESC'], array_filter(['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ACTIVE' => 'Y',
-        'ACTIVE_DATE' => 'Y', '!ID' => $lead['id'], 'SECTION_ID' => (int)(($arParams['PARENT_SECTION'] ?? 0) ?: (end($arResult['SECTION']['PATH']) ?: [])['ID'] ?? 0) ?: null, 'INCLUDE_SUBSECTIONS' => 'Y']),
+        'ACTIVE_DATE' => 'Y', '!ID' => $lead['id'], 'SECTION_ID' => (int)(($arParams['PARENT_SECTION'] ?? 0) ?: (array_column($arResult['SECTION']['PATH'] ?? [], 'ID') ?: [0])[count($arResult['SECTION']['PATH'] ?? []) - 1] ?? 0) ?: null, 'INCLUDE_SUBSECTIONS' => 'Y']),
         false, ['nTopCount' => 5], ['ID', 'NAME', 'DETAIL_PAGE_URL', 'ACTIVE_FROM', 'DATE_CREATE', 'IBLOCK_SECTION_ID']);
     while ($x = $r->GetNext()) {
         $date = $x['ACTIVE_FROM'] ?: $x['DATE_CREATE'];
