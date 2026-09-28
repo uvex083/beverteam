@@ -1879,7 +1879,8 @@ form[data-form]{position:relative}
 .lbox__ar{top:50%;margin-top:-24px}
 .lbox__ar--p{left:20px}.lbox__ar--n{right:20px}
 .lbox__ar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.lbox__ar.swiper-button-disabled{opacity:.3;pointer-events:none}
+/* неактивная стрелка ловит клик сама — иначе он проходит на фон и окно закрывается */
+.lbox__ar.swiper-button-disabled,.lbox__ar.swiper-button-disabled:hover{opacity:.3;cursor:default;background:rgba(255,255,255,.12)}
 .lbox__n{position:absolute;top:28px;left:50%;transform:translateX(-50%);z-index:2;color:#fff;font:500 14px 'JetBrains Mono',monospace;opacity:.8}
 @media(max-width:700px){.lbox .swiper-slide{padding:64px 12px 40px}.lbox__ar{display:none}}
 .gal__big img{cursor:zoom-in}
