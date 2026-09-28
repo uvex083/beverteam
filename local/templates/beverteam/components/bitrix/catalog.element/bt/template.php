@@ -24,6 +24,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
   </nav>
   <div class="prod" itemscope itemtype="https://schema.org/Product">
     <meta itemprop="name" content="<?= $e($name) ?>">
+    <meta itemprop="description" content="<?= $e(TruncateText(trim(preg_replace('/\s+/u', ' ', strip_tags(($arResult['~PREVIEW_TEXT'] ?? '') ?: ($arResult['~DETAIL_TEXT'] ?? '')))) ?: $name, 300)) ?>">
     <meta itemprop="sku" content="<?= $e($arResult['CODE']) ?>"><?php if ($arResult['BT_BRAND']): ?><div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="<?= $arResult['BT_BRAND'] ?>"></div><?php endif ?>
     <div class="gal">
       <div class="gal__side">
@@ -107,7 +108,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <button aria-selected="false" data-p="rev" id="tabRev">Отзывы<?= $revN ? ' (' . $revN . ')' : '' ?></button>
       <button aria-selected="false" data-p="deliv">Доставка</button>
     </div>
-    <div class="pane prose" data-pane="desc" itemprop="description">
+    <div class="pane prose" data-pane="desc">
       <?php if ($arResult['BT_SPECS']): ?>
       <div class="pspecs">
         <h3>Подробнее</h3>

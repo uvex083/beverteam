@@ -25,7 +25,7 @@ $msgr = function (string $cls = '') {
 };
 $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>';
 ?><!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" prefix="og: https://ogp.me/ns# product: https://ogp.me/ns/product#">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0E0E0C">
 <title><?php $APPLICATION->ShowTitle() ?></title>
