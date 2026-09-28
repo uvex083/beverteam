@@ -939,7 +939,8 @@ function bt_og(): string
     $e = fn($s) => htmlspecialcharsbx(trim(strip_tags((string)$s)));
     $host = 'https://beverteam.ru';
     $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
-    $url = $host . $APPLICATION->GetCurPage(false);
+    // посадочная страница (в т.ч. страница фильтра) — canonical на себя, иначе поисковик склеит её с чистым адресом
+    $url = $host . (function_exists('bt_landing') && bt_landing() ? bt_url_key((string)$_SERVER['REQUEST_URI']) : $APPLICATION->GetCurPage(false));
     // картинки и адрес для соцсетей — с того домена, где открыта страница: на тестовом домене файлов боевого сайта нет
     $self = 'https://' . preg_replace('/[^a-z0-9.\-]/i', '', $_SERVER['HTTP_HOST'] ?? 'beverteam.ru');
     $img = $APPLICATION->GetPageProperty('og_image') ?: '/local/templates/beverteam/images/og-logo.png';
