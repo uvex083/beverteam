@@ -131,7 +131,7 @@ foreach ($forms as $code => [$kind, $keys]) {
     }
     [$lName, $lText, $lPic] = ($labels[$code] ?? []) + ['', '', ''];
     $single = $kind === 'block';
-    $fields = ['ACTIVE' => $single ? 'Показывать блок на сайте' : 'Показывать на сайте',
+    $fields = ['ACTIVE' => $single ? 'Активность' : 'Показывать на сайте',
         'NAME' => $single ? 'Название (видно только в админке)' : ($lName ?: 'Название')];
     $single or $fields['SORT'] = 'Порядок (меньше — выше)';
     $miss = [];
@@ -145,7 +145,7 @@ foreach ($forms as $code => [$kind, $keys]) {
         } elseif ($k === 'pic') {
             $fields['PREVIEW_PICTURE'] = $lPic ?: 'Картинка';
         } elseif (isset($props[$k])) {
-            $fields['PROPERTY_' . $props[$k]['ID']] = $props[$k]['NAME'];
+            $fields['PROPERTY_' . $props[$k]['ID']] = $k === 'caption' ? 'Надпись над заголовком (мелко)' : $props[$k]['NAME'];
         } else {
             $miss[] = $k;
         }
