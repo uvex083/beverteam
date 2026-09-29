@@ -875,7 +875,7 @@ input,textarea{caret-color:var(--ink)}
 /* — пагинация журнала — */
 .jmore{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:34px}
 .jmore .cnt{font-size:13px;color:var(--gray);font-variant-numeric:tabular-nums}
-.jmore .bar{width:min(260px,60%);height:4px;border-radius:3px;background:var(--paper-2);overflow:hidden}
+.jmore .bar{width:min(260px,60%);height:4px;border-radius:3px;background:var(--paper-2);overflow:hidden;margin-bottom:10px}
 .jmore .bar i{display:block;height:100%;background:var(--ink);border-radius:3px;transition:width .35s cubic-bezier(.16,1,.3,1)}
 
 /* — выбор объёма и фасовки (торговые предложения) — */
