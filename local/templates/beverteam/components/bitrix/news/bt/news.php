@@ -36,7 +36,9 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   </nav>
   <?php endif ?>
   <?php if ($tags): ?>
-  <nav class="jtags" aria-label="Темы"><span>Темы:</span><?php foreach ($tags as $t => $n): ?><a href="<?= htmlspecialcharsbx(bt_tag_url($t)) ?>"<?= $t === $tag ? ' aria-current="page"' : '' ?>>#<?= htmlspecialcharsbx($t) ?><sup><?= $n ?></sup></a><?php endforeach ?></nav>
+  <?php $top = 10; $open = $tag !== '' && array_search($tag, array_keys($tags), true) >= $top ?>
+  <nav class="jtags<?= $open ? ' is-open' : '' ?>" aria-label="Темы"><span>Темы:</span><?php $i = 0; foreach ($tags as $t => $n): ?><a href="<?= htmlspecialcharsbx(bt_tag_url($t)) ?>"<?= $i++ >= $top ? ' class="jtags__more"' : '' ?><?= $t === $tag ? ' aria-current="page"' : '' ?>>#<?= htmlspecialcharsbx($t) ?><sup><?= $n ?></sup></a><?php endforeach ?>
+    <?php if (count($tags) > $top): ?><button type="button" class="jtags__btn" data-tags-more>Ещё <?= count($tags) - $top ?></button><?php endif ?></nav>
   <?php endif ?>
 
   <?php $APPLICATION->IncludeComponent('bitrix:news.list', 'bt', [

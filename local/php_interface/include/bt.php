@@ -822,8 +822,8 @@ function bt_post_card(array $p): string
     $e = fn($s) => htmlspecialcharsbx((string)$s);
     $img = $p['img'] ? '<img src="' . $e($p['img']) . '" alt="' . $e($p['t']) . '" loading="lazy" width="520" height="325">'
         : '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-ph="' . $e($p['cat']) . '" data-ph-t="' . $e($p['t']) . '" alt="' . $e($p['t']) . '" width="520" height="325">';
-    return '<a class="ncard" href="' . $e($p['url']) . '">' . $img
-        . '<div class="ncard__b"><div class="ncard__m"><span class="tag">' . $e($p['cat']) . '</span><time datetime="' . $e($p['d']) . '">' . bt_date_ru($p['d']) . '</time>'
+    return '<a class="ncard" href="' . $e($p['url']) . '"><span class="ncard__ph">' . $img . '<span class="tag ncard__cat">' . $e($p['cat']) . '</span></span>'
+        . '<div class="ncard__b"><div class="ncard__m"><time datetime="' . $e($p['d']) . '">' . bt_date_ru($p['d']) . '</time>'
         . ($p['kind'] === 'news' && $p['cat'] !== 'Новости' ? '<span class="tag tag--n">Новость</span>' : '')
         . (!empty($p['draft']) ? '<span class="tag tag--draft">Черновик</span>' : '') . '</div>'
         . '<h3>' . $e($p['t']) . '</h3><p>' . $e($p['lead']) . '</p></div></a>';

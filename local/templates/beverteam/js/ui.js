@@ -74,9 +74,9 @@ window.BT_phFit = root => (root||document).querySelectorAll('img[data-ph]').forE
 addEventListener('resize',()=>{clearTimeout(window.__phT);window.__phT=setTimeout(()=>BT_phFit(),200);});
 window.BT_postDate = iso => { const d=new Date(iso), M=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear(); };
-window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}">
-    <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="325">
-    <div class="ncard__b"><div class="ncard__m"><span class="tag">${p.cat}</span><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
+window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}"><span class="ncard__ph">
+    <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="325"><span class="tag ncard__cat">${p.cat}</span></span>
+    <div class="ncard__b"><div class="ncard__m"><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
     <h3>${p.t}</h3><p>${p.lead}</p></div></a>`;
 
 /* ---------- Ремонт: бренды под посадочные страницы ---------- */
@@ -1861,3 +1861,6 @@ document.addEventListener('click',e=>{
   const all=[...img.closest('.post__body').querySelectorAll('img')].filter(i=>!i.closest('a'));
   BT_lightbox(all.map(i=>({src:i.currentSrc||i.src,cap:i.closest('figure')?.querySelector('figcaption')?.textContent.trim()||i.alt})),all.indexOf(img));
 });
+
+// журнал: остальные темы по кнопке «Ещё N»
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tags-more]');if(!b)return;b.closest('.jtags').classList.add('is-open');});
