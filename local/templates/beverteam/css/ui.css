@@ -1032,9 +1032,8 @@ input,textarea{caret-color:var(--ink)}
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .ncard{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;display:flex;flex-direction:column;transition:.18s}
 @media(hover:hover){.ncard:hover{border-color:#C2C2B6}}
-.ncard h3 span{padding-bottom:3px;background:linear-gradient(var(--lime),var(--lime)) no-repeat 0 100%/0 2px;transition:background-size .45s cubic-bezier(.65,0,.35,1)}
-/* при наведении заголовок подчёркивается слева направо, строка за строкой */
-@media(hover:hover){.ncard:hover h3 span{background-size:100% 2px}}
+.ncard h3{text-decoration:underline 2px transparent;text-underline-offset:4px;transition:text-decoration-color .3s}
+@media(hover:hover){.ncard:hover h3{text-decoration-color:var(--lime)}}
 .ncard img{width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;display:block;background:var(--paper-2)}
 .ncard__b{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
 .ncard__m{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;color:var(--gray)}
