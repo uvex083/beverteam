@@ -647,7 +647,7 @@ input,textarea{caret-color:var(--ink)}
 .post__toc li>a{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;margin:0 -8px;border-radius:var(--rad-xs);color:#3A3A34;line-height:1.35;transition:color .15s,background-color .15s}
 .post__toc-n{flex:0 0 auto;min-width:17px;padding-top:.2em;font:500 11px/1.35 'JetBrains Mono';color:#B5B5AC}
 /* подпункты всегда раскрыты, у активного пункта меняется только цвет — жирность переносила бы строки и список прыгал */
-.post__toc li.is-open>a{color:var(--ink)}
+.post__toc li.is-open>a{background:var(--lime);color:var(--ink)}
 .post__toc li>a.on{background:var(--lime);color:var(--ink)}
 .post__toc li.is-open>a .post__toc-n,.post__toc li>a.on .post__toc-n{color:var(--ink)}
 .post__toc-sub{padding:0 0 4px 27px}
