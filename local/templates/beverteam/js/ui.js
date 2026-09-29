@@ -1068,6 +1068,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       e.preventDefault();
       const topic=b.dataset.lead||'Оставить заявку', f=ld.querySelector('form');
       f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
+      ld.querySelectorAll('.lead__ok [data-def]').forEach(x=>x.textContent=x.dataset.def);
       ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic;
       /* «Купить в один клик»: имя, телефон и товар без комментария; вошедшему покупателю — его имя и телефон */
       const prod=b.dataset.product||''; f.elements.product.value=prod;
@@ -1079,6 +1080,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(innerWidth>768) setTimeout(()=>{const i=[...f.querySelectorAll('.field input')].find(x=>!x.value); if(i) i.focus();},40);
     });
   }
+  /* форма на странице отправлена: очищаем её и показываем окно «Заявка отправлена» — посетитель остаётся на том же месте */
+  const okMsg={subscribe:['Вы подписаны','Будем присылать подборку новых статей журнала на этот адрес. Отписаться можно в любой момент.']};
+  window.BT_formOk=f=>{
+    f.reset(); f.querySelectorAll('.is-err').forEach(x=>x.classList.remove('is-err')); f.querySelectorAll('.err').forEach(x=>x.textContent=''); f.querySelectorAll('[aria-invalid]').forEach(x=>x.removeAttribute('aria-invalid'));
+    const ok=ld.querySelector('.lead__ok'), t=ok.querySelector('.display'), m=ok.querySelector('.muted');
+    t.dataset.def??=t.textContent; m.dataset.def??=m.textContent;
+    const [tt,mm]=okMsg[f.dataset.form]||[t.dataset.def,m.dataset.def]; t.textContent=tt; m.textContent=mm;
+    ld.querySelector('form').hidden=true; ok.hidden=false; ld.classList.add('open');
+    setTimeout(()=>ok.querySelector('.btn').focus({preventScroll:true}),40);
+  };
   document.addEventListener('submit',async e=>{
     const f=e.target.closest('form[data-form]'); if(!f) return;
     /* невалидную форму уже остановил общий обработчик submit выше */
@@ -1092,6 +1103,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const d=await r.json().catch(()=>({}));
       if(d.ok){
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
+        else if(ld) BT_formOk(f);
         else location.href='/form-success/';
         return;
       }
