@@ -43,7 +43,17 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
   <div>
     <meta itemprop="datePublished" content="<?= $e($iso) ?>"><meta itemprop="articleSection" content="<?= $e($cat) ?>">
-    <div hidden itemprop="author" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="BEVERTEAM"></div>
+    <?php $host = (\CMain::IsHTTPS() ? 'https://' : 'http://') . SITE_SERVER_NAME; $co = bt_contacts(); $mod = $arResult['TIMESTAMP_X'] ?? ''; ?>
+    <?php if ($mod): ?><meta itemprop="dateModified" content="<?= $e(date('Y-m-d', MakeTimeStamp($mod))) ?>"><?php endif ?>
+    <link itemprop="mainEntityOfPage" href="<?= $e($host . $arResult['~DETAIL_PAGE_URL']) ?>">
+    <?php if ($pic): ?><link itemprop="image" href="<?= $e($host . $pic) ?>"><?php endif ?>
+    <?php /* автор и издатель — компания: Яндекс требует у организации адрес и телефон */ ?>
+    <div hidden itemprop="author publisher" itemscope itemtype="https://schema.org/Organization" itemid="https://beverteam.ru/#org">
+      <meta itemprop="name" content="BEVERTEAM"><link itemprop="url" href="<?= $e($host) ?>/">
+      <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject"><link itemprop="url" href="<?= $e($host) ?>/local/templates/beverteam/images/og-logo.png"></div>
+      <meta itemprop="telephone" content="<?= $e($co['phone1'] ?? '') ?>">
+      <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><meta itemprop="postalCode" content="<?= $e($co['zip'] ?? '') ?>"><meta itemprop="addressLocality" content="<?= $e($co['city'] ?? '') ?>"><meta itemprop="streetAddress" content="<?= $e($co['street'] ?? '') ?>"></div>
+    </div>
     <?php if (($arResult['PROPERTIES']['REVIEW']['VALUE_XML_ID'] ?? '') === 'draft'): ?><div class="post__draft">Черновик — статья на вычитке, факты и фото ещё уточняются</div><?php endif ?>
     <h1 class="display h1" itemprop="headline"><?= $e($arResult['~NAME']) ?></h1>
     <div class="post__meta">
@@ -52,7 +62,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
       <?php if ($min): ?><span>·</span><span><?= $min ?> мин чтения</span><?php endif ?>
       <span>·</span><span>BEVERTEAM</span>
     </div>
-    <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>" itemprop="image"></figure><?php endif ?>
+    <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>"></figure><?php endif ?>
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>
     <?php if ($prods): ?>
     <section class="post__prods" id="prods" aria-labelledby="prodsT">

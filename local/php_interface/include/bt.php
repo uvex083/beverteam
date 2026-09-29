@@ -1311,7 +1311,6 @@ function bt_org_ld(): string
         'description' => 'Кофе BOTANICA, чай, кофемашины Jetinno: продажа, аренда, ремонт и сервис в Екатеринбурге.',
         'email' => $co['email'] ?? '', 'telephone' => array_values(array_filter([$co['phone1'] ?? '', $co['phone2'] ?? ''])),
         'priceRange' => '₽₽', 'taxID' => $co['inn'] ?? '', 'foundingDate' => '2010',
-        'identifier' => ['@type' => 'PropertyValue', 'propertyID' => 'ОГРНИП', 'value' => $co['ogrnip'] ?? ''],
         'areaServed' => ['@type' => 'City', 'name' => 'Екатеринбург'],
         'knowsAbout' => ['кофе в зёрнах', 'чай', 'аренда кофемашин', 'ремонт кофемашин', 'кофемашины Jetinno', 'вендинг', 'HoReCa'],
         'address' => ['@type' => 'PostalAddress', 'postalCode' => $co['zip'] ?? '', 'addressLocality' => $co['city'] ?? '',
