@@ -809,6 +809,9 @@ input,textarea{caret-color:var(--ink)}
 .spromo img{position:absolute;right:14px;top:50%;transform:translateY(-50%);max-height:104px;width:auto;
   background:#fff;border-radius:14px;padding:8px;box-shadow:0 8px 20px rgba(0,0,0,.18)}
 .spromo .k,.spromo b,.spromo span{position:relative;z-index:1;max-width:min(30ch,62%)}
+/* картинка не шире трети карточки — на узком экране не наезжает на заголовок */
+.spromo img{max-width:34%;object-fit:contain}
+@media(max-width:560px){.spromo img{max-height:84px}}
 /* результаты */
 .sres{display:grid;gap:8px;margin-bottom:28px}
 .sres a{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:11px 14px}
