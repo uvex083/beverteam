@@ -56,7 +56,7 @@ $revs = bt_reviews();
     <div><h2 class="display h2" style="margin-bottom:22px">Команда</h2>
       <?php if ($team): ?>
       <?= bt_demo_note('about_team', $isDemo($team)) ?>
-      <div class="grid g2"><?php foreach ($team as $p): ?><div class="person"><?php if ($p['pic']): ?><img class="ph" src="<?= $e($p['pic']) ?>" alt="<?= $e($p['name']) ?>" loading="lazy"><?php else: ?><div class="ph">фото</div><?php endif ?><b><?= $e($p['name']) ?></b><small><?= $e($p['text']) ?></small></div><?php endforeach ?></div>
+      <div class="grid g2 ateam"><?php foreach ($team as $p): ?><div class="person"><?php if ($p['pic']): ?><img class="ph" src="<?= $e($p['pic']) ?>" alt="<?= $e($p['name']) ?>" loading="lazy"><?php else: ?><div class="ph">фото</div><?php endif ?><b><?= $e($p['name']) ?></b><small><?= $e($p['text']) ?></small></div><?php endforeach ?></div>
       <?php else: ?>
       <div class="grid g2"><?php for ($i = 0; $i < 4; $i++): ?><div class="person"><div class="ph">фото</div><b>Имя</b><small>Должность</small></div><?php endfor ?></div>
       <p class="muted" style="font-size:13px;margin:12px 0 0">Фото и имена сотрудников — нужен файл от клиента.</p>

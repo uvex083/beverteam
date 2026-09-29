@@ -1699,7 +1699,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 @media(max-width:1100px){.aboutp .apart{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){.aboutp .intro,.aboutp .cert,.aboutp .vals,.aboutp .areq,.aboutp .aform{grid-template-columns:1fr}.aboutp .facts,.aboutp .anum,.aboutp .aplaces{grid-template-columns:1fr 1fr}
   .aboutp .ahist{grid-template-columns:1fr;border-top:0;border-left:2px solid var(--ink);gap:18px}.aboutp .ahist li{padding:0 0 0 22px}.aboutp .ahist li::before{top:4px;left:-7px}}
-@media(max-width:560px){.aboutp .vals__g{grid-template-columns:1fr}.aboutp .apart{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.aboutp .vals__g{grid-template-columns:1fr}.aboutp .apart{grid-template-columns:1fr 1fr}.aboutp .grid.ateam{grid-template-columns:1fr 1fr;gap:10px}.aboutp .ateam .person{padding:10px}.aboutp .ateam .person b{font-size:13.5px}}
 
 /* ---------- контакты (contacts.html) ---------- */
 .contp .cl{display:grid;grid-template-columns:.85fr 1.15fr;gap:20px}
