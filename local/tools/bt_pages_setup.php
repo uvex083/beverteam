@@ -163,15 +163,15 @@ $def = [
     'main_strip' => ['main', 'Полоса преимуществ', 50, false, $iconProp],
     'main_utp' => ['main', 'Почему BEVERTEAM: заголовок', 60, true, []],
     'main_utp_items' => ['main', 'Почему BEVERTEAM: карточки', 70, false, $iconProp],
-    'main_catalog' => ['main', 'Каталог', 80, true, []],
-    'main_rent' => ['main', 'Аренда и продажа кофемашин', 90, true, []],
+    'main_catalog' => ['main', 'Каталог: заголовок и кнопка', 80, true, []],
+    'main_rent' => ['main', 'Аренда и продажа кофемашин: заголовок, вкладки, кнопки', 90, true, []],
     'main_service' => ['main', 'Сервисный центр', 100, true, ['HIGHLIGHT' => ['Выделить в заголовке (часть текста)', 'S', []]]],
     'main_bean' => ['main', 'Зерно месяца', 110, true, ['PRODUCT' => ['Товар', 'E', ['LINK_IBLOCK_ID' => bt_iblock('catalog')]]]],
     'main_steps' => ['main', 'Как проходит аренда', 120, true, []],
-    'main_reviews' => ['main', 'Отзывы', 130, true, []],
+    'main_reviews' => ['main', 'Отзывы: заголовок и кнопка', 130, true, []],
     'main_sub' => ['main', 'Кофе по подписке', 140, true, ['HIGHLIGHT' => ['Выделить в заголовке (часть текста)', 'S', []]]],
     'main_about' => ['main', 'О магазине и форма заявки', 150, true, []],
-    'main_journal' => ['main', 'Журнал', 160, true, []],
+    'main_journal' => ['main', 'Журнал: заголовок и кнопка', 160, true, []],
     'main_seo' => ['main', 'SEO-текст', 170, true, []],
     'about_intro' => ['about', 'О компании: описание', 5, true, []],
     'about_values' => ['about', 'О компании: преимущества, заголовок', 6, true, []],
@@ -194,9 +194,9 @@ foreach ($def as $code => [$type, $name, $sort, $single, $extra]) {
 }
 // отзывы после блоков «О компании»
 $rev = CIBlock::GetList([], ['=CODE' => 'reviews', 'CHECK_PERMISSIONS' => 'N'])->Fetch();
-if ($rev && (int)$rev['SORT'] !== 30) {
-    $say('ИБ reviews → сортировка 30');
-    $apply and (new CIBlock())->Update($rev['ID'], ['SORT' => 30]);
+if ($rev && (int)$rev['SORT'] !== 25) {
+    $say('ИБ reviews → сортировка 25');
+    $apply and (new CIBlock())->Update($rev['ID'], ['SORT' => 25]);
 }
 
 if (!$apply) {
