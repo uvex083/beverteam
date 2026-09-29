@@ -10,7 +10,7 @@ foreach ($arResult['ITEMS'] as $it) {
     $posts[] = [
         'kind' => $kind ?: 'article', 'cat' => bt_blog_rubrics()[(int)$it['IBLOCK_SECTION_ID']]['name'] ?? (($it['PROPERTIES']['RUBRIC']['~VALUE'] ?? '') ?: ($kind === 'news' ? 'Новости' : 'Статьи')),
         'd' => $date ? date('Y-m-d', MakeTimeStamp($date)) : '', 't' => $it['~NAME'], 'lead' => trim(strip_tags((string)$it['~PREVIEW_TEXT'])),
-        'url' => $it['~DETAIL_PAGE_URL'], 'img' => $it['PREVIEW_PICTURE']['SRC'] ?? '', 'id' => (int)$it['ID'],
+        'url' => $it['~DETAIL_PAGE_URL'], 'img' => bt_img($it['PREVIEW_PICTURE']['ID'] ?? 0, 1040, 650, BX_RESIZE_IMAGE_EXACT), 'id' => (int)$it['ID'],
         'draft' => ($it['PROPERTIES']['REVIEW']['VALUE_XML_ID'] ?? '') === 'draft',
     ];
 }

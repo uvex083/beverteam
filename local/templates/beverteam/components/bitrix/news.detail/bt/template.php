@@ -15,6 +15,12 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
     $toc[] = [$id, trim(strip_tags($m[3])), strtolower($m[1]) === 'h2' ? 2 : 3];
     return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
 }, (string)$arResult['~DETAIL_TEXT']);
+// фото в тексте — уменьшенная копия не шире 1200 px в webp, грузится при прокрутке
+$body = preg_replace_callback('~<img\b([^>]*?)\ssrc="(/upload/[^"]+\.(?:jpe?g|png))"([^>]*)>~i', function ($m) {
+    $src = bt_img(bt_upload_file_id($m[2]), 1200, 2400) ?: $m[2];
+    $attrs = $m[1] . $m[3];
+    return '<img' . $m[1] . ' src="' . $src . '"' . $m[3] . (str_contains($attrs, 'loading=') ? '' : ' loading="lazy"') . (str_contains($attrs, 'decoding=') ? '' : ' decoding="async"') . '>';
+}, $body);
 // таблица — в прокручиваемой обёртке: на телефоне листается сама, на широком экране тянется во всю колонку
 $body = preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $body);
 // товары из статьи — карточки каталога (выключенные и удалённые товары пропускаются)

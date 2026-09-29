@@ -25,6 +25,16 @@ function bt_img($file, int $w, int $h, int $mode = BX_RESIZE_IMAGE_PROPORTIONAL)
     return $src !== '' ? bt_webp($src) : '';
 }
 
+// ID файла по пути /upload/<папка>/<имя> — для уменьшенных копий картинок, вставленных в текст
+function bt_upload_file_id(string $src): int
+{
+    if (!preg_match('~^/upload/(.+)/([^/]+)$~', $src, $m)) {
+        return 0;
+    }
+    $f = \Bitrix\Main\FileTable::getList(['filter' => ['=SUBDIR' => $m[1], '=FILE_NAME' => $m[2]], 'select' => ['ID'], 'limit' => 1, 'cache' => ['ttl' => 86400]])->fetch();
+    return (int)($f['ID'] ?? 0);
+}
+
 // Атрибуты width/height по файлу картинки — место под неё резервируется до загрузки
 function bt_img_wh(string $src): string
 {
