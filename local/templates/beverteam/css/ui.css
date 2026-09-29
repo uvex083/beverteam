@@ -1001,7 +1001,7 @@ input,textarea{caret-color:var(--ink)}
 @media(hover:hover){.ncard:hover{border-color:#C2C2B6}}
 .ncard h3{text-decoration:underline 2px transparent;text-underline-offset:4px;transition:text-decoration-color .18s}
 @media(hover:hover){.ncard:hover h3{text-decoration-color:var(--lime)}}
-.ncard img{width:100%;aspect-ratio:16/10;height:auto;object-fit:cover;display:block;background:var(--paper-2)}
+.ncard img{width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;display:block;background:var(--paper-2)}
 .ncard__b{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
 .ncard__m{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;color:var(--gray)}
 .ncard__m .tag{background:var(--lime-soft);color:#4E5A12;border-radius:999px;padding:3px 9px}
@@ -2152,7 +2152,7 @@ form[data-form]{position:relative}
 @media(max-width:640px){.r2chk,.r2symp,.r2err,.r2why,.r2steps{grid-template-columns:1fr}.r2tbl td:nth-child(2),.r2tbl th:nth-child(2){display:none}.r2tbl td:last-child{white-space:normal}}
 /* фото в тексте статьи */
 .post__body figure{margin:28px 0}
-.post__body figure img,.post__body>img{display:block;width:100%;height:auto;border-radius:var(--rad);background:var(--paper)}
+.post__body figure img,.post__body>img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:var(--rad);background:var(--paper)}
 .post__body figcaption{margin-top:10px;font-size:13.5px;line-height:1.5;color:var(--gray)}
 @media(hover:hover){.post__body img{cursor:zoom-in}}
 /* журнал: статья на вычитке (свойство «Вычитка») */

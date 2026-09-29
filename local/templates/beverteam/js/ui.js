@@ -75,7 +75,7 @@ addEventListener('resize',()=>{clearTimeout(window.__phT);window.__phT=setTimeou
 window.BT_postDate = iso => { const d=new Date(iso), M=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear(); };
 window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}"><span class="ncard__ph">
-    <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="325"><span class="tag ncard__cat">${p.cat}</span></span>
+    <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="293"><span class="tag ncard__cat">${p.cat}</span></span>
     <div class="ncard__b"><div class="ncard__m"><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
     <h3>${p.t}</h3><p>${p.lead}</p></div></a>`;
 
