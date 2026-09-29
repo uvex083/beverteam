@@ -806,11 +806,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     const prods=Object.values(BT_PRODUCTS).flat()
       .filter(m=>(m.n+' '+m.par).toLowerCase().includes(ql)).slice(0,6);
     const pages=PAGES.filter(p=>(p.t+' '+p.d+' '+(p.k||'')).toLowerCase().includes(ql)).slice(0,5);
-    const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead).toLowerCase().includes(ql)).slice(0,3);
+    const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead+' '+p.cat+' '+(p.tags||[]).join(' ')).toLowerCase().includes(ql)).slice(0,5);
     if(!prods.length&&!pages.length&&!posts.length){
+      const none=SR.promos.filter(p=>p.w==='none');
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>
-        <p>Попробуйте короче или загляните в <a class="link" href="/catalog/">каталог</a>. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p>
-        ${SR.promos.some(p=>p.w==='none')?`<div class="srch__promo" style="margin-top:24px;max-width:520px">${SR.promos.filter(p=>p.w==='none').map(promoHtml).join('')}</div>`:''}</div>`;
+        <p>Попробуйте короче или другими словами. Можно позвонить: <a class="link" href="tel:${CO.tel1}">${CO.tel1f}</a></p></div>
+        <div class="srch__grid"><div>
+          ${SR.hints.length?`<h4>Часто ищут</h4><div class="srch__chips">${SR.hints.map(h=>`<button data-q="${esc(h)}">${esc(h)}</button>`).join('')}</div>`:''}
+          ${SR.secs.length?`<h4>Разделы</h4><div class="srch__secs">${SR.secs.map(c=>`<a href="${esc(c.u)}"><span class="srch__ic" aria-hidden="true"><svg><use href="#ico-${esc(c.i)}"/></svg></span>${esc(c.t)}</a>`).join('')}</div>`:''}
+        </div>${none.length?`<div class="srch__promo"><h4>Поможем выбрать</h4>${none.map(promoHtml).join('')}</div>`:''}</div>`;
       return;
     }
     sinner.innerHTML=`<div class="srch__grid"><div>
