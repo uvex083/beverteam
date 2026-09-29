@@ -1661,8 +1661,45 @@ form[data-form]{position:relative}
 .aboutp .areq h2{margin-bottom:14px}
 .aboutp .areq .muted{margin:0;font-size:15px;line-height:1.6;max-width:42ch}
 .aboutp .areq .req__btns{margin-top:22px}
-@media(max-width:900px){.aboutp .intro,.aboutp .cert,.aboutp .vals,.aboutp .areq{grid-template-columns:1fr}.aboutp .facts{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.aboutp .vals__g{grid-template-columns:1fr}}
+/* плашка над блоком с тестовым наполнением */
+.demo-note{margin:0 0 16px;padding:10px 14px;border-radius:var(--rad-s);background:var(--warn-s);color:#6B4A12;font-size:13px;line-height:1.5}
+.demo-note b{color:var(--warn);margin-right:4px;text-transform:uppercase;font:700 11px/1 'JetBrains Mono';letter-spacing:.06em}
+.aboutp .anum{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.aboutp .anum div{background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(20px,2.4vw,30px)}
+.aboutp .anum b{display:block;font:800 clamp(28px,3.4vw,44px)/1 Unbounded,sans-serif;color:var(--lime);margin-bottom:10px}
+.aboutp .anum span{color:#B9B9B0;font-size:14px;line-height:1.45}
+a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
+@media(hover:hover){a.utp__i--a:hover{border-color:var(--line-h)}a.utp__i--a:hover b{text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:2px;text-underline-offset:3px}}
+.aboutp .tl>a{display:block;color:inherit}
+.aboutp .tl__go{color:var(--gray);transition:transform .15s;display:inline-block}
+@media(hover:hover){.aboutp .tl>a:hover b{color:var(--ink)}.aboutp .tl>a:hover .tl__go{transform:translateX(4px);color:var(--ink)}}
+.aboutp .ahist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;border-top:2px solid var(--ink)}
+.aboutp .ahist li{position:relative;padding:22px 18px 0 0}
+.aboutp .ahist li::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--lime);border:2px solid var(--ink);box-sizing:border-box}
+.aboutp .ahist b{display:block;font:800 22px/1 Unbounded,sans-serif;margin-bottom:8px}
+.aboutp .ahist span{font-size:14px;color:#3A3A34;line-height:1.5}
+.aboutp .aplaces{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.aboutp .aplaces figure{margin:0}
+.aboutp .aplaces img,.aboutp .aplaces .ph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--rad);display:block}
+.aboutp .aplaces .ph{display:grid;place-items:center;background:repeating-linear-gradient(45deg,#FAFAF8 0 10px,#EFEFE9 10px 20px);border:1px dashed #C8C8BE;color:var(--gray-2);font-size:12px}
+.aboutp .aplaces figcaption{margin-top:10px;font-size:14px;font-weight:600}
+.aboutp .apart{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.aboutp .apart__i{display:grid;place-items:center;align-content:center;gap:6px;min-height:120px;padding:16px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);text-align:center;color:var(--ink);transition:border-color .15s}
+.aboutp .apart__i img{max-width:100%;max-height:56px;object-fit:contain}
+.aboutp .apart__i b{font:800 15px/1.2 Unbounded,sans-serif}
+.aboutp .apart__i small{font-size:12px;color:var(--gray);line-height:1.35}
+.aboutp .apart__i.is-demo{border-style:dashed;background:transparent}
+.aboutp .apart__i.is-demo b{font:600 12px/1.3 Manrope,sans-serif;color:var(--gray-2)}
+@media(hover:hover){.aboutp a.apart__i:hover{border-color:var(--line-h)}}
+.arate{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--white);border:1px solid var(--line);color:var(--ink);font-size:13px}
+.arate b{font:800 15px/1 Unbounded,sans-serif}
+.arate__st{color:#F2B705;letter-spacing:1px}
+@media(hover:hover){.arate:hover{border-color:var(--line-h)}}
+.aboutp .aform{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:1100px){.aboutp .apart{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.aboutp .intro,.aboutp .cert,.aboutp .vals,.aboutp .areq,.aboutp .aform{grid-template-columns:1fr}.aboutp .facts,.aboutp .anum,.aboutp .aplaces{grid-template-columns:1fr 1fr}
+  .aboutp .ahist{grid-template-columns:1fr;border-top:0;border-left:2px solid var(--ink);gap:18px}.aboutp .ahist li{padding:0 0 0 22px}.aboutp .ahist li::before{top:4px;left:-7px}}
+@media(max-width:560px){.aboutp .vals__g{grid-template-columns:1fr}.aboutp .apart{grid-template-columns:1fr 1fr}}
 
 /* ---------- контакты (contacts.html) ---------- */
 .contp .cl{display:grid;grid-template-columns:.85fr 1.15fr;gap:20px}

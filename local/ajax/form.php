@@ -40,9 +40,13 @@ $d = [
     'topic' => $v('topic', 150) ?: 'Заявка с сайта', 'page' => preg_match('~^/[^\s]*$~', (string)$req->getPost('page')) ? mb_substr((string)$req->getPost('page'), 0, 255) : '',
     'message' => mb_substr(trim((string)$req->getPost('message')), 0, 2000),
 ];
-// товар («Купить в один клик»), модель кофемашины (ремонт, аренда) — первой строкой сообщения
+// товар («Купить в один клик»), модель кофемашины (ремонт, аренда), компания — первой строкой сообщения
 if ($product = $v('product', 255)) {
     $d['message'] = 'Товар: ' . $product . ($d['message'] !== '' ? "\n" . $d['message'] : '');
+}
+if ($company = $v('company', 150)) {
+    $d['message'] = 'Компания: ' . $company . ($d['message'] !== '' ? "
+" . $d['message'] : '');
 }
 if ($model = $v('model', 150)) {
     $d['message'] = 'Модель: ' . $model . ($d['message'] !== '' ? "\n" . $d['message'] : '');

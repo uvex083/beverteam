@@ -513,6 +513,16 @@ function bt_blocks(string $code, int $limit = 0): array
     return $list;
 }
 
+// Плашка «Демо» над блоком с тестовым наполнением: текст — описание инфоблока (что запросить у клиента)
+function bt_demo_note(string $code, bool $on): string
+{
+    if (!$on) {
+        return '';
+    }
+    $d = trim(strip_tags((string)(\CIBlock::GetArrayByID(bt_iblock($code), 'DESCRIPTION') ?? '')));
+    return '<div class="demo-note"><b>Демо-данные</b>' . ($d !== '' ? ' ' . htmlspecialcharsbx($d) : '') . '</div>';
+}
+
 // Карточки спискового инфоблока: название, текст анонса, картинка, иконка
 function bt_list(string $code): array
 {
@@ -528,14 +538,21 @@ function bt_list(string $code): array
     $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $list = [];
-    $hasIcon = (bool)\CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'ICON'])->Fetch();
+    $props = [];
+    foreach (['ICON', 'LINK', 'DEMO'] as $pc) {
+        if (\CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => $pc])->Fetch()) {
+            $props[] = 'PROPERTY_' . $pc;
+        }
+    }
     $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false,
-        array_merge(['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_TEXT_TYPE', 'PREVIEW_PICTURE'], $hasIcon ? ['PROPERTY_ICON'] : []));
+        array_merge(['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_TEXT_TYPE', 'PREVIEW_PICTURE'], $props));
     while ($f = $r->GetNext()) {
         $list[] = [
             'name' => $f['~NAME'], 'text' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
             'pic' => bt_img($f['PREVIEW_PICTURE'], 1000, 1000),
             'icon' => bt_svg((int)($f['PROPERTY_ICON_VALUE'] ?? 0)),
+            'link' => trim((string)($f['~PROPERTY_LINK_VALUE'] ?? '')),
+            'demo' => !empty($f['PROPERTY_DEMO_VALUE']),
         ];
     }
     $GLOBALS['CACHE_MANAGER']->EndTagCache();
@@ -1164,7 +1181,10 @@ function bt_org_ld(): string
         'logo' => $host . 'local/templates/beverteam/images/og-logo.png', 'image' => $host . 'local/templates/beverteam/images/og-logo.png',
         'description' => 'Кофе BOTANICA, чай, кофемашины Jetinno: продажа, аренда, ремонт и сервис в Екатеринбурге.',
         'email' => $co['email'] ?? '', 'telephone' => array_values(array_filter([$co['phone1'] ?? '', $co['phone2'] ?? ''])),
-        'priceRange' => '₽₽', 'taxID' => $co['inn'] ?? '',
+        'priceRange' => '₽₽', 'taxID' => $co['inn'] ?? '', 'foundingDate' => '2010',
+        'identifier' => ['@type' => 'PropertyValue', 'propertyID' => 'ОГРНИП', 'value' => $co['ogrnip'] ?? ''],
+        'areaServed' => ['@type' => 'City', 'name' => 'Екатеринбург'],
+        'knowsAbout' => ['кофе в зёрнах', 'чай', 'аренда кофемашин', 'ремонт кофемашин', 'кофемашины Jetinno', 'вендинг', 'HoReCa'],
         'address' => ['@type' => 'PostalAddress', 'postalCode' => $co['zip'] ?? '', 'addressLocality' => $co['city'] ?? '',
             'streetAddress' => $co['street'] ?? '', 'addressCountry' => 'RU'],
         'openingHoursSpecification' => [['@type' => 'OpeningHoursSpecification',
