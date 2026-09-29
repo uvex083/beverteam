@@ -819,8 +819,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const EN='qwertyuiop[]asdfghjkl;\'zxcvbnm,.`', RU='йцукенгшщзхъфывапролджэячсмитьбюё';
   const swap=q=>{const l=q.toLowerCase(), lat=/[a-z]/.test(l), cyr=/[а-яё]/.test(l); if(lat===cyr) return '';
     const [a,b]=lat?[EN,RU]:[RU,EN]; return [...l].map(c=>{const i=a.indexOf(c); return i<0?c:b[i];}).join('');};
-  const mark=(t,q)=>{const ws=stems(q).filter(w=>w.length>1); if(!ws.length) return esc(t);
-    const re=new RegExp('('+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]')).join('|')+')','gi');
+  /* подсветка: основа слова плюс столько набранных букв, сколько совпало с текстом («ремонт» — целиком, «кофема» — «кофема») */
+  const rxc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]');
+  const opt=r=>r?'(?:'+rxc(r[0])+opt(r.slice(1))+')?':'';
+  const mark=(t,q)=>{const ws=norm(q).split(/[\s,.;:!?«»"()-]+/).filter(w=>stem(w).length>1); if(!ws.length) return esc(t);
+    const re=new RegExp('('+ws.sort((a,b)=>b.length-a.length).map(w=>{const s=stem(w); return rxc(s)+opt(w.slice(s.length));}).join('|')+')','gi');
     return t.split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join('');};
 
   const PAGES=window.BT_PAGES||[];
