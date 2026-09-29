@@ -43,7 +43,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
       'IBLOCK_TYPE' => $arParams['IBLOCK_TYPE'], 'IBLOCK_ID' => $arParams['IBLOCK_ID'],
       'NEWS_COUNT' => $arParams['NEWS_COUNT'], 'SORT_BY1' => $arParams['SORT_BY1'], 'SORT_ORDER1' => $arParams['SORT_ORDER1'],
       'SORT_BY2' => $arParams['SORT_BY2'], 'SORT_ORDER2' => $arParams['SORT_ORDER2'],
-      'FIELD_CODE' => ['PREVIEW_PICTURE'], 'PROPERTY_CODE' => ['KIND', 'RUBRIC', 'READ_TIME'],
+      'FIELD_CODE' => ['PREVIEW_PICTURE'], 'PROPERTY_CODE' => ['KIND', 'RUBRIC', 'READ_TIME', 'REVIEW'],
       'DETAIL_URL' => $arResult['FOLDER'] . $arResult['URL_TEMPLATES']['detail'],
       'PARENT_SECTION_CODE' => $rubric, 'INCLUDE_SUBSECTIONS' => 'Y', 'CHECK_DATES' => 'Y', 'FILTER_NAME' => 'btJournalFilter',
       'CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_FILTER' => 'Y', 'CACHE_GROUPS' => 'N',

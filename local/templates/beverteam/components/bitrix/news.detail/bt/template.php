@@ -28,6 +28,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
   <div>
     <meta itemprop="datePublished" content="<?= $e($iso) ?>"><meta itemprop="articleSection" content="<?= $e($cat) ?>">
     <div hidden itemprop="author" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="BEVERTEAM"></div>
+    <?php if (($arResult['PROPERTIES']['REVIEW']['VALUE_XML_ID'] ?? '') === 'draft'): ?><div class="post__draft">Черновик — статья на вычитке, факты и фото ещё уточняются</div><?php endif ?>
     <h1 class="display h1" itemprop="headline"><?= $e($arResult['~NAME']) ?></h1>
     <div class="post__meta">
       <span class="tag"><?= $e($cat) ?></span>

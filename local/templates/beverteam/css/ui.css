@@ -2155,3 +2155,6 @@ form[data-form]{position:relative}
 .post__body figure img,.post__body>img{display:block;width:100%;height:auto;border-radius:var(--rad);background:var(--paper)}
 .post__body figcaption{margin-top:10px;font-size:13.5px;line-height:1.5;color:var(--gray)}
 @media(hover:hover){.post__body img{cursor:zoom-in}}
+/* журнал: статья на вычитке (свойство «Вычитка») */
+.tag.tag--draft{background:#FFE08A;color:var(--ink)}
+.post__draft{display:inline-block;margin:0 0 16px;padding:8px 14px;border-radius:999px;background:#FFE08A;font-size:13.5px;font-weight:600}
