@@ -18,7 +18,7 @@ $ibId = bt_iblock('journal') or die("нет ИБ journal\n");
 is_dir($dir) or die("нет папки $dir\n");
 
 // рубрики: код в JSON => [название, символьный код раздела, сортировка]
-$rubrics = ['uhod' => ['Уход за кофемашиной', 'uhod-za-kofemashinoy', 10], 'kofe' => ['Выбор кофе', 'vybor-kofe', 20],
+$rubrics = ['uhod' => ['Уход за кофемашиной', 'uhod-za-kofemashinoy', 10], 'kofe' => ['Выбор кофе', 'vybor-kofe', 20], 'recept' => ['Приготовление кофе', 'prigotovlenie-kofe', 25],
     'biznes' => ['Для бизнеса', 'dlya-biznesa', 30], 'chay' => ['Чай', 'chay', 40]];
 $secId = [];
 foreach ($rubrics as $k => [$name, $code, $sort]) {
