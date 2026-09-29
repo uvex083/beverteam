@@ -50,7 +50,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     <?php /* автор и издатель — компания: Яндекс требует у организации адрес и телефон */ ?>
     <div hidden itemprop="author publisher" itemscope itemtype="https://schema.org/Organization" itemid="https://beverteam.ru/#org">
       <meta itemprop="name" content="BEVERTEAM"><link itemprop="url" href="<?= $e($host) ?>/">
-      <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject"><link itemprop="url" href="<?= $e($host) ?>/local/templates/beverteam/images/og-logo.png"></div>
+      <link itemprop="logo" href="<?= $e($host) ?>/local/templates/beverteam/images/og-logo.png">
       <meta itemprop="telephone" content="<?= $e($co['phone1'] ?? '') ?>">
       <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><meta itemprop="postalCode" content="<?= $e($co['zip'] ?? '') ?>"><meta itemprop="addressLocality" content="<?= $e($co['city'] ?? '') ?>"><meta itemprop="streetAddress" content="<?= $e($co['street'] ?? '') ?>"></div>
     </div>
