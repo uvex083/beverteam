@@ -990,7 +990,7 @@ function bt_post_card(array $p): string
         . '<div class="ncard__b"><div class="ncard__m"><time datetime="' . $e($p['d']) . '">' . bt_date_ru($p['d']) . '</time>'
         . ($p['kind'] === 'news' && $p['cat'] !== 'Новости' ? '<span class="tag tag--n">Новость</span>' : '')
         . (!empty($p['draft']) ? '<span class="tag tag--draft">Черновик</span>' : '') . '</div>'
-        . '<h3>' . $e($p['t']) . '</h3><p>' . $e($p['lead']) . '</p></div></a>';
+        . '<h3><span>' . $e($p['t']) . '</span></h3><p>' . $e($p['lead']) . '</p></div></a>';
 }
 
 // Модели аренды для главной: подбор на первом экране и «кофе по подписке»
