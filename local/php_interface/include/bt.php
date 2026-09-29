@@ -437,12 +437,12 @@ function bt_catalog_data(): array
     }
 
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $rentId, 'ACTIVE' => 'Y'], false, false,
-        ['ID', 'NAME', 'CODE', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG']);
+        ['ID', 'NAME', 'CODE', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_FEATURE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG']);
     while ($f = $r->Fetch()) {
         $data['rent'][] = [
             'id' => 'r' . $f['ID'], 'code' => $f['CODE'], 'url' => '/arenda-kofemashin/#calc', 'img' => $img($f['PREVIEW_PICTURE']),
             'n' => $f['NAME'], 'p' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'unit' => 'в месяц', 'rent' => 1, 'stock' => 1,
-            'par' => implode(' · ', array_filter([$f['PROPERTY_AUDIENCE_VALUE'], $f['PROPERTY_CUPS_PER_DAY_VALUE'] ? 'до ' . $f['PROPERTY_CUPS_PER_DAY_VALUE'] . ' чашек/день' : '', $f['PROPERTY_FREE_FROM_KG_VALUE'] ? 'бесплатно от ' . $f['PROPERTY_FREE_FROM_KG_VALUE'] . ' кг кофе' : ''])),
+            'par' => implode(' · ', array_filter([$f['PROPERTY_AUDIENCE_VALUE'], $f['PROPERTY_FEATURE_VALUE'] ?? '', $f['PROPERTY_CUPS_PER_DAY_VALUE'] ? 'до ' . $f['PROPERTY_CUPS_PER_DAY_VALUE'] . ' чашек/день' : '', $f['PROPERTY_FREE_FROM_KG_VALUE'] ? 'бесплатно от ' . $f['PROPERTY_FREE_FROM_KG_VALUE'] . ' кг кофе' : ''])),
         ];
     }
 
@@ -1004,6 +1004,42 @@ function bt_post_card(array $p): string
 }
 
 // Модели аренды для главной: подбор на первом экране и «кофе по подписке»
+// Подстановки в текстах сайта (блоки, статьи, SEO): считаются по активным моделям аренды, в админке остаются метками
+function bt_rent_tokens(): array
+{
+    $m = bt_rent_models();
+    if (!$m) {
+        return [];
+    }
+    $kg = array_filter(array_column($m, 'kg'));
+    $names = array_map(fn($x) => preg_replace('/^Jetinno\s+/u', '', $x['model']), $m);
+    $last = array_pop($names);
+    return [
+        '#RENT_FROM#' => bt_fmt(min(array_column($m, 'price'))),
+        '#RENT_FREE_KG#' => $kg ? (string)min($kg) : '',
+        '#RENT_MODELS#' => 'Jetinno ' . ($names ? implode(', ', $names) . ' и ' : '') . $last,
+    ];
+}
+
+// main:OnEndBufferContent — метки #RENT_…# в готовой странице заменяются значениями
+function bt_tokens_buffer(&$content): void
+{
+    if (defined('ADMIN_SECTION') || !str_contains($content, '#RENT_')) {
+        return;
+    }
+    $content = strtr($content, bt_rent_tokens());
+}
+
+// title и description страницы: вкладка SEO элемента первого блока в админке, если заполнена, иначе текст по умолчанию
+function bt_page_seo(string $blockCode, string $title, string $description): void
+{
+    global $APPLICATION;
+    $b = bt_block($blockCode);
+    $seo = $b ? (new \Bitrix\Iblock\InheritedProperty\ElementValues(bt_iblock($blockCode), $b['id']))->getValues() : [];
+    $APPLICATION->SetPageProperty('title', ($seo['ELEMENT_META_TITLE'] ?? '') ?: $title);
+    $APPLICATION->SetPageProperty('description', ($seo['ELEMENT_META_DESCRIPTION'] ?? '') ?: $description);
+}
+
 function bt_rent_models(): array
 {
     $ibId = bt_iblock('rent');
@@ -1016,13 +1052,13 @@ function bt_rent_models(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
     $list = [];
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false,
-        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG', 'PROPERTY_MACHINE']);
+        ['ID', 'NAME', 'PREVIEW_PICTURE', 'PROPERTY_PRICE_MONTH', 'PROPERTY_AUDIENCE', 'PROPERTY_FEATURE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FREE_FROM_KG', 'PROPERTY_MACHINE']);
     while ($f = $r->Fetch()) {
         $m = $f['PROPERTY_MACHINE_VALUE'] ? bt_product((string)$f['PROPERTY_MACHINE_VALUE']) : null;
         $list[] = [
             'id' => 'r' . $f['ID'], 'name' => $f['NAME'], 'url' => $m['url'] ?? '', 'buy' => $m['p'] ?? 0,
             'model' => trim(preg_replace('/^Кофемашина\s+|\s+Аренда$/u', '', $m['n'] ?? $f['NAME'])),
-            'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'],
+            'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'], 'feature' => (string)($f['PROPERTY_FEATURE_VALUE'] ?? ''),
             'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'],
             'img' => $f['PREVIEW_PICTURE'] ? bt_img($f['PREVIEW_PICTURE'], 480, 340) : ($m['img'] ?? ''),
         ];

@@ -28,6 +28,7 @@ AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contact
 require_once __DIR__ . '/include/bt_seo.php';
 AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
+AddEventHandler('main', 'OnEndBufferContent', 'bt_tokens_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
 

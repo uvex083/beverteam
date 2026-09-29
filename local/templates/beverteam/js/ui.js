@@ -89,12 +89,6 @@ window.BT_BRANDS=[
   {id:'delonghi',slug:"De'Longhi",models:'Magnifica, Dinamica, Eletta',note:'бытовые автоматы, ремонт и чистка на дому'}
 ];
 
-/* ---------- Подписка на кофе ---------- */
-window.BT_SUB={
-  volumes:[{kg:3,rent:'JL05 бесплатно',disc:0.18},{kg:6,rent:'JL15 VIVA бесплатно',disc:0.22},{kg:9,rent:'JL36 бесплатно',disc:0.26},{kg:20,rent:'любая модель + вторая точка',disc:0.28}],
-  periods:[{id:'m1',t:'Раз в месяц',k:1},{id:'w2',t:'Раз в 2 недели',k:2},{id:'m2',t:'Раз в 2 месяца',k:0.5}]
-};
-
 /* ---------- Отзывы на товар (UGC с фото) ---------- */
 window.BT_REVIEWS={
   oromia:[
