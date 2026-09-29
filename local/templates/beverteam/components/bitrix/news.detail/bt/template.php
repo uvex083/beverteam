@@ -77,7 +77,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
       <?php endif ?>
       <?php if ($promo): ?>
       <a class="post__promo" href="<?= $e($promo['link']) ?>">
-        <?php if ($promo['img']): ?><img src="<?= $e($promo['img']) ?>" alt="" width="64" height="64" loading="lazy"><?php endif ?>
+        <?php if ($promo['img']): ?><img src="<?= $e($promo['img']) ?>" alt="" width="52" height="52" loading="lazy"><?php endif ?>
         <span><b><?= $e($promo['title']) ?></b><?php if ($promo['text'] !== ''): ?><span><?= $e($promo['text']) ?></span><?php endif ?><em><?= $e($promo['btn']) ?> →</em></span>
       </a>
       <?php endif ?>
