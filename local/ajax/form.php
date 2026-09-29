@@ -120,7 +120,7 @@ CEvent::Send('BT_FORM_REQUEST', SITE_ID, [
         'E-mail' => htmlspecialcharsbx($d['email']),
         'Сообщение' => nl2br(htmlspecialcharsbx($d['message'])),
         'Страница' => $d['page'] !== '' ? '<a href="' . htmlspecialcharsbx($host . $d['page']) . '" style="color:#0E0E0C">' . htmlspecialcharsbx($host . $d['page']) . '</a>' : '',
-    ], fn($v) => $v !== ''))),
+    ], fn($v) => $v !== '')),
     'ADMIN_URL' => $host . '/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=' . $ibId . '&type=forms&ID=' . $id . '&lang=ru',
 ]);
 
