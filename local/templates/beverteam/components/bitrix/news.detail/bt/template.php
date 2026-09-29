@@ -12,7 +12,7 @@ $iso = $date ? date('Y-m-d', MakeTimeStamp($date)) : '';
 $toc = [];
 $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) use (&$toc) {
     $id = 'h' . (count($toc) + 1);
-    $toc[] = [$id, trim(strip_tags($m[3]))];
+    $toc[] = [$id, trim(strip_tags($m[3])), strtolower($m[1]) === 'h2' ? 2 : 3];
     return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
 }, (string)$arResult['~DETAIL_TEXT']);
 // таблица — в прокручиваемой обёртке: на телефоне листается сама, на широком экране тянется во всю колонку
@@ -20,8 +20,18 @@ $body = preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table',
 // товары из статьи — карточки каталога (выключенные и удалённые товары пропускаются)
 $prods = array_values(array_filter(array_map(fn($id) => bt_product((string)$id), (array)($arResult['PROPERTIES']['PRODUCTS']['VALUE'] ?? []))));
 if ($prods) {
-    $toc[] = ['prods', 'Товары из статьи'];
+    $toc[] = ['prods', 'Товары из статьи', 2];
 }
+// оглавление: разделы H2 с номерами, подзаголовки H3–H4 — внутри своего раздела
+$tree = [];
+foreach ($toc as [$id, $t, $lv]) {
+    if ($lv === 3 && $tree) {
+        $tree[count($tree) - 1]['sub'][] = [$id, $t];
+    } else {
+        $tree[] = ['id' => $id, 't' => $t, 'sub' => []];
+    }
+}
+$promo = bt_journal_promo((int)$arResult['IBLOCK_SECTION_ID']);
 $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']['ID'] ?? 0), 1600, 1600);
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
@@ -50,12 +60,28 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
       <a class="btn btn--line" href="/podbor-kofe/">Подобрать кофе за минуту</a>
     </div>
   </div>
-  <?php if (count($toc) >= 2): ?>
+  <?php if (count($tree) >= 2 || $promo): ?>
   <aside>
-    <nav class="post__toc" aria-label="Содержание">
-      <b>В статье</b>
-      <?php foreach ($toc as [$id, $t]): ?><a href="#<?= $id ?>"><?= $e($t) ?></a><?php endforeach ?>
-    </nav>
+    <div class="post__side">
+      <?php if (count($tree) >= 2): ?>
+      <nav class="post__toc" aria-label="Содержание" data-min="<?= $min ?>">
+        <div class="post__toc-hd"><b>В статье</b><span class="post__toc-pct"></span></div>
+        <span class="post__toc-bar"><i></i></span>
+        <ol>
+          <?php foreach ($tree as $n => $h): ?>
+          <li<?= $h['sub'] ? ' class="has-sub"' : '' ?>><a href="#<?= $h['id'] ?>"><span class="post__toc-n"><?= sprintf('%02d', $n + 1) ?></span><span><?= $e($h['t']) ?></span><?php if ($h['sub']): ?><em><?= count($h['sub']) ?></em><?php endif ?></a>
+            <?php if ($h['sub']): ?><div class="post__toc-sub"><div><?php foreach ($h['sub'] as [$id, $t]): ?><a href="#<?= $id ?>"><?= $e($t) ?></a><?php endforeach ?></div></div><?php endif ?></li>
+          <?php endforeach ?>
+        </ol>
+      </nav>
+      <?php endif ?>
+      <?php if ($promo): ?>
+      <a class="post__promo" href="<?= $e($promo['link']) ?>">
+        <?php if ($promo['img']): ?><img src="<?= $e($promo['img']) ?>" alt="" width="64" height="64" loading="lazy"><?php endif ?>
+        <span><b><?= $e($promo['title']) ?></b><?php if ($promo['text'] !== ''): ?><span><?= $e($promo['text']) ?></span><?php endif ?><em><?= $e($promo['btn']) ?> →</em></span>
+      </a>
+      <?php endif ?>
+    </div>
   </aside>
   <?php endif ?>
 </article>

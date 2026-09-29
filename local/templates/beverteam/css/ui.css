@@ -635,15 +635,40 @@ input,textarea{caret-color:var(--ink)}
 .post__body figure img{border-radius:var(--rad);width:100%;object-fit:cover}
 .post__body figcaption{font-size:13px;color:var(--gray);margin-top:8px}
 .post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}
-.post__toc{position:sticky;top:130px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px;font-size:14px}
-.post__toc b{display:block;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:12px}
+.post__side{position:sticky;top:130px;display:flex;flex-direction:column;gap:12px}
+.post__toc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px 14px;font-size:14px}
+.post__toc-hd{display:flex;justify-content:space-between;gap:10px;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)}
+.post__toc b{font-weight:700}
+.post__toc-pct{white-space:nowrap}
+.post__toc-bar{display:block;height:4px;margin:12px 0 10px;background:var(--paper);border-radius:99px;overflow:hidden}
+.post__toc-bar i{display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--lime);border-radius:inherit}
+.post__toc ol{list-style:none;margin:0;padding:0}
 .post>aside{align-self:stretch}   /* колонка во всю высоту статьи — оглавление внутри неё липнет при прокрутке */
-.post__toc a{display:block;padding:6px 0 6px 12px;margin-left:-12px;border-left:3px solid transparent;color:#3A3A34;transition:color .15s,border-color .15s}
-.post__toc a.on{color:var(--ink);font-weight:600;border-left-color:var(--lime)}@media(hover:hover){.post__toc a:hover{color:var(--ink)}}
+.post__toc li>a{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;margin:0 -8px;border-radius:var(--rad-xs);color:#3A3A34;line-height:1.35;transition:color .15s,background-color .15s}
+.post__toc-n{flex:0 0 auto;min-width:17px;padding-top:.2em;font:500 11px/1.35 'JetBrains Mono';color:#B5B5AC}
+.post__toc li>a em{margin-left:auto;flex:0 0 auto;min-width:22px;padding:1px 6px;border-radius:99px;background:var(--paper);font:500 10.5px/16px 'JetBrains Mono';font-style:normal;text-align:center;color:var(--gray)}
+.post__toc li.is-open>a{color:var(--ink);font-weight:600}
+.post__toc li.is-open>a em{visibility:hidden}
+.post__toc li>a.on{background:var(--lime);color:var(--ink);font-weight:700}
+.post__toc li.is-open>a .post__toc-n,.post__toc li>a.on .post__toc-n{color:var(--ink)}
+.post__toc-sub{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s}
+.post__toc-sub>div{overflow:hidden;padding-left:27px}
+.post__toc li.is-open .post__toc-sub{grid-template-rows:1fr}
+.post__toc-sub a{display:block;padding:4px 0;font-size:13px;line-height:1.35;color:var(--gray)}
+.post__toc-sub a:last-child{margin-bottom:4px}
+.post__toc-sub a.on{color:var(--ink);font-weight:600}
+@media(hover:hover){.post__toc a:hover{color:var(--ink)}}
+.post__promo{display:flex;gap:14px;align-items:center;padding:16px;border-radius:var(--rad);background:var(--espresso);color:#fff}
+.post__promo img{flex:0 0 64px;width:64px;height:64px;object-fit:contain;background:#fff;border-radius:var(--rad-s);padding:4px}
+.post__promo b{display:block;font:800 13px/1.15 Unbounded,sans-serif;text-transform:uppercase;letter-spacing:-.01em}
+.post__promo span span{display:block;margin-top:5px;font-size:12.5px;line-height:1.35;color:#D7C9B5}
+.post__promo em{display:inline-block;margin-top:10px;padding:7px 14px;border-radius:99px;background:var(--lime);color:var(--ink);font:700 12.5px/1 Manrope,sans-serif;font-style:normal;transition:background-color .15s}
+@media(hover:hover){.post__promo:hover em{background:#fff}}
+@media(max-height:760px) and (min-width:1001px){.post__promo{display:none}}
 @media(max-width:1000px){.jlead{grid-template-columns:1fr}
   .jlead>.ncard{grid-template-columns:1fr;min-height:0}
   .jlead>.ncard>.ncard__ph>img{height:auto;aspect-ratio:16/10}
-  .post{grid-template-columns:minmax(0,1fr)}.post__toc{position:static}}
+  .post{grid-template-columns:minmax(0,1fr)}.post__side{position:static}.post__toc-pct,.post__toc-bar{display:none}.post__toc-hd{margin-bottom:10px}}
 
 /* ================= Подписка ================= */
 .subg{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}

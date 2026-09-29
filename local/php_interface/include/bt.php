@@ -816,6 +816,34 @@ function bt_date_ru(string $iso): string
     return $t ? date('j', $t) . ' ' . $m[date('n', $t) - 1] . ' ' . date('Y', $t) : '';
 }
 
+// Карточка под оглавлением статьи (ИБ «Журнал: карточка под оглавлением»): своя для рубрики, иначе общая — без рубрик.
+// #PRICE# в тексте — «от N ₽» по разделу из ссылки; без картинки берётся фото самого дешёвого товара раздела
+function bt_journal_promo(int $sectionId): ?array
+{
+    $all = bt_blocks('journal_promo');
+    $b = null;
+    foreach ($all as $x) {
+        $rub = array_filter(array_map(fn($v) => (int)$v[0], $x['rubrics'] ?? []));
+        if ($rub ? in_array($sectionId, $rub, true) : !$b) {
+            $b = $x;
+            if ($rub) {
+                break;
+            }
+        }
+    }
+    if (!$b || ($b['btn_link'] ?? '') === '') {
+        return null;
+    }
+    $link = $b['btn_link'];
+    $group = ['/catalog/kofe/' => 'coffee', '/catalog/chay/' => 'tea', '/catalog/professionalnye-kofemashiny/' => 'machines', '/catalog/aksessuary/' => 'acc', '/arenda-kofemashin/' => 'rent', '/servis/remont-kofemashin/' => 'machines'];
+    $items = bt_catalog_data()[$group[strtok($link, '?#')] ?? ''] ?? [];
+    usort($items, fn($a, $c) => $a['p'] <=> $c['p']);
+    $text = (string)($b['text'] ?? '');
+    $text = trim(str_contains($text, '#PRICE#') ? ($items ? str_replace('#PRICE#', 'от ' . bt_fmt((float)$items[0]['p']), $text) : preg_replace('~,?\s*#PRICE#~u', '', $text)) : $text);
+    return ['title' => ($b['title'] ?? '') ?: $b['name'], 'text' => strip_tags($text), 'btn' => ($b['btn_text'] ?? '') ?: 'Подробнее', 'link' => $link,
+        'img' => bt_img($b['pic_id'], 160, 160) ?: ($items[0]['img'] ?? '')];
+}
+
 // Карточка журнала — серверная копия BT_postCard() из ui.js; без фото — фирменная заглушка (рисует BT_phFit)
 function bt_post_card(array $p): string
 {

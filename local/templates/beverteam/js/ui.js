@@ -1714,9 +1714,10 @@ document.addEventListener('click',e=>{
   }).catch(()=>{ location.href=a.href; });
 });
 
-/* оглавление статьи: подсвечиваем раздел, до которого дочитали (последний заголовок выше линии под шапкой) */
+/* оглавление статьи: подсвечиваем раздел, до которого дочитали (последний заголовок выше линии под шапкой), раскрываем его подпункты, показываем прогресс */
 document.addEventListener('DOMContentLoaded',()=>{
   const links=[...document.querySelectorAll('.post__toc a[href^="#"]')]; if(!links.length) return;
+  const toc=links[0].closest('.post__toc'), body=document.querySelector('.post .post__body'), pct=toc.querySelector('.post__toc-pct'), mins=+toc.dataset.min||0;
   // оглавление начинается вровень с верхом главной картинки (или текста, если картинки нет), а не с заголовком
   const aside=document.querySelector('.post>aside'), top=document.querySelector('.post .post__ph, .post .post__body');
   const align=()=>{ if(!aside||!top) return; aside.style.paddingTop=innerWidth>900?Math.max(0,top.getBoundingClientRect().top-aside.parentElement.getBoundingClientRect().top)+'px':''; };
@@ -1726,7 +1727,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const spy=()=>{ raf=0; const line=(document.querySelector('.hdr')?.offsetHeight||0)+40;
     let cur=hs[0]; hs.forEach(h=>{ if(h.getBoundingClientRect().top<=line) cur=h; });
     if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) cur=hs[hs.length-1];
-    links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id)); };
+    links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id));
+    toc.querySelectorAll('li').forEach(li=>li.classList.toggle('is-open',!!li.querySelector('a.on')));
+    if(body&&pct){ const r=body.getBoundingClientRect(), p=Math.min(1,Math.max(0,(innerHeight*.5-r.top)/r.height)), left=Math.ceil(mins*(1-p));
+      toc.style.setProperty('--p',p); pct.textContent=Math.round(p*100)+'%'+(mins&&left?' · '+left+' мин':''); } };
   addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
 });
 
