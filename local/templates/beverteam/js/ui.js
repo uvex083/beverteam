@@ -1729,6 +1729,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) cur=hs[hs.length-1];
     links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id));
     toc.querySelectorAll('li').forEach(li=>li.classList.toggle('is-open',!!li.querySelector('a.on')));
+    const ol=toc.querySelector('ol'), on=toc.querySelector('a.on');
+    if(ol&&on&&ol.scrollHeight>ol.clientHeight){ const a=on.offsetTop, z=a+on.offsetHeight;
+      if(a<ol.scrollTop+40||z>ol.scrollTop+ol.clientHeight-40) ol.scrollTo({top:a-ol.clientHeight/3,behavior:'smooth'}); }
     if(body&&pct){ const r=body.getBoundingClientRect(), p=Math.min(1,Math.max(0,(innerHeight*.5-r.top)/r.height)), left=Math.ceil(mins*(1-p));
       toc.style.setProperty('--p',p); pct.textContent=Math.round(p*100)+'%'+(mins&&left?' · '+left+' мин':''); } };
   addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
