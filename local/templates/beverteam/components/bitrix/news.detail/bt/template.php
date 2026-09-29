@@ -69,8 +69,8 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
         <span class="post__toc-bar"><i></i></span>
         <ol>
           <?php foreach ($tree as $n => $h): ?>
-          <li<?= $h['sub'] ? ' class="has-sub"' : '' ?>><a href="#<?= $h['id'] ?>"><span class="post__toc-n"><?= sprintf('%02d', $n + 1) ?></span><span><?= $e($h['t']) ?></span><?php if ($h['sub']): ?><em><?= count($h['sub']) ?></em><?php endif ?></a>
-            <?php if ($h['sub']): ?><div class="post__toc-sub"><div><?php foreach ($h['sub'] as [$id, $t]): ?><a href="#<?= $id ?>"><?= $e($t) ?></a><?php endforeach ?></div></div><?php endif ?></li>
+          <li<?= $h['sub'] ? ' class="has-sub"' : '' ?>><a href="#<?= $h['id'] ?>"><span class="post__toc-n"><?= sprintf('%02d', $n + 1) ?></span><span><?= $e($h['t']) ?></span></a>
+            <?php if ($h['sub']): ?><div class="post__toc-sub"><?php foreach ($h['sub'] as [$id, $t]): ?><a href="#<?= $id ?>"><?= $e($t) ?></a><?php endforeach ?></div><?php endif ?></li>
           <?php endforeach ?>
         </ol>
       </nav>

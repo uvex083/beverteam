@@ -646,17 +646,15 @@ input,textarea{caret-color:var(--ink)}
 .post>aside{align-self:stretch}   /* колонка во всю высоту статьи — оглавление внутри неё липнет при прокрутке */
 .post__toc li>a{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;margin:0 -8px;border-radius:var(--rad-xs);color:#3A3A34;line-height:1.35;transition:color .15s,background-color .15s}
 .post__toc-n{flex:0 0 auto;min-width:17px;padding-top:.2em;font:500 11px/1.35 'JetBrains Mono';color:#B5B5AC}
-.post__toc li>a em{margin-left:auto;flex:0 0 auto;min-width:22px;padding:1px 6px;border-radius:99px;background:var(--paper);font:500 10.5px/16px 'JetBrains Mono';font-style:normal;text-align:center;color:var(--gray)}
-.post__toc li.is-open>a{color:var(--ink);font-weight:600}
-.post__toc li.is-open>a em{visibility:hidden}
-.post__toc li>a.on{background:var(--lime);color:var(--ink);font-weight:700}
+/* подпункты всегда раскрыты, у активного пункта меняется только цвет — жирность переносила бы строки и список прыгал */
+.post__toc li.is-open>a{color:var(--ink)}
+.post__toc li>a.on{background:var(--lime);color:var(--ink)}
 .post__toc li.is-open>a .post__toc-n,.post__toc li>a.on .post__toc-n{color:var(--ink)}
-.post__toc-sub{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s}
-.post__toc-sub>div{overflow:hidden;padding-left:27px}
-.post__toc li.is-open .post__toc-sub{grid-template-rows:1fr}
-.post__toc-sub a{display:block;padding:4px 0;font-size:13px;line-height:1.35;color:var(--gray)}
-.post__toc-sub a:last-child{margin-bottom:4px}
-.post__toc-sub a.on{color:var(--ink);font-weight:600}
+.post__toc-sub{padding:0 0 4px 27px}
+.post__toc-sub a{display:block;padding:4px 0;font-size:13px;line-height:1.35;color:var(--gray);transition:color .15s}
+.post__toc-sub a{position:relative}
+.post__toc-sub a.on{color:var(--ink)}
+.post__toc-sub a.on::before{content:"";position:absolute;left:-15px;top:calc(4px + .675em - 3px);width:6px;height:6px;border-radius:50%;background:var(--lime-d)}
 @media(hover:hover){.post__toc a:hover{color:var(--ink)}}
 .post__promo{display:flex;gap:12px;align-items:center;padding:16px 14px;border-radius:var(--rad);background:var(--espresso);color:#fff}
 .post__promo img{flex:0 0 52px;width:52px;height:52px;object-fit:contain;background:#fff;border-radius:var(--rad-s);padding:4px}
