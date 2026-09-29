@@ -2150,3 +2150,8 @@ form[data-form]{position:relative}
 @media(max-width:1100px){.r2steps{grid-template-columns:repeat(3,1fr)}.r2models{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){.r2hero{grid-template-columns:1fr}.r2symp,.r2err,.r2why{grid-template-columns:1fr 1fr}.r2models{grid-template-columns:1fr 1fr}.r2more{grid-template-columns:1fr}}
 @media(max-width:640px){.r2chk,.r2symp,.r2err,.r2why,.r2steps{grid-template-columns:1fr}.r2tbl td:nth-child(2),.r2tbl th:nth-child(2){display:none}.r2tbl td:last-child{white-space:normal}}
+/* фото в тексте статьи */
+.post__body figure{margin:28px 0}
+.post__body figure img,.post__body>img{display:block;width:100%;height:auto;border-radius:var(--rad);background:var(--paper)}
+.post__body figcaption{margin-top:10px;font-size:13.5px;line-height:1.5;color:var(--gray)}
+@media(hover:hover){.post__body img{cursor:zoom-in}}

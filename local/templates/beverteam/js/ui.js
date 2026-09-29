@@ -1854,3 +1854,10 @@ window.BT_mbar=(btn,sumEl,onTap)=>{
   new MutationObserver(show).observe(btn.parentNode,{attributes:true,attributeFilter:['hidden']});
   sync();
 };
+
+// фото в тексте статьи журнала — по клику в просмотр, листаются все фото статьи
+document.addEventListener('click',e=>{
+  const img=e.target.closest('.post__body img'); if(!img||img.closest('a')) return;
+  const all=[...img.closest('.post__body').querySelectorAll('img')].filter(i=>!i.closest('a'));
+  BT_lightbox(all.map(i=>({src:i.currentSrc||i.src,cap:i.closest('figure')?.querySelector('figcaption')?.textContent.trim()||i.alt})),all.indexOf(img));
+});
