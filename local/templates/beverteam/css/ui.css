@@ -580,12 +580,12 @@ input,textarea{caret-color:var(--ink)}
 @media(hover:hover){.jfilter a:hover{border-color:var(--line-h)}}
 .jtags{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:-10px 0 26px;font-size:14px}
 .jtags>span{color:var(--gray);font-size:13px}
-.jtags a{color:var(--ink);font-weight:600;border-bottom:1px solid transparent}
+.jtags a{color:var(--ink);font-weight:600;border-bottom:1px solid transparent;padding:0 6px;margin:0 -6px;border-radius:6px;transition:background-color .2s}
 .jtags a[aria-current]{border-bottom-color:var(--lime)}@media(hover:hover){.jtags a:hover{border-bottom-color:var(--lime)}}
-.jtags a[aria-current]{background:var(--lime);border-radius:6px;padding:0 6px}
+.jtags a[aria-current]{background:var(--lime)}
 .jtags sup{font:600 10px/1 'JetBrains Mono',monospace;color:var(--gray);margin-left:2px}
 .jtags--post{margin:28px 0 0;gap:8px}
-.jtags--post a{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.jtags--post a{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0;font-size:13px}
 @media(hover:hover){.jtags--post a:hover{border-color:var(--line-h)}}
 .jlead{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;margin-bottom:20px;align-items:stretch}
 /* крупная карточка: картинка слева во всю высоту, текст сверху с ровными полями */
