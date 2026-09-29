@@ -774,7 +774,7 @@ function bt_search_alias(): array
 // порядок — название совпало лучше описания
 function bt_search(string $q): array
 {
-    $norm = fn(string $s) => str_replace('ё', 'е', mb_strtolower($s));
+    $norm = fn(string $s) => preg_replace(['/([a-zа-я])(\d)/u', '/(\d)([a-zа-я])/u'], '$1 $2', str_replace('ё', 'е', mb_strtolower($s)));
     $stem = fn(string $w) => mb_strlen($w) >= 7 ? mb_substr($w, 0, -2) : (mb_strlen($w) >= 5 ? mb_substr($w, 0, -1) : $w);
     $alias = bt_search_alias();
     // слово запроса → все его написания (основы)
@@ -795,7 +795,8 @@ function bt_search(string $q): array
         }
         $ws = array_map($alts, $words);
         $hit = fn(string $h) => !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($h, $a)));
-        // 0 — название равно запросу, 1 — начинается с него, 2 — все слова в названии, 3 — совпало только описание
+        // 0 — название равно запросу, 1 — начинается с него, 2 — слова запроса отдельными словами названия («кофе», но не «кофемашина»),
+        // 3 — слова внутри слов названия, 4 — совпало только описание
         $rank = function (string $title) use ($norm, $q, $ws): int {
             $t = $norm($title);
             $qq = $norm(trim($q));
@@ -805,7 +806,12 @@ function bt_search(string $q): array
             if (str_starts_with($t, $qq)) {
                 return 1;
             }
-            return !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($t, $a))) ? 2 : 3;
+            $tw = preg_split('/[^a-zа-я0-9]+/u', $t);
+            $whole = fn(array $alt) => array_filter($tw, fn($x) => array_filter($alt, fn($a) => str_starts_with($x, $a) && mb_strlen($x) - mb_strlen($a) <= 3));
+            if (!array_filter($ws, fn($alt) => !$whole($alt))) {
+                return 2;
+            }
+            return !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($t, $a))) ? 3 : 4;
         };
         $pick = function (array $items, callable $title, callable $hay) use ($hit, $rank, $norm): array {
             $out = [];
@@ -817,14 +823,16 @@ function bt_search(string $q): array
             usort($out, fn($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
             return array_column($out, 2);
         };
+        // группа товара — частью названия: «кофе» находит сорта BOTANICA раньше кофемашин
+        $group = ['coffee' => 'кофе в зернах', 'tea' => 'чай', 'machines' => 'кофемашина', 'acc' => 'аксессуары', 'rent' => 'аренда кофемашины'];
         $prods = [];
-        foreach (bt_catalog_data() as $list) {
+        foreach (bt_catalog_data() as $g => $list) {
             foreach ($list as $m) {
-                $prods[$m['code']] = $m;
+                $prods[$m['code']] ??= $m + ['_g' => $group[$g] ?? ''];
             }
         }
         return [
-            $pick(array_values($prods), fn($m) => $m['n'], fn($m) => $m['n'] . ' ' . $m['par'] . ' ' . $m['code']),
+            $pick(array_values($prods), fn($m) => $m['_g'] . ' ' . $m['n'], fn($m) => $m['_g'] . ' ' . $m['n'] . ' ' . $m['par'] . ' ' . $m['code']),
             $pick(bt_search_pages(), fn($p) => $p['t'], fn($p) => $p['t'] . ' ' . $p['d'] . ' ' . $p['k']),
             $pick(bt_posts(), fn($p) => $p['t'], fn($p) => $p['t'] . ' ' . $p['lead'] . ' ' . $p['cat'] . ' ' . implode(' ', $p['tags'] ?? [])),
         ];
