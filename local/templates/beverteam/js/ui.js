@@ -796,17 +796,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>`;
   }
 
-  const mark=(t,q)=>{const i=t.toLowerCase().indexOf(q.toLowerCase());
-    return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length));};
+  /* поиск по словам: каждое слово запроса в любом месте и порядке, без окончаний («кофемашины» найдёт «кофемашин»), ё = е */
+  const norm=t=>String(t||'').toLowerCase().replace(/ё/g,'е');
+  const stems=q=>norm(q).split(/[\s,.;:!?«»"()-]+/).filter(Boolean).map(w=>w.length>=7?w.slice(0,-2):w.length>=5?w.slice(0,-1):w);
+  const hit=(hay,ws)=>{const h=norm(hay); return ws.every(w=>h.includes(w));};
+  const mark=(t,q)=>{const ws=stems(q).filter(w=>w.length>1); if(!ws.length) return esc(t);
+    const re=new RegExp('('+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]')).join('|')+')','gi');
+    return t.split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join('');};
 
   const PAGES=window.BT_PAGES||[];
 
   function paintResults(q){
-    const ql=q.toLowerCase();
+    const ws=stems(q);
     const prods=Object.values(BT_PRODUCTS).flat()
-      .filter(m=>(m.n+' '+m.par).toLowerCase().includes(ql)).slice(0,6);
-    const pages=PAGES.filter(p=>(p.t+' '+p.d+' '+(p.k||'')).toLowerCase().includes(ql)).slice(0,5);
-    const posts=(window.BT_POSTS||[]).filter(p=>(p.t+' '+p.lead+' '+p.cat+' '+(p.tags||[]).join(' ')).toLowerCase().includes(ql)).slice(0,5);
+      .filter(m=>hit(m.n+' '+m.par,ws)).slice(0,6);
+    const pages=PAGES.filter(p=>hit(p.t+' '+p.d+' '+(p.k||''),ws)).slice(0,6);
+    const posts=(window.BT_POSTS||[]).filter(p=>hit(p.t+' '+p.lead+' '+p.cat+' '+(p.tags||[]).join(' '),ws)).slice(0,5);
     if(!prods.length&&!pages.length&&!posts.length){
       const none=SR.promos.filter(p=>p.w==='none');
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>

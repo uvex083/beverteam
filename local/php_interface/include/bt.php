@@ -1311,7 +1311,7 @@ function bt_search_pages(): array
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('rent'));
     $pages = [
         ['t' => 'Услуги и сервис', 'u' => '/servis/', 'd' => 'Аренда, продажа, ремонт и обслуживание кофемашин', 'k' => 'услуги сервис обслуживание'],
-        ['t' => 'Ремонт и обслуживание кофемашин', 'u' => '/servis/remont-kofemashin/', 'd' => 'Сервисный центр Jetinno · выезд инженера', 'k' => 'ремонт сервис обслуживание починка неисправность диагностика инженер jetinno'],
+        ['t' => 'Ремонт и обслуживание кофемашин', 'u' => '/servis/remont-kofemashin/', 'd' => 'Любые марки · выезд инженера · сервисный центр Jetinno', 'k' => 'ремонт кофемашины сервис обслуживание починка неисправность диагностика инженер накипь чистка jetinno delonghi saeco philips jura melitta'],
         ['t' => 'Аренда кофемашин', 'u' => '/arenda-kofemashin/', 'd' => 'Для дома, офиса и кафе', 'k' => 'аренда прокат кофемашина офис кафе'],
         ['t' => 'Кофе по подписке', 'u' => '/podpiska/', 'd' => 'Регулярная доставка кофе, кофемашина бесплатно', 'k' => 'подписка доставка кофе регулярно'],
         ['t' => 'Подбор кофе', 'u' => '/podbor-kofe/', 'd' => '5 вопросов — сорт BOTANICA с ценой', 'k' => 'подбор кофе тест выбрать'],
@@ -1329,6 +1329,11 @@ function bt_search_pages(): array
         if ($u !== '' && !in_array($u, $known, true)) {
             $pages[] = ['t' => $f['NAME'], 'u' => $u, 'd' => 'Услуга · ' . trim(strip_tags((string)$f['PREVIEW_TEXT'])), 'k' => 'услуги'];
         }
+    }
+    // рубрики журнала — отдельными разделами
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('journal'));
+    foreach (bt_blog_rubrics() as $rb) {
+        $pages[] = ['t' => $rb['name'], 'u' => $rb['url'], 'd' => 'Журнал · статьи: ' . $rb['cnt'], 'k' => 'журнал статьи советы'];
     }
     foreach (bt_rent_models() as $m) {
         $pages[] = ['t' => $m['name'], 'u' => '/arenda-kofemashin/', 'd' => 'Аренда · ' . bt_fmt($m['price']) . ' в месяц · ' . $m['audience'], 'k' => 'аренда ' . $m['model']];
