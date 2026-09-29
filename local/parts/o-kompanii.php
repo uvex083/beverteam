@@ -4,6 +4,9 @@
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $intro = bt_block('about_intro');
+$values = bt_block('about_values');
+$valueItems = bt_list('about_values_items');
+$gallery = array_values(array_filter(bt_list('about_gallery'), fn($g) => $g['pic']));
 $work = bt_block('about_work');
 $cert = bt_block('about_cert');
 $team = bt_list('about_team');
@@ -22,6 +25,17 @@ $revs = bt_reviews();
     <div class="intro__ph"><?php if (!empty($intro['pic'])): ?><img src="<?= $e($intro['pic']) ?>" alt="Чай и кофе BEVERTEAM" fetchpriority="high"><?php else: ?><div class="ph"><span>Фото компании<br><small>нужен файл от клиента</small></span></div><?php endif ?></div>
   </div>
 
+  <?php if ($values || $valueItems): ?>
+  <section class="sec"><div class="vals">
+    <div class="vals__hd">
+      <?php if (!empty($values['caption'])): ?><div class="mono"><?= $e($values['caption']) ?></div><?php endif ?>
+      <h2 class="display h2"><?= $e($values['title'] ?? '') ?></h2>
+      <?= $values['text'] ?? '' ?>
+    </div>
+    <?php if ($valueItems): ?><div class="vals__g"><?php foreach ($valueItems as $u): ?><div class="utp__i"><?php if ($u['icon']): ?><div class="ic"><?= $u['icon'] ?></div><?php endif ?><b><?= $e($u['name']) ?></b><p><?= $e($u['text']) ?></p></div><?php endforeach ?></div><?php endif ?>
+  </div></section>
+  <?php endif ?>
+
   <section class="sec"><div class="grid g2" style="gap:40px">
     <div><h2 class="display h2" style="margin-bottom:22px"><?= $e($work['title'] ?? 'Чем занимаемся') ?></h2>
       <div class="tl"><?php foreach ($work['items'] ?? [] as [$t, $d]): ?><div><b><?= $e($t) ?></b><?= $e($d) ?></div><?php endforeach ?></div></div>
@@ -35,6 +49,13 @@ $revs = bt_reviews();
     </div>
   </div></section>
 
+  <?php if ($gallery): ?>
+  <section class="sec sec--t0">
+    <h2 class="display h2" style="margin-bottom:22px">Фотогалерея нашей продукции</h2>
+    <div class="agal"><div data-gallery><?php foreach ($gallery as $g): ?><a href="<?= $e($g['pic']) ?>"><img src="<?= $e($g['pic']) ?>"<?= bt_img_wh($g['pic']) ?> alt="<?= $e($g['name']) ?>" loading="lazy"></a><?php endforeach ?></div></div>
+  </section>
+  <?php endif ?>
+
   <?php if ($cert): ?>
   <section class="sec sec--t0"><div class="cert">
     <div><div class="mono" style="color:var(--lime)"><?= $e($cert['caption'] ?? '') ?></div><h2 class="display h2" style="margin:14px 0"><?= $e($cert['title'] ?? '') ?></h2><p style="color:#A8A8A0;margin:0;max-width:40ch"><?= $e($cert['subtitle'] ?? '') ?></p></div>
@@ -43,9 +64,25 @@ $revs = bt_reviews();
   <?php endif ?>
 
   <?php if ($revs): ?>
-  <section class="sec sec--t0" id="reviews">
+  <section class="sec sec--t0" id="about-reviews">
     <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Отзывы клиентов</h2><a class="link" href="/otzyvy-o-nas/">Все отзывы →</a></div>
-    <div class="grid g3 revs"><?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?></div>
+    <div class="grid g3 revs" data-revs><?php foreach ($revs as $r) echo bt_rev_card($r) ?></div>
+  </section>
+  <?php endif ?>
+
+  <?php $req = bt_requisites(); if ($req): ?>
+  <section class="sec sec--t0" id="rekvizity">
+    <div class="areq">
+      <div>
+        <h2 class="display h2">Реквизиты</h2>
+        <p class="muted">BEVERTEAM — чай и кофе для дома и бизнеса. Работаем с ИП и юрлицами по договору: оплата по счёту, закрывающие документы.</p>
+        <div class="req__btns">
+          <a class="btn" href="/local/ajax/requisites.php" download="BEVERTEAM-rekvizity.pdf"><?= bt_icon('doc') ?>Скачать реквизиты (PDF)</a>
+          <button class="btn btn--line" type="button" data-copy="<?= $e(implode(PHP_EOL, array_map(fn($r) => $r[0] . ': ' . $r[1], $req))) ?>">Скопировать</button>
+        </div>
+      </div>
+      <dl class="req__list"><?php foreach ($req as [$l, $v]): ?><div><dt><?= $e($l) ?></dt><dd><?= $e($v) ?></dd></div><?php endforeach ?></dl>
+    </div>
   </section>
   <?php endif ?>
 </div>

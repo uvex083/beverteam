@@ -1876,3 +1876,12 @@ document.addEventListener('click',e=>{
 
 // журнал: остальные темы по кнопке «Ещё N»
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tags-more]');if(!b)return;b.closest('.jtags').classList.add('is-open');});
+
+// «О компании»: отзывы и фотогалерея — слайдеры, клик по фото — просмотр на весь экран
+document.addEventListener('DOMContentLoaded',()=>{
+  BT_slider(document.querySelector('.aboutp [data-revs]'),{min:4,swiper:{breakpoints:{560:{slidesPerView:2,spaceBetween:14},900:{slidesPerView:3,spaceBetween:16},1200:{slidesPerView:4,spaceBetween:18}}}});
+  const box=document.querySelector('.aboutp .agal'); if(!box) return;
+  box.addEventListener('click',e=>{const a=e.target.closest('a'); if(!a) return; e.preventDefault();
+    const all=[...box.querySelectorAll('a')]; BT_lightbox(all.map(x=>({src:x.getAttribute('href'),cap:x.querySelector('img').alt})),all.indexOf(a));});
+  BT_slider(box.querySelector('[data-gallery]'),{min:2,swiper:{slidesPerView:'auto',spaceBetween:14,breakpoints:{}}});
+});
