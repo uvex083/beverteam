@@ -798,20 +798,35 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* поиск по словам: каждое слово запроса в любом месте и порядке, без окончаний («кофемашины» найдёт «кофемашин»), ё = е */
   const norm=t=>String(t||'').toLowerCase().replace(/ё/g,'е');
-  const stems=q=>norm(q).split(/[\s,.;:!?«»"()-]+/).filter(Boolean).map(w=>w.length>=7?w.slice(0,-2):w.length>=5?w.slice(0,-1):w);
-  const hit=(hay,ws)=>{const h=norm(hay); return ws.every(w=>h.includes(w));};
+  const stem=w=>w.length>=7?w.slice(0,-2):w.length>=5?w.slice(0,-1):w;
+  const stems=q=>norm(q).split(/[\s,.;:!?«»"()-]+/).filter(Boolean).map(stem);
+  /* написания брендов кириллицей и латиницей (bt_search_alias): слово запроса → все основы его группы */
+  const ALIAS=(SR.alias||[]).map(g=>g.map(norm));
+  const alts=w=>{const g=ALIAS.find(g=>g.some(a=>a.startsWith(w)||w.startsWith(stem(a)))); return g?g.map(stem):[w];};
+  const hit=(hay,ws)=>{const h=norm(hay); return ws.every(w=>alts(w).some(a=>h.includes(a)));};
+  /* порядок: название равно запросу, начинается с него, все слова в названии, совпало только описание — как bt_search() */
+  const rank=(title,q,ws)=>{const t=norm(title), qq=norm(q.trim()); return t===qq?0:t.startsWith(qq)?1:ws.every(w=>alts(w).some(a=>t.includes(a)))?2:3;};
+  const pick=(list,title,hay,ws,q,n)=>list.map((x,i)=>[x,i]).filter(([x])=>hit(hay(x),ws))
+    .map(([x,i])=>[rank(title(x),q,ws),i,x]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).slice(0,n).map(r=>r[2]);
+  /* другая раскладка: «rjat» → «кофе» — только если по набранному ничего нет (как bt_layout_swap) */
+  const EN='qwertyuiop[]asdfghjkl;\'zxcvbnm,.`', RU='йцукенгшщзхъфывапролджэячсмитьбюё';
+  const swap=q=>{const l=q.toLowerCase(), lat=/[a-z]/.test(l), cyr=/[а-яё]/.test(l); if(lat===cyr) return '';
+    const [a,b]=lat?[EN,RU]:[RU,EN]; return [...l].map(c=>{const i=a.indexOf(c); return i<0?c:b[i];}).join('');};
   const mark=(t,q)=>{const ws=stems(q).filter(w=>w.length>1); if(!ws.length) return esc(t);
     const re=new RegExp('('+ws.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]')).join('|')+')','gi');
     return t.split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join('');};
 
   const PAGES=window.BT_PAGES||[];
 
-  function paintResults(q){
-    const ws=stems(q);
-    const prods=Object.values(BT_PRODUCTS).flat()
-      .filter(m=>hit(m.n+' '+m.par,ws)).slice(0,6);
-    const pages=PAGES.filter(p=>hit(p.t+' '+p.d+' '+(p.k||''),ws)).slice(0,6);
-    const posts=(window.BT_POSTS||[]).filter(p=>hit(p.t+' '+p.lead+' '+p.cat+' '+(p.tags||[]).join(' '),ws)).slice(0,5);
+  const findAll=q=>{const ws=stems(q);
+    const all={}; Object.values(BT_PRODUCTS).flat().forEach(m=>{all[m.code||m.id]=m;});
+    return [pick(Object.values(all),m=>m.n,m=>m.n+' '+m.par+' '+(m.code||''),ws,q,6),
+      pick(PAGES,p=>p.t,p=>p.t+' '+p.d+' '+(p.k||''),ws,q,6),
+      pick(window.BT_POSTS||[],p=>p.t,p=>p.t+' '+p.lead+' '+p.cat+' '+(p.tags||[]).join(' '),ws,q,5)];};
+  function paintResults(q0){
+    let q=q0, [prods,pages,posts]=findAll(q), note='';
+    if(!prods.length&&!pages.length&&!posts.length){ const f=swap(q0); if(f){ const r=findAll(f);
+      if(r.some(x=>x.length)){ [prods,pages,posts]=r; q=f; note=`<p class="srch__fix">Показаны результаты по запросу «<b>${esc(f)}</b>» — вы набрали «${esc(q0)}» в другой раскладке</p>`; } } }
     if(!prods.length&&!pages.length&&!posts.length){
       const none=SR.promos.filter(p=>p.w==='none');
       sinner.innerHTML=`<div class="sempty"><b>Ничего не нашли по запросу «${esc(q)}»</b>
@@ -822,7 +837,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         </div>${none.length?`<div class="srch__promo"><h4>Поможем выбрать</h4>${none.map(promoHtml).join('')}</div>`:''}</div>`;
       return;
     }
-    sinner.innerHTML=`<div class="srch__grid"><div>
+    sinner.innerHTML=`${note}<div class="srch__grid"><div>
       ${prods.length?`<h4>Товары · ${prods.length}</h4><div class="sres">${prods.map(m=>
         `<a href="${m.url}"><img src="${m.img}" alt="" loading="lazy"><span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
       ${pages.length?`<h4>Разделы</h4><div class="sres">${pages.map(p=>

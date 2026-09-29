@@ -740,7 +740,118 @@ function bt_search_cfg(): array
         'hints' => array_column(bt_blocks('search_hints'), 'name'),
         'promos' => $promos,
         'secs' => array_map(fn($t) => ['t' => $t['name'], 'u' => $t['url'], 'i' => $t['icon'] ?? 'cup'], bt_home_tiles()),
+        'alias' => bt_search_alias(),
     ];
+}
+
+// Написания одного слова кириллицей и латиницей: «джетино» находит Jetinno, «ботаника» — BOTANICA. Слова — в нижнем регистре, ё = е
+function bt_search_alias(): array
+{
+    return [
+        ['jetinno', 'джетинно', 'джетино', 'жетино', 'джитино', 'йетино'],
+        ['botanica', 'ботаника', 'botanika'],
+        ['delonghi', 'de’longhi', "de'longhi", 'делонги', 'делонжи', 'делонги'],
+        ['saeco', 'саеко', 'саэко', 'сайко'],
+        ['philips', 'филипс', 'филипс'],
+        ['jura', 'юра', 'джура'],
+        ['melitta', 'мелитта', 'мелита'],
+        ['nivona', 'нивона'],
+        ['krups', 'крупс'],
+        ['bosch', 'бош'],
+        ['puer', 'пуэр', 'пуер'],
+        ['oolong', 'улун'],
+        ['matcha', 'матча', 'маття'],
+        ['earl grey', 'эрл грей', 'эрлгрей'],
+        ['drip', 'дрип'],
+        ['espresso', 'эспрессо', 'экспрессо'],
+        ['cappuccino', 'капучино', 'капуччино'],
+        ['latte', 'латте', 'лате'],
+    ];
+}
+
+// Поиск по данным сайта (товары, разделы, журнал) — та же логика, что у живого поиска в ui.js (paintResults):
+// слова в любом порядке без окончаний, написания брендов кириллицей и латиницей, другая раскладка — если по набранному пусто;
+// порядок — название совпало лучше описания
+function bt_search(string $q): array
+{
+    $norm = fn(string $s) => str_replace('ё', 'е', mb_strtolower($s));
+    $stem = fn(string $w) => mb_strlen($w) >= 7 ? mb_substr($w, 0, -2) : (mb_strlen($w) >= 5 ? mb_substr($w, 0, -1) : $w);
+    $alias = bt_search_alias();
+    // слово запроса → все его написания (основы)
+    $alts = function (string $w) use ($alias, $stem, $norm): array {
+        foreach ($alias as $g) {
+            foreach ($g as $a) {
+                if (str_starts_with($norm($a), $w) || str_starts_with($w, $stem($norm($a)))) {
+                    return array_map(fn($x) => $stem($norm($x)), $g);
+                }
+            }
+        }
+        return [$stem($w)];
+    };
+    $run = function (string $q) use ($norm, $alts): array {
+        $words = array_values(array_filter(preg_split('/[\s,.;:!?«»"()\-]+/u', $norm($q))));
+        if (!$words) {
+            return [[], [], []];
+        }
+        $ws = array_map($alts, $words);
+        $hit = fn(string $h) => !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($h, $a)));
+        // 0 — название равно запросу, 1 — начинается с него, 2 — все слова в названии, 3 — совпало только описание
+        $rank = function (string $title) use ($norm, $q, $ws): int {
+            $t = $norm($title);
+            $qq = $norm(trim($q));
+            if ($t === $qq) {
+                return 0;
+            }
+            if (str_starts_with($t, $qq)) {
+                return 1;
+            }
+            return !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($t, $a))) ? 2 : 3;
+        };
+        $pick = function (array $items, callable $title, callable $hay) use ($hit, $rank, $norm): array {
+            $out = [];
+            foreach ($items as $i => $it) {
+                if ($hit($norm($hay($it)))) {
+                    $out[] = [$rank($title($it)), $i, $it];
+                }
+            }
+            usort($out, fn($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+            return array_column($out, 2);
+        };
+        $prods = [];
+        foreach (bt_catalog_data() as $list) {
+            foreach ($list as $m) {
+                $prods[$m['code']] = $m;
+            }
+        }
+        return [
+            $pick(array_values($prods), fn($m) => $m['n'], fn($m) => $m['n'] . ' ' . $m['par'] . ' ' . $m['code']),
+            $pick(bt_search_pages(), fn($p) => $p['t'], fn($p) => $p['t'] . ' ' . $p['d'] . ' ' . $p['k']),
+            $pick(bt_posts(), fn($p) => $p['t'], fn($p) => $p['t'] . ' ' . $p['lead'] . ' ' . $p['cat'] . ' ' . implode(' ', $p['tags'] ?? [])),
+        ];
+    };
+    $res = $run($q);
+    $used = $q;
+    if (!array_filter($res) && ($fixed = bt_layout_swap($q)) !== '') {
+        $alt = $run($fixed);
+        if (array_filter($alt)) {
+            [$res, $used] = [$alt, $fixed];
+        }
+    }
+    return ['q' => $used, 'fixed' => $used !== $q, 'prod' => $res[0], 'pages' => $res[1], 'posts' => $res[2]];
+}
+
+// Запрос в другой раскладке: «rjat» → «кофе», «ощеттщ» → «jetinno»; пустая строка — если переключать нечего
+function bt_layout_swap(string $q): string
+{
+    $en = str_split('qwertyuiop[]asdfghjkl;\'zxcvbnm,.`');
+    $ru = mb_str_split('йцукенгшщзхъфывапролджэячсмитьбюё');
+    $lower = mb_strtolower($q);
+    $toRu = preg_match('/[a-z]/', $lower) && !preg_match('/[а-яё]/u', $lower);
+    $toEn = !$toRu && preg_match('/[а-яё]/u', $lower) && !preg_match('/[a-z]/', $lower);
+    if (!$toRu && !$toEn) {
+        return '';
+    }
+    return strtr($lower, $toRu ? array_combine($en, $ru) : array_combine($ru, $en));
 }
 
 // Иконка из файла: SVG встраиваем (цвет — от родителя через currentColor), PNG — картинкой
