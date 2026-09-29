@@ -1729,12 +1729,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) cur=hs[hs.length-1];
     links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id));
     toc.querySelectorAll('li').forEach(li=>li.classList.toggle('is-open',!!li.querySelector('a.on')));
-    const ol=toc.querySelector('ol'), on=toc.querySelector('a.on');
-    if(ol&&on&&ol.scrollHeight>ol.clientHeight){ const a=on.offsetTop, z=a+on.offsetHeight;
-      if(a<ol.scrollTop+40||z>ol.scrollTop+ol.clientHeight-40) ol.scrollTo({top:a-ol.clientHeight/3,behavior:'smooth'}); }
     if(body&&pct){ const r=body.getBoundingClientRect(), p=Math.min(1,Math.max(0,(innerHeight*.5-r.top)/r.height)), left=Math.ceil(mins*(1-p));
       toc.style.setProperty('--p',p); pct.textContent=Math.round(p*100)+'%'+(mins&&left?' · '+left+' мин':''); } };
   addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
+  // колонка выше экрана — как фильтр каталога: при прокрутке вниз уезжает до своего низа, при прокрутке вверх возвращается к шапке
+  const side=toc.closest('.post__side'); if(!side) return;
+  const topGap=parseFloat(getComputedStyle(side).top)||0, desk=matchMedia('(min-width:1001px)');
+  let lastY=scrollY, off=topGap;
+  const stick=()=>{ if(!desk.matches){ side.style.top=''; return; }
+    const minTop=Math.min(topGap, innerHeight-side.offsetHeight-20);
+    off=Math.max(minTop, Math.min(topGap, off-(scrollY-lastY))); lastY=scrollY; side.style.top=off+'px'; };
+  addEventListener('scroll',stick,{passive:true}); addEventListener('resize',stick); stick();
 });
 
 /* Просмотр фото на весь экран: BT_lightbox([{src, cap}], index). Листание стрелками, свайпом и клавишами, двойной клик — увеличение, Esc/фон — закрыть */

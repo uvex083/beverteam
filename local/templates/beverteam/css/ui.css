@@ -635,11 +635,7 @@ input,textarea{caret-color:var(--ink)}
 .post__body figure img{border-radius:var(--rad);width:100%;object-fit:cover}
 .post__body figcaption{font-size:13px;color:var(--gray);margin-top:8px}
 .post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}
-.post__side{position:sticky;top:130px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 150px)}
-.post__promo{flex-shrink:0}
-/* длинное оглавление не выше экрана: список листается внутри, карточка под ним всегда видна */
-.post__toc{display:flex;flex-direction:column;min-height:0}
-.post__toc ol{position:relative;overflow-y:auto;min-height:0;margin:0 -8px!important;padding:0 8px!important;scrollbar-width:thin;scrollbar-color:var(--line) transparent;overscroll-behavior:contain}
+.post__side{position:sticky;top:130px;display:flex;flex-direction:column;gap:12px}
 .post__toc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px 14px;font-size:14px}
 .post__toc-hd{display:flex;justify-content:space-between;gap:10px;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)}
 .post__toc b{font-weight:700}
@@ -666,11 +662,10 @@ input,textarea{caret-color:var(--ink)}
 .post__promo span span{display:block;margin-top:5px;font-size:12.5px;line-height:1.35;color:#D7C9B5}
 .post__promo em{display:inline-block;margin-top:10px;white-space:nowrap;padding:7px 14px;border-radius:99px;background:var(--lime);color:var(--ink);font:700 12.5px/1 Manrope,sans-serif;font-style:normal;transition:background-color .15s}
 @media(hover:hover){.post__promo:hover em{background:#fff}}
-@media(max-height:640px) and (min-width:1001px){.post__promo{display:none}}
 @media(max-width:1000px){.jlead{grid-template-columns:1fr}
   .jlead>.ncard{grid-template-columns:1fr;min-height:0}
   .jlead>.ncard>.ncard__ph>img{height:auto;aspect-ratio:16/10}
-  .post{grid-template-columns:minmax(0,1fr)}.post__side{position:static;max-height:none}.post__toc-pct,.post__toc-bar{display:none}.post__toc-hd{margin-bottom:10px}}
+  .post{grid-template-columns:minmax(0,1fr)}.post__side{position:static}.post__toc-pct,.post__toc-bar{display:none}.post__toc-hd{margin-bottom:10px}}
 
 /* ================= Подписка ================= */
 .subg{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
