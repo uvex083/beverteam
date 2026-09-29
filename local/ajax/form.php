@@ -80,15 +80,16 @@ if ($errors) {
     $out(200, ['ok' => false, 'errors' => $errors]);
 }
 
-// частота: не чаще раза в 15 секунд из сессии и не больше 5 заявок за 10 минут с одного IP
+// защита от спама: не чаще раза в 15 секунд из сессии и не больше 5 заявок за 10 минут с одного IP; администраторам не мешает проверять формы
 $ip = (string)$req->getRemoteAddress();
 $ibId = bt_iblock('form_requests');
-if (time() - (int)($_SESSION['BT_FORM_LAST'] ?? 0) < 15) {
+$isAdmin = $USER->IsAdmin();
+if (!$isAdmin && time() - (int)($_SESSION['BT_FORM_LAST'] ?? 0) < 15) {
     $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Заявка уже отправлена. Повторить можно через несколько секунд.']);
 }
 $recent = (int)CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=PROPERTY_IP' => $ip,
     '>=DATE_CREATE' => ConvertTimeStamp(time() - 600, 'FULL')], []);
-if ($recent >= 5) {
+if (!$isAdmin && $recent >= 5) {
     $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Слишком много заявок подряд. Позвоните нам или попробуйте позже.']);
 }
 
