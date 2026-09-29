@@ -63,15 +63,21 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   ], $component) ?>
 
   <section class="sec sec--t0" style="padding-top:var(--pad)">
-    <div class="wr">
-      <div>
-        <h2 class="display h2">Не пропускайте новые материалы</h2>
-        <p style="margin:16px 0 0;max-width:46ch;color:#3A3A34">Оставьте e-mail — напишем, когда выйдут новые статьи и новости. Отписаться можно в любой момент.</p>
+    <div class="jsub">
+      <div class="jsub__t">
+        <div class="mono">Журнал · рассылка</div>
+        <h2 class="display h2">Не пропускайте<br><span>новые статьи</span></h2>
+        <p>Раз в месяц — подборка новых статей журнала. Без спама, отписаться можно в любой момент.</p>
       </div>
-      <form class="wr__f" data-form="subscribe" novalidate>
+      <form class="jsub__f" data-form="subscribe" novalidate>
         <input type="hidden" name="topic" value="Подписка на новые материалы журнала">
-        <div class="field"><label>E-mail *</label><input name="email" type="email" placeholder="mail@company.ru" maxlength="100"></div>
-        <?= bt_form_tail('Подписаться') ?>
+        <input type="hidden" name="sessid" value="<?= bitrix_sessid() ?>">
+        <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+        <div class="jsub__row">
+          <div class="field"><input name="email" type="email" placeholder="mail@company.ru" maxlength="100" aria-label="E-mail" autocomplete="email"></div>
+          <button class="btn" type="submit">Подписаться</button>
+        </div>
+        <label class="check jsub__agree"><input type="checkbox" name="agree" value="Y"> <span>Согласен с <a href="/polzovatelskoe-soglashenie/" target="_blank">соглашением</a> и <a href="/politika-konfidencialnosti/" target="_blank">политикой</a></span></label>
       </form>
     </div>
   </section>

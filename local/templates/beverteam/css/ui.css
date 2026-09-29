@@ -2167,3 +2167,25 @@ form[data-form]{position:relative}
 .jtags.is-open .jtags__btn{display:none}
 .jtags__btn{background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font:600 13px/1.4 Manrope,sans-serif;color:var(--ink);cursor:pointer;transition:border-color .2s}
 @media(hover:hover){.jtags__btn:hover{border-color:var(--line-h)}}
+/* журнал: подписка — тёмный баннер, форма в одну строку */
+.jsub{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr minmax(0,440px);gap:24px 48px;align-items:center;background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(28px,3.4vw,44px) clamp(24px,3.4vw,48px)}
+.jsub::before{content:"";position:absolute;right:-140px;top:-170px;width:460px;height:460px;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 44px,rgba(255,255,255,.07) 44px 46px);pointer-events:none}
+.jsub::after{content:"";position:absolute;right:40px;top:26px;width:62px;height:62px;border-radius:50%;border:15px solid var(--lime);pointer-events:none}
+.jsub>*{position:relative;z-index:1}
+.jsub .mono{color:var(--lime)}
+.jsub h2{margin:12px 0 12px;color:#fff}
+.jsub h2 span{color:var(--lime)}
+.jsub__t p{margin:0;max-width:44ch;color:#B9B9B0;font-size:15px;line-height:1.55}
+.jsub__row{display:flex;gap:10px;align-items:flex-start}
+.jsub__row .field{flex:1;margin:0}
+.jsub__row input{width:100%;height:52px;border-radius:999px;background:#1E1E1B;border:1px solid #33332E;color:#fff;padding:0 22px;font-size:15px}
+.jsub__row input::placeholder{color:#8A8A82}
+.jsub__row input:focus{border-color:#55554D;outline:0}
+.jsub__row .btn{height:52px;flex-shrink:0}
+.jsub__agree{margin-top:14px;color:#9C9C94;font-size:12.5px}
+.jsub__agree a{color:#D8D8D0;text-decoration:underline;text-decoration-color:#55554D;text-underline-offset:3px}
+.jsub__agree input[type=checkbox]{background-color:transparent;border-color:#55554D}
+.jsub__agree input[type=checkbox]:checked{background-color:var(--lime);border-color:var(--lime);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' fill='none' stroke='%230E0E0C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.jsub .check.is-err{color:#FF8A7A}
+@media(max-width:900px){.jsub{grid-template-columns:1fr}.jsub::after{width:44px;height:44px;border-width:11px;right:20px;top:20px}}
+@media(max-width:520px){.jsub__row{flex-direction:column;align-items:stretch}.jsub__row .btn{width:100%}}
