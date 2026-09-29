@@ -13,13 +13,19 @@ $posts = $rubric !== '' ? array_values(array_filter(bt_posts(), fn($p) => $p['ru
 global $btJournalFilter;
 $btJournalFilter = [];
 if ($tag !== '') {
-    // подборка по тегу — служебная страница: не индексируем, canonical ведёт на журнал
+    // подборка по тегу — служебная страница: не индексируем (canonical не ставим — с noindex он лишний)
     $posts = array_values(array_filter($posts, fn($p) => in_array($tag, $p['tags'] ?? [], true)));
     $btJournalFilter['=CODE'] = array_column($posts, 'id') ?: ['-'];
     $APPLICATION->SetTitle('#' . $tag);
     $APPLICATION->SetPageProperty('title', 'Материалы по теме «' . $tag . '» — журнал BEVERTEAM');
     $APPLICATION->SetPageProperty('robots', 'noindex, follow');
     $APPLICATION->AddChainItem('#' . $tag);
+    $n = count($posts);
+    $sub = 'Статьи журнала по теме «' . $tag . '» — ' . $n . ' ' . ($n % 10 === 1 && $n % 100 !== 11 ? 'материал' : ($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20) ? 'материала' : 'материалов'));
+    $APPLICATION->SetPageProperty('description', $sub . '. Журнал BEVERTEAM о кофе, чае и кофемашинах.');
+} elseif ($rubric !== '') {
+    // вводный текст рубрики — описание раздела в админке
+    $sub = trim(strip_tags((string)(CIBlockSection::GetList([], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], '=CODE' => $rubric], false, ['DESCRIPTION'])->Fetch()['DESCRIPTION'] ?? '')));
 }
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'ItemList',
     'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => 'https://' . SITE_SERVER_NAME . $p['url'], 'name' => $p['t']], $posts, array_keys($posts))],
@@ -27,7 +33,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 ?>
 <div class="wrap journalp">
   <?php bt_crumbs() ?>
-  <div class="pagehead"><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1><p class="sub">Как выбирать зерно, настраивать кофемашину и ухаживать за оборудованием. Пишем сами, на своём опыте обжарки и сервиса.</p></div>
+  <div class="pagehead"><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1><p class="sub"><?= htmlspecialcharsbx(($sub ?? '') ?: 'Как выбирать зерно, настраивать кофемашину и ухаживать за оборудованием. Пишем сами, на своём опыте обжарки и сервиса.') ?></p></div>
 
   <?php if (count($rubrics) > 1 || $rubric !== '' || $tag !== ''): ?>
   <nav class="jfilter" aria-label="Рубрики">

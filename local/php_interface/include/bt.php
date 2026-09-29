@@ -1119,7 +1119,7 @@ function bt_og(): string
         . '<meta property="og:logo" content="' . $self . '/local/templates/beverteam/images/og-logo.png"><meta name="twitter:image" content="' . $e($img) . '">'
         . '<meta name="twitter:card" content="summary_large_image">' . $APPLICATION->GetPageProperty('og_extra');
     // страницы фильтра, сортировки и поиска склеиваем с чистым адресом; у товара canonical ставит сам компонент
-    if (!$APPLICATION->GetPageProperty('canonical')) {
+    if (!$APPLICATION->GetPageProperty('canonical') && !str_contains((string)$APPLICATION->GetPageProperty('robots'), 'noindex')) {
         $html .= '<link rel="canonical" href="' . $e($url) . '">';
     }
     return $html;
