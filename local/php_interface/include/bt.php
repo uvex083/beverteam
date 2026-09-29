@@ -1008,6 +1008,9 @@ function bt_post_card(array $p): string
 // Вызывается из обработчика буфера — без кеша Битрикса: кеш открывает свой буфер, а внутри обработчика буфера это фатальная ошибка
 function bt_rent_tokens(): array
 {
+    if (!Loader::includeModule('iblock')) {
+        return [];
+    }
     $price = $kg = $names = [];
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_CODE' => 'rent', 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_PRICE_MONTH', 'PROPERTY_FREE_FROM_KG']);
     while ($f = $r->Fetch()) {
