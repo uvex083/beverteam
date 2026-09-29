@@ -612,8 +612,10 @@ input,textarea{caret-color:var(--ink)}
 .post__body ol>li{counter-increment:li}
 .post__body ol>li::before{content:counter(li);position:absolute;left:0;top:.2em;width:22px;height:22px;border-radius:50%;background:var(--lime);
   font:700 11.5px/22px 'JetBrains Mono',monospace;text-align:center}
-.post__body a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:2px;text-underline-offset:3px}
-@media(hover:hover){.post__body a:hover{text-decoration-color:var(--ink)}}
+.post__body a{color:var(--ink);font-weight:600;text-decoration:none;padding-bottom:2px;background:linear-gradient(var(--lime),var(--lime)) no-repeat 100% 100%/100% 2px}
+/* при наведении линия уходит вправо и выезжает слева */
+@keyframes btLink{0%{background-position:100% 100%;background-size:100% 2px}50%{background-position:100% 100%;background-size:0 2px}50.01%{background-position:0 100%;background-size:0 2px}100%{background-position:0 100%;background-size:100% 2px}}
+@media(hover:hover){.post__body a:hover{animation:btLink .6s cubic-bezier(.65,0,.35,1)}}
 .post__body strong,.post__body b{font-weight:700;color:var(--ink)}
 .post__body blockquote{margin:30px 0;padding:22px 26px;background:var(--white);border-left:4px solid var(--lime);border-radius:0 var(--rad) var(--rad) 0;
   font-size:18px;line-height:1.6;font-weight:500;color:var(--ink)}
