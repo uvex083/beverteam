@@ -607,8 +607,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* номер вставили целиком поверх «+7 (» — берём последние 10 цифр, иначе «+7 900…» превращается в «+7 (790…» */
     let prev=el.value;
     el.addEventListener('input',()=>{const d=el.value.replace(/\D/g,'');
-      /* первой набрали 8 («8 900…») — это код страны, а не начало номера */
-      if(d==='78'&&prev.replace(/\D/g,'').length<=1){el.value='+7 (';prev=el.value;return;}
+      /* первой набрали 8 или 7 («8 900…», «+7 900…») — это код страны, а не начало номера */
+      if((d==='78'||d==='77')&&prev.replace(/\D/g,'').length<=1){el.value='+7 (';prev=el.value;return;}
       el.value=fmt(d.length>11&&prev.replace(/\D/g,'').length<=1?'7'+d.slice(-10):el.value); prev=el.value;});
     el.addEventListener('blur',()=>{if(el.value.replace(/\D/g,'').length<=1)el.value='';});
     el.addEventListener('keydown',e=>{if(e.key.length===1&&!/[\d+]/.test(e.key)&&!e.ctrlKey&&!e.metaKey)e.preventDefault();});
