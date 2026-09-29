@@ -1004,18 +1004,23 @@ function bt_post_card(array $p): string
 }
 
 // Модели аренды для главной: подбор на первом экране и «кофе по подписке»
-// Подстановки в текстах сайта (блоки, статьи, SEO): считаются по активным моделям аренды, в админке остаются метками
+// Подстановки в текстах сайта (блоки, статьи, SEO): считаются по активным моделям аренды, в админке остаются метками.
+// Вызывается из обработчика буфера — без кеша Битрикса: кеш открывает свой буфер, а внутри обработчика буфера это фатальная ошибка
 function bt_rent_tokens(): array
 {
-    $m = bt_rent_models();
-    if (!$m) {
+    $price = $kg = $names = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_CODE' => 'rent', 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_PRICE_MONTH', 'PROPERTY_FREE_FROM_KG']);
+    while ($f = $r->Fetch()) {
+        $price[] = (float)$f['PROPERTY_PRICE_MONTH_VALUE'];
+        (int)$f['PROPERTY_FREE_FROM_KG_VALUE'] > 0 and $kg[] = (int)$f['PROPERTY_FREE_FROM_KG_VALUE'];
+        $names[] = trim(preg_replace('/^(Аренда\s+)?(кофемашины\s+)?(Jetinno\s+)?/iu', '', $f['NAME']));
+    }
+    if (!$price) {
         return [];
     }
-    $kg = array_filter(array_column($m, 'kg'));
-    $names = array_map(fn($x) => preg_replace('/^Jetinno\s+/u', '', $x['model']), $m);
     $last = array_pop($names);
     return [
-        '#RENT_FROM#' => bt_fmt(min(array_column($m, 'price'))),
+        '#RENT_FROM#' => bt_fmt(min($price)),
         '#RENT_FREE_KG#' => $kg ? (string)min($kg) : '',
         '#RENT_MODELS#' => 'Jetinno ' . ($names ? implode(', ', $names) . ' и ' : '') . $last,
     ];
