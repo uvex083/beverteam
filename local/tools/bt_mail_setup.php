@@ -102,8 +102,7 @@ $messages = [
         . m_note('Если вы не запрашивали код, просто не отвечайте на это письмо — без кода в кабинет не войти.')],
     'BT_FORM_REQUEST' => ['Заявка с сайта: #TOPIC#', '#EMAIL_TO#', '#DEFAULT_EMAIL_FROM#', '',
         m_head('#HTML_TOPIC#', 'Заявка с сайта')
-        . $rows(['Имя' => '#HTML_CLIENT_NAME#', 'Телефон' => '<a href="tel:#PHONE#" style="color:#0E0E0C;font-weight:700;text-decoration:none;white-space:nowrap">#HTML_PHONE#</a>',
-            'E-mail' => '#HTML_EMAIL#', 'Сообщение' => '#HTML_MESSAGE#', 'Страница' => '<a href="#PAGE#" style="color:#0E0E0C">#HTML_PAGE#</a>'])
+        . m_box('#ROWS#')
         . m_btn('#ADMIN_URL#', 'Заявка в админке')
         . m_note('Заявка сохранена в админке: Контент → Заявки → Заявки с сайта.')],
 

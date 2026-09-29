@@ -113,6 +113,14 @@ CEvent::Send('BT_FORM_REQUEST', SITE_ID, [
     'EMAIL_TO' => bt_notify_email(),
     'TOPIC' => $d['topic'], 'CLIENT_NAME' => $d['name'] ?: '—', 'PHONE' => $d['phone'] ?: '—', 'EMAIL' => $d['email'] ?: '—',
     'MESSAGE' => $d['message'] ?: '—', 'PAGE' => $d['page'] ? $host . $d['page'] : '—',
+    // строки письма — только заполненные поля: у подписки нет имени и телефона, у заявки — e-mail
+    'ROWS' => bt_mail_rows(array_filter([
+        'Имя' => htmlspecialcharsbx($d['name']),
+        'Телефон' => $d['phone'] !== '' ? '<a href="tel:' . preg_replace('/[^\d+]/', '', $d['phone']) . '" style="color:#0E0E0C;font-weight:700;text-decoration:none;white-space:nowrap">' . htmlspecialcharsbx($d['phone']) . '</a>' : '',
+        'E-mail' => htmlspecialcharsbx($d['email']),
+        'Сообщение' => nl2br(htmlspecialcharsbx($d['message'])),
+        'Страница' => $d['page'] !== '' ? '<a href="' . htmlspecialcharsbx($host . $d['page']) . '" style="color:#0E0E0C">' . htmlspecialcharsbx($host . $d['page']) . '</a>' : '',
+    ], fn($v) => $v !== ''))),
     'ADMIN_URL' => $host . '/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=' . $ibId . '&type=forms&ID=' . $id . '&lang=ru',
 ]);
 
