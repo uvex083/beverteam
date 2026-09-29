@@ -29,13 +29,15 @@ if (!str_contains((string)$ib['DESCRIPTION'], '#RENT_')) {
         . '#RENT_MODELS# — список моделей («Jetinno Jl 05, Jl 15 (VIVA) и JL 36»). Выключили или добавили модель — тексты обновятся.')]);
 }
 
-// где цифра — минимум по всем моделям: [код ИБ, название элемента или '' для всех элементов ИБ]
+// где цифра — минимум по всем моделям: [код ИБ, название элемента или '' для всех элементов ИБ, только эти поля]
 $targets = [['main_facts', ''], ['main_utp_items', ''], ['search_promos', ''], ['sub_head', ''], ['sub_how', ''], ['sub_faq', ''], ['rent_top', ''], ['rent_terms', ''],
-    ['rent_faq', 'Сколько стоит аренда кофемашины?'], ['journal', 'Аренда кофемашин Jetinno — от 3 500 ₽ в месяц']];
+    ['rent_faq', 'Сколько стоит аренда кофемашины?'], ['journal', 'Аренда кофемашин Jetinno — от 3 500 ₽ в месяц', ['NAME']]];
 $re = ['/от\s3[\s\x{00A0}]?500\s?(?:₽|руб(?:лей|\.)?)/u' => 'от #RENT_FROM#', '/от\s3[\s\x{00A0}]кг/u' => 'от #RENT_FREE_KG# кг'];
 $fix = fn(string $s) => preg_replace(array_keys($re), array_values($re), $s);
 $el = new CIBlockElement();
-foreach ($targets as [$code, $name]) {
+foreach ($targets as $t) {
+    [$code, $name] = $t;
+    $only = $t[2] ?? null;
     $id = bt_iblock($code);
     if (!$id) {
         continue;
@@ -44,14 +46,14 @@ foreach ($targets as [$code, $name]) {
     while ($o = $r->GetNextElement()) {
         $f = $o->GetFields();
         $upd = [];
-        foreach (['NAME', 'PREVIEW_TEXT', 'DETAIL_TEXT'] as $k) {
+        foreach ($only ?? ['NAME', 'PREVIEW_TEXT', 'DETAIL_TEXT'] as $k) {
             $v = (string)$f['~' . $k];
             if ($v !== '' && ($n = $fix($v)) !== $v) {
                 $upd[$k] = $n;
             }
         }
         $props = [];
-        foreach ($o->GetProperties() as $pc => $p) {
+        foreach ($only === null ? $o->GetProperties() : [] as $pc => $p) {
             if ($p['PROPERTY_TYPE'] !== 'S' || $p['MULTIPLE'] === 'Y') {
                 continue;
             }
