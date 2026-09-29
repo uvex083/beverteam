@@ -784,13 +784,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   // подсказки, предложения и разделы — из админки (header.php → BT_SRCH)
   const SR=window.BT_SRCH||{hints:[],promos:[],secs:[]};
   const promoHtml=p=>`<a class="spromo spromo--${p.c}" href="${esc(p.u)}"><span class="k">${esc(p.k)}</span><b>${esc(p.t)}</b><span>${esc(p.s)}</span>${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}</a>`;
+  /* статья журнала строкой результата: превью, заголовок, дата и рубрика */
+  const postRow=(p,q)=>`<a href="${BT_postUrl(p)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}<span><span class="n">${q?mark(p.t,q):esc(p.t)}</span><span class="p">${BT_postDate(p.d)} · ${esc(p.cat)}</span></span></a>`;
   function paintEmpty(){
-    const rec=recent(), pr=SR.promos.filter(p=>p.w==='empty');
+    const rec=recent(), pr=SR.promos.filter(p=>p.w==='empty'), fresh=(window.BT_POSTS||[]).slice(0,3);
     sinner.innerHTML=`<div class="srch__grid">
       <div>
         ${rec.length?`<h4>Вы искали</h4><div class="srch__chips">${rec.map(q=>`<button class="rec" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
         ${SR.hints.length?`<h4>Часто ищут</h4><div class="srch__chips">${SR.hints.map(q=>`<button data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
         ${SR.secs.length?`<h4>Разделы</h4><div class="srch__secs">${SR.secs.map(c=>`<a href="${esc(c.u)}"><span class="srch__ic" aria-hidden="true"><svg><use href="#ico-${esc(c.i)}"/></svg></span>${esc(c.t)}</a>`).join('')}</div>`:''}
+        ${fresh.length?`<h4 class="srch__h">Новое в журнале <a class="link" href="/blog/">Весь журнал →</a></h4><div class="sres sres--post">${fresh.map(p=>postRow(p)).join('')}</div>`:''}
       </div>
       ${pr.length?`<div class="srch__promo"><h4>Предложения</h4>${pr.map(promoHtml).join('')}</div>`:''}
     </div>`;
@@ -846,8 +849,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         `<a href="${m.url}"><img src="${m.img}" alt="" loading="lazy"><span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
       ${pages.length?`<h4>Разделы</h4><div class="sres">${pages.map(p=>
         `<a href="${p.u}"><span><span class="n">${mark(p.t,q)}</span><span class="p">${esc(p.d)}</span></span></a>`).join('')}</div>`:''}
-      ${posts.length?`<h4>Журнал</h4><div class="sres">${posts.map(p=>
-        `<a href="${BT_postUrl(p)}"><span><span class="n">${mark(p.t,q)}</span><span class="p">${BT_postDate(p.d)} · ${esc(p.cat)}</span></span></a>`).join('')}</div>`:''}
+      ${posts.length?`<h4>Журнал</h4><div class="sres sres--post">${posts.map(p=>postRow(p,q)).join('')}</div>`:''}
       </div>
       ${SR.promos.some(p=>p.w==='none')?`<div class="srch__promo"><h4>Не нашли нужное?</h4>${SR.promos.filter(p=>p.w==='none').map(promoHtml).join('')}</div>`:''}</div>`;
   }

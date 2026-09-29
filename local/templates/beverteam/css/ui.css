@@ -819,6 +819,9 @@ input,textarea{caret-color:var(--ink)}
 .sres .p{display:block;font-size:12.5px;color:var(--gray);line-height:1.4}
 .sres .pr{margin-left:auto;font-family:Unbounded;font-weight:700;font-size:15px;white-space:nowrap}
 .sres mark{background:var(--lime);color:inherit;border-radius:3px;padding:0 2px}
+.sres--post img{width:80px;height:45px;object-fit:cover;padding:0;mix-blend-mode:normal}
+.srch__h{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.srch__h .link{font:600 13px/1.2 Manrope,sans-serif;letter-spacing:0;text-transform:none}
 .sempty{padding:8px 0 28px;margin-bottom:28px;border-bottom:1px solid var(--line);color:var(--gray)}
 .sempty>b{display:block;font-family:Unbounded;font-size:18px;color:var(--ink);margin-bottom:8px}
 .sempty>p{margin:0}
