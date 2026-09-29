@@ -1104,7 +1104,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(d.ok){
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
         else if(ld) BT_formOk(f);
-        else location.href='/form-success/';
+        else { f.reset(); BT_toast('Заявка отправлена'); }
         return;
       }
       if(d.errors){ let first=null;
