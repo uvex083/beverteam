@@ -277,13 +277,18 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php if ($models): ?>
   <section class="sec sec--t0">
     <h2 class="display h2">Аренда или покупка</h2>
-    <div class="ar2vs">
-      <div class="card"><b>Аренда</b><ul class="r2chk"><li>0 ₽ вложений на старте</li><li>Обслуживание и ремонт включены</li><li>Подменная машина на время ремонта</li><li>Можно сменить модель под нагрузку</li></ul></div>
-      <div class="card"><b>Покупка</b><ul class="ar2minus"><li>Сразу <?= $e(bt_fmt(min(array_filter(array_column($models, 'buy')) ?: [0]))) ?> и больше</li><li>Обслуживание и ремонт — отдельно</li><li>Простой на время ремонта</li><li>Машина ваша — выгодно при сроке от 1–2 лет</li></ul></div>
-    </div>
-    <div class="tblw" style="margin-top:14px"><table class="tbl r2tbl">
-      <thead><tr><th>Модель</th><th>Покупка</th><th>Аренда за 12 месяцев</th></tr></thead>
-      <tbody><?php foreach ($models as $m): if (!$m['buy']) continue; ?><tr><td><?= $e($m['model']) ?></td><td><?= $e(bt_fmt($m['buy'])) ?></td><td><b><?= $m['kg'] ? '0 ₽ с нашим кофе' : '' ?></b><?= $m['kg'] ? ' или ' : '' ?><?= $e(bt_fmt($m['price'] * 12)) ?></td></tr><?php endforeach ?></tbody>
+    <div class="tblw"><table class="tbl ar2vs">
+      <thead><tr><th></th><th>Аренда</th><th>Покупка</th></tr></thead>
+      <tbody>
+        <tr><td>Вложения на старте</td><td><b>0 ₽</b></td><td>от <?= $e(bt_fmt(min(array_filter(array_column($models, 'buy')) ?: [0]))) ?></td></tr>
+        <tr><td>Обслуживание и ремонт</td><td>Включены в аренду</td><td>За свой счёт</td></tr>
+        <tr><td>Если машина сломалась</td><td>Подменная машина на время ремонта</td><td>Простой до конца ремонта</td></tr>
+        <tr><td>Выросла нагрузка</td><td>Поменяем модель</td><td>Продать и купить новую</td></tr>
+        <?php foreach ($models as $m): if (!$m['buy']) continue; ?>
+        <tr><td><?= $e($m['model']) ?> за 12 месяцев</td><td><?= $m['kg'] ? '<b>0 ₽</b> с нашим кофе или ' : '' ?><?= $e(bt_fmt($m['price'] * 12)) ?></td><td><?= $e(bt_fmt($m['buy'])) ?></td></tr>
+        <?php endforeach ?>
+        <tr><td>Когда выгоднее</td><td>Старт, рост, нужен сервис без хлопот</td><td>Срок от 1–2 лет, есть свой сервис</td></tr>
+      </tbody>
     </table></div>
   </section>
   <?php endif ?>
