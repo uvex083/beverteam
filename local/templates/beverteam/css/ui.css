@@ -1145,7 +1145,7 @@ input,textarea{caret-color:var(--ink)}
 .sel__list{position:absolute;z-index:70;top:calc(100% + 6px);left:0;min-width:100%;width:max-content;max-width:min(340px,92vw);
   background:var(--white);border:1px solid var(--line);border-radius:16px;padding:6px;margin:0;list-style:none;
   box-shadow:0 20px 44px -14px rgba(14,14,12,.22),0 2px 8px rgba(14,14,12,.06);
-  max-height:min(320px,56vh);overflow:auto;overscroll-behavior:contain;
+  max-height:min(320px,56vh);overflow:hidden auto;overscroll-behavior:contain;
   opacity:0;transform:translateY(-6px) scale(.985);transform-origin:top left;pointer-events:none;
   transition:opacity .16s ease,transform .16s cubic-bezier(.22,1,.36,1)}
 .sel__list--up{top:auto;bottom:calc(100% + 6px);transform-origin:bottom left;transform:translateY(6px) scale(.985)}
@@ -1153,6 +1153,7 @@ input,textarea{caret-color:var(--ink)}
 .sel.is-open .sel__list{opacity:1;transform:none;pointer-events:auto}
 .sel__opt{display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:10px;padding:9px 12px;
   font-size:14px;line-height:1.35;color:#55554E;white-space:nowrap;transition:color .15s}
+.sel__list .sel__opt{white-space:normal}
 .sel__opt.is-cur{color:var(--ink)}@media(hover:hover){.sel__opt:hover{color:var(--ink)}}
 .sel__opt[aria-selected=true]{color:var(--ink);font-weight:600}
 .sel__opt[aria-selected=true]::after{content:"";width:14px;height:14px;margin-left:auto;flex:0 0 14px;
@@ -2249,6 +2250,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .ar2calc .opts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
 .ar2calc .rng{display:block;width:100%;margin:4px 0 22px;accent-color:var(--ink);cursor:pointer}
 .ar2sel{width:100%;height:46px;border:1px solid var(--line);border-radius:var(--rad-s);padding:0 14px;background:var(--paper);font:inherit;font-size:14.5px;color:var(--ink)}
+.ar2calc .sel{display:block;width:100%}.ar2calc .sel__btn{border-radius:var(--rad-s);padding:12px 14px;font-size:14.5px}.ar2calc .sel__list{width:100%;max-width:100%}
 .ar2calc__out{background:var(--ink);color:#fff;border-color:var(--ink);display:grid;gap:18px;align-content:start}
 .ar2pick{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center}
 .ar2pick img{width:120px;height:96px;object-fit:contain;background:#fff;border-radius:var(--rad-s);padding:6px}
