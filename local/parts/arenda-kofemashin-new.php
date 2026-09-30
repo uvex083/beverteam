@@ -127,7 +127,7 @@ $faq = [
 
 $geo = bt_block('repair_geo');
 $cities = array_values(array_filter(array_column((array)($geo['items'] ?? []), 0), fn($v) => $v !== ''));
-$revs = array_values(array_filter(bt_reviews(), fn($r) => preg_match('/аренд|в офис|для офиса|сотрудник/ui', $r['text'])));
+$revs = bt_reviews();
 
 // разметка для поисковиков — из тех же данных
 $page = 'https://beverteam.ru/arenda-kofemashin/';
@@ -311,7 +311,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php if ($revs): ?>
   <section class="sec sec--t0">
     <div class="r2head"><h2 class="display h2">Отзывы клиентов</h2><a class="link" href="/otzyvy-o-nas/">Все отзывы →</a></div>
-    <div class="grid g3 revs"><?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?></div>
+    <div class="grid g3 revs" data-revs><?php foreach ($revs as $r) echo bt_rev_card($r) ?></div>
   </section>
   <?php endif ?>
 

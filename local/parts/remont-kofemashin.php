@@ -37,7 +37,7 @@ $districts = $vals($geo['districts'] ?? []);
 $stepItems = array_values(array_filter((array)($steps['items'] ?? []), fn($t) => $t[0] !== ''));
 $contractItems = $vals($contract['items'] ?? []);
 $models = $jet ? array_values(array_filter(bt_catalog_data()['machines'] ?? [], fn($m) => !empty($m['img']))) : [];
-$revs = $revH ? array_values(array_filter(bt_reviews(), fn($r) => preg_match('/ремонт|сервис|почин|диагност|кофемашин/ui', $r['text']))) : [];
+$revs = $revH ? bt_reviews() : [];
 
 // разметка для поисковиков — из тех же данных, что на странице
 $num = fn($t) => preg_match('/(\d[\d\x{00A0} ]*)\s*₽/u', (string)$t, $m) ? (int)preg_replace('/\D/', '', $m[1]) : null;
@@ -179,7 +179,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php if ($revs): ?>
   <section class="sec sec--t0">
     <div class="r2head"><h2 class="display h2"><?= bt_title($revH['title'] ?? '') ?></h2><?= bt_btn($revH['btn_text'] ?? '', $revH['btn_link'] ?? '', 'link') ?></div>
-    <div class="grid g3 revs"><?php foreach (array_slice($revs, 0, 3) as $r) echo bt_rev_card($r) ?></div>
+    <div class="grid g3 revs" data-revs><?php foreach ($revs as $r) echo bt_rev_card($r) ?></div>
   </section>
   <?php endif ?>
 
