@@ -59,22 +59,33 @@ while ($ib = $r->Fetch()) {
         $f = $ob->GetFields();
         foreach ($ob->GetProperties() as $p) {
             if ($p['PROPERTY_TYPE'] === 'S' && $p['MULTIPLE'] !== 'Y' && is_string($p['VALUE']) && str_contains($p['VALUE'], '/podpiska/')) {
-                $fix[] = [$ib['ID'], $f['ID'], $p['CODE'], $ib['CODE'] . ' «' . $f['NAME'] . '» ' . $p['CODE']];
+                // промо поиска «Кофемашина бесплатно» — это аренда, остальное — на «Кофе в офис»
+                $to = $ib['CODE'] === 'search_promos' ? '/arenda-kofemashin/#calc' : '/kofe-v-ofis/';
+                $fix[] = [$ib['ID'], $f['ID'], $p['CODE'], $ib['CODE'] . ' «' . $f['NAME'] . '» ' . $p['CODE'] . " → $to", $to];
             }
         }
     }
 }
 foreach ($fix as [, , , $label]) {
-    $say("ссылка /podpiska/ → /kofe-v-ofis/: $label");
+    $say("ссылка /podpiska/: $label");
 }
 
 if (!$apply) {
     echo "done (show: наполнение — только в apply)\n";
     return;
 }
-foreach ($fix as [$ibId, $elId, $code]) {
+foreach ($fix as [$ibId, $elId, $code, , $to]) {
     $v = CIBlockElement::GetProperty($ibId, $elId, [], ['CODE' => $code])->Fetch()['VALUE'] ?? '';
-    CIBlockElement::SetPropertyValuesEx($elId, $ibId, [$code => str_replace('/podpiska/', '/kofe-v-ofis/', $v)]);
+    CIBlockElement::SetPropertyValuesEx($elId, $ibId, [$code => str_replace('/podpiska/', $to, $v)]);
+}
+// блок на главной: подпись и кнопка были про подписку
+if (($ibId = bt_iblock('main_sub')) && ($el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => 'main'], false, false, ['ID'])->Fetch())) {
+    $cur = CIBlockElement::GetProperty($ibId, $el['ID'], [], ['CODE' => 'BTN_TEXT'])->Fetch()['VALUE'] ?? '';
+    if ($cur === 'Собрать подписку') {
+        $say('  ~ главная, блок «Кофе по графику»: подпись «Кофе в офис», кнопка «Рассчитать поставки»');
+        CIBlockElement::SetPropertyValuesEx($el['ID'], $ibId, ['CAPTION' => 'Кофе в офис', 'BTN_TEXT' => 'Рассчитать поставки']);
+        CIBlock::clearIblockTagCache($ibId);
+    }
 }
 // карточки «Другие услуги» на аренде и ремонте вели на подписку
 foreach (['rent_links', 'repair_links'] as $code) {
