@@ -21,7 +21,7 @@ $kg0 = 3;
 $periods = [[1, 'Раз в месяц'], [2, 'Раз в 2 недели'], [4, 'Раз в неделю']];
 // доставка по Екатеринбургу: курьер 350 ₽, бесплатно от 3 000 ₽ за одну доставку (условия — «Оплата и доставка»)
 $cfg = [
-    'coffee' => array_map(fn($c) => ['id' => $c['id'], 'n' => $c['n'], 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null], $coffee),
+    'coffee' => array_map(fn($c) => ['id' => $c['id'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null], $coffee),
     'ship' => 350, 'free' => 3000, 'g' => 8,
     'rent' => $rentKg ? ['kg' => min($rentKg), 'url' => '/arenda-kofemashin/#calc'] : null,
 ];
