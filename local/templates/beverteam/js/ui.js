@@ -1205,6 +1205,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     draw();
   }
 
+  /* ---------- таблица не влезает по ширине — под ней подсказка «листайте» (любая таблица в прокручиваемой обёртке) ---------- */
+  const tswipe=()=>document.querySelectorAll('table').forEach(t=>{
+    let w=t.parentElement;
+    while(w&&w!==document.body&&!/auto|scroll/.test(getComputedStyle(w).overflowX)) w=w.parentElement;
+    if(!w||w===document.body) return;
+    const on=w.scrollWidth>w.clientWidth+2;
+    if(!w._tsw){ if(!on) return;
+      w._tsw=document.createElement('div'); w._tsw.className='tswipe'; w._tsw.setAttribute('aria-hidden','true');
+      w._tsw.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 7 4 11l4 4M16 7l4 4-4 4M4 11h16"/></svg>Листайте таблицу';
+      w.after(w._tsw); }
+    w._tsw.hidden=!on;
+  });
+  let tswT; const tswLater=()=>{clearTimeout(tswT); tswT=setTimeout(tswipe,200);};
+  tswipe(); addEventListener('resize',tswLater); addEventListener('load',tswipe); document.addEventListener('toggle',tswLater,true);
+  new MutationObserver(ms=>{ if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&!n.classList.contains('tswipe')))) tswLater(); }).observe(document.body,{childList:true,subtree:true});
+
   /* ---------- аренда (новая версия): люди × чашки × дни → расход, модель, два варианта оплаты, цена чашки ---------- */
   const r2=document.querySelector('[data-rcalc2]');
   if(r2){
