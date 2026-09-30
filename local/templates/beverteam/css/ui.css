@@ -373,7 +373,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .check input[type=checkbox]:checked{background-color:var(--ink);border-color:var(--ink);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.2l2.6 2.6L10 3.4' fill='none' stroke='%23D7E85C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .check--top{align-items:flex-start}
-.check--top input{margin-top:3px}
+.check--top input{margin-top:1px}
 .radio-card{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 @media(hover:hover){.radio-card:hover{border-color:#B9B9AF}}
 .radio-card input{margin-top:3px;accent-color:var(--ink);width:17px;height:17px;flex-shrink:0}
