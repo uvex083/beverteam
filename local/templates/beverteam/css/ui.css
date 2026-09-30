@@ -1547,7 +1547,8 @@ input,textarea{caret-color:var(--ink)}
 .home .hincl .link{color:#fff;border-bottom-color:var(--lime)}
 .home .cfg__q{font-weight:700;font-size:16px;margin:0 0 4px}
 .home .cfg__hint{color:var(--gray);font-size:13px;margin:0 0 18px}
-.home .chipsx{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chipsx{display:flex;flex-wrap:wrap;gap:8px}
+.home .chipsx{margin-bottom:22px}
 .home .cfg__res{display:grid;grid-template-columns:118px 1fr;gap:18px;align-items:center;border-top:1px solid var(--line);padding-top:22px}
 .home .cfg__img{background:var(--paper);border-radius:12px;height:132px;display:grid;place-items:center;padding:10px}
 .home .cfg__img img{max-height:112px;width:auto;mix-blend-mode:multiply}
