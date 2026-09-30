@@ -2150,6 +2150,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
     padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.06);animation:mbarIn .2s ease-out}
   .mbar .btn{flex:1;justify-content:space-between;gap:12px;padding-left:24px;padding-right:24px}.mbar .btn.is-off{opacity:.5}
   .mbar .btn b{font-family:Unbounded;font-weight:800;white-space:nowrap}
+  .mbar .btn:has(b:empty){justify-content:center}.mbar .btn b:empty{display:none}
   body.has-mbar{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
   body.has-mbar .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
 }

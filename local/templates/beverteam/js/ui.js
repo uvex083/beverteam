@@ -1284,7 +1284,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[cur.days]||cur.days+' дн.'}, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
         +(cur.m.kg?`С нашим кофе ≈ ${rub(cur.costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
     });
-    if(f) BT_goBar('Оставить заявку',()=>(f.closest('[id]')||f).scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.r2hero .row'),q('[data-rc2-go]'),f]);
+    if(f) BT_goBar('Арендовать кофемашину',()=>(f.closest('[id]')||f).scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.r2hero .row'),q('[data-rc2-go]'),f]);
     document.querySelectorAll('[data-rc2-set]').forEach(a=>a.addEventListener('click',()=>{ const sel=f?.elements.model; if(sel){ sel.value=a.dataset.rc2Set; sel.dispatchEvent(new Event('change',{bubbles:true})); } }));
     draw();
   }
