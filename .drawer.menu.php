@@ -5,8 +5,8 @@ $sub = ['DEPTH_LEVEL' => 2];
 $rubrics = array_values(bt_blog_rubrics());
 $aMenuLinks = array_merge([
     ['Каталог', '/catalog/', [], $a, ''],
-    ['Аренда кофемашин', '/arenda-kofemashin/', [], $a, ''],
     ['Услуги', '/servis/', [], $a, ''],
+    ['Аренда кофемашин', '/arenda-kofemashin/', [], $sub, ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
     ['Кофе в офис', '/kofe-v-ofis/', [], $sub, ''],
     ['Журнал', '/blog/', [], $a, ''],
