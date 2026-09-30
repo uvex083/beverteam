@@ -1,2 +1,2 @@
 <?php
-$sSectionName = 'Сервис';
+$sSectionName = 'Услуги';
