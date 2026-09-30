@@ -2316,7 +2316,8 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .ar2pm--no li{color:#4A4A43;font-weight:500}
 .ar2pm--no li::before{content:"−";color:var(--gray-2)}
 .ar2seg{grid-template-columns:repeat(4,1fr)}
-.ar2seg .link{justify-self:start;background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
+.ar2seg .card{grid-template-rows:auto 1fr auto}
+.ar2seg .link{justify-self:start;align-self:end;background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
 @media(max-width:1100px){.ar2inc,.ar2seg{grid-template-columns:1fr 1fr}.ar2models,.ar2cf{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.ar2calc,.ar2vs{grid-template-columns:1fr}}
 @media(max-width:640px){.ar2models,.ar2cf,.ar2inc,.ar2seg,.ar2tar{grid-template-columns:1fr}.ar2kpi{grid-template-columns:1fr 1fr 1fr}.ar2kpi div{padding:12px 10px}.ar2pick{grid-template-columns:88px 1fr}.ar2pick img{width:88px;height:72px}}
