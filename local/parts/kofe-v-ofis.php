@@ -86,21 +86,21 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <p class="muted r2lead">Выберите объём, график и сорт — цена, доставка и стоимость чашки пересчитаются сразу.</p>
     <div class="ar2calc" data-ofcfg='<?= htmlspecialcharsbx(json_encode($cfg, JSON_UNESCAPED_UNICODE)) ?>'>
       <div class="ar2calc__in">
-        <span class="ar2q">Кофе в месяц</span>
+        <div class="ofg"><span class="ar2q">Кофе в месяц</span>
         <div class="opts" role="group" aria-label="Кофе в месяц" data-of-kg>
           <?php foreach ($kgs as $k): ?><button type="button" class="chipx" data-v="<?= $k ?>" aria-pressed="<?= $k === $kg0 ? 'true' : 'false' ?>"><?= $k ?> кг<s data-of-pct></s></button><?php endforeach ?>
-        </div>
-        <span class="ar2q">Как часто привозить</span>
+        </div></div>
+        <div class="ofg"><span class="ar2q">Как часто привозить</span>
         <div class="opts" role="group" aria-label="Как часто привозить" data-of-per>
           <?php foreach ($periods as $i => [$n, $t]): ?><button type="button" class="chipx" data-v="<?= $n ?>" aria-pressed="<?= $i ? 'false' : 'true' ?>"><?= $e($t) ?></button><?php endforeach ?>
-        </div>
-        <label class="ar2q" for="ofSort">Сорт кофе</label>
+        </div></div>
+        <div class="ofg"><label class="ar2q" for="ofSort">Сорт кофе</label>
         <select id="ofSort" class="ar2sel" data-of-sort>
           <?php foreach ($coffee as $i => $c): ?><option value="<?= $i ?>"<?= $i === $sort0 ? ' selected' : '' ?>><?= $e($short($c['n'])) ?> — <?= $e(bt_fmt($c['p'])) ?>/кг</option><?php endforeach ?>
-        </select>
+        </select></div>
         <a class="ofsort" href="<?= $e($coffee[$sort0]['url']) ?>" data-of-info>
-          <img src="<?= $e($coffee[$sort0]['img'] ?? '') ?>" alt="" width="72" height="72" loading="lazy">
-          <span><b data-of-in><?= $e($short($coffee[$sort0]['n'])) ?></b><small data-of-ip><?= $e($coffee[$sort0]['par'] ?? '') ?></small><i>О сорте →</i></span>
+          <img src="<?= $e($coffee[$sort0]['img'] ?? '') ?>" alt="" width="96" height="96" loading="lazy">
+          <span><b data-of-in><?= $e($short($coffee[$sort0]['n'])) ?></b><small data-of-ip><?= $e($coffee[$sort0]['par'] ?? '') ?></small><em data-of-ipr></em><i>О сорте →</i></span>
         </a>
       </div>
       <div class="ar2calc__out" aria-live="polite">
