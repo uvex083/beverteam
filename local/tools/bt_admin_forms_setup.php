@@ -96,7 +96,8 @@ $forms = [
     'servis_head' => ['block', ['subtitle']],
     'servis_price' => ['block', ['caption', 'title', 'subtitle', 'items', 'btn_text', 'btn_link']],
     'sub_faq' => ['blocks', ['name', 'html']],
-    'sub_head' => ['block', ['caption', 'title', 'subtitle', 'btn_text']],
+    'sub_head' => ['block', ['title', 'subtitle', 'items', 'btn_text', 'caption']],
+    'sub_rent' => ['block', ['title', 'subtitle', 'btn_text', 'btn_link']],
     'sub_how' => ['block', ['title', 'items']],
 ];
 // подписи стандартных полей у списков: код ИБ => [name, текст анонса, картинка]

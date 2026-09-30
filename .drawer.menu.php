@@ -8,7 +8,7 @@ $aMenuLinks = array_merge([
     ['Аренда кофемашин', '/arenda-kofemashin/', [], $a, ''],
     ['Услуги', '/servis/', [], $a, ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
-    ['Кофе по подписке', '/podpiska/', [], $sub, ''],
+    ['Кофе в офис', '/kofe-v-ofis/', [], $sub, ''],
     ['Журнал', '/blog/', [], $a, ''],
 ], count($rubrics) > 1 ? array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], $rubrics) : [], [
     ['Подбор кофе', '/podbor-kofe/', [], $a + ['badge' => 'за минуту'], ''],

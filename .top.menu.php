@@ -11,7 +11,7 @@ $aMenuLinks = [
     ['Аренда кофемашин', '/arenda-kofemashin/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Услуги', '/servis/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],
-    ['Кофе по подписке', '/podpiska/', [], $sub, ''],
+    ['Кофе в офис', '/kofe-v-ofis/', [], $sub, ''],
     ['Журнал', '/blog/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Все материалы', '/blog/', [], $sub, ''],
     ...array_map(fn($r) => [$r['name'], $r['url'], [], $sub, ''], array_values(bt_blog_rubrics())),

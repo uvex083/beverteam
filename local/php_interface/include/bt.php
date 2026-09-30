@@ -314,7 +314,7 @@ function bt_mega_cats(): array
     }
     unset($c);
     $rent = bt_catalog_data()['rent'];
-    $cats[] = ['t' => 'Аренда кофемашин', 'h' => '/arenda-kofemashin/', 'sub' => [['Для офиса', '/arenda-kofemashin/'], ['Для кафе и HoReCa', '/arenda-kofemashin/'], ['На мероприятие', '/arenda-kofemashin/#event'], ['Кофе по подписке', '/podpiska/']],
+    $cats[] = ['t' => 'Аренда кофемашин', 'h' => '/arenda-kofemashin/', 'sub' => [['Для офиса', '/arenda-kofemashin/'], ['Для кафе и HoReCa', '/arenda-kofemashin/'], ['На мероприятие', '/arenda-kofemashin/#event'], ['Кофе в офис', '/kofe-v-ofis/']],
         'promo' => $rent ? ['img' => $rent[0]['img'], 'b' => $rent[0]['n'], 't' => 'от ' . bt_fmt(min(array_column($rent, 'p'))) . ' в месяц', 'h' => '/arenda-kofemashin/'] : null];
     // порядок как в макете: Чай, Кофе, Кофемашины, Аренда, Аксессуары
     $acc = array_filter($cats, fn($c) => $c['h'] === '/catalog/aksessuary/');
@@ -1307,7 +1307,7 @@ function bt_acc_start(string $cur, string $head, string $sub = ''): void
     $cnt = \Bitrix\Sale\Internals\OrderTable::getCount(['=USER_ID' => (int)$USER->GetID(), '=LID' => SITE_ID]);
     $nav = [['profile', '/personal/', 'Профиль', ''], ['orders', '/personal/orders/', 'Заказы', $cnt ? '<span class="cnt">' . $cnt . '</span>' : ''],
         ['addr', '/personal/addresses/', 'Адреса доставки', ''], ['docs', '/personal/docs/', 'Счета и документы', ''],
-        ['sub', '/personal/podpiska/', 'Подписка на кофе', ''], ['fav', '/personal/favorites/', 'Избранное', '']];
+        ['sub', '/personal/podpiska/', 'Поставки кофе', ''], ['fav', '/personal/favorites/', 'Избранное', '']];
     echo '<div class="wrap accp">';
     bt_crumbs();
     echo '<div class="pagehead">' . $head . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . '</div><div class="acc-l"><aside class="acc-nav">'
@@ -1425,7 +1425,7 @@ function bt_sitemap_build(): string
 {
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
-    $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/podpiska/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
+    $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
         '/o-kompanii/', '/otzyvy-o-nas/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
@@ -1491,7 +1491,7 @@ function bt_search_pages(): array
         ['t' => 'Услуги и сервис', 'u' => '/servis/', 'd' => 'Аренда, продажа, ремонт и обслуживание кофемашин', 'k' => 'услуги сервис обслуживание'],
         ['t' => 'Ремонт и обслуживание кофемашин', 'u' => '/servis/remont-kofemashin/', 'd' => 'Любые марки · выезд инженера · сервисный центр Jetinno', 'k' => 'ремонт кофемашины сервис обслуживание починка неисправность диагностика инженер накипь чистка jetinno delonghi saeco philips jura melitta'],
         ['t' => 'Аренда кофемашин', 'u' => '/arenda-kofemashin/', 'd' => 'Для дома, офиса и кафе', 'k' => 'аренда прокат кофемашина офис кафе'],
-        ['t' => 'Кофе по подписке', 'u' => '/podpiska/', 'd' => 'Регулярная доставка кофе, кофемашина бесплатно', 'k' => 'подписка доставка кофе регулярно'],
+        ['t' => 'Кофе в офис', 'u' => '/kofe-v-ofis/', 'd' => 'Регулярная доставка зерна для офиса и кафе', 'k' => 'кофе в офис доставка кофе регулярно подписка'],
         ['t' => 'Подбор кофе', 'u' => '/podbor-kofe/', 'd' => '5 вопросов — сорт BOTANICA с ценой', 'k' => 'подбор кофе тест выбрать'],
         ['t' => 'Оплата и доставка', 'u' => '/oplata-i-dostavka/', 'd' => 'Способы оплаты, доставка и самовывоз', 'k' => 'оплата доставка самовывоз курьер'],
         ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],

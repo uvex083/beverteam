@@ -1310,26 +1310,32 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  /* ---------- подписка: объём — пороги бесплатной аренды, цена — оптовая сетка сорта; расчёт уходит в заявку ---------- */
-  const sc=document.querySelector('[data-subcfg]');
-  if(sc){
-    const S=JSON.parse(sc.dataset.subcfg), q=s=>sc.querySelector(s), sel=q('[data-sub-sort]');
-    let per=q('[data-sub-per][aria-pressed=true]');
+  /* ---------- кофе в офис: кг в месяц × оптовая сетка сорта, доставка по порогу за одну поставку, расчёт уходит в заявку ---------- */
+  const oc=document.querySelector('[data-ofcfg]');
+  if(oc){
+    const S=JSON.parse(oc.dataset.ofcfg), q=s=>oc.querySelector(s), sel=q('[data-of-sort]');
+    const on=box=>+(q(box+' [aria-pressed=true]')?.dataset.v||0);
     const calc=()=>{
-      const vi=+(q('input[name=vol]:checked')?.value||0), v=S.vols[vi], c=S.coffee[+sel.value]||S.coffee[0];
-      const sum=BT_tier(c,v.kg).p*v.kg, base=c.p*v.kg, cups=Math.round(v.kg*1000/8), p=per.textContent.toLowerCase();
-      sc.querySelectorAll('.vol').forEach((l,i)=>{ l.classList.toggle('on',i===vi);
-        const pct=BT_tierPct(c,BT_tier(c,S.vols[i].kg)); l.querySelector('[data-sub-pct]').textContent=pct?'−'+pct+'%':''; });
-      q('[data-sub-kg]').textContent='Кофе, '+v.kg+' кг';
-      q('[data-sub-sum]').textContent=BT_fmt(base);
-      q('[data-sub-disc]').textContent=base>sum?'−'+BT_fmt(base-sum):'—';
-      q('[data-sub-tot]').textContent=BT_fmt(sum);
-      q('[data-sub-cup]').innerHTML=`Примерно <b>${cups.toLocaleString('ru-RU')} чашек</b> в месяц (8 г на чашку) · ${BT_fmt(Math.round(sum/cups))} за чашку · доставка ${p}`;
-      q('[data-sub-msg]').value=`Объём: ${v.kg} кг в месяц (${v.m} — аренда 0 ₽); сорт: ${c.n}; доставка: ${p}; расчёт на сайте: ${sum} ₽ в месяц`;
+      const kg=on('[data-of-kg]'), n=on('[data-of-per]')||1, c=S.coffee[+sel.value]||S.coffee[0], t=BT_tier(c,kg);
+      const base=c.p*kg, sum=t.p*kg, one=sum/n, ship=one>=S.free?0:S.ship*n, tot=sum+ship, cups=Math.round(kg*1000/S.g);
+      const per=q('[data-of-per] [aria-pressed=true]').textContent.toLowerCase();
+      oc.querySelectorAll('[data-of-kg] [data-v]').forEach(b=>{ const p=BT_tierPct(c,BT_tier(c,+b.dataset.v)); b.querySelector('[data-of-pct]').textContent=p?' −'+p+'%':''; });
+      q('[data-of-kgl]').textContent='Кофе, '+kg+' кг';
+      q('[data-of-sum]').textContent=BT_fmt(base);
+      q('[data-of-disc]').textContent=base>sum?'−'+BT_fmt(base-sum):'—';
+      q('[data-of-shipl]').textContent=n>1?`Доставка, ${n} раза в месяц`:'Доставка';
+      q('[data-of-ship]').textContent=ship?BT_fmt(ship):'бесплатно';
+      q('[data-of-tot]').textContent=BT_fmt(tot);
+      q('[data-of-cup]').innerHTML=`Примерно <b>${cups.toLocaleString('ru-RU')} чашек</b> в месяц (${S.g} г на чашку) · ${BT_fmt(Math.round(tot/cups))} за чашку`
+        +(ship?` · доставка бесплатно от ${BT_fmt(S.free)} за раз`:'');
+      const r=q('[data-of-rent]');
+      if(S.rent){ r.hidden=false; r.innerHTML=kg>=S.rent.kg?`При таком объёме кофемашина Jetinno — <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Рассчитать аренду →</a>`
+        :`Нет кофемашины? От ${S.rent.kg} кг в месяц даём Jetinno <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Подробнее →</a>`; }
+      q('[data-of-msg]').value=`Кофе в офис: ${kg} кг в месяц, ${c.n}; доставка ${per}; расчёт на сайте: ${tot} ₽ в месяц (кофе ${sum} ₽, доставка ${ship?ship+' ₽':'бесплатно'})`;
     };
-    sc.addEventListener('change',e=>{ if(e.target.name==='vol'||e.target===sel) calc(); });
-    sc.addEventListener('click',e=>{ const b=e.target.closest('[data-sub-per]'); if(!b) return; per=b;
-      sc.querySelectorAll('[data-sub-per]').forEach(x=>x.setAttribute('aria-pressed',x===b)); calc(); });
+    sel.addEventListener('change',calc);
+    oc.addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b||!b.parentElement.matches('[data-of-kg],[data-of-per]')) return;
+      b.parentElement.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b)); calc(); });
     calc();
   }
 

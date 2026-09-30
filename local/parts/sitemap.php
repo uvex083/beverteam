@@ -21,7 +21,7 @@ $rent = array_map(fn($m) => [$m['model'] . ' — ' . mb_strtolower($m['audience'
 $services = [
     ['Аренда кофемашин', '/arenda-kofemashin/', $rent],
     ['Аренда на мероприятия', '/arenda-kofemashin/#event'],
-    ['Кофе по подписке', '/podpiska/'],
+    ['Кофе в офис', '/kofe-v-ofis/'],
     ['Сервисное обслуживание', '/servis/', [['Ремонт кофемашин', '/servis/remont-kofemashin/']]],
     ['Подбор кофе за минуту', '/podbor-kofe/'],
 ];
