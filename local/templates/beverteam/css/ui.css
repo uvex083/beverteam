@@ -188,7 +188,6 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .dn__ct{margin:0 -16px;padding:6px 16px calc(28px + env(safe-area-inset-bottom));display:grid;gap:12px;background:var(--paper)}
 .dn__root{display:flex;flex-direction:column;padding-bottom:0}
 .dn__root>.dn__acc{margin-top:auto}
-.dn__root>.dn__ct{flex-grow:1;align-content:start}
 .dn__k{font:600 11px/1 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-top:8px}
 .dn__tel{font:700 18px/1 'JetBrains Mono',monospace}
 .dn__addr{font-size:13px;color:var(--gray)}
