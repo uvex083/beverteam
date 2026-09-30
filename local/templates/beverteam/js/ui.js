@@ -1386,7 +1386,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         </div>
         ${A.vol==='l'||A.vol==='xl'?'<div class="alert alert--info" style="margin-top:24px">При таком объёме кофемашина в аренду обойдётся в 0 ₽. <a class="link" href="/podpiska/">Посмотреть подписку</a></div>':''}
         <hr class="hr" style="margin:26px 0">
-        <div class="row between" style="gap:14px"><button type="button" class="btn btn--ghost btn--sm" data-qagain>Пройти заново</button><a class="link" href="/kontakty/#form" data-lead="Подбор кофе">Хочу, чтобы подобрал человек →</a></div>`;
+        <div class="row between" style="gap:14px"><button type="button" class="btn btn--ghost btn--sm" data-qagain>Пройти заново</button><a class="link" href="/kontakty/#form" data-lead="Подбор кофе">Трудности? Поможем с подбором →</a></div>`;
     };
     qz.addEventListener('click',e=>{
       const v=e.target.closest('[data-v]'), t=e.target;
