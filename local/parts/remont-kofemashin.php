@@ -146,7 +146,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
       <?php if (!empty($contract['subtitle'])): ?><p><?= $e($contract['subtitle']) ?></p><?php endif ?>
       <div class="row" style="gap:12px"><?= bt_btn($contract['btn_text'] ?? '', $contract['btn_link'] ?? '') ?>
         <?php if (!empty($contract['btn2_text'])): ?><?= !empty($contract['file'])
-            ? '<a class="btn btn--line btn--inv" href="' . $e($contract['file']) . '" target="_blank" rel="noopener">' . $e($contract['btn2_text']) . ', PDF</a>'
+            ? '<a class="btn btn--line btn--inv" href="' . $e($contract['file']) . '" target="_blank" rel="noopener" download="obrazec-dogovora-beverteam.pdf">Скачать ' . $e(mb_strtolower($contract['btn2_text'])) . ', PDF</a>'
             : '<a class="btn btn--line btn--inv" href="#form">Запросить ' . $e(mb_strtolower($contract['btn2_text'])) . '</a>' ?><?php endif ?></div></div>
     <?php if ($contractItems): ?><ul class="r2list"><?php foreach ($contractItems as $c): ?><li><?= $e($c) ?></li><?php endforeach ?></ul><?php endif ?>
   </div></section>
