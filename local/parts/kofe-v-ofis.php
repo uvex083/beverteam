@@ -25,7 +25,7 @@ $periods = [[1, 'Раз в месяц'], [2, 'Раз в 2 недели'], [4, '�
 $ship = 350;
 $free = 3000;
 $cfg = [
-    'coffee' => array_map(fn($c) => ['id' => $c['id'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null], $coffee),
+    'coffee' => array_map(fn($c) => ['id' => $c['id'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'img' => $c['img'] ?? '', 'par' => $c['par'] ?? '', 'url' => $c['url']], $coffee),
     'ship' => $ship, 'free' => $free, 'g' => 8,
     'rent' => $rentKg ? ['kg' => min($rentKg), 'url' => '/arenda-kofemashin/#calc'] : null,
 ];
@@ -98,6 +98,10 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <select id="ofSort" class="ar2sel" data-of-sort>
           <?php foreach ($coffee as $i => $c): ?><option value="<?= $i ?>"<?= $i === $sort0 ? ' selected' : '' ?>><?= $e($short($c['n'])) ?> — <?= $e(bt_fmt($c['p'])) ?>/кг</option><?php endforeach ?>
         </select>
+        <a class="ofsort" href="<?= $e($coffee[$sort0]['url']) ?>" data-of-info>
+          <img src="<?= $e($coffee[$sort0]['img'] ?? '') ?>" alt="" width="72" height="72" loading="lazy">
+          <span><b data-of-in><?= $e($short($coffee[$sort0]['n'])) ?></b><small data-of-ip><?= $e($coffee[$sort0]['par'] ?? '') ?></small><i>О сорте →</i></span>
+        </a>
       </div>
       <div class="ar2calc__out" aria-live="polite">
         <span class="mono" style="color:var(--lime)">Ваш расчёт</span>

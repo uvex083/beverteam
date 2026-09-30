@@ -1321,6 +1321,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       const base=c.p*kg, sum=t.p*kg, ship=sum/n>=S.free?0:S.ship*n, tot=sum+ship, cups=Math.round(kg*1000/S.g);
       const per=q('[data-of-per] [aria-pressed=true]').textContent.toLowerCase();
       oc.querySelectorAll('[data-of-kg] [data-v]').forEach(b=>{ const p=BT_tierPct(c,BT_tier(c,+b.dataset.v)); b.querySelector('[data-of-pct]').textContent=p?' −'+p+'%':''; });
+      const inf=q('[data-of-info]'); if(inf){ inf.href=c.url; const im=inf.querySelector('img'); if(c.img&&im.getAttribute('src')!==c.img) im.src=c.img;
+        q('[data-of-in]').textContent=c.n.replace(/^BOTANICA\s+/,''); q('[data-of-ip]').textContent=c.par; }
       q('[data-of-kgv]').textContent=kg+' кг';
       q('[data-of-cups]').textContent=cups.toLocaleString('ru-RU');
       q('[data-of-cup]').textContent=BT_fmt(Math.round(tot/cups));
