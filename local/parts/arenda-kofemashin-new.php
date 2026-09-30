@@ -173,8 +173,8 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <p class="muted r2lead">Сколько кофе уйдёт в месяц, какая машина справится и сколько стоит чашка — сразу в двух вариантах оплаты.</p>
     <div class="ar2calc" data-rcalc2='<?= htmlspecialcharsbx(json_encode($calc, JSON_UNESCAPED_UNICODE)) ?>'>
       <div class="ar2calc__in">
-        <span class="ar2q">Где будет стоять машина</span>
-        <div class="opts" role="group" aria-label="Где будет стоять машина"><?php foreach ($places as $i => [$pl, $who, $n, $per, $days]): ?>
+        <span class="ar2q">Куда поставим машину?</span>
+        <div class="opts" role="group" aria-label="Куда поставим машину?"><?php foreach ($places as $i => [$pl, $who, $n, $per, $days]): ?>
           <button type="button" class="chipx" aria-pressed="<?= $i ? 'false' : 'true' ?>" data-rc2-place='<?= htmlspecialcharsbx(json_encode(['who' => $who, 'n' => $n, 'per' => $per, 'days' => $days], JSON_UNESCAPED_UNICODE)) ?>'><?= $e($pl) ?></button>
         <?php endforeach ?></div>
         <label class="ar2q" for="rc2n"><span data-rc2-who><?= $e($places[0][1]) ?></span> <b data-rc2-nv><?= $places[0][2] ?></b></label>
