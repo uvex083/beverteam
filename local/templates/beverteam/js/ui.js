@@ -745,8 +745,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const q=s=>dn.querySelector(s), u=window.BT_USER;
     if(u){ q('[data-dme-name]').textContent=u.name||u.email; q('[data-dme-sub]').textContent='Личный кабинет';
       q('[data-dme-i]').textContent=(u.name||u.email||'?').trim().charAt(0).toUpperCase(); }
-    q('[data-dcnt="fav"]').textContent=(window.BT_FAV||[]).length||'';
-    q('[data-dcnt="cmp"]').textContent=(window.BT_CMP||[]).length||'';
   };
   new MutationObserver(()=>{ const o=dr.classList.contains('open');
     burger.setAttribute('aria-expanded',o); burger.setAttribute('aria-label',o?'Закрыть меню':'Меню');

@@ -68,10 +68,6 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
         <span><b data-dme-name>Войти или зарегистрироваться</b><small data-dme-sub>Заказы, адреса и документы в одном месте</small></span>
         <?= bt_icon('arrR') ?>
       </a>
-      <div class="dn__tiles">
-        <a href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span><b data-dcnt="fav"></b></a>
-        <a href="/catalog/compare/"><?= bt_icon('compare') ?><span>Сравнение</span><b data-dcnt="cmp"></b></a>
-      </div>
     </div>
     <div class="dn__ct">
       <span class="dn__k">Связаться с нами</span>
