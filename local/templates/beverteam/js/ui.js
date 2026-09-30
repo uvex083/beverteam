@@ -1205,6 +1205,62 @@ document.addEventListener('DOMContentLoaded',()=>{
     draw();
   }
 
+  /* ---------- аренда (новая версия): люди × чашки × дни → расход, модель, два варианта оплаты, цена чашки ---------- */
+  const r2=document.querySelector('[data-rcalc2]');
+  if(r2){
+    const C=JSON.parse(r2.dataset.rcalc2), M=C.models, q=s=>r2.querySelector(s), rng=q('[data-rc2-n]');
+    const kgf=x=>String(Math.round(x*10)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
+    const st={per:2,days:22}; let cur=null;
+    const press=(box,v)=>box.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===v));
+    const draw=()=>{
+      const n=+rng.value, cups=n*st.per, need=cups*C.g*st.days/1000, m=M.find(x=>x.cups>=cups)||M[M.length-1], over=cups>M[M.length-1].cups;
+      const B=C.beans.find(b=>b.code===q('[data-rc2-bean]').value)||C.beans[0];
+      const kgA=Math.max(Math.ceil(need),m.kg), costA=kgA*BT_tier(B,kgA).p, costB=m.price+need*BT_tier(B,Math.max(need,1)).p;
+      const a=m.kg>0, best=a&&costA<=costB?'a':'b';
+      cur={m,cups,need,n,days:st.days,bean:B.n,costA,costB,kgA};
+      q('[data-rc2-nv]').textContent=n;
+      const img=q('[data-rc2-img]'); if(img.getAttribute('src')!==m.img) img.src=m.img; img.alt=m.m;
+      q('[data-rc2-name]').textContent=m.m;
+      q('[data-rc2-s]').textContent=`До ${m.cups} чашек в день · ${m.aud}`+(m.f?` · ${m.f}`:'');
+      q('[data-rc2-cups]').textContent=cups;
+      q('[data-rc2-kg]').textContent=kgf(need)+' кг';
+      q('[data-rc2-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*st.days,1));
+      q('[data-rc2-a]').hidden=!a;
+      q('[data-rc2-at]').textContent=rub(costA)+' / мес';
+      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?` — порог модели ${m.kg} кг`:'');
+      q('[data-rc2-bt]').textContent=rub(costB)+' / мес';
+      q('[data-rc2-bd]').textContent=`Аренда ${rub(m.price)} + ≈ ${kgf(need)} кг кофе`;
+      q('[data-rc2-a]').classList.toggle('is-best',best==='a'); q('[data-rc2-b]').classList.toggle('is-best',best==='b');
+      q('[data-rc2-note]').textContent=over?'Для такой нагрузки подберём решение индивидуально: несколько машин или модель мощнее — оставьте заявку.'
+        :`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${st.days} дней. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
+    };
+    rng.addEventListener('input',draw);
+    q('[data-rc2-bean]').addEventListener('change',draw);
+    r2.addEventListener('click',e=>{
+      const pl=e.target.closest('[data-rc2-place]');
+      if(pl){ const P=JSON.parse(pl.dataset.rc2Place); r2.querySelectorAll('[data-rc2-place]').forEach(b=>b.setAttribute('aria-pressed',b===pl));
+        q('[data-rc2-who]').textContent=P.who; rng.value=P.n; st.per=P.per; st.days=P.days; press(q('[data-rc2-per]'),P.per); press(q('[data-rc2-days]'),P.days); draw(); return; }
+      const v=e.target.closest('[data-v]'); if(!v) return;
+      const box=v.parentElement; if(box.matches('[data-rc2-per]')) st.per=+v.dataset.v; else if(box.matches('[data-rc2-days]')) st.days=+v.dataset.v; else return;
+      press(box,+v.dataset.v); draw();
+    });
+    const toCalc=()=>document.getElementById('calc').scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('[data-rc2-model]').forEach(b=>b.addEventListener('click',()=>{
+      const m=M.find(x=>x.id===b.dataset.rc2Model); if(!m) return; rng.value=Math.max(1,Math.min(+rng.max,Math.ceil(m.cups/st.per))); draw(); toCalc(); }));
+    document.querySelectorAll('[data-rc2-goplace]').forEach(b=>b.addEventListener('click',()=>{
+      const pl=[...r2.querySelectorAll('[data-rc2-place]')].find(x=>x.textContent.trim().startsWith(b.dataset.rc2Goplace)); pl?.click(); toCalc(); }));
+    const f=document.querySelector('#form form');
+    q('[data-rc2-go]').addEventListener('click',()=>{
+      if(!f||!cur) return;
+      const sel=f.elements.model, msg=f.elements.message;
+      if(sel){ sel.value=cur.m.m; sel.dispatchEvent(new Event('change',{bubbles:true})); }
+      if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${cur.days} дней, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
+        +(cur.m.kg?`С нашим кофе ≈ ${rub(cur.costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
+    });
+    document.querySelectorAll('[data-rc2-set]').forEach(a=>a.addEventListener('click',()=>{ const sel=f?.elements.model; if(sel){ sel.value=a.dataset.rc2Set; sel.dispatchEvent(new Event('change',{bubbles:true})); } }));
+    draw();
+  }
+
   /* ---------- ремонт: отмеченные симптомы — первой строкой поля «Что случилось», свой текст остаётся ---------- */
   const sy=document.querySelector('[data-symp]'), st=document.querySelector('[data-symp-to]');
   if(sy&&st){
