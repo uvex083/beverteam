@@ -2252,6 +2252,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .chipx s{text-decoration:none;color:var(--ok);font-weight:700;font-size:12px}
 .chipx[aria-pressed=true] s{color:var(--ink)}
 .ofsteps{grid-template-columns:repeat(4,1fr)}
+.ofp .ar2calc{align-items:start}
 .oftot{display:grid;gap:10px;border-top:1px solid #2C2C27;padding-top:16px}
 .oftot div{display:flex;justify-content:space-between;gap:16px;font-size:14px;color:#D8D8D0}
 .oftot div span:last-child{white-space:nowrap}

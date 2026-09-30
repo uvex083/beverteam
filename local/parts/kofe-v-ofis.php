@@ -35,7 +35,7 @@ $short = fn(string $n) => trim(preg_replace(['/^BOTANICA\s+/u', '/,\s*1\s*кг$/
 $maxPct = 0;
 foreach ($coffee as $c) {
     foreach ((array)($c['bulk'] ?? []) as $t) {
-        $c['bulk'][0]['p'] > 0 and $maxPct = max($maxPct, (int)round((1 - $t['p'] / $c['bulk'][0]['p']) * 100));
+        $t['kg'] <= max($kgs) && $c['bulk'][0]['p'] > 0 and $maxPct = max($maxPct, (int)round((1 - $t['p'] / $c['bulk'][0]['p']) * 100));
     }
 }
 $facts = array_values(array_filter([
