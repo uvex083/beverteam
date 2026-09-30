@@ -1313,29 +1313,34 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* ---------- кофе в офис: кг в месяц × оптовая сетка сорта, доставка по порогу за одну поставку, расчёт уходит в заявку ---------- */
   const oc=document.querySelector('[data-ofcfg]');
   if(oc){
-    const S=JSON.parse(oc.dataset.ofcfg), q=s=>oc.querySelector(s), sel=q('[data-of-sort]');
+    const S=JSON.parse(oc.dataset.ofcfg), q=s=>oc.querySelector(s), sel=q('[data-of-sort]'), f=document.querySelector('#form form'), msg=f?.elements.message;
     const on=box=>+(q(box+' [aria-pressed=true]')?.dataset.v||0);
+    let text='';
     const calc=()=>{
       const kg=on('[data-of-kg]'), n=on('[data-of-per]')||1, c=S.coffee[+sel.value]||S.coffee[0], t=BT_tier(c,kg);
-      const base=c.p*kg, sum=t.p*kg, one=sum/n, ship=one>=S.free?0:S.ship*n, tot=sum+ship, cups=Math.round(kg*1000/S.g);
+      const base=c.p*kg, sum=t.p*kg, ship=sum/n>=S.free?0:S.ship*n, tot=sum+ship, cups=Math.round(kg*1000/S.g);
       const per=q('[data-of-per] [aria-pressed=true]').textContent.toLowerCase();
       oc.querySelectorAll('[data-of-kg] [data-v]').forEach(b=>{ const p=BT_tierPct(c,BT_tier(c,+b.dataset.v)); b.querySelector('[data-of-pct]').textContent=p?' −'+p+'%':''; });
-      q('[data-of-kgl]').textContent='Кофе, '+kg+' кг';
+      q('[data-of-kgv]').textContent=kg+' кг';
+      q('[data-of-cups]').textContent=cups.toLocaleString('ru-RU');
+      q('[data-of-cup]').textContent=BT_fmt(Math.round(tot/cups));
+      q('[data-of-kgl]').textContent=`${c.n}, ${kg} кг`;
       q('[data-of-sum]').textContent=BT_fmt(base);
       q('[data-of-disc]').textContent=base>sum?'−'+BT_fmt(base-sum):'—';
       q('[data-of-shipl]').textContent=n>1?`Доставка, ${n} раза в месяц`:'Доставка';
       q('[data-of-ship]').textContent=ship?BT_fmt(ship):'бесплатно';
       q('[data-of-tot]').textContent=BT_fmt(tot);
-      q('[data-of-cup]').innerHTML=`Примерно <b>${cups.toLocaleString('ru-RU')} чашек</b> в месяц (${S.g} г на чашку) · ${BT_fmt(Math.round(tot/cups))} за чашку`
-        +(ship?` · доставка бесплатно от ${BT_fmt(S.free)} за раз`:'');
+      q('[data-of-note]').textContent=`Доставка по Екатеринбургу бесплатная, если одна поставка от ${BT_fmt(S.free)}, иначе ${BT_fmt(S.ship)}. Чашка — ${S.g} г зерна.`;
       const r=q('[data-of-rent]');
       if(S.rent){ r.hidden=false; r.innerHTML=kg>=S.rent.kg?`При таком объёме кофемашина Jetinno — <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Рассчитать аренду →</a>`
         :`Нет кофемашины? От ${S.rent.kg} кг в месяц даём Jetinno <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Подробнее →</a>`; }
-      q('[data-of-msg]').value=`Кофе в офис: ${kg} кг в месяц, ${c.n}; доставка ${per}; расчёт на сайте: ${tot} ₽ в месяц (кофе ${sum} ₽, доставка ${ship?ship+' ₽':'бесплатно'})`;
+      text=`Расчёт на сайте: ${c.n}, ${kg} кг в месяц, доставка ${per} — ≈ ${BT_fmt(tot)} в месяц (кофе ${BT_fmt(sum)}, доставка ${ship?BT_fmt(ship):'бесплатно'})`;
     };
     sel.addEventListener('change',calc);
     oc.addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b||!b.parentElement.matches('[data-of-kg],[data-of-per]')) return;
       b.parentElement.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b)); calc(); });
+    q('[data-of-go]').addEventListener('click',()=>{ if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=text; });
+    if(f) BT_goBar('Рассчитать поставки',()=>document.getElementById('calc').scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.r2hero .row'),oc,f]);
     calc();
   }
 
