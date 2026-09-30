@@ -106,7 +106,8 @@ $steps = [
     ['Работа', 'Кофе привозим по графику, обслуживание и ремонт — наша забота.'],
 ];
 // описания моделей для FAQ и SEO-текста — из ИБ rent и характеристик каталога
-$mdesc = fn($m) => $m['model'] . ' — ' . mb_strtolower($m['audience']) . ($m['cups'] ? ', до ' . $m['cups'] . ' чашек в день' : '') . ($m['feature'] !== '' ? ', ' . mb_strtolower($m['feature']) : '') . (($sc = $spec($m, 'SCREEN')) !== '' ? ', ' . mb_strtolower($sc) : '');
+$lc = fn($s) => mb_strtolower(mb_substr($s, 0, 1)) . mb_substr($s, 1);
+$mdesc = fn($m) => $m['model'] . ' — ' . $lc($m['audience']) . ($m['cups'] ? ', до ' . $m['cups'] . ' чашек в день' : '') . ($m['feature'] !== '' ? ', ' . $lc($m['feature']) : '') . (($sc = $spec($m, 'SCREEN')) !== '' ? ', ' . $lc($sc) : '');
 $mnames = implode(', ', array_column($models, 'model'));
 $tap = array_values(array_filter($models, fn($m) => $spec($m, 'WATER_SUPPLY') === 'Да'));
 $tank = array_values(array_filter($models, fn($m) => $spec($m, 'WATER_SUPPLY') !== 'Да'));
