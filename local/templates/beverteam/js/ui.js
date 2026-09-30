@@ -1232,7 +1232,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rc2-bd]').textContent=`Аренда ${rub(m.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rc2-a]').classList.toggle('is-best',best==='a'); q('[data-rc2-b]').classList.toggle('is-best',best==='b');
       q('[data-rc2-note]').textContent=over?'Для такой нагрузки подберём решение индивидуально: несколько машин или модель мощнее — оставьте заявку.'
-        :`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${st.days} дней. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
+        :`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
     };
     rng.addEventListener('input',draw);
     q('[data-rc2-bean]').addEventListener('change',draw);
@@ -1254,7 +1254,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(!f||!cur) return;
       const sel=f.elements.model, msg=f.elements.message;
       if(sel){ sel.value=cur.m.m; sel.dispatchEvent(new Event('change',{bubbles:true})); }
-      if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${cur.days} дней, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
+      if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[cur.days]||cur.days+' дн.'}, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
         +(cur.m.kg?`С нашим кофе ≈ ${rub(cur.costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
     });
     document.querySelectorAll('[data-rc2-set]').forEach(a=>a.addEventListener('click',()=>{ const sel=f?.elements.model; if(sel){ sel.value=a.dataset.rc2Set; sel.dispatchEvent(new Event('change',{bubbles:true})); } }));

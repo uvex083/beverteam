@@ -181,8 +181,8 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <input class="rng" id="rc2n" type="range" min="1" max="150" step="1" value="<?= $places[0][2] ?>" data-rc2-n>
         <span class="ar2q">Чашек на человека в день</span>
         <div class="opts" role="group" aria-label="Чашек на человека в день" data-rc2-per><?php foreach ([1, 2, 3] as $v): ?><button type="button" class="chipx" data-v="<?= $v ?>" aria-pressed="<?= $v === $places[0][3] ? 'true' : 'false' ?>"><?= $v ?></button><?php endforeach ?></div>
-        <span class="ar2q">Дней работы в месяц</span>
-        <div class="opts" role="group" aria-label="Дней работы в месяц" data-rc2-days><?php foreach ([22 => '22 — будни', 26 => '26 — шесть дней', 30 => '30 — без выходных'] as $v => $t): ?><button type="button" class="chipx" data-v="<?= $v ?>" aria-pressed="<?= $v === $places[0][4] ? 'true' : 'false' ?>"><?= $e($t) ?></button><?php endforeach ?></div>
+        <span class="ar2q">График работы</span>
+        <div class="opts" role="group" aria-label="График работы" data-rc2-days><?php foreach ([22 => 'Пятидневка', 26 => 'Шестидневка', 30 => 'Без выходных'] as $v => $t): ?><button type="button" class="chipx" data-v="<?= $v ?>" aria-pressed="<?= $v === $places[0][4] ? 'true' : 'false' ?>"><?= $e($t) ?></button><?php endforeach ?></div>
         <label class="ar2q" for="rc2b">Кофе</label>
         <select id="rc2b" class="ar2sel" data-rc2-bean><?php foreach ($calc['beans'] as $b): ?><option value="<?= $e($b['code']) ?>"<?= $b['code'] === $bean0 ? ' selected' : '' ?>><?= $e($b['n']) ?> — <?= $e(bt_fmt($b['p'])) ?>/кг</option><?php endforeach ?></select>
       </div>
