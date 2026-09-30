@@ -209,7 +209,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <?php if ($models): ?>
   <section class="sec sec--t0" id="models">
-    <div class="r2head"><h2 class="display h2">Кофемашины в аренду</h2><a class="link" href="/catalog/professionalnye-kofemashiny/">Купить в собственность →</a></div>
+    <div class="r2head"><h2 class="display h2">Кофемашины в аренду</h2><a class="link" href="/catalog/professionalnye-kofemashiny/">Хочу купить →</a></div>
     <div class="ar2models"><?php foreach ($models as $m): ?>
       <article class="card ar2m">
         <a class="ar2m__ph" href="<?= $e($m['url']) ?>"><img src="<?= $e($m['img']) ?>" alt="<?= $e($m['model']) ?>" loading="lazy" width="480" height="340"></a>
