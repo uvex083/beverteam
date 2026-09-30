@@ -158,6 +158,25 @@ foreach ([
     bt_el_seed($ibs['sub_faq'], '', ['NAME' => $q, 'SORT' => ($i + 1) * 10, 'PREVIEW_TEXT' => $a, 'PREVIEW_TEXT_TYPE' => 'text'], [], $say, $fail);
 }
 
+// «Услуги» (/servis/): карточка «Продажа оборудования» → «Кофе в офис»; цену сайт считает сам — от самого доступного сорта за кг
+if (($ibId = bt_iblock('servis_dirs')) && ($el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=NAME' => 'Продажа оборудования'], false, false, ['ID'])->Fetch())) {
+    $say('  ~ «Услуги»: карточка «Продажа оборудования» → «Кофе в офис»');
+    (new CIBlockElement())->Update($el['ID'], ['NAME' => 'Кофе в офис', 'PREVIEW_TEXT' => 'Зерно BOTANICA свежей обжарки для офиса и кафе с доставкой по графику.', 'PREVIEW_TEXT_TYPE' => 'text']);
+    CIBlockElement::SetPropertyValuesEx($el['ID'], $ibId, [
+        'ITEMS' => array_map(fn($x) => ['VALUE' => $x, 'DESCRIPTION' => ''], ['От 1 кг в месяц, для любой зерновой кофемашины', 'Доставка раз в неделю, в 2 недели или в месяц', 'Оптовая цена от объёма', 'Договор, оплата по счёту']),
+        'PRICE' => '', 'PRICE_NOTE' => 'за кг', 'LINK' => '/kofe-v-ofis/', 'LINK_TEXT' => 'Подробнее →',
+    ]);
+    CIBlock::clearIblockTagCache($ibId);
+}
+if (($ibId = bt_iblock('servis_head')) && ($el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => 'main'], false, false, ['ID'])->Fetch())) {
+    $cur = CIBlockElement::GetProperty($ibId, $el['ID'], [], ['CODE' => 'SUBTITLE'])->Fetch()['VALUE'] ?? '';
+    if (str_starts_with($cur, 'Арендовать, купить или починить')) {
+        $say('  ~ «Услуги»: подзаголовок без «купить»');
+        CIBlockElement::SetPropertyValuesEx($el['ID'], $ibId, ['SUBTITLE' => 'Аренда и ремонт кофемашин, поставки кофе в офис. Авторизованный сервисный центр Jetinno в Екатеринбурге.']);
+        CIBlock::clearIblockTagCache($ibId);
+    }
+}
+
 foreach ($ibs as $id) {
     $id and CIBlock::clearIblockTagCache($id);
 }

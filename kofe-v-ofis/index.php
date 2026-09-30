@@ -7,5 +7,7 @@ $top = bt_block('sub_head');
 $seo = $top ? (new \Bitrix\Iblock\InheritedProperty\ElementValues(bt_iblock('sub_head'), $top['id']))->getValues() : [];
 $APPLICATION->SetPageProperty('keywords', $seo['ELEMENT_META_KEYWORDS'] ?? '');
 $APPLICATION->SetTitle(($seo['ELEMENT_PAGE_TITLE'] ?? '') ?: 'Кофе в офис с доставкой в Екатеринбурге');
+$APPLICATION->AddChainItem('Услуги', '/servis/');
+$APPLICATION->AddChainItem('Кофе в офис', '/kofe-v-ofis/');
 require $_SERVER['DOCUMENT_ROOT'] . '/local/parts/kofe-v-ofis.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

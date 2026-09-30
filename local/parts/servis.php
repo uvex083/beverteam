@@ -10,6 +10,7 @@ $data = bt_catalog_data();
 $minRent = $data['rent'] ? min(array_column($data['rent'], 'p')) : 0;
 $machinePrices = array_filter(array_column($data['machines'], 'p'));
 $minMachine = $machinePrices ? min($machinePrices) : 0;
+$minCoffee = ($cp = array_filter(array_column($data['coffee'], 'p'))) ? min($cp) : 0;
 ?>
 <div class="wrap servp">
   <?php bt_crumbs() ?>
@@ -23,6 +24,8 @@ $minMachine = $machinePrices ? min($machinePrices) : 0;
             $p = 'от ' . bt_fmt($minRent);
         } elseif ($p === '' && str_starts_with($link, '/catalog/') && $minMachine) {
             $p = 'от ' . bt_fmt($minMachine);
+        } elseif ($p === '' && $link === '/kofe-v-ofis/' && $minCoffee) {
+            $p = 'от ' . bt_fmt($minCoffee);
         }
     ?>
     <a class="dir" href="<?= $e($link) ?>"><span class="num"><?= sprintf('%02d', $i + 1) ?></span><h2><span><?= $e($d['name']) ?></span></h2>
