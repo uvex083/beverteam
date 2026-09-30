@@ -255,7 +255,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <div><div class="mono" style="color:var(--lime)"><?= $e($terms['caption']) ?></div>
       <h2 class="display h2" style="margin:14px 0"><?= $e($terms['title']) ?></h2>
       <p><?= $e($terms['sub']) ?></p>
-      <div class="row" style="gap:12px"><a class="btn" href="#form">Запросить договор</a></div></div>
+      <div class="row" style="gap:12px"><a class="btn" href="/upload/docs/dogovor-arendy-kofemashiny-obrazec.pdf" target="_blank" rel="noopener" download>Скачать образец договора, PDF</a></div></div>
     <ul class="r2list"><?php foreach ($terms['items'] as $t): ?><li><?= $e($t) ?></li><?php endforeach ?></ul>
   </div></section>
 
