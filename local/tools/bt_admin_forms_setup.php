@@ -156,7 +156,7 @@ foreach ($forms as $code => [$kind, $keys]) {
         } elseif ($k === 'pic') {
             $fields['PREVIEW_PICTURE'] = $lPic ?: 'Картинка';
         } elseif (isset($props[$k])) {
-            $fields['PROPERTY_' . $props[$k]['ID']] = $k === 'caption' ? 'Надпись над заголовком (мелко)' : $props[$k]['NAME'];
+            $fields['PROPERTY_' . $props[$k]['ID']] = $k === 'caption' ? ($code === 'sub_head' ? 'Подпись под кнопкой формы' : 'Надпись над заголовком (мелко)') : $props[$k]['NAME'];
         } else {
             $miss[] = $k;
         }
