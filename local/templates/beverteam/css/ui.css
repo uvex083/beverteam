@@ -2295,6 +2295,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .ar2m__sp li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
 .ar2m__sp span{color:var(--gray)}
 .ar2m .btn{align-self:flex-start;margin-top:auto}
+@media(max-width:640px){.ar2m .btn{align-self:stretch;justify-content:center}}
 .ar2 .pl .r2list li{display:block;position:relative;padding:13px 0 13px 26px}
 .ar2inc{grid-template-columns:repeat(4,1fr)}
 .ar2inc .ic svg{fill:none}
