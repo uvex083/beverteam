@@ -2266,7 +2266,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .ofrent .btn{background:var(--ink);color:#fff;border-color:var(--ink)}
 .ofwhy{grid-template-columns:repeat(4,1fr)}
 @media(max-width:1100px){.ofsteps,.ofwhy{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.ofsteps,.ofwhy{grid-template-columns:1fr}.ofrent .btn{width:100%}}
+@media(max-width:640px){.ofsteps,.ofwhy{grid-template-columns:1fr}.ofrent .btn,.ar2calc__out .btn{width:100%;justify-self:stretch}}
 /* подсказка под широкой таблицей */
 .tswipe{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;font-size:12.5px;color:var(--gray)}
 .tswipe[hidden]{display:none}
