@@ -221,7 +221,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
             <?php if ($m['kg']): ?><div><b>0 ₽</b><span>при заказе кофе от <?= $m['kg'] ?>&nbsp;кг в месяц</span></div><?php endif ?>
             <div><b><?= $e(bt_fmt($m['price'])) ?></b><span>в месяц, кофе любой</span></div>
           </div>
-          <ul class="ar2m__sp"><?php foreach (['SCREEN', 'BEAN_HOPPER', 'WATER_SUPPLY', 'TELEMETRY'] as $c): if (($v = $spec($m, $c)) !== ''): ?><li><span><?= $e($specCodes[$c]) ?></span><?= $e($v) ?></li><?php endif; endforeach ?></ul>
+          <ul class="ar2m__sp"><?php foreach (['SCREEN', 'BEAN_HOPPER', 'WATER_SUPPLY', 'TELEMETRY'] as $c): ?><li><span><?= $e($specCodes[$c]) ?></span><?= $e($spec($m, $c) ?: 'Нет') ?></li><?php endforeach ?></ul>
           <button type="button" class="btn btn--line btn--sm" data-rc2-model="<?= $e($m['id']) ?>">Рассчитать для этой модели</button>
         </div>
       </article>
@@ -238,7 +238,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <tr><td>Аренда 0 ₽</td><?php foreach ($models as $m): ?><td><?= $m['kg'] ? 'при кофе от ' . $m['kg'] . '&nbsp;кг в месяц' : '—' ?></td><?php endforeach ?></tr>
         <tr><td>Фиксированная аренда</td><?php foreach ($models as $m): ?><td><b><?= $e(bt_fmt($m['price'])) ?>/мес</b></td><?php endforeach ?></tr>
         <?php foreach ($specCodes as $c => $t): if (!array_filter($models, fn($m) => $spec($m, $c) !== '')) continue; ?>
-        <tr><td><?= $e($t) ?></td><?php foreach ($models as $m): ?><td><?= $e($spec($m, $c) ?: '—') ?></td><?php endforeach ?></tr>
+        <tr><td><?= $e($t) ?></td><?php foreach ($models as $m): ?><td><?= $e($spec($m, $c) ?: (in_array($c, ['SCREEN', 'WATER_SUPPLY', 'TELEMETRY', 'MDB'], true) ? 'Нет' : '—')) ?></td><?php endforeach ?></tr>
         <?php endforeach ?>
         <tr><td>Купить</td><?php foreach ($models as $m): ?><td><?= $m['buy'] ? '<a class="link" href="' . $e($m['url']) . '">' . $e(bt_fmt($m['buy'])) . '</a>' : 'по запросу' ?></td><?php endforeach ?></tr>
       </tbody>
