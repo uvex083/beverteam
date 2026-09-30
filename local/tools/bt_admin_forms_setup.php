@@ -54,12 +54,21 @@ $forms = [
     'main_sub' => ['block', ['caption', 'title', 'highlight', 'subtitle', 'items', 'btn_text', 'btn_link', 'btn2_text', 'btn2_link', 'pic']],
     'main_utp' => ['block', ['title', 'subtitle']],
     'main_utp_items' => ['list', ['name', 'text', 'icon']],
+    'rent_calc' => ['block', ['title', 'subtitle', 'btn_text']],
+    'rent_coffee' => ['block', ['title', 'subtitle', 'btn_text', 'btn_link']],
+    'rent_contract' => ['block', ['caption', 'title', 'subtitle', 'items', 'btn_text', 'file']],
     'rent_event' => ['block', ['title', 'subtitle', 'btn_text', 'btn_link']],
+    'rent_facts' => ['blocks', ['name', 'html']],
     'rent_faq' => ['blocks', ['name', 'html']],
     'rent_form' => ['block', ['title', 'subtitle', 'btn_text']],
-    'rent_seo' => ['block', ['text']],
-    'rent_terms' => ['list', ['name', 'text']],
-    'rent_top' => ['block', ['caption', 'title', 'subtitle', 'items', 'btn_text']],
+    'rent_links' => ['blocks', ['name', 'html', 'link']],
+    'rent_models_head' => ['block', ['title', 'btn_text', 'btn_link']],
+    'rent_segments' => ['blocks', ['name', 'html', 'place']],
+    'rent_seo' => ['block', ['title', 'text']],
+    'rent_steps' => ['block', ['title', 'items']],
+    'rent_terms' => ['list', ['name', 'text', 'icon']],
+    'rent_top' => ['block', ['caption', 'subtitle', 'items', 'btn_text', 'btn_link']],
+    'rent_vs' => ['block', ['title', 'items', 'minus']],
     'repair_brands' => ['blocks', ['name', 'models', 'authorized']],
     'repair_contract' => ['block', ['caption', 'title', 'subtitle', 'items', 'btn_text', 'btn_link', 'btn2_text', 'file']],
     'repair_errors' => ['blocks', ['name', 'html', 'engineer']],
@@ -98,12 +107,13 @@ $labels = [
     'about_team' => ['Имя и фамилия', 'Должность', 'Фото'], 'about_places' => ['Подпись к фото', '', 'Фото'],
     'about_partners' => ['Компания', 'Подпись (кто это)', 'Логотип'], 'contacts_photos' => ['Подпись к фото', 'Текст', 'Фото'],
     'about_values_items' => ['Заголовок карточки', 'Текст карточки'], 'main_utp_items' => ['Заголовок карточки', 'Текст карточки'],
-    'repair_strip' => ['Заголовок карточки', 'Текст карточки'], 'main_strip' => ['Текст'], 'rent_terms' => ['Заголовок', 'Текст'],
+    'repair_strip' => ['Заголовок карточки', 'Текст карточки'], 'main_strip' => ['Текст'], 'rent_terms' => ['Заголовок карточки', 'Текст карточки'],
+    'rent_facts' => ['Цифра (крупно)', 'Подпись под цифрой'], 'rent_segments' => ['Кому подходит', 'Текст'], 'rent_links' => ['Название', 'Текст'],
     'contacts_how' => ['Заголовок', 'Текст'], 'repair_symptoms' => ['Симптом', 'Описание'], 'repair_errors' => ['Ошибка на экране', 'Что она значит'],
     'repair_price' => ['Услуга'], 'repair_links' => ['Название', 'Текст'], 'repair_brands' => ['Марка'], 'servis_dirs' => ['Направление', 'Описание'],
 ];
 // первые блоки страниц: вкладка SEO — title, description (и H1 у ремонта)
-$seo = ['main_hero' => false, 'rent_top' => false, 'sub_head' => false, 'repair_top' => true];
+$seo = ['main_hero' => false, 'rent_top' => true, 'sub_head' => false, 'repair_top' => true];
 
 $backupKey = 'bt.admin_forms_backup';
 if ($mode === 'rollback') {

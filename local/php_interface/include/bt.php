@@ -1011,12 +1011,17 @@ function bt_rent_tokens(): array
     if (!Loader::includeModule('iblock')) {
         return [];
     }
-    $price = $kg = $names = [];
-    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_CODE' => 'rent', 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_PRICE_MONTH', 'PROPERTY_FREE_FROM_KG']);
+    $price = $kg = $names = $desc = [];
+    $lc = fn($s) => mb_strtolower(mb_substr($s, 0, 1)) . mb_substr($s, 1);
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_CODE' => 'rent', 'ACTIVE' => 'Y'], false, false,
+        ['ID', 'NAME', 'PROPERTY_PRICE_MONTH', 'PROPERTY_FREE_FROM_KG', 'PROPERTY_AUDIENCE', 'PROPERTY_CUPS_PER_DAY', 'PROPERTY_FEATURE']);
     while ($f = $r->Fetch()) {
         $price[] = (float)$f['PROPERTY_PRICE_MONTH_VALUE'];
         (int)$f['PROPERTY_FREE_FROM_KG_VALUE'] > 0 and $kg[] = (int)$f['PROPERTY_FREE_FROM_KG_VALUE'];
-        $names[] = trim(preg_replace('/^(Аренда\s+)?(кофемашины\s+)?(Jetinno\s+)?/iu', '', $f['NAME']));
+        $names[] = $n = trim(preg_replace('/^(Аренда\s+)?(кофемашины\s+)?(Jetinno\s+)?/iu', '', $f['NAME']));
+        $cups = (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'];
+        $desc[] = 'Jetinno ' . $n . ' — ' . implode(', ', array_filter([$lc((string)$f['PROPERTY_AUDIENCE_VALUE']),
+            $cups ? 'до ' . $cups . ' чашек в день' : '', $lc((string)($f['PROPERTY_FEATURE_VALUE'] ?? ''))]));
     }
     if (!$price) {
         return [];
@@ -1026,6 +1031,7 @@ function bt_rent_tokens(): array
         '#RENT_FROM#' => bt_fmt(min($price)),
         '#RENT_FREE_KG#' => $kg ? (string)min($kg) : '',
         '#RENT_MODELS#' => 'Jetinno ' . ($names ? implode(', ', $names) . ' и ' : '') . $last,
+        '#RENT_MODELS_DESC#' => implode('. ', $desc) . '.',
     ];
 }
 
