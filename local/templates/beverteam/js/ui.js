@@ -1221,6 +1221,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   tswipe(); addEventListener('resize',tswLater); addEventListener('load',tswipe); document.addEventListener('toggle',tswLater,true);
   new MutationObserver(ms=>{ if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&!n.classList.contains('tswipe')))) tswLater(); }).observe(document.body,{childList:true,subtree:true});
 
+  /* ---------- телефон: закреплённая внизу кнопка заявки — видна, пока на экране нет ни одного из watch (кнопки, формы) ---------- */
+  window.BT_goBar=(label,onTap,watch)=>{
+    if(!('IntersectionObserver' in window)) return null;
+    const bar=document.createElement('div'); bar.className='mbar'; bar.hidden=true;
+    bar.innerHTML='<button type="button" class="btn"><span></span><b></b></button>'; document.body.appendChild(bar);
+    bar.querySelector('span').textContent=label; bar.querySelector('button').addEventListener('click',onTap);
+    const seen=new Map(), show=()=>{ const on=![...seen.values()].some(Boolean); bar.hidden=!on; document.body.classList.toggle('has-mbar',on); };
+    watch.filter(Boolean).forEach(el=>{ seen.set(el,true); new IntersectionObserver(es=>{seen.set(el,es[0].isIntersecting); show();}).observe(el); });
+    return bar;
+  };
+
   /* ---------- аренда (новая версия): люди × чашки × дни → расход, модель, два варианта оплаты, цена чашки ---------- */
   const r2=document.querySelector('[data-rcalc2]');
   if(r2){
@@ -1273,6 +1284,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[cur.days]||cur.days+' дн.'}, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
         +(cur.m.kg?`С нашим кофе ≈ ${rub(cur.costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
     });
+    if(f) BT_goBar('Оставить заявку',()=>(f.closest('[id]')||f).scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.r2hero .row'),q('[data-rc2-go]'),f]);
     document.querySelectorAll('[data-rc2-set]').forEach(a=>a.addEventListener('click',()=>{ const sel=f?.elements.model; if(sel){ sel.value=a.dataset.rc2Set; sel.dispatchEvent(new Event('change',{bubbles:true})); } }));
     draw();
   }
@@ -1280,21 +1292,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* ---------- ремонт: отмеченные симптомы — первой строкой поля «Что случилось», свой текст остаётся ---------- */
   const sy=document.querySelector('[data-symp]'), st=document.querySelector('[data-symp-to]');
   if(sy&&st){
-    /* под симптомами — всегда кнопка «Вызвать инженера»: ведёт к форме; на телефоне при отмеченных симптомах — ещё и закреплённая внизу */
+    /* под симптомами — кнопка «Вызвать инженера» к форме; на телефоне она же закреплена внизу, пока на экране нет другой такой кнопки */
     const cta=document.querySelector('[data-symp-cta]'), note=cta?.querySelector('[data-symp-note]'), go=cta?.querySelector('[data-symp-go]'), form=st.closest('form');
     const note0=note?.textContent||'';
     const toForm=e=>{ e&&e.preventDefault(); (form.closest('[id]')||form).scrollIntoView({behavior:'smooth',block:'start'});
       if(innerWidth>768) setTimeout(()=>form.querySelector('input[name=name]')?.focus({preventScroll:true}),500); };
     go?.addEventListener('click',toForm);
-    let bar=null, n=0, ctaSeen=true, formSeen=false;
-    const show=()=>{ if(!bar) return; const on=n>0&&!ctaSeen&&!formSeen; bar.hidden=!on; document.body.classList.toggle('has-mbar',on); };
-    if(go&&'IntersectionObserver' in window){
-      bar=document.createElement('div'); bar.className='mbar'; bar.hidden=true;
-      bar.innerHTML='<button type="button" class="btn"><span></span><b></b></button>'; document.body.appendChild(bar);
-      bar.querySelector('span').textContent=go.textContent; bar.querySelector('button').addEventListener('click',()=>toForm());
-      new IntersectionObserver(es=>{ctaSeen=es[0].isIntersecting;show();}).observe(cta);
-      new IntersectionObserver(es=>{formSeen=es[0].isIntersecting;show();}).observe(form);
-    }
+    let n=0;
+    const bar=go?BT_goBar(go.textContent,()=>toForm(),[document.querySelector('.r2hero .row'),cta,form]):null;
     sy.addEventListener('change',()=>{
       const on=[...sy.querySelectorAll('input:checked')].map(x=>x.value), list=on.join('; '), own=st.value.replace(/^Симптомы:.*(\n|$)/,'');
       st.value=(list?'Симптомы: '+list+(own?'\n':''):'')+own;
@@ -1302,7 +1307,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       n=on.length;
       if(note) note.textContent=n?'Выбрано '+n+': '+on.join(', ').toLowerCase().replace(/^./,c=>c.toUpperCase())+'. Симптомы уже в заявке.':note0;
       if(bar) bar.querySelector('b').textContent=n?'· '+n:'';
-      show();
     });
   }
 
