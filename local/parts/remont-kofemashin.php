@@ -98,6 +98,14 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <div class="r2symp" data-symp><?php foreach ($symptoms as $s): ?>
       <label><input type="checkbox" value="<?= $e($s['name']) ?>"><span><b><?= $e($s['name']) ?></b><?php if ($s['html'] !== ''): ?><small><?= $s['html'] ?></small><?php endif ?><?php if ($s['price'] !== ''): ?><i><?= $e($s['price']) ?></i><?php endif ?></span></label>
     <?php endforeach ?></div>
+    <?php $go = ($form['btn_text'] ?? '') ?: 'Вызвать инженера'; ?>
+    <div class="r2sympcta" data-symp-cta>
+      <p data-symp-note>Отметьте симптомы или сразу оставьте заявку — инженер уточнит детали по телефону.</p>
+      <div class="r2sympcta__b">
+        <a class="btn" href="#form" data-symp-go><?= $e($go) ?></a>
+        <?php if (!empty($co['phone1'])): ?><a class="btn btn--line" href="<?= $e($co['phone1_href']) ?>"><?= $e($co['phone1']) ?></a><?php endif ?>
+      </div>
+    </div>
   </section>
   <?php endif ?>
 

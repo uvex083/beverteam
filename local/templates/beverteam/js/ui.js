@@ -1207,11 +1207,32 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* ---------- ремонт: отмеченные симптомы — первой строкой поля «Что случилось», свой текст остаётся ---------- */
   const sy=document.querySelector('[data-symp]'), st=document.querySelector('[data-symp-to]');
-  if(sy&&st) sy.addEventListener('change',()=>{
-    const list=[...sy.querySelectorAll('input:checked')].map(x=>x.value).join('; '), own=st.value.replace(/^Симптомы:.*(\n|$)/,'');
-    st.value=(list?'Симптомы: '+list+(own?'\n':''):'')+own;
-    if(st.closest('.field')?.classList.contains('is-err')) BT_checkField(st);
-  });
+  if(sy&&st){
+    /* под симптомами — всегда кнопка «Вызвать инженера»: ведёт к форме; на телефоне при отмеченных симптомах — ещё и закреплённая внизу */
+    const cta=document.querySelector('[data-symp-cta]'), note=cta?.querySelector('[data-symp-note]'), go=cta?.querySelector('[data-symp-go]'), form=st.closest('form');
+    const note0=note?.textContent||'';
+    const toForm=e=>{ e&&e.preventDefault(); form.scrollIntoView({behavior:'smooth',block:'start'});
+      if(innerWidth>768) setTimeout(()=>form.querySelector('input[name=name]')?.focus({preventScroll:true}),500); };
+    go?.addEventListener('click',toForm);
+    let bar=null, n=0, ctaSeen=true, formSeen=false;
+    const show=()=>{ if(!bar) return; const on=n>0&&!ctaSeen&&!formSeen; bar.hidden=!on; document.body.classList.toggle('has-mbar',on); };
+    if(go&&'IntersectionObserver' in window){
+      bar=document.createElement('div'); bar.className='mbar'; bar.hidden=true;
+      bar.innerHTML='<button type="button" class="btn"><span></span><b></b></button>'; document.body.appendChild(bar);
+      bar.querySelector('span').textContent=go.textContent; bar.querySelector('button').addEventListener('click',()=>toForm());
+      new IntersectionObserver(es=>{ctaSeen=es[0].isIntersecting;show();}).observe(cta);
+      new IntersectionObserver(es=>{formSeen=es[0].isIntersecting;show();}).observe(form);
+    }
+    sy.addEventListener('change',()=>{
+      const on=[...sy.querySelectorAll('input:checked')].map(x=>x.value), list=on.join('; '), own=st.value.replace(/^Симптомы:.*(\n|$)/,'');
+      st.value=(list?'Симптомы: '+list+(own?'\n':''):'')+own;
+      if(st.closest('.field')?.classList.contains('is-err')) BT_checkField(st);
+      n=on.length;
+      if(note) note.textContent=n?'Выбрано '+n+': '+on.join(', ').toLowerCase().replace(/^./,c=>c.toUpperCase())+'. Симптомы уже в заявке.':note0;
+      if(bar) bar.querySelector('b').textContent=n?'· '+n:'';
+      show();
+    });
+  }
 
   /* ---------- подписка: объём — пороги бесплатной аренды, цена — оптовая сетка сорта; расчёт уходит в заявку ---------- */
   const sc=document.querySelector('[data-subcfg]');
