@@ -2310,6 +2310,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .ar2vs th:nth-child(2),.ar2vs td:nth-child(2){background:var(--lime-soft);color:var(--ink)}
 .ar2vs th:nth-child(2){color:var(--ink)}
 .ar2vs td:nth-child(3){color:#4A4A43}
+@media(max-width:640px){.rentp .tblw .tbl.ar2vs{min-width:0;font-size:13px;line-height:1.4}.ar2vs th,.ar2vs td{padding:10px 8px}.ar2vs td:first-child{width:30%}}
 .ar2seg{grid-template-columns:repeat(4,1fr)}
 .ar2seg .link{justify-self:start;background:none;border:0;padding:0;font:inherit;font-weight:600;cursor:pointer}
 @media(max-width:1100px){.ar2inc,.ar2seg{grid-template-columns:1fr 1fr}.ar2models,.ar2cf{grid-template-columns:1fr 1fr}}
