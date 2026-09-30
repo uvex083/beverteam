@@ -2242,6 +2242,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 @media(max-width:1100px){.r2steps{grid-template-columns:repeat(3,1fr)}.r2models{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){.r2hero{grid-template-columns:1fr}.r2symp,.r2err,.r2why{grid-template-columns:1fr 1fr}.r2models{grid-template-columns:1fr 1fr}.r2more{grid-template-columns:1fr}}
 @media(max-width:640px){.r2chk,.r2symp,.r2err,.r2why,.r2steps{grid-template-columns:1fr}.r2tbl td:nth-child(2),.r2tbl th:nth-child(2){display:none}.r2tbl td:last-child{white-space:normal}}
+@media(max-width:640px){.rep2 .pl .row{flex-direction:column;align-items:stretch}.rep2 .pl .row .btn{width:100%}}
 /* подсказка под широкой таблицей */
 .tswipe{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;font-size:12.5px;color:var(--gray)}
 .tswipe[hidden]{display:none}
