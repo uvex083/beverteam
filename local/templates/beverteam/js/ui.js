@@ -1211,7 +1211,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* под симптомами — всегда кнопка «Вызвать инженера»: ведёт к форме; на телефоне при отмеченных симптомах — ещё и закреплённая внизу */
     const cta=document.querySelector('[data-symp-cta]'), note=cta?.querySelector('[data-symp-note]'), go=cta?.querySelector('[data-symp-go]'), form=st.closest('form');
     const note0=note?.textContent||'';
-    const toForm=e=>{ e&&e.preventDefault(); form.scrollIntoView({behavior:'smooth',block:'start'});
+    const toForm=e=>{ e&&e.preventDefault(); (form.closest('[id]')||form).scrollIntoView({behavior:'smooth',block:'start'});
       if(innerWidth>768) setTimeout(()=>form.querySelector('input[name=name]')?.focus({preventScroll:true}),500); };
     go?.addEventListener('click',toForm);
     let bar=null, n=0, ctaSeen=true, formSeen=false;
