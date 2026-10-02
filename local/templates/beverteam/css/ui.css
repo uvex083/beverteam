@@ -23,7 +23,7 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;cursor:pointer;color:inherit}
 input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3,h4{margin:0;line-height:1.1}
-.th{display:block;margin:0;line-height:1.1;font-weight:700}.th2{font-size:1.5em}.th3{font-size:1.17em}.th4{font-size:1em}.th5{font-size:.83em}
+.th{display:block;margin:0;line-height:1.1;font-weight:700}.th2{font-size:1.5em}.th3{font-size:1.17em}.th4{font-size:1em}.th5{font-size:.83em;line-height:inherit}
 .display{font-family:Unbounded,'BT Fallback',Manrope,sans-serif;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;line-height:1.05}
 .h1{font-size:clamp(24px,3.4vw,42px)}
 .h2{font-size:clamp(20px,2.6vw,32px)}
