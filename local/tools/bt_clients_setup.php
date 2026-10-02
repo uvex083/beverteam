@@ -45,7 +45,7 @@ $caseProps = [
     'DEMO' => ['Демо-данные', 'L', ['LIST_TYPE' => 'C', 'VALUES' => [['VALUE' => 'Да', 'XML_ID' => 'Y', 'DEF' => 'N']],
         'HINT' => 'Стоит галочка — на сайте над списком плашка «Демо». Снимите, когда замените на настоящие данные']],
 ];
-$ctaProps = $blockProps + ['BTN2_TEXT' => ['Вторая кнопка: текст', 'S', []], 'BTN2_LINK' => ['Вторая кнопка: ссылка', 'S', []]];
+$ctaProps = array_diff_key($blockProps, ['CAPTION' => 1]) + ['BTN2_TEXT' => ['Вторая кнопка: текст', 'S', []], 'BTN2_LINK' => ['Вторая кнопка: ссылка', 'S', []]];
 
 $ibs = [
     'clients_head' => bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => 'clients_head', 'NAME' => 'Первый экран', 'SORT' => 10], array_diff_key($blockProps, ['TITLE' => 1]), $apply, $say, $fail),
