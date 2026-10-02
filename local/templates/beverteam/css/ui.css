@@ -100,11 +100,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 /* header */
 .hdr{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff}
 .hdr__top{display:flex;align-items:center;gap:clamp(12px,2vw,28px);height:68px}
-.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
-.brand__m{width:30px;height:30px;border-radius:8px;background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:Unbounded;font-weight:800;font-size:14px}
-.brand__t{font-family:Unbounded,'BT Fallback',system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:.02em;
-  /* ширина зарезервирована: подмена фолбэка на Unbounded не двигает шапку */
-  display:inline-block;width:122px;white-space:nowrap}
+.brand{display:flex;align-items:center;flex-shrink:0}
+.brand picture{display:contents}.brand img{display:block;height:34px;width:auto}
 .catbtn{display:inline-flex;align-items:center;gap:9px;background:var(--lime);color:var(--ink);border:0;border-radius:999px;
   padding:10px 18px;font-weight:700;font-size:13.5px;cursor:pointer;transition:background-color .18s,color .18s}
 .catbtn svg{width:16px;height:16px;display:block}
@@ -479,7 +476,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .ftr h5,.ftr .ftr__h{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
 .ftr ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 @media(hover:hover){.ftr a:hover{color:var(--lime)}}
-.ftr .brand__t{color:#fff}
+.ftr .brand img{height:58px}
 .ftr__soc{display:flex;gap:8px;margin-top:16px}
 .ftr__soc a{width:36px;height:36px;border-radius:10px;background:#26261F;display:grid;place-items:center;font-family:'JetBrains Mono';font-size:11px;color:#C9C9C2}
 .ftr__b{border-top:1px solid #2A2A25;margin-top:38px;padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:#9C9C94}
@@ -982,7 +979,7 @@ input,textarea{caret-color:var(--ink)}
 }
 @media(max-width:480px){.g2,.g3,.g4{grid-template-columns:1fr}
   /* узкие телефоны: шапка в одну строку без обрезки корзины */
-  .hdr__top{gap:6px}.hdr .brand__t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.hdr__acts{gap:0}.catbtn{padding:10px 12px}}
+  .hdr__top{gap:6px}.hdr .brand img{height:30px}.hdr__acts{gap:0}.catbtn{padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 

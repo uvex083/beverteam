@@ -32,8 +32,7 @@ a{color:#0E0E0C}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
     <td align="left" valign="middle">
       <a href="<?= $host ?>/" style="text-decoration:none"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td width="32" height="32" align="center" valign="middle" bgcolor="#D7E85C" style="width:32px;height:32px;background-color:#D7E85C;border-radius:8px;font-family:Unbounded,'Arial Black',Arial,Helvetica,sans-serif;font-weight:800;font-size:15px;line-height:32px;color:#0E0E0C">B</td>
-        <td style="padding-left:11px;font-family:Unbounded,'Arial Black',Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;letter-spacing:1px;color:#FFFFFF;white-space:nowrap">BEVERTEAM</td>
+        <td><img src="<?= $host ?>/local/templates/beverteam/brand/logo-mail-white.png" width="162" height="34" alt="Бэвертим" style="display:block;border:0;width:162px;height:34px"></td>
       </tr></table></a>
     </td>
     <td align="right" valign="middle" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;color:#C9C9C2;white-space:nowrap"><a href="<?= $host ?>/catalog/" style="color:#D7E85C;text-decoration:none;font-weight:700">Каталог</a></td>

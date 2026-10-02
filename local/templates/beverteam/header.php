@@ -23,14 +23,15 @@ $msgr = function (string $cls = '') {
     }
     return '<div class="msgr ' . $cls . '">' . $html . '</div>';
 };
-$logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>';
+$logo = '<picture><source media="(max-width:480px)" srcset="' . SITE_TEMPLATE_PATH . '/brand/mark-bevertim-white.svg"><img src="' . SITE_TEMPLATE_PATH . '/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим"></picture>';
+$home = $APPLICATION->GetCurPage(false) === '/';
 ?><!DOCTYPE html>
 <html lang="ru" prefix="og: https://ogp.me/ns# product: https://ogp.me/ns/product#">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0E0E0C">
 <title><?php $APPLICATION->ShowTitle() ?></title>
 <link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Unbounded-3959e2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/Manrope-e5e254.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="<?= SITE_TEMPLATE_PATH ?>/fonts/JetBrainsMono-6ca536.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="<?= SITE_TEMPLATE_PATH ?>/brand/apple-touch-icon.png"><link rel="manifest" href="<?= SITE_TEMPLATE_PATH ?>/brand/site.webmanifest">
 <meta name="yandex-verification" content="36480871fc540413">
 <?php $APPLICATION->AddBufferContent('bt_og') ?><?= bt_org_ld() ?>
 <?php $APPLICATION->ShowHead() ?>
@@ -42,7 +43,7 @@ $logo = '<span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span>'
 <header class="hdr" id="hdr">
   <div class="wrap hdr__top">
     <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="drawer"><?= bt_icon('burger') . bt_icon('close') ?></button>
-    <a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><?= $logo ?></a>
+    <?php if ($home): ?><span class="brand" title="Чай и кофе для дома и бизнеса BEVERTEAM"><?= $logo ?></span><?php else: ?><a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><?= $logo ?></a><?php endif ?>
     <button class="catbtn" id="catbtn" aria-expanded="false" aria-controls="mega"><span class="catbtn__i"><?= bt_icon('cat') . bt_icon('close') ?></span><span class="lbl">Каталог</span></button>
     <div class="hdr__msgr"><?= $msgr() ?></div>
     <div class="hdr__acts">

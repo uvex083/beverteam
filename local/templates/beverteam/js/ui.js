@@ -398,7 +398,7 @@ function header(){
   return `<header class="hdr" id="hdr">
   <div class="wrap hdr__top">
     <button class="burger" id="burger" aria-label="Меню">${I.burger}</button>
-    <a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>
+    <a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><picture><source media="(max-width:480px)" srcset="/local/templates/beverteam/brand/mark-bevertim-white.svg"><img src="/local/templates/beverteam/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим"></picture></a>
     <button class="catbtn" id="catbtn" aria-expanded="false" aria-controls="mega"><span class="catbtn__i">${I.cat}${I.close}</span><span class="lbl">Каталог</span></button>
     <div class="hdr__msgr">${msgrHtml()}</div>
     <div class="hdr__acts">
@@ -432,7 +432,7 @@ function drawer(){
   return `<div class="drawer" id="drawer">
     <div class="drawer__bg" data-close></div>
     <div class="drawer__p">
-      <div class="drawer__hd"><a class="brand" href="/"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
+      <div class="drawer__hd"><a class="brand" href="/"><img src="/local/templates/beverteam/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим"></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
       <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px">${I.search} Поиск по каталогу</button></div>
       ${CATS.map(c=>`<details class="acc"><summary>${c.t}</summary><ul>${c.sub.map(s=>`<li><a href="${s[1]}">${s[0]}</a></li>`).join('')}<li><a href="${c.h}" class="link">Все в разделе</a></li></ul></details>`).join('')}
       <a class="drawer__l" href="/podpiska/">Кофе по подписке</a>
@@ -459,7 +459,7 @@ function footer(){
   <meta itemprop="name" content="${CO.name} — чай и кофе для дома и бизнеса">
   <meta itemprop="priceRange" content="650–297000 ₽">
   <div class="ftr__g">
-    <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>
+    <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><img src="/local/templates/beverteam/brand/logo-bevertim-full-white.svg" width="248" height="58" alt="Бэвертим — на стороне вкуса" loading="lazy"></a>
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. ${CO.city}, с 2010 года.</p>
       <div class="ftr__soc" style="margin-top:14px">${msgrHtml()}</div>
       <div class="ftr__hours"><b>Время работы</b>Офис: ${CO.hours}<br>${CO.hoursSvc}<br>Сб–Вс — выходные</div></div>

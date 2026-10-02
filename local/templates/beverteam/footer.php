@@ -28,7 +28,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
 <?php else: ?>
 <footer class="ftr"><div class="wrap">
   <div class="ftr__g">
-    <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><span class="brand__m">B</span><span class="brand__t">BEVERTEAM</span></a>
+    <div><a class="brand" href="/" style="margin-bottom:14px" title="Чай и кофе для дома и бизнеса BEVERTEAM"><img src="<?= SITE_TEMPLATE_PATH ?>/brand/logo-bevertim-full-white.svg" width="248" height="58" alt="Бэвертим — на стороне вкуса" loading="lazy"></a>
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. <?= $co['city'] ?? '' ?>, с 2010 года.</p>
       <div class="ftr__soc" style="margin-top:14px"><div class="msgr"><?= $msgr ?></div></div>
       <div class="ftr__hours"><b>Время работы</b>Офис: <?= $co['hours'] ?? '' ?><br>Выезд инженера: <?= $co['hours_service'] ?? '' ?><br>Сб–Вс — выходные</div></div>
