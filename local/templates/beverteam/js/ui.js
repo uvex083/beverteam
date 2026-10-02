@@ -2080,14 +2080,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   BT_slider(box.querySelector('[data-gallery]'),{min:2,swiper:{slidesPerView:'auto',spaceBetween:14,breakpoints:{}}});
 });
 
-/* Наши клиенты: фильтры на лету (счётчики по остальным фильтрам, адрес с фильтром), шахматка пересобирается по видимым карточкам, фото — на весь экран по всем видимым установкам */
+/* Наши клиенты: фильтры на лету (счётчики по остальным фильтрам, адрес с фильтром), выпадающие списки модели и города, шахматка по видимым карточкам, фото — на весь экран по всем видимым установкам */
 document.addEventListener('DOMContentLoaded',()=>{
   const grid=document.querySelector('[data-kl-grid]'); if(!grid) return;
-  const bar=document.querySelector('[data-kl-bar]'), cards=[...grid.querySelectorAll('.klc')], btns=[...bar.querySelectorAll('[data-kl-f]')], keys=['obj','model','city'];
+  const bar=document.querySelector('[data-kl-bar]'), cards=[...grid.querySelectorAll('.klc')], btns=[...bar.querySelectorAll('[data-kl-f]')], dds=[...bar.querySelectorAll('[data-kl-dd]')], keys=['obj','model','city'];
   const u0=new URL(location.href), st={};
   keys.forEach(k=>{ const v=u0.searchParams.get(k)||''; st[k]=btns.some(b=>b.dataset.klF===k&&b.dataset.v===v)?v:''; });
   const wide=matchMedia('(min-width:1101px)'), still=matchMedia('(prefers-reduced-motion:reduce)');
   const match=(c,skip)=>keys.every(k=>k===skip||!st[k]||c.dataset[k]===st[k]);
+  const label=(k,v)=>btns.find(b=>b.dataset.klF===k&&b.dataset.v===v)?.dataset.l||'';
   const layout=()=>{ const per=wide.matches?2:1; let i=0;
     cards.forEach(c=>{ if(c.hidden) return; const r=Math.floor(i/per); c.classList.toggle('is-flip',r%2===1); c.classList.toggle('is-dark',(r+i%per)%2===0); i++; }); };
   const draw=()=>{
@@ -2095,14 +2096,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     layout();
     btns.forEach(b=>{ const k=b.dataset.klF, v=b.dataset.v, n=cards.filter(c=>match(c,k)&&(!v||c.dataset[k]===v)).length;
       b.setAttribute('aria-pressed',String(st[k]===v)); b.setAttribute('aria-disabled',String(!n&&st[k]!==v)); b.querySelector('s').textContent=n; });
+    bar.querySelectorAll('[data-kl-cur]').forEach(el=>{ const k=el.dataset.klCur; el.textContent=label(k,st[k]); el.closest('.kldd').classList.toggle('is-set',!!st[k]); });
     bar.querySelector('[data-kl-count]').textContent=`Показано ${shown} из ${cards.length}`;
-    bar.querySelector('[data-kl-reset]').hidden=!keys.some(k=>st[k]);
+    bar.querySelectorAll('[data-kl-auto]').forEach(el=>el.hidden=!keys.some(k=>st[k]));
     document.querySelector('[data-kl-empty]').hidden=shown>0;
     const u=new URL(location.href); keys.forEach(k=>st[k]?u.searchParams.set(k,st[k]):u.searchParams.delete(k)); history.replaceState(history.state,'',u);
   };
-  const go=fn=>{ const run=()=>{ fn(); draw(); }; document.startViewTransition&&!still.matches?document.startViewTransition(run):run(); };
-  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-kl-f]'); if(!b||b.getAttribute('aria-disabled')==='true') return; go(()=>{ st[b.dataset.klF]=b.dataset.v; }); });
-  document.addEventListener('click',e=>{ if(e.target.closest('[data-kl-reset]')) go(()=>keys.forEach(k=>{ st[k]=''; })); });
+  const closeDd=keep=>dds.forEach(d=>{ if(d===keep) return; d.querySelector('.kldd__p').hidden=true; d.querySelector('[data-kl-dd-t]').setAttribute('aria-expanded','false'); });
+  const go=fn=>{ const run=()=>{ fn(); draw(); }; closeDd(); document.startViewTransition&&!still.matches?document.startViewTransition(run):run(); };
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[data-kl-dd-t]');
+    if(t){ const d=t.closest('[data-kl-dd]'), p=d.querySelector('.kldd__p'), open=p.hidden; closeDd(d); p.hidden=!open; t.setAttribute('aria-expanded',String(open)); return; }
+    const b=e.target.closest('[data-kl-f]');
+    if(b){ b.getAttribute('aria-disabled')==='true'||go(()=>{ st[b.dataset.klF]=b.dataset.v; }); return; }
+    if(e.target.closest('[data-kl-reset]')){ go(()=>keys.forEach(k=>{ st[k]=''; })); return; }
+    e.target.closest('.kldd__p')||closeDd();
+  });
+  document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; const d=dds.find(d=>!d.querySelector('.kldd__p').hidden); if(d){ closeDd(); d.querySelector('[data-kl-dd-t]').focus(); } });
   wide.addEventListener('change',layout);
   grid.addEventListener('click',e=>{ const a=e.target.closest('[data-kl-open]'); if(!a) return; e.preventDefault();
     const items=[]; let start=0;

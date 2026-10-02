@@ -48,7 +48,7 @@ $caseProps = [
 $ctaProps = array_diff_key($blockProps, ['CAPTION' => 1]) + ['BTN2_TEXT' => ['Вторая кнопка: текст', 'S', []], 'BTN2_LINK' => ['Вторая кнопка: ссылка', 'S', []]];
 
 $ibs = [
-    'clients_head' => bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => 'clients_head', 'NAME' => 'Первый экран', 'SORT' => 10], array_diff_key($blockProps, ['TITLE' => 1]), $apply, $say, $fail),
+    'clients_head' => bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => 'clients_head', 'NAME' => 'Первый экран', 'SORT' => 10], array_diff_key($blockProps, ['TITLE' => 1]) + ['LIST_TITLE' => ['Заголовок над фильтрами', 'S', []]], $apply, $say, $fail),
     'clients' => bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => 'clients', 'NAME' => 'Установки', 'SORT' => 20,
         'DESCRIPTION' => 'Фото установок, название клиента, город, модель, чашек в день и почему выбрана именно она — запросить у Василия'], $caseProps, $apply, $say, $fail),
     'clients_cta' => bt_ib_ensure(['IBLOCK_TYPE_ID' => $type, 'CODE' => 'clients_cta', 'NAME' => 'Призыв внизу страницы', 'SORT' => 30], $ctaProps, $apply, $say, $fail),
@@ -67,6 +67,10 @@ $headId = bt_el_seed($ibs['clients_head'], 'main', ['NAME' => 'Первый эк
     'SUBTITLE' => 'Бизнес-центры, офисы, кафе, пекарни и АЗС, где работают наши кофемашины. Для каждой установки — какая модель стоит, сколько чашек готовит и почему выбрали именно её. Фото открываются на весь экран.',
     'BTN_TEXT' => 'Подобрать машину', 'BTN_LINK' => '#cta',
 ], $say, $fail);
+if ((string)(CIBlockElement::GetProperty($ibs['clients_head'], $headId, [], ['CODE' => 'LIST_TITLE'])->Fetch()['VALUE'] ?? '') === '') {
+    $say('  ~ заголовок над фильтрами');
+    CIBlockElement::SetPropertyValuesEx($headId, $ibs['clients_head'], ['LIST_TITLE' => 'Где работают наши кофемашины']);
+}
 $tpl = new \Bitrix\Iblock\InheritedProperty\ElementTemplates($ibs['clients_head'], $headId);
 if (!array_filter($tpl->findTemplates(), fn($t) => $t['INHERITED'] === 'N')) {
     $say('  SEO страницы — во вкладке SEO элемента «Первый экран»');

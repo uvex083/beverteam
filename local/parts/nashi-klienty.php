@@ -26,6 +26,21 @@ $groups = array_filter([
     'city' => ['Город', array_combine(array_keys($cities), array_keys($cities))],
 ], fn($g) => count($g[1]) > 1);
 $cups = array_sum(array_column($cases, 'cups'));
+// иконки типов объектов по коду значения списка «Тип объекта»; для нового типа — общая
+$icons = [
+    'all' => '<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>',
+    'bc' => '<rect x="5" y="3" width="14" height="18" rx="1.6"/><path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15M10.5 21v-2.5h3V21"/>',
+    'ofis' => '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5.5c0-.8.7-1.5 1.5-1.5h4c.8 0 1.5.7 1.5 1.5V7M3 12.5h18M11 12.5v1.5h2v-1.5"/>',
+    'kafe' => '<path d="M4 9h12.5v4.5A5.5 5.5 0 0 1 11 19H9.5A5.5 5.5 0 0 1 4 13.5V9Z"/><path d="M16.5 10.5h1.25a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1.2 1 1.3 1 2.5M12 3.5c0 1.2 1 1.3 1 2.5"/>',
+    'pekarnya' => '<path d="M3.5 13.5c0-4 3.8-6.5 8.5-6.5s8.5 2.5 8.5 6.5v3a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-3Z"/><path d="M8.5 9.5 9.8 13M12 9v3.6M15.5 9.5 14.2 13"/>',
+    'azs' => '<path d="M4.5 20V5.5c0-1.1.9-2 2-2h5c1.1 0 2 .9 2 2V20M3 20h12M4.5 10.5h9"/><path d="M13.5 8.5h1.8l2.7 2.7v5.3a1.5 1.5 0 0 0 3 0V9.2L18 6.2"/>',
+    'magazin' => '<path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16v1a3 3 0 0 1-5.3 1.9A3 3 0 0 1 12 13.5a3 3 0 0 1-2.7-1.1A3 3 0 0 1 4 10.5v-1Z"/><path d="M5.5 13v7h13v-7M10 20v-4h4v4"/>',
+    'gostinica' => '<path d="M3 18.5V6M3 14.5h18v4M21 14.5V12a3 3 0 0 0-3-3h-7v5.5"/><circle cx="7" cy="11" r="2"/>',
+    'avtosalon' => '<path d="M5 15.5v-3.2L7 7.5h10l2 4.8v3.2"/><path d="M3.5 15.5h17v2.5a1 1 0 0 1-1 1h-1.8a1 1 0 0 1-1-1v-.5H7.3v.5a1 1 0 0 1-1 1H4.5a1 1 0 0 1-1-1v-2.5ZM5 12.3h14"/>',
+    'meropriyatie' => '<path d="M5 21 9.5 7.5l7 7L3 19"/><path d="M14 4.5c.6.6.6 1.5 0 2.1M18.5 9.5c.7-.5 1.6-.4 2.1.2M16 3l.5 1.5M20.5 6.5 22 7M17 12.5l1.5.5"/>',
+    'drugoe' => '<path d="M12 21s-6.5-6.1-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.9-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/>',
+];
+$ico = fn(string $k) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . ($icons[$k] ?? $icons['drugoe']) . '</svg>';
 $stats = array_filter([
     [$n, $word($n, 'объект', 'объекта', 'объектов') . ' с нашими кофемашинами'],
     [count($cities), $word(count($cities), 'город', 'города', 'городов') . ' Свердловской области'],
@@ -48,17 +63,27 @@ $stats = array_filter([
 
   <?php if ($cases): ?>
   <?= bt_demo_note('clients', $demo) ?>
-  <div class="klbar" data-kl-bar>
-    <?php foreach ($groups as $g => [$label, $opts]): ?>
-    <div class="klf" role="group" aria-label="<?= $e($label) ?>">
-      <span class="klf__l"><?= $e($label) ?></span>
-      <div class="klf__r">
-        <button class="chipx" type="button" data-kl-f="<?= $g ?>" data-v="" aria-pressed="true">Все <s><?= $n ?></s></button>
-        <?php foreach ($opts as $v => $t): ?><button class="chipx" type="button" data-kl-f="<?= $g ?>" data-v="<?= $e($v) ?>" aria-pressed="false"><?= $e($t) ?> <s></s></button><?php endforeach ?>
-      </div>
+  <section aria-labelledby="klh2">
+  <h2 class="display h2 klh2" id="klh2"><?= $e(($head['list_title'] ?? '') ?: 'Где работают наши кофемашины') ?></h2>
+  <div class="kl1" data-kl-bar>
+    <?php if (isset($groups['obj'])): ?>
+    <div class="kl1__seg" role="group" aria-label="Тип объекта">
+      <?php foreach (['' => 'Все объекты'] + $groups['obj'][1] as $v => $t): ?>
+      <button class="kl1__b" type="button" data-kl-f="obj" data-v="<?= $e($v) ?>" data-l="<?= $e($v === '' ? 'все' : $t) ?>" aria-pressed="<?= $v === '' ? 'true' : 'false' ?>"><?= $ico($v === '' ? 'all' : $v) ?><span><?= $e($t) ?></span><s><?= $v === '' ? $n : '' ?></s></button>
+      <?php endforeach ?>
     </div>
-    <?php endforeach ?>
-    <p class="klcount" aria-live="polite"><span data-kl-count>Показано <?= $n ?> из <?= $n ?></span> <button class="link" type="button" data-kl-reset hidden>Сбросить фильтры</button></p>
+    <?php endif ?>
+    <div class="kl1__row">
+      <?php foreach (['model' => 'Все модели', 'city' => 'Все города'] as $g => $all): if (!isset($groups[$g])) continue; ?>
+      <div class="kldd" data-kl-dd>
+        <button class="kldd__t" type="button" aria-expanded="false" data-kl-dd-t><small><?= $e($groups[$g][0]) ?></small> <b data-kl-cur="<?= $g ?>">все</b><svg class="kldd__ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="kldd__p" role="group" aria-label="<?= $e($groups[$g][0]) ?>" hidden>
+          <?php foreach (['' => $all] + $groups[$g][1] as $v => $t): ?><button class="kldd__o" type="button" data-kl-f="<?= $g ?>" data-v="<?= $e($v) ?>" data-l="<?= $e($v === '' ? 'все' : $t) ?>" aria-pressed="<?= $v === '' ? 'true' : 'false' ?>"><?= $e($t) ?> <s><?= $v === '' ? $n : '' ?></s></button><?php endforeach ?>
+        </div>
+      </div>
+      <?php endforeach ?>
+      <p class="klcount"><span data-kl-count aria-live="polite">Показано <?= $n ?> из <?= $n ?></span> <button class="link" type="button" data-kl-reset data-kl-auto hidden>Сбросить фильтры</button></p>
+    </div>
   </div>
 
   <div class="klgrid" data-kl-grid>
@@ -88,6 +113,7 @@ $stats = array_filter([
     <?php endforeach ?>
   </div>
   <p class="klempty" data-kl-empty hidden>Таких установок пока нет на странице. <button class="link" type="button" data-kl-reset>Сбросить фильтры</button></p>
+  </section>
   <?php else: ?>
   <p class="muted">Скоро здесь появятся фото наших установок.</p>
   <?php endif ?>
