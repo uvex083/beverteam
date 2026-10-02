@@ -41,7 +41,7 @@ $row = function (array $it, string $cls) use (&$row, &$panels, &$n, $e): string 
         $list .= $row($s, 'dn__i');
     }
     $panels[] = '<section class="dn__p" id="' . $id . '"><button class="dn__back" type="button" data-dback>' . bt_icon('arrL') . 'Назад</button>'
-        . '<h3 class="dn__h">' . $it['T'] . '</h3><nav class="dn__list">' . $list . '</nav></section>';
+        . '<div class="dn__h th th3">' . $it['T'] . '</div><nav class="dn__list">' . $list . '</nav></section>';
     return '<button class="' . $cls . '" type="button" data-dgo="' . $id . '">' . $img . '<span>' . $it['T'] . '</span>' . $badge . bt_icon('arrR') . '</button>';
 };
 $accent = $plain = '';

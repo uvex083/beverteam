@@ -23,6 +23,7 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;cursor:pointer;color:inherit}
 input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3,h4{margin:0;line-height:1.1}
+.th{display:block;margin:0;line-height:1.1;font-weight:700}.th2{font-size:1.5em}.th3{font-size:1.17em}.th4{font-size:1em}.th5{font-size:.83em}
 .display{font-family:Unbounded,'BT Fallback',Manrope,sans-serif;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;line-height:1.05}
 .h1{font-size:clamp(24px,3.4vw,42px)}
 .h2{font-size:clamp(20px,2.6vw,32px)}
@@ -148,7 +149,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .mega__cats button[aria-selected=true]{background:var(--paper);color:var(--ink)}
 .mega__cats button[aria-selected=true]::after{content:"→";color:var(--gray)}
 .mega__panel{padding:24px 28px;display:grid;grid-template-columns:1fr 1fr 260px;grid-template-rows:auto 1fr;gap:24px}
-.mega__panel h4{font-family:Unbounded;font-weight:700;font-size:14px;margin:0;grid-column:1/3}
+.mega__panel h4,.mega__panel .mega__t{font-family:Unbounded;font-weight:700;font-size:14px;margin:0;grid-column:1/3}
 .mega__panel ul{list-style:none;margin:0;padding:0;display:grid;align-content:start;gap:9px;font-size:14px}
 @media(hover:hover){.mega__panel ul a:hover{color:var(--ink);text-decoration:underline}}
 .mega__promo{background:var(--paper);border-radius:var(--rad-s);padding:18px;display:flex;flex-direction:column;gap:10px;grid-column:3;grid-row:1/span 2}
@@ -212,12 +213,12 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 /* product card */
 .pc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px;display:flex;flex-direction:column;position:relative;transition:border-color .18s}
 @media(hover:hover){.pc:hover{border-color:var(--line-h)}}
-.pc h3 a{background-image:linear-gradient(180deg,transparent 30%,var(--lime) 30%,var(--lime) 96%,transparent 96%);
+.pc h3 a,.pc .pc__t a{background-image:linear-gradient(180deg,transparent 30%,var(--lime) 30%,var(--lime) 96%,transparent 96%);
   background-repeat:no-repeat;background-size:0% 100%;background-position:0 0;
   transition:background-size .38s cubic-bezier(.22,1,.36,1);padding:0 .08em;margin:0 -.08em;
   -webkit-box-decoration-break:clone;box-decoration-break:clone}
-.pc h3 a:focus-visible{background-size:100% 100%}@media(hover:hover){.pc:hover h3 a{background-size:100% 100%}}
-@media(prefers-reduced-motion:reduce){.pc h3 a{transition:none}}
+.pc h3 a:focus-visible,.pc .pc__t a:focus-visible{background-size:100% 100%}@media(hover:hover){.pc:hover h3 a,.pc:hover .pc__t a{background-size:100% 100%}}
+@media(prefers-reduced-motion:reduce){.pc h3 a,.pc .pc__t a{transition:none}}
 .pc__badges{position:absolute;top:20px;left:20px;display:flex;gap:6px;z-index:2;max-width:calc(100% - 60px)}
 .pc__acts{position:absolute;top:16px;right:16px;z-index:3;display:flex;flex-direction:column;gap:8px}
 .pc__acts button{width:34px;height:34px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--white);
@@ -232,7 +233,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pc__acts .pc__cmpi[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
 .pc__ph{height:180px;display:grid;place-items:center;margin:6px 0 12px;background:var(--paper);border-radius:var(--rad-s);overflow:hidden}
 .pc__ph img{max-height:160px;width:auto;mix-blend-mode:multiply}
-.pc h3{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;font-family:Manrope}
+.pc h3,.pc .pc__t{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;font-family:Manrope}
 .pc__par{font-size:12.5px;color:var(--gray);margin:0 0 10px;flex:1}
 .pc__stock{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600;margin:0;white-space:nowrap}
 /* есть оценка — наличие уходит вправо, нет — стоит слева */
@@ -475,7 +476,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 #app{display:flex;flex-direction:column;min-height:100vh}#app>*{flex-shrink:0}#app>.wrap{width:100%}#app>.drawer+*{flex-grow:1}
 .ftr{background:var(--ink);color:#9C9C94;margin-top:var(--pad);padding:52px 0 32px;font-size:13.5px}
 .ftr__g{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.1fr;gap:28px}
-.ftr h5{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
+.ftr h5,.ftr .ftr__h{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
 .ftr ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 @media(hover:hover){.ftr a:hover{color:var(--lime)}}
 .ftr .brand__t{color:#fff}
@@ -490,7 +491,7 @@ html{color-scheme:light}
 .skip{position:absolute;left:16px;top:-100px;z-index:200;background:var(--lime);color:var(--ink);padding:10px 16px;border-radius:999px;font-weight:700}
 .skip:focus{top:12px}
 .btn:active,.catbtn:active,.chipx:active,.opts button:active{transform:translateY(0) scale(.98)}
-.display,h1,h2,h3,h4{text-wrap:balance}
+.display,h1,h2,h3,h4,.th{text-wrap:balance}
 p,li,dd{text-wrap:pretty}
 .price,.price--old,.tiers,.tbl td,.hdr__tel,.mono,.qty input,.sum .l,.facts b,.rev__score b,.pc__foot,.tel{font-variant-numeric:tabular-nums}
 .toolbar select,.field select{color:var(--ink);background-color:var(--white)}
@@ -522,7 +523,7 @@ input,textarea{caret-color:var(--ink)}
   @keyframes bt-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 }
 /* маркер-подсветка в заголовке: полоса за x-высотой, а не заливка всей строки */
-.hero h1 em{background-image:linear-gradient(180deg,transparent 34%,var(--lime) 34%,var(--lime) 94%,transparent 94%);
+.hero h1:not(.hero__title) em{background-image:linear-gradient(180deg,transparent 34%,var(--lime) 34%,var(--lime) 94%,transparent 94%);
   background-repeat:no-repeat;background-size:100% 100%;padding:0 .08em;font-style:normal;
   -webkit-box-decoration-break:clone;box-decoration-break:clone}
 
@@ -594,7 +595,7 @@ input,textarea{caret-color:var(--ink)}
 .jlead>.ncard{display:grid;grid-template-columns:1.02fr .98fr;min-height:330px}
 .jlead>.ncard>.ncard__ph{align-self:stretch}.jlead>.ncard>.ncard__ph>img{width:100%;height:100%;aspect-ratio:auto;min-height:0;object-fit:cover}
 .jlead>.ncard .ncard__b{justify-content:flex-start;gap:12px;padding:clamp(24px,2.4vw,36px)}
-.jlead>.ncard h3{font-size:clamp(20px,1.9vw,26px);overflow-wrap:break-word}
+.jlead>.ncard h3,.jlead>.ncard .ncard__t{font-size:clamp(20px,1.9vw,26px);overflow-wrap:break-word}
 .jlead>.ncard p{font-size:14.5px}
 .jside{gap:10px}
 .jside a{gap:7px;padding:16px 18px}
@@ -1034,13 +1035,13 @@ input,textarea{caret-color:var(--ink)}
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .ncard{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;display:flex;flex-direction:column;transition:.18s}
 @media(hover:hover){.ncard:hover{border-color:#C2C2B6}}
-.ncard h3{text-decoration:underline 2px transparent;text-underline-offset:4px;transition:text-decoration-color .3s}
-@media(hover:hover){.ncard:hover h3{text-decoration-color:var(--lime)}}
+.ncard h3,.ncard .ncard__t{text-decoration:underline 2px transparent;text-underline-offset:4px;transition:text-decoration-color .3s}
+@media(hover:hover){.ncard:hover h3,.ncard:hover .ncard__t{text-decoration-color:var(--lime)}}
 .ncard img{width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;display:block;background:var(--paper-2)}
 .ncard__b{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
 .ncard__m{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;color:var(--gray)}
 .ncard__m .tag{background:var(--lime-soft);color:#4E5A12;border-radius:999px;padding:3px 9px}
-.ncard h3{font-family:Unbounded;font-weight:700;font-size:15.5px;line-height:1.3;text-transform:uppercase}
+.ncard h3,.ncard .ncard__t{font-family:Unbounded;font-weight:700;font-size:15.5px;line-height:1.3;text-transform:uppercase}
 .ncard p{margin:0;font-size:13.5px;color:var(--gray);line-height:1.6}
 
 /* — FAQ-аккордеон (общий: категории, инфостраницы, аренда) + микроразметка FAQPage — */
@@ -1124,7 +1125,7 @@ input,textarea{caret-color:var(--ink)}
   .pc{padding:13px}
   .pc__ph{height:132px;margin:4px 0 10px}
   .pc__ph img{max-height:118px}
-  .pc h3{font-size:14px}
+  .pc h3,.pc .pc__t{font-size:14px}
   .pc__scales{gap:6px 12px;margin-bottom:10px}
 
 }
@@ -1175,8 +1176,8 @@ input,textarea{caret-color:var(--ink)}
 [data-rv="scale"]{transform:scale(.97)}
 [data-rv].rv-done{will-change:auto}
 /* первый экран: заголовок проявляется построчно, подсветка «прорисовывается» */
-.hero h1{opacity:0;transform:translateY(16px);animation:rv-up .7s cubic-bezier(.22,1,.36,1) .05s forwards}
-.hero h1 em{background-size:0% 100%;animation:rv-mark .7s cubic-bezier(.22,1,.36,1) .5s forwards}
+.hero h1:not(.hero__title){opacity:0;transform:translateY(16px);animation:rv-up .7s cubic-bezier(.22,1,.36,1) .05s forwards}
+.hero h1:not(.hero__title) em{background-size:0% 100%;animation:rv-mark .7s cubic-bezier(.22,1,.36,1) .5s forwards}
 .hero__lead,.hero .row,.hero .link,.hero__right{opacity:0;animation:rv-up .7s cubic-bezier(.22,1,.36,1) forwards}
 .hero__lead{animation-delay:.16s}.hero .row{animation-delay:.24s}.hero .link{animation-delay:.3s}
 .hero__right{animation-delay:.2s}
@@ -1184,8 +1185,8 @@ input,textarea{caret-color:var(--ink)}
 @keyframes rv-mark{to{background-size:100% 100%}}
 @media(prefers-reduced-motion:reduce){
   [data-rv]{opacity:1!important;transform:none!important;transition:none}
-  .hero h1,.hero h1 em,.hero__lead,.hero .row,.hero .link,.hero__right{animation:none;opacity:1;transform:none}
-  .hero h1 em{background-size:100% 100%}
+  .hero h1:not(.hero__title),.hero h1:not(.hero__title) em,.hero__lead,.hero .row,.hero .link,.hero__right{animation:none;opacity:1;transform:none}
+  .hero h1:not(.hero__title) em{background-size:100% 100%}
 }
 
 /* дескрипторы вкуса маркером — приём Tasty Coffee, сразу продаёт вкус */
@@ -1356,6 +1357,7 @@ input,textarea{caret-color:var(--ink)}
 .pspecs__grid b{margin-left:auto;text-align:right;font-size:14px;font-weight:700}
 @media(max-width:560px){.pspecs__grid{padding:6px 16px}.pspecs__grid>div{gap:12px}}
 @media(max-width:900px){.prod{grid-template-columns:1fr}.gal{position:static}.gal__main{height:360px;order:1}.specs{grid-template-columns:1fr}}
+@media(max-width:900px){.prod{display:flex;flex-direction:column;gap:0}.pinfo{display:contents}.pinfo>*{order:3}.pinfo>.pkick{order:0}.pinfo>.h1{order:1;margin-bottom:16px}.prod>.gal{order:2;margin-bottom:22px}}
 
 /* ---------- страница сравнения (compare.html) ---------- */
 /* вкладки категорий */
@@ -1529,7 +1531,7 @@ input,textarea{caret-color:var(--ink)}
 .home .hero__title{font-size:clamp(32px,4.8vw,58px);margin:0;opacity:0;transform:translateY(16px);animation:rv-up .7s cubic-bezier(.22,1,.36,1) .05s forwards}
 .home .hero__title em{font-style:normal;background:var(--lime);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 @media(prefers-reduced-motion:reduce){.home .hero__title{animation:none;opacity:1;transform:none}}
-.home .wr h1{font-size:clamp(24px,2.6vw,34px)}
+.home .wr h1,.home .wr .wr__t{font-size:clamp(24px,2.6vw,34px)}
 .home .hero__sub{margin:24px 0 0;max-width:44ch;color:#3A3A34;font-size:16px}
 .home .hero__cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
 .home .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:46px}
@@ -1577,7 +1579,7 @@ input,textarea{caret-color:var(--ink)}
 .home .tile small{padding:0 16px 14px;color:var(--gray);font-size:12px}
 .home .svc{background:var(--ink);color:#fff;border-radius:var(--rad);overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr}
 .home .svc__l{padding:clamp(32px,4vw,56px)}
-.home .svc__l h2 span{color:var(--lime)}
+.home .svc__l h2 span,.home .svc__l .svc__t span{color:var(--lime)}
 .home .svc__l>p{color:#A8A8A0;margin:0 0 30px;max-width:40ch}
 .home .svc__list{list-style:none;margin:0 0 34px;padding:0;border-top:1px solid #2C2C27}
 .home .svc__list li{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid #2C2C27;font-size:14.5px}
@@ -1593,7 +1595,7 @@ input,textarea{caret-color:var(--ink)}
 .home .qscore span{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.06em}
 .home .bean__c{padding:clamp(32px,4vw,56px)}
 .home .bean__c .mono{color:#C6B7A8}
-.home .bean__c h2{margin:14px 0 16px}
+.home .bean__c h2,.home .bean__c .bean__t{margin:14px 0 16px}
 .home .bean__c>p{color:#D6C9BD;margin:0 0 24px;max-width:44ch}
 .home .bean .notes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;line-height:1.4}
 .home .bean .notes span{border:1px solid #6A5343;border-radius:999px;padding:7px 14px;font-size:13px}
@@ -1601,7 +1603,7 @@ input,textarea{caret-color:var(--ink)}
 .home .stepsx{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .home .stepx{border-top:2px solid var(--ink);padding-top:18px}
 .home .stepx b{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;color:var(--gray);display:block;margin-bottom:12px}
-.home .stepx h3{margin:0 0 8px;font-family:Unbounded;font-weight:700;font-size:16px}
+.home .stepx h3,.home .stepx .stepx__t{margin:0 0 8px;font-family:Unbounded;font-weight:700;font-size:16px}
 .home .stepx p{margin:0;font-size:14px;color:#4A4A43}
 .home .home__about p{margin:18px 0 0;max-width:56ch;color:#3A3A34}
 .home .seo{font-size:14.5px;color:#4A515B}.home .seo h2{font-size:22px;margin-bottom:12px}.home .seo p{margin:0 0 12px}
@@ -1979,7 +1981,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .cshared .row{gap:10px;flex-wrap:wrap}
 /* окно подтверждения (BT_confirm) */
 .modal--confirm .modal__p{max-width:420px}
-.modal--confirm h3{font-size:20px;margin:0 28px 10px 0}
+.modal--confirm h3,.modal--confirm .modal__t{font-size:20px;margin:0 28px 10px 0}
 .modal--confirm p{margin:0 0 22px;font-size:14.5px}
 .modal__btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .modal__btns .btn{flex:1 1 140px}

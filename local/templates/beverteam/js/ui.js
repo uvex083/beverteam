@@ -77,7 +77,7 @@ window.BT_postDate = iso => { const d=new Date(iso), M=['января','февр
 window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}"><span class="ncard__ph">
     <img src="${p.img||BT_ph(p.cat,p.t)}" ${p.img?'':`data-ph="${p.cat}" data-ph-t="${String(p.t).replace(/"/g,'&quot;')}"`} alt="${p.t}" loading="lazy" width="520" height="293"><span class="tag ncard__cat">${p.cat}</span></span>
     <div class="ncard__b"><div class="ncard__m"><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
-    <h3><span>${p.t}</span></h3><p>${p.lead}</p></div></a>`;
+    <div class="ncard__t th th3"><span>${p.t}</span></div><p>${p.lead}</p></div></a>`;
 
 /* ---------- Ремонт: бренды под посадочные страницы ---------- */
 window.BT_BRANDS=[
@@ -361,7 +361,7 @@ window.BT_card = function(m){
     </div>
     <a class="pc__ph" href="${m.url}"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
     <div class="pc__meta">${m.rv?`<a class="pc__rv" href="${m.url}#reviews">${I.star}<b>${String(m.rv[0]).replace('.',',')}</b><span>· ${m.rv[1]} ${m.rv[1]%10===1&&m.rv[1]%100!==11?'отзыв':(m.rv[1]%10>=2&&m.rv[1]%10<=4&&(m.rv[1]%100<10||m.rv[1]%100>=20)?'отзыва':'отзывов')}</span></a>`:''}<span class="pc__stock${m.stock?'':' pc__stock--no'}">${m.stock?'В наличии':'Под заказ'}</span></div>
-    <h3><a href="${m.url}" itemprop="url">${m.n}</a></h3>
+    <div class="pc__t th th3"><a href="${m.url}" itemprop="url">${m.n}</a></div>
     <p class="pc__par">${m.par}</p>
     ${scales}
     ${BT_packs(m)}
@@ -423,7 +423,7 @@ function header(){
 function megaPanel(i){
   const c = CATS[i]; const half = Math.ceil(c.sub.length/2);
   const li = s => `<li><a href="${s[1]}">${s[0]}</a></li>`;
-  return `<h4><a href="${c.h}">${c.t} →</a></h4>
+  return `<div class="mega__t th th4"><a href="${c.h}">${c.t} →</a></div>
     <ul>${c.sub.slice(0,half).map(li).join('')}</ul>
     <ul>${c.sub.slice(half).map(li).join('')}</ul>
     ${c.promo?`<a class="mega__promo" href="${c.promo.h}"><img src="${c.promo.img}" alt="" loading="lazy"><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`:''}`;
@@ -463,10 +463,10 @@ function footer(){
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. ${CO.city}, с 2010 года.</p>
       <div class="ftr__soc" style="margin-top:14px">${msgrHtml()}</div>
       <div class="ftr__hours"><b>Время работы</b>Офис: ${CO.hours}<br>${CO.hoursSvc}<br>Сб–Вс — выходные</div></div>
-    <div><h5>Каталог</h5><ul><li><a href="/catalog/">Чай</a></li><li><a href="/catalog/">Кофе BOTANICA</a></li><li><a href="/catalog/">Автоматические кофемашины JETINNO</a></li><li><a href="/catalog/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
-    <div><h5>Услуги</h5><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/catalog/">Кофе оптом</a></li></ul></div>
-    <div><h5>Покупателям</h5><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/blog/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
-    <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><h5>Контакты</h5><ul>
+    <div><div class="ftr__h th th5">Каталог</div><ul><li><a href="/catalog/">Чай</a></li><li><a href="/catalog/">Кофе BOTANICA</a></li><li><a href="/catalog/">Автоматические кофемашины JETINNO</a></li><li><a href="/catalog/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
+    <div><div class="ftr__h th th5">Услуги</div><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/catalog/">Кофе оптом</a></li></ul></div>
+    <div><div class="ftr__h th th5">Покупателям</div><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/blog/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
+    <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><div class="ftr__h th th5">Контакты</div><ul>
       <li><a href="tel:${CO.tel1}" itemprop="telephone">${CO.tel1f}</a></li>
       <li><a href="tel:${CO.tel2}">${CO.tel2f}</a></li>
       <li><a href="mailto:${CO.mail}" itemprop="email">${CO.mail}</a></li>
@@ -498,7 +498,7 @@ function authModal(){
 
     <!-- шаг 1: e-mail или телефон -->
     <form data-step="pick" novalidate>
-      <h3 class="display" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</h3>
+      <div class="display modal__t th th3" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</div>
       <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'войдите через сервис или получите код на почту':'пришлём код на почту'}.</p>
       ${IDP.length?BT_idpHtml('')+'<div class="or">или получить код</div>':''}
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
@@ -512,7 +512,7 @@ function authModal(){
     <!-- шаг 2: код -->
     <div data-step="code" hidden>
       <button class="authback" id="aBack" type="button">← Изменить</button>
-      <h3 class="display" style="font-size:20px;margin-bottom:6px">Введите код</h3>
+      <div class="display modal__t th th3" style="font-size:20px;margin-bottom:6px">Введите код</div>
       <p class="muted" style="margin:0 0 16px;font-size:14px">Отправили на <b id="aTo"></b>. Код действует 10 минут.</p>
       <div class="code4" id="aCode">
         <input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Цифра 1">
@@ -526,7 +526,7 @@ function authModal(){
 
     <!-- шаг 3: имя для нового аккаунта -->
     <form data-step="name" hidden novalidate>
-      <h3 class="display" style="font-size:20px;margin-bottom:6px">Как к вам обращаться</h3>
+      <div class="display modal__t th th3" style="font-size:20px;margin-bottom:6px">Как к вам обращаться</div>
       <p class="muted" style="margin:0 0 16px;font-size:14px">Аккаунта с этим e-mail ещё нет — создадим. Имя подставим в заказы.</p>
       <div class="field"><label for="aName">Имя и фамилия *</label><input id="aName" name="name" autocomplete="name" maxlength="100"></div>
       <button class="btn btn--block" id="aFinish" type="submit">Готово</button>
@@ -1826,7 +1826,7 @@ window.BT_confirm = o => new Promise(res => {
   let m=document.getElementById('btConfirm');
   if(!m){ document.body.insertAdjacentHTML('beforeend',`<div class="modal modal--confirm" id="btConfirm" role="alertdialog" aria-modal="true" aria-labelledby="btConfirmT" aria-describedby="btConfirmD">
     <div class="modal__bg" data-cf="0"></div><div class="modal__p"><button class="modal__x" type="button" data-cf="0" aria-label="Закрыть">×</button>
-    <h3 class="display" id="btConfirmT"></h3><p class="muted" id="btConfirmD"></p>
+    <div class="display modal__t th th3" id="btConfirmT"></div><p class="muted" id="btConfirmD"></p>
     <div class="modal__btns"><button class="btn btn--line" type="button" data-cf="0"></button><button class="btn btn--dark" type="button" data-cf="1"></button></div></div></div>`);
     m=document.getElementById('btConfirm'); }
   const last=document.activeElement;

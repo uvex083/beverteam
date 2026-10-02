@@ -29,7 +29,7 @@ $data = bt_catalog_data();
 $onMain = fn(array $list, string $code, string $prefix = '') => array_values(array_filter($list, fn($m) => in_array((int)substr((string)$m['id'], strlen($prefix)), bt_main_ids($code), true)));
 $mainRent = $onMain($data['rent'], 'rent', 'r');
 $mainMachines = $onMain($data['machines'], 'catalog');
-$head = fn(array $b, string $link = '') => '<div class="sec__head" data-rv><div><h2 class="display h2">' . $e($b['title'] ?? '') . '</h2>'
+$head = fn(array $b, string $link = '', string $tag = 'h2') => '<div class="sec__head" data-rv><div><' . $tag . ' class="display h2' . ($tag === 'h2' ? '' : ' th th2') . '">' . $e($b['title'] ?? '') . '</' . $tag . '>'
     . (($b['subtitle'] ?? '') !== '' ? '<p>' . $e($b['subtitle']) . '</p>' : '') . '</div>' . $link . '</div>';
 
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'BEVERTEAM',
@@ -59,7 +59,7 @@ $c0 = $chips[$cur] ?? null;
 <section class="hero"><div class="wrap hero__grid">
   <div class="hero-in">
     <?php if (!empty($hero['caption'])): ?><div class="eyebrow mono"><i></i><?= $e($hero['caption']) ?></div><?php endif ?>
-    <p class="display hero__title"><?= bt_title($hero['title'] ?? '', $hero['highlight'] ?? '') ?></p>
+    <h1 class="display hero__title"><?= bt_title($hero['title'] ?? '', $hero['highlight'] ?? '') ?></h1>
     <?php if (!empty($hero['subtitle'])): ?><p class="hero__sub"><?= $e($hero['subtitle']) ?></p><?php endif ?>
     <div class="hero__cta">
       <?= bt_btn($hero['btn_text'] ?? '', $hero['btn_link'] ?? '') ?>
@@ -144,7 +144,7 @@ $c0 = $chips[$cur] ?? null;
 <section class="sec sec--t0"><div class="wrap"><div class="svc" data-rv>
   <div class="svc__l">
     <div class="mono" style="color:var(--lime)"><?= $e($svc['caption'] ?? '') ?></div>
-    <h2 class="display h2" style="margin-top:14px"><?= bt_title($svc['title'] ?? '', $svc['highlight'] ?? '', 'span') ?></h2>
+    <div class="display h2 svc__t th th2" style="margin-top:14px"><?= bt_title($svc['title'] ?? '', $svc['highlight'] ?? '', 'span') ?></div>
     <?php if (!empty($svc['subtitle'])): ?><p><?= $e($svc['subtitle']) ?></p><?php endif ?>
     <?php if (!empty($svc['items'])): ?><ul class="svc__list"><?php foreach ($svc['items'] as [$t, $v]): ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?></ul><?php endif ?>
     <div class="row"><?= bt_btn($svc['btn_text'] ?? '', $svc['btn_link'] ?? '') ?><?= bt_btn($svc['btn2_text'] ?? '', $svc['btn2_link'] ?? '', 'btn btn--line btn--inv') ?></div>
@@ -164,7 +164,7 @@ if ($bp):
   <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bpImg) ?>"<?= bt_img_wh($bpImg) ?> alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
   <div class="bean__c">
     <div class="mono"><?= $e($bean['caption'] ?? '') ?></div>
-    <h2 class="display h2"><?= bt_title($bean['title'] ?? $bp['n']) ?></h2>
+    <div class="display h2 bean__t th th2"><?= bt_title($bean['title'] ?? $bp['n']) ?></div>
     <?php if (!empty($bean['subtitle'])): ?><p><?= $e($bean['subtitle']) ?></p><?php endif ?>
     <?php if ($notes): ?><div class="notes"><?php foreach ($notes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
     <div class="row"><?= bt_btn(($bean['btn_text'] ?? '') ?: bt_fmt($bp['p']) . ' · к товару', ($bean['btn_link'] ?? '') ?: $bp['url']) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
@@ -176,14 +176,14 @@ if ($bp):
 <section class="sec sec--t0"><div class="wrap">
   <?= $head($steps) ?>
   <div class="stepsx">
-    <?php foreach ($steps['items'] as $i => [$t, $d]): ?><div class="stepx"><b>Шаг <?= sprintf('%02d', $i + 1) ?></b><h3><?= $e($t) ?></h3><p><?= $e($d) ?></p></div><?php endforeach ?>
+    <?php foreach ($steps['items'] as $i => [$t, $d]): ?><div class="stepx"><b>Шаг <?= sprintf('%02d', $i + 1) ?></b><div class="stepx__t th th3"><?= $e($t) ?></div><p><?= $e($d) ?></p></div><?php endforeach ?>
   </div>
 </div></section>
 <?php endif ?>
 
 <?php if ($revs = $onMain(bt_reviews(), 'reviews')): ?>
 <section class="sec sec--t0"><div class="wrap">
-  <?= $head($revB, bt_btn($revB['btn_text'] ?? '', $revB['btn_link'] ?? '', 'link')) ?>
+  <?= $head($revB, bt_btn($revB['btn_text'] ?? '', $revB['btn_link'] ?? '', 'link'), 'div') ?>
   <div class="grid g3 revs" data-rv>
     <?php foreach ($revs as $r) echo bt_rev_card($r) ?>
   </div>
@@ -194,7 +194,7 @@ if ($bp):
 <section class="sec sec--t0"><div class="wrap"><div class="svc" data-rv>
   <div class="svc__l">
     <div class="mono" style="color:var(--lime)"><?= $e($sub['caption'] ?? '') ?></div>
-    <h2 class="display h2" style="margin-top:14px"><?= bt_title($sub['title'] ?? '', $sub['highlight'] ?? '', 'span') ?></h2>
+    <div class="display h2 svc__t th th2" style="margin-top:14px"><?= bt_title($sub['title'] ?? '', $sub['highlight'] ?? '', 'span') ?></div>
     <?php if (!empty($sub['subtitle'])): ?><p><?= $e($sub['subtitle']) ?></p><?php endif ?>
     <ul class="svc__list">
       <?php foreach ($rent as $m) if ($m['kg']): ?><li>От <?= $m['kg'] ?> кг кофе в месяц <i><?= $e($m['model']) ?> — 0 ₽ аренда</i></li><?php endif ?>
@@ -209,7 +209,7 @@ if ($bp):
 <section class="sec sec--t0" id="form"><div class="wrap">
   <div class="wr">
     <div>
-      <h1 class="display h2"><?php $APPLICATION->ShowTitle(false) ?></h1>
+      <h2 class="display h2 wr__t"><?php $APPLICATION->ShowTitle(false) ?></h2>
       <div class="home__about"><?= $about['text'] ?? '' ?></div>
       <div class="row" style="margin-top:24px"><?= bt_btn($about['btn_text'] ?? '', $about['btn_link'] ?? '', 'btn btn--line') ?><?= bt_btn($about['btn2_text'] ?? '', $about['btn2_link'] ?? '', 'btn btn--line') ?></div>
     </div>
@@ -226,7 +226,7 @@ if ($bp):
 
 <?php if ($posts = bt_posts()): ?>
 <section class="sec sec--t0"><div class="wrap">
-  <?= $head($jour, bt_btn($jour['btn_text'] ?? '', $jour['btn_link'] ?? '', 'link')) ?>
+  <?= $head($jour, bt_btn($jour['btn_text'] ?? '', $jour['btn_link'] ?? '', 'link'), 'div') ?>
   <div class="news" id="news"><?php foreach (array_slice($posts, 0, 3) as $p) echo bt_post_card($p) ?></div>
 </div></section>
 <?php endif ?>

@@ -197,7 +197,7 @@ function bt_card(array $m, bool $eager = false): string
         . '<div class="pc__meta">' . (!empty($m['rv']) ? '<a class="pc__rv" href="' . $e($m['url']) . '#reviews">' . bt_icon('star') . '<b>' . str_replace('.', ',', (string)$m['rv'][0]) . '</b><span>· ' . $m['rv'][1] . ' '
             . (($m['rv'][1] % 10 === 1 && $m['rv'][1] % 100 !== 11) ? 'отзыв' : (($m['rv'][1] % 10 >= 2 && $m['rv'][1] % 10 <= 4 && ($m['rv'][1] % 100 < 10 || $m['rv'][1] % 100 >= 20)) ? 'отзыва' : 'отзывов')) . '</span></a>' : '')
         . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span></div>'
-        . '<h3><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></h3>'
+        . '<div class="pc__t th th3"><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></div>'
         . '<p class="pc__par">' . $e($m['par']) . '</p>'
         . $scales . $packs
         . '<div class="pc__foot" itemprop="offers" itemscope itemtype="https://schema.org/Offer">'
@@ -1000,7 +1000,7 @@ function bt_post_card(array $p): string
         . '<div class="ncard__b"><div class="ncard__m"><time datetime="' . $e($p['d']) . '">' . bt_date_ru($p['d']) . '</time>'
         . ($p['kind'] === 'news' && $p['cat'] !== 'Новости' ? '<span class="tag tag--n">Новость</span>' : '')
         . (!empty($p['draft']) ? '<span class="tag tag--draft">Черновик</span>' : '') . '</div>'
-        . '<h3><span>' . $e($p['t']) . '</span></h3><p>' . $e($p['lead']) . '</p></div></a>';
+        . '<div class="ncard__t th th3"><span>' . $e($p['t']) . '</span></div><p>' . $e($p['lead']) . '</p></div></a>';
 }
 
 // Модели аренды для главной: подбор на первом экране и «кофе по подписке»

@@ -39,7 +39,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
         <span class="gal__n" id="galN"><?= $photos ? '1 / ' . count($photos) : '' ?></span>
       </div>
     </div>
-    <div>
+    <div class="pinfo">
       <div class="pkick"><?php if ($section): ?><span class="mono muted"><?= $e($section['~NAME']) ?></span><?php endif ?><span class="bb__st">В наличии</span></div>
       <h1 class="display h1"><?= $e($h1) ?></h1>
       <div class="pmeta">

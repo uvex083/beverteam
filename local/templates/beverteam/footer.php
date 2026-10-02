@@ -32,10 +32,10 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
       <p style="margin:0;max-width:28ch">Чай, кофе и оборудование для дома и бизнеса. <?= $co['city'] ?? '' ?>, с 2010 года.</p>
       <div class="ftr__soc" style="margin-top:14px"><div class="msgr"><?= $msgr ?></div></div>
       <div class="ftr__hours"><b>Время работы</b>Офис: <?= $co['hours'] ?? '' ?><br>Выезд инженера: <?= $co['hours_service'] ?? '' ?><br>Сб–Вс — выходные</div></div>
-    <div><h5>Каталог</h5><?php $menu('foot_catalog') ?></div>
-    <div><h5>Услуги</h5><?php $menu('foot_services') ?></div>
-    <div><h5>Покупателям</h5><?php $menu('foot_buyers') ?></div>
-    <div><h5>Контакты</h5><ul>
+    <div><div class="ftr__h th th5">Каталог</div><?php $menu('foot_catalog') ?></div>
+    <div><div class="ftr__h th th5">Услуги</div><?php $menu('foot_services') ?></div>
+    <div><div class="ftr__h th th5">Покупателям</div><?php $menu('foot_buyers') ?></div>
+    <div><div class="ftr__h th th5">Контакты</div><ul>
       <li><a href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a></li>
       <li><a href="<?= $co['phone2_href'] ?? '' ?>"><?= $co['phone2'] ?? '' ?></a></li>
       <li><a href="mailto:<?= $co['email'] ?? '' ?>"><?= $co['email'] ?? '' ?></a></li>
