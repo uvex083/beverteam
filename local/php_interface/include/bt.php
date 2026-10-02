@@ -1134,7 +1134,7 @@ function bt_clients(): array
     foreach ($list as &$c) {
         $m = $c['machine'] !== '' ? bt_product($c['machine']) : null;
         $rent = $m ? bt_rent_by_code((string)$m['code']) : null;
-        $c['model'] = $m ? ['n' => trim(preg_replace('/^Кофемашина\s+/u', '', $m['n'])), 'code' => (string)$m['code'], 'img' => (string)($m['img'] ?? ''),
+        $c['model'] = $m ? ['n' => trim(preg_replace(['/^Кофемашина\s+/u', '/\bJl\b/u', '/\bJL(\d)/u'], ['', 'JL', 'JL $1'], $m['n'])), 'code' => (string)$m['code'], 'img' => (string)($m['img'] ?? ''),
             'url' => $rent ? bt_rent_url($rent) : $m['url'], 'rent' => (bool)$rent] : null;
     }
     unset($c);

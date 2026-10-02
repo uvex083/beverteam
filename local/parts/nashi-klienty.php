@@ -27,7 +27,7 @@ $groups = array_filter([
 ], fn($g) => count($g[1]) > 1);
 $cups = array_sum(array_column($cases, 'cups'));
 $stats = array_filter([
-    [$n, $word($n, 'установка', 'установки', 'установок') . ' на этой странице'],
+    [$n, $word($n, 'объект', 'объекта', 'объектов') . ' с нашими кофемашинами'],
     [count($cities), $word(count($cities), 'город', 'города', 'городов') . ' Свердловской области'],
     [count($models), $word(count($models), 'модель', 'модели', 'моделей') . ' Jetinno'],
     [$cups ? '≈ ' . number_format($cups, 0, '', "\u{00A0}") : 0, 'чашек в день на всех машинах'],
