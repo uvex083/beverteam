@@ -2511,7 +2511,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   .kl1__row .kldd:last-of-type .kldd__p{left:auto;right:0}
   .kl1__row .klcount{grid-column:1/-1;margin-left:0}
   .klgrid{grid-template-columns:1fr;gap:14px;background:none;border-radius:0;overflow:visible}
-  .klc{grid-column:auto;grid-template-columns:1fr;border-radius:var(--rad);overflow:hidden;border:1px solid var(--line)}
+  .klc,.klc.is-flip{grid-column:auto;grid-template-columns:1fr;border-radius:var(--rad);overflow:hidden;border:1px solid var(--line)}
   .klc.is-flip .klc__ph{order:0}
   .klc__ph::before{padding-top:75%}
   .klc.is-dark .klc__t{background:var(--white);color:var(--ink)}
