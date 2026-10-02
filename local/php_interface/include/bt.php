@@ -1099,6 +1099,48 @@ function bt_rent_by_code(string $code): ?array
     return null;
 }
 
+// Установки для страницы «Наши клиенты»: фото, клиент, город, тип объекта, модель из каталога (ссылка — на аренду, если модель в аренде)
+function bt_clients(): array
+{
+    $ibId = bt_iblock('clients');
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_clients', '/bt/blocks')) {
+        $list = $cache->getVars();
+    } else {
+        $cache->startDataCache();
+        $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+        $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+        $list = [];
+        $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT']);
+        while ($el = $r->GetNextElement()) {
+            $f = $el->GetFields();
+            $p = $el->GetProperties();
+            $photos = [];
+            foreach (array_filter((array)$p['PHOTOS']['VALUE']) as $fid) {
+                $photos[] = ['t' => bt_img($fid, 800, 800, BX_RESIZE_IMAGE_EXACT), 'b' => bt_img($fid, 1920, 1920)];
+            }
+            $list[] = [
+                'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'why' => trim((string)$f['~PREVIEW_TEXT']), 'city' => trim((string)$p['CITY']['~VALUE']),
+                'seg' => (string)$p['SEGMENT']['VALUE_XML_ID'], 'segn' => (string)$p['SEGMENT']['~VALUE'], 'segs' => (int)($p['SEGMENT']['VALUE_SORT'] ?? 0),
+                'machine' => (string)$p['MACHINE']['VALUE'], 'cups' => (int)$p['CUPS']['VALUE'], 'demo' => $p['DEMO']['VALUE_XML_ID'] === 'Y', 'photos' => $photos,
+            ];
+        }
+        $GLOBALS['CACHE_MANAGER']->EndTagCache();
+        $cache->endDataCache($list);
+    }
+    foreach ($list as &$c) {
+        $m = $c['machine'] !== '' ? bt_product($c['machine']) : null;
+        $rent = $m ? bt_rent_by_code((string)$m['code']) : null;
+        $c['model'] = $m ? ['n' => trim(preg_replace('/^Кофемашина\s+/u', '', $m['n'])), 'code' => (string)$m['code'], 'img' => (string)($m['img'] ?? ''),
+            'url' => $rent ? bt_rent_url($rent) : $m['url'], 'rent' => (bool)$rent] : null;
+    }
+    unset($c);
+    return $list;
+}
+
 // Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и иконкой + аренда
 function bt_home_tiles(): array
 {
@@ -1443,7 +1485,7 @@ function bt_sitemap_build(): string
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
     $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
-        '/o-kompanii/', '/otzyvy-o-nas/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
+        '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
@@ -1517,6 +1559,7 @@ function bt_search_pages(): array
         ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],
         ['t' => 'О компании', 'u' => '/o-kompanii/', 'd' => 'BEVERTEAM с 2010 года', 'k' => 'о компании beverteam'],
         ['t' => 'Отзывы', 'u' => '/otzyvy-o-nas/', 'd' => 'Что говорят клиенты', 'k' => 'отзывы'],
+        ['t' => 'Наши клиенты', 'u' => '/nashi-klienty/', 'd' => 'Установки кофемашин Jetinno в офисах, кафе и бизнес-центрах', 'k' => 'наши клиенты установки объекты'],
         ['t' => 'Журнал', 'u' => '/blog/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
         ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],
     ];

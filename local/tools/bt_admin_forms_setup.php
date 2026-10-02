@@ -34,6 +34,9 @@ $forms = [
     'about_values' => ['block', ['caption', 'title', 'text']],
     'about_values_items' => ['list', ['name', 'text', 'link', 'icon']],
     'about_work' => ['block', ['title', 'items', 'links']],
+    'clients' => ['list', ['name', 'text', 'photos', 'city', 'segment', 'machine', 'cups', 'demo']],
+    'clients_cta' => ['block', ['title', 'subtitle', 'btn_text', 'btn_link', 'btn2_text', 'btn2_link']],
+    'clients_head' => ['block', ['caption', 'subtitle', 'btn_text', 'btn_link']],
     'contacts_how' => ['list', ['name', 'text']],
     'contacts_photos' => ['list', ['name', 'text', 'pic']],
     'main_about' => ['block', ['caption', 'title', 'text', 'form_title', 'btn_text', 'btn_link', 'btn2_text', 'btn2_link']],
@@ -110,11 +113,12 @@ $labels = [
     'about_values_items' => ['Заголовок карточки', 'Текст карточки'], 'main_utp_items' => ['Заголовок карточки', 'Текст карточки'],
     'repair_strip' => ['Заголовок карточки', 'Текст карточки'], 'main_strip' => ['Текст'], 'rent_terms' => ['Заголовок карточки', 'Текст карточки'],
     'rent_facts' => ['Цифра (крупно)', 'Подпись под цифрой'], 'rent_segments' => ['Кому подходит', 'Текст'], 'rent_links' => ['Название', 'Текст'],
+    'clients' => ['Клиент (название на сайте)', 'Почему выбрали эту модель — 2–3 строки'],
     'contacts_how' => ['Заголовок', 'Текст'], 'repair_symptoms' => ['Симптом', 'Описание'], 'repair_errors' => ['Ошибка на экране', 'Что она значит'],
     'repair_price' => ['Услуга'], 'repair_links' => ['Название', 'Текст'], 'repair_brands' => ['Марка'], 'servis_dirs' => ['Направление', 'Описание'],
 ];
 // первые блоки страниц: вкладка SEO — title, description (и H1 у ремонта)
-$seo = ['main_hero' => false, 'rent_top' => true, 'sub_head' => false, 'repair_top' => true];
+$seo = ['main_hero' => false, 'rent_top' => true, 'sub_head' => false, 'repair_top' => true, 'clients_head' => true];
 
 $backupKey = 'bt.admin_forms_backup';
 if ($mode === 'rollback') {

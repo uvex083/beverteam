@@ -2079,3 +2079,34 @@ document.addEventListener('DOMContentLoaded',()=>{
     const all=[...box.querySelectorAll('a')]; BT_lightbox(all.map(x=>({src:x.getAttribute('href'),cap:x.querySelector('img').alt})),all.indexOf(a));});
   BT_slider(box.querySelector('[data-gallery]'),{min:2,swiper:{slidesPerView:'auto',spaceBetween:14,breakpoints:{}}});
 });
+
+/* Наши клиенты: фильтры на лету (счётчики по остальным фильтрам, адрес с фильтром), шахматка пересобирается по видимым карточкам, фото — на весь экран по всем видимым установкам */
+document.addEventListener('DOMContentLoaded',()=>{
+  const grid=document.querySelector('[data-kl-grid]'); if(!grid) return;
+  const bar=document.querySelector('[data-kl-bar]'), cards=[...grid.querySelectorAll('.klc')], btns=[...bar.querySelectorAll('[data-kl-f]')], keys=['obj','model','city'];
+  const u0=new URL(location.href), st={};
+  keys.forEach(k=>{ const v=u0.searchParams.get(k)||''; st[k]=btns.some(b=>b.dataset.klF===k&&b.dataset.v===v)?v:''; });
+  const wide=matchMedia('(min-width:1101px)'), still=matchMedia('(prefers-reduced-motion:reduce)');
+  const match=(c,skip)=>keys.every(k=>k===skip||!st[k]||c.dataset[k]===st[k]);
+  const layout=()=>{ const per=wide.matches?2:1; let i=0;
+    cards.forEach(c=>{ if(c.hidden) return; const r=Math.floor(i/per); c.classList.toggle('is-flip',r%2===1); c.classList.toggle('is-dark',(r+i%per)%2===0); i++; }); };
+  const draw=()=>{
+    let shown=0; cards.forEach(c=>{ c.hidden=!match(c); c.hidden||shown++; });
+    layout();
+    btns.forEach(b=>{ const k=b.dataset.klF, v=b.dataset.v, n=cards.filter(c=>match(c,k)&&(!v||c.dataset[k]===v)).length;
+      b.setAttribute('aria-pressed',String(st[k]===v)); b.setAttribute('aria-disabled',String(!n&&st[k]!==v)); b.querySelector('s').textContent=n; });
+    bar.querySelector('[data-kl-count]').textContent=`Показано ${shown} из ${cards.length}`;
+    bar.querySelector('[data-kl-reset]').hidden=!keys.some(k=>st[k]);
+    document.querySelector('[data-kl-empty]').hidden=shown>0;
+    const u=new URL(location.href); keys.forEach(k=>st[k]?u.searchParams.set(k,st[k]):u.searchParams.delete(k)); history.replaceState(history.state,'',u);
+  };
+  const go=fn=>{ const run=()=>{ fn(); draw(); }; document.startViewTransition&&!still.matches?document.startViewTransition(run):run(); };
+  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-kl-f]'); if(!b||b.getAttribute('aria-disabled')==='true') return; go(()=>{ st[b.dataset.klF]=b.dataset.v; }); });
+  document.addEventListener('click',e=>{ if(e.target.closest('[data-kl-reset]')) go(()=>keys.forEach(k=>{ st[k]=''; })); });
+  wide.addEventListener('change',layout);
+  grid.addEventListener('click',e=>{ const a=e.target.closest('[data-kl-open]'); if(!a) return; e.preventDefault();
+    const items=[]; let start=0;
+    cards.filter(c=>!c.hidden).forEach(c=>{ c===a.closest('.klc')&&(start=items.length); JSON.parse(c.dataset.klPh).forEach(src=>items.push({src,cap:c.dataset.klCap})); });
+    BT_lightbox(items,start); });
+  draw();
+});

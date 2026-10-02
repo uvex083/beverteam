@@ -13,6 +13,7 @@ $aMenuLinks = array_merge([
     ['Подбор кофе', '/podbor-kofe/', [], $a + ['badge' => 'за минуту'], ''],
     ['О компании', '/o-kompanii/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Отзывы', '/otzyvy-o-nas/', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Наши клиенты', '/nashi-klienty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],

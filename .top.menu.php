@@ -19,6 +19,7 @@ $aMenuLinks = [
     ['Отзывы', '/otzyvy-o-nas/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Контакты', '/kontakty/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Ещё', '#', [], ['DEPTH_LEVEL' => 1], ''],
+    ['Наши клиенты', '/nashi-klienty/', [], $sub, ''],
     ['Оплата и доставка', '/oplata-i-dostavka/', [], $sub, ''],
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], $sub, ''],
 ];
