@@ -1125,7 +1125,7 @@ function bt_clients(): array
             $list[] = [
                 'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'why' => trim((string)$f['~PREVIEW_TEXT']), 'city' => trim((string)$p['CITY']['~VALUE']),
                 'seg' => (string)$p['SEGMENT']['VALUE_XML_ID'], 'segn' => (string)$p['SEGMENT']['~VALUE'], 'segs' => (int)($p['SEGMENT']['VALUE_SORT'] ?? 0),
-                'machine' => (string)$p['MACHINE']['VALUE'], 'cups' => (int)$p['CUPS']['VALUE'], 'demo' => $p['DEMO']['VALUE_XML_ID'] === 'Y', 'photos' => $photos,
+                'machine' => (string)$p['MACHINE']['VALUE'], 'cups' => (int)$p['CUPS']['VALUE'], 'tone' => (string)($p['TONE']['VALUE_XML_ID'] ?? ''), 'demo' => $p['DEMO']['VALUE_XML_ID'] === 'Y', 'photos' => $photos,
             ];
         }
         $GLOBALS['CACHE_MANAGER']->EndTagCache();

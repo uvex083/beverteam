@@ -92,22 +92,24 @@ $stats = array_filter([
         $alt = $c['name'] . ($c['city'] !== '' ? ', ' . $c['city'] : '') . ($m ? ' — ' . $m['n'] : '');
         $cnt = count($c['photos']);
         $row = intdiv($i, 2); ?>
-    <article class="klc<?= $row % 2 ? ' is-flip' : '' ?><?= ($row + $i) % 2 ? '' : ' is-dark' ?>" id="client-<?= $c['id'] ?>" style="view-transition-name:kl<?= $c['id'] ?>"
-      data-obj="<?= $e($c['seg']) ?>" data-model="<?= $e($m['code'] ?? '') ?>" data-city="<?= $e($c['city']) ?>"
+    <article class="klc<?= $row % 2 ? ' is-flip' : '' ?><?= ($c['tone'] !== '' ? $c['tone'] === 'dark' : ($row + $i) % 2 === 0) ? ' is-dark' : '' ?>" id="client-<?= $c['id'] ?>" style="view-transition-name:kl<?= $c['id'] ?>"
+      data-obj="<?= $e($c['seg']) ?>" data-model="<?= $e($m['code'] ?? '') ?>" data-city="<?= $e($c['city']) ?>"<?= $c['tone'] !== '' ? ' data-tone="' . $e($c['tone']) . '"' : '' ?>
       data-kl-ph="<?= $e(json_encode(array_column($c['photos'], 'b'), JSON_UNESCAPED_SLASHES)) ?>" data-kl-cap="<?= $e($alt) ?>">
       <a class="klc__ph" href="<?= $e($c['photos'][0]['b']) ?>" data-kl-open aria-label="<?= $e($c['name']) ?>: фото на весь экран">
         <img src="<?= $e($c['photos'][0]['t']) ?>" width="800" height="800" alt="<?= $e($alt) ?>" loading="<?= $i < 4 ? 'eager' : 'lazy' ?>">
         <?php if ($c['segn'] !== ''): ?><span class="klc__seg"><?= $e($c['segn']) ?></span><?php endif ?>
-        <span class="klc__zoom"><?= bt_icon('search') ?><?= $cnt > 1 ? $cnt . ' фото' : 'Смотреть' ?></span>
+        <span class="klc__zoom<?= $m ? ' klc__zoom--top' : '' ?>"><?= bt_icon('search') ?><?= $cnt > 1 ? $cnt . ' фото' : 'Смотреть' ?></span>
       </a>
       <div class="klc__t">
         <?php if ($c['city'] !== ''): ?><p class="klc__city"><?= $e($c['city']) ?></p><?php endif ?>
         <div class="klc__name th th3"><?= $e($c['name']) ?></div>
         <?php if ($c['why'] !== ''): ?><p class="klc__why"><?= $e($c['why']) ?></p><?php endif ?>
+        <?php if ($m || $c['cups']): ?>
         <div class="klc__ft">
           <?php if ($m): ?><a class="klc__m" href="<?= $e($m['url']) ?>"><?php if ($m['img']): ?><img src="<?= $e($m['img']) ?>" alt="" width="44" height="44" loading="lazy"><?php endif ?><span><small><?= $m['rent'] ? 'В аренду' : 'Кофемашина' ?></small><b><?= $e($m['n']) ?></b></span></a><?php endif ?>
           <?php if ($c['cups']): ?><p class="klc__cups"><b><?= $c['cups'] ?></b><small><?= $word($c['cups'], 'чашка', 'чашки', 'чашек') ?><br>в день</small></p><?php endif ?>
         </div>
+        <?php endif ?>
       </div>
     </article>
     <?php endforeach ?>

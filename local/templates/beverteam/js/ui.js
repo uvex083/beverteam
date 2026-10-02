@@ -2090,7 +2090,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const match=(c,skip)=>keys.every(k=>k===skip||!st[k]||c.dataset[k]===st[k]);
   const label=(k,v)=>btns.find(b=>b.dataset.klF===k&&b.dataset.v===v)?.dataset.l||'';
   const layout=()=>{ const per=wide.matches?2:1; let i=0;
-    cards.forEach(c=>{ if(c.hidden) return; const r=Math.floor(i/per); c.classList.toggle('is-flip',r%2===1); c.classList.toggle('is-dark',(r+i%per)%2===0); i++; }); };
+    cards.forEach(c=>{ if(c.hidden) return; const r=Math.floor(i/per); c.classList.toggle('is-flip',r%2===1); c.classList.toggle('is-dark',c.dataset.tone?c.dataset.tone==='dark':(r+i%per)%2===0); i++; }); };
   const draw=()=>{
     let shown=0; cards.forEach(c=>{ c.hidden=!match(c); c.hidden||shown++; });
     layout();

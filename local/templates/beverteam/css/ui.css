@@ -2484,7 +2484,10 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .klc__m small{font-size:11.5px;color:var(--gray)}
 .klc.is-dark .klc__m small{color:#9C9C93}
 .klc__m b{font-size:14px;border-bottom:1px solid var(--lime);justify-self:start}
-.klc__cups{margin:0;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.klc__cups{margin:0 0 0 auto;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.klc__zoom--top{top:14px;bottom:auto}
+.klc__seg{max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.klc__zoom--top~.klc__seg,.klc__seg:has(~.klc__zoom--top){max-width:calc(100% - 140px)}
 .klc__cups b{font:800 clamp(22px,2vw,28px)/1 Unbounded,sans-serif}
 .klc.is-dark .klc__cups b{color:var(--lime)}
 .klc__cups small{font-size:11.5px;line-height:1.2;color:var(--gray)}
