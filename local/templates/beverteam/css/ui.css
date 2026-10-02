@@ -1357,7 +1357,7 @@ input,textarea{caret-color:var(--ink)}
 .pspecs__grid b{margin-left:auto;text-align:right;font-size:14px;font-weight:700}
 @media(max-width:560px){.pspecs__grid{padding:6px 16px}.pspecs__grid>div{gap:12px}}
 @media(max-width:900px){.prod{grid-template-columns:1fr}.gal{position:static}.gal__main{height:360px;order:1}.specs{grid-template-columns:1fr}}
-@media(max-width:900px){.prod{display:flex;flex-direction:column;gap:0}.pinfo{display:contents}.pinfo>*{order:3}.pinfo>.pkick{order:0}.pinfo>.h1{order:1;margin-bottom:16px}.prod>.gal{order:2;margin-bottom:22px}}
+@media(max-width:900px){.prod{display:flex;flex-direction:column;gap:0;align-items:stretch}.pinfo{display:contents}.pinfo>*{order:3}.pinfo>.pkick{order:0}.pinfo>.h1{order:1;margin-bottom:16px}.prod>.gal{order:2;margin-bottom:22px}}
 
 /* ---------- страница сравнения (compare.html) ---------- */
 /* вкладки категорий */
