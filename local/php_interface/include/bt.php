@@ -1082,6 +1082,23 @@ function bt_rent_models(): array
     return $list;
 }
 
+// Страница модели в аренду: /arenda-kofemashin/<код товара каталога>/
+function bt_rent_url(array $m): string
+{
+    $code = basename(rtrim((string)$m['url'], '/'));
+    return $code !== '' ? '/arenda-kofemashin/' . $code . '/' : '/arenda-kofemashin/';
+}
+
+function bt_rent_by_code(string $code): ?array
+{
+    foreach (bt_rent_models() as $m) {
+        if ($code !== '' && basename(rtrim((string)$m['url'], '/')) === $code) {
+            return $m;
+        }
+    }
+    return null;
+}
+
 // Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и иконкой + аренда
 function bt_home_tiles(): array
 {
@@ -1434,6 +1451,9 @@ function bt_sitemap_build(): string
     }
     foreach (bt_blog_rubrics() as $rub) {
         $urls[] = $rub['url'];
+    }
+    foreach (bt_rent_models() as $m) {
+        $urls[] = bt_rent_url($m);
     }
     foreach (['catalog', 'journal'] as $code) {
         $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock($code), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'DETAIL_PAGE_URL', 'TIMESTAMP_X']);

@@ -1230,6 +1230,48 @@ document.addEventListener('DOMContentLoaded',()=>{
     return bar;
   };
 
+  /* ---------- страница модели в аренду: галерея, расчёт расхода и двух вариантов оплаты для этой модели ---------- */
+  const rg=document.querySelector('[data-rmgal]');
+  if(rg){
+    const full=JSON.parse(rg.dataset.rmgal||'[]'), img=rg.querySelector('[data-rmgal-img]'); let cur=0;
+    rg.addEventListener('click',e=>{
+      const t=e.target.closest('[data-rmgal-i]');
+      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
+      if(e.target.closest('[data-rmgal-open]')&&full.length) BT_lightbox(full.map(src=>({src,cap:''})),cur);
+    });
+  }
+  const rmc=document.querySelector('[data-rmcalc]');
+  if(rmc){
+    const C=JSON.parse(rmc.dataset.rmcalc), M=C.m, q=s=>rmc.querySelector(s), rng=q('[data-rm-n]');
+    const kgf=x=>String(Math.round(x*10)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
+    let days=22, text='';
+    const draw=()=>{
+      const cups=+rng.value, need=cups*C.g*days/1000, B=C.beans.find(b=>b.code===q('[data-rm-bean]').value)||C.beans[0];
+      const kgA=Math.max(Math.ceil(need),M.kg), costA=kgA*BT_tier(B,kgA).p, costB=M.price+need*BT_tier(B,Math.max(need,1)).p, a=M.kg>0, best=a&&costA<=costB?'a':'b';
+      q('[data-rm-nv]').textContent=cups; q('[data-rm-cups]').textContent=cups; q('[data-rm-kg]').textContent=kgf(need)+' кг';
+      q('[data-rm-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*days,1));
+      q('[data-rm-a]').hidden=!a;
+      q('[data-rm-at]').textContent=rub(costA)+' / мес';
+      q('[data-rm-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?` — порог модели ${M.kg} кг`:'');
+      q('[data-rm-bt]').textContent=rub(costB)+' / мес';
+      q('[data-rm-bd]').textContent=`Аренда ${rub(M.price)} + ≈ ${kgf(need)} кг кофе`;
+      q('[data-rm-a]').classList.toggle('is-best',best==='a'); q('[data-rm-b]').classList.toggle('is-best',best==='b');
+      const note=q('[data-rm-note]');
+      if(M.cups&&cups>M.cups){ note.innerHTML=`${escq(M.m)} рассчитана до ${M.cups} чашек в день.`+(C.next?` Для такой нагрузки подойдёт <a class="link" href="${escq(C.next.url)}">${escq(C.next.m)}</a>.`:' Подберём решение — оставьте заявку.'); }
+      else note.textContent=`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${days} рабочих дн${days%10>=2&&days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}.`;
+      text=`Расчёт на сайте для ${M.m}: ≈ ${cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[days]}, ≈ ${kgf(need)} кг кофе в месяц (${B.n}). `
+        +(a?`С нашим кофе ≈ ${rub(costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(costB)}/мес с кофе.`;
+    };
+    rng.addEventListener('input',draw);
+    q('[data-rm-bean]').addEventListener('change',draw);
+    q('[data-rm-days]').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; days=+b.dataset.v;
+      q('[data-rm-days]').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b)); draw(); });
+    const f=document.querySelector('#form form'), msg=f?.elements.message;
+    q('[data-rm-go]').addEventListener('click',()=>{ if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=text; });
+    if(f) BT_goBar('Арендовать '+M.m,()=>(f.closest('[id]')||f).scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.rminfo .row'),q('[data-rm-go]'),f]);
+    draw();
+  }
+
   /* ---------- аренда (новая версия): люди × чашки × дни → расход, модель, два варианта оплаты, цена чашки ---------- */
   const r2=document.querySelector('[data-rcalc2]');
   if(r2){

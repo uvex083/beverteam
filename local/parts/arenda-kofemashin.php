@@ -88,7 +88,7 @@ $graph = [
             '@type' => 'Offer', 'name' => 'Аренда ' . $m['model'], 'priceCurrency' => 'RUB', 'price' => $m['price'],
             'priceSpecification' => ['@type' => 'UnitPriceSpecification', 'price' => $m['price'], 'priceCurrency' => 'RUB', 'unitCode' => 'MON', 'unitText' => 'месяц'],
             'description' => ($m['cups'] ? 'До ' . $m['cups'] . ' чашек в день. ' : '') . ($m['kg'] ? '0 ₽ при заказе кофе от ' . $m['kg'] . ' кг в месяц.' : ''),
-            'itemOffered' => ['@type' => 'Product', 'name' => $m['model'], 'brand' => ['@type' => 'Brand', 'name' => 'Jetinno'], 'image' => 'https://beverteam.ru' . $m['img'], 'url' => 'https://beverteam.ru' . $m['url']],
+            'itemOffered' => ['@type' => 'Product', 'name' => $m['model'], 'brand' => ['@type' => 'Brand', 'name' => 'Jetinno'], 'image' => 'https://beverteam.ru' . $m['img'], 'url' => 'https://beverteam.ru' . bt_rent_url($m)],
         ], $models)]],
 ];
 $steps and $graph[] = ['@type' => 'HowTo', '@id' => $page . '#steps', 'name' => $plain($stepsB['title'] ?? ''),
@@ -158,17 +158,17 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <div class="r2head"><h2 class="display h2"><?= bt_title(($modelsH['title'] ?? '') ?: 'Кофемашины в аренду') ?></h2><?= bt_btn($modelsH['btn_text'] ?? '', $modelsH['btn_link'] ?? '', 'link') ?></div>
     <div class="ar2models"><?php foreach ($models as $m): ?>
       <article class="card ar2m">
-        <a class="ar2m__ph" href="<?= $e($m['url']) ?>"><img src="<?= $e($m['img']) ?>" alt="<?= $e($m['model']) ?>" loading="lazy" width="480" height="340"></a>
+        <a class="ar2m__ph" href="<?= $e(bt_rent_url($m)) ?>"><img src="<?= $e($m['img']) ?>" alt="<?= $e($m['model']) ?>" loading="lazy" width="480" height="340"></a>
         <div class="ar2m__b">
           <span class="mono muted"><?= $e($m['audience']) ?><?= $m['cups'] ? ' · до ' . $m['cups'] . ' чашек в день' : '' ?></span>
-          <h3><a href="<?= $e($m['url']) ?>"><?= $e($m['model']) ?></a></h3>
+          <h3><a href="<?= $e(bt_rent_url($m)) ?>"><?= $e($m['model']) ?></a></h3>
           <?php if ($m['feature'] !== ''): ?><span class="tag"><?= $e($m['feature']) ?></span><?php endif ?>
           <div class="ar2m__pr">
             <?php if ($m['kg']): ?><div><b>0 ₽</b><span>при заказе кофе от <?= $m['kg'] ?>&nbsp;кг в месяц</span></div><?php endif ?>
             <div><b><?= $e(bt_fmt($m['price'])) ?></b><span>в месяц, кофе любой</span></div>
           </div>
           <ul class="ar2m__sp"><?php foreach (['SCREEN', 'BEAN_HOPPER', 'WATER_SUPPLY', 'TELEMETRY'] as $c): ?><li><span><?= $e($specCodes[$c]) ?></span><?= $e($spec($m, $c) ?: 'Нет') ?></li><?php endforeach ?></ul>
-          <button type="button" class="btn btn--line btn--sm" data-rc2-model="<?= $e($m['id']) ?>">Рассчитать для этой модели</button>
+          <div class="ar2m__go"><a class="btn btn--sm" href="<?= $e(bt_rent_url($m)) ?>">Подробнее о модели</a><button type="button" class="btn btn--line btn--sm" data-rc2-model="<?= $e($m['id']) ?>">Рассчитать</button></div>
         </div>
       </article>
     <?php endforeach ?></div>
@@ -177,7 +177,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <section class="sec sec--t0" id="compare">
     <h2 class="display h2" style="margin-bottom:22px">Сравнение моделей</h2>
     <div class="tblw"><table class="tbl">
-      <thead><tr><th>Параметр</th><?php foreach ($models as $m): ?><th><?= $e($m['model']) ?></th><?php endforeach ?></tr></thead>
+      <thead><tr><th>Параметр</th><?php foreach ($models as $m): ?><th><a href="<?= $e(bt_rent_url($m)) ?>"><?= $e($m['model']) ?></a></th><?php endforeach ?></tr></thead>
       <tbody>
         <tr><td>Для кого</td><?php foreach ($models as $m): ?><td><?= $e($m['audience']) ?></td><?php endforeach ?></tr>
         <tr><td>Нагрузка</td><?php foreach ($models as $m): ?><td><?= $m['cups'] ? 'до ' . $m['cups'] . ' чашек в день' : '—' ?></td><?php endforeach ?></tr>
@@ -290,7 +290,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   </form></section>
 
   <?php if ($faq): ?>
-  <section class="sec sec--t0">
+  <section class="sec sec--t0" id="faq">
     <h2 class="display h2" style="margin-bottom:20px">Вопросы об аренде кофемашин</h2>
     <div class="faq"><?php foreach ($faq as $i => $q): ?><details<?= $i ? '' : ' open' ?>><summary><?= $e($q['name']) ?></summary><div class="faq__a"><?= str_starts_with(ltrim($q['html']), '<') ? $q['html'] : '<p>' . $q['html'] . '</p>' ?></div></details><?php endforeach ?></div>
   </section>

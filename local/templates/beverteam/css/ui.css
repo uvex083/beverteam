@@ -2250,6 +2250,35 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 @media(max-width:900px){.r2hero{grid-template-columns:1fr}.r2symp,.r2err,.r2why{grid-template-columns:1fr 1fr}.r2models{grid-template-columns:1fr 1fr}.r2more{grid-template-columns:1fr}}
 @media(max-width:640px){.r2chk,.r2symp,.r2err,.r2why,.r2steps{grid-template-columns:1fr}.r2tbl td:nth-child(2),.r2tbl th:nth-child(2){display:none}.r2tbl td:last-child{white-space:normal}}
 @media(max-width:640px){.rep2 .pl .row,.r2hero .row{flex-direction:column;align-items:stretch}.rep2 .pl .row .btn,.r2hero .row .btn{width:100%}}
+/* страница модели в аренду */
+.rmhero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:start;padding:clamp(8px,1.5vw,16px) 0 var(--pad)}
+.rmgal{display:grid;gap:12px}
+.rmgal__big{display:block;width:100%;aspect-ratio:1;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(16px,3vw,40px);cursor:zoom-in}
+.rmgal__big img{width:100%;height:100%;object-fit:contain}
+.rmgal__th{display:flex;gap:8px;flex-wrap:wrap}
+.rmgal__th button{width:66px;height:66px;padding:4px;background:var(--white);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .2s}
+.rmgal__th button[aria-pressed=true]{border-color:var(--ink)}
+.rmgal__th img{width:100%;height:100%;object-fit:contain}
+.rminfo{display:grid;gap:16px;align-content:start}
+.rminfo .h1{margin:0}
+.rmtag{justify-self:start;background:var(--lime-soft);color:#4E5A12;border-radius:999px;padding:4px 12px;font-size:13px}
+.rmpr div{padding:16px}.rmpr b{font-size:clamp(22px,2.2vw,28px)}.rmpr span{font-size:13px}
+.rminfo .r2chk{margin:4px 0 6px}
+.rmbuy{margin:0;font-size:14px}
+.rmspecs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rmdl{margin:0;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:8px 22px}
+.rmdl div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.rmdl div:last-child{border-bottom:0}.rmdl dt{color:var(--gray)}.rmdl dd{margin:0;text-align:right;font-weight:600}
+.rmtech{list-style:none;margin:0;padding:18px 22px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);display:grid;gap:10px;font-size:14px;align-content:start}
+.rmtech li{position:relative;padding-left:18px;line-height:1.45}.rmtech li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--lime)}
+.rmabout{max-width:80ch;margin-top:16px}
+.rmothers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rmothers .card{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center;padding:16px;transition:border-color .2s}
+.rmothers img{width:120px;height:100px;object-fit:contain;mix-blend-mode:multiply}
+.rmothers span{display:grid;gap:6px}.rmothers b{font-family:Unbounded;font-size:16px}.rmothers em{font-style:normal;font-size:13.5px;font-weight:600}
+@media(hover:hover){.rmothers .card:hover{border-color:var(--line-h)}}
+@media(max-width:900px){.rmhero,.rmspecs{grid-template-columns:1fr}.rmothers{grid-template-columns:1fr}}
+@media(max-width:640px){.rminfo .row{flex-direction:column;align-items:stretch}.rminfo .row .btn{width:100%}}
 /* кофе в офис */
 .chipx s{text-decoration:none;color:var(--ok);font-weight:700;font-size:12px}
 .chipx[aria-pressed=true] s{color:var(--ink)}
@@ -2327,8 +2356,9 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .ar2m__sp{list-style:none;margin:0;padding:0;font-size:13.5px}
 .ar2m__sp li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
 .ar2m__sp span{color:var(--gray)}
-.ar2m .btn{align-self:flex-start;margin-top:auto}
-@media(max-width:640px){.ar2m .btn{align-self:stretch;justify-content:center}}
+.ar2m__go{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.ar2m .tblw th a{color:inherit}
+@media(max-width:640px){.ar2m__go .btn{flex:1;justify-content:center}}
 .ar2 .pl .r2list li{display:block;position:relative;padding:13px 0 13px 26px}
 .ar2inc{grid-template-columns:repeat(4,1fr)}
 .ar2inc .ic svg{fill:none}

@@ -56,4 +56,12 @@ $arUrlRewrite=array (
     'PATH' => '/servis/remont-kofemashin/index.php',
     'SORT' => 100,
   ),
+  8 => 
+  array (
+    'CONDITION' => '#^/arenda-kofemashin/([a-z0-9-]+)/(\?.*)?$#',
+    'RULE' => 'CODE=$1',
+    'ID' => '',
+    'PATH' => '/arenda-kofemashin/model.php',
+    'SORT' => 100,
+  ),
 );
