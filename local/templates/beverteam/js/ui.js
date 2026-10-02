@@ -1248,6 +1248,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const draw=()=>{
       const cups=+rng.value, need=cups*C.g*days/1000, B=C.beans.find(b=>b.code===q('[data-rm-bean]').value)||C.beans[0];
       const kgA=Math.max(Math.ceil(need),M.kg), costA=kgA*BT_tier(B,kgA).p, costB=M.price+need*BT_tier(B,Math.max(need,1)).p, a=M.kg>0, best=a&&costA<=costB?'a':'b';
+      const inf=q('[data-rm-info]'); if(inf){ inf.href=B.url; const im=inf.querySelector('img'); if(B.img&&im.getAttribute('src')!==B.img) im.src=B.img;
+        q('[data-rm-in]').textContent=B.n.replace(/^BOTANICA\s+/,''); q('[data-rm-ip]').textContent=B.par; }
       q('[data-rm-nv]').textContent=cups; q('[data-rm-cups]').textContent=cups; q('[data-rm-kg]').textContent=kgf(need)+' кг';
       q('[data-rm-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*days,1));
       q('[data-rm-a]').hidden=!a;

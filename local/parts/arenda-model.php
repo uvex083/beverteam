@@ -37,10 +37,11 @@ if ($code !== '' && Loader::includeModule('iblock')) {
         foreach (preg_split('/<br\s*\/?>|<\/p>|\n/u', html_entity_decode($techHtml)) as $line) {
             $line = trim(strip_tags($line));
             if ($line !== '' && !preg_match('/^(Габариты|Экран|Подача воды|Онлайн телеметрия)/u', $line)) {
-                $tech[] = preg_replace('/\s{2,}|\s+-\s+/u', ' — ', $line);
+                $tech[] = preg_replace(['/\s+-\s+/u', '/\s{2,}/u'], ' — ', $line);
             }
         }
-        $about = trim((string)($f['~DETAIL_TEXT'] ?: $f['~PREVIEW_TEXT']));
+        // в описании товара есть список характеристик — он уже выше, оставляем только текст
+        $about = trim(preg_replace('~<(ul|ol)\b.*?</\1>~isu', '', (string)($f['~DETAIL_TEXT'] ?: $f['~PREVIEW_TEXT'])));
     }
 }
 if (!$photos && $m['img']) {
@@ -60,7 +61,7 @@ $cups0 = max(5, (int)round($m['cups'] * 0.6 / 5) * 5);
 $calc = [
     'm' => ['m' => $m['model'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg']],
     'next' => $next ? ['m' => $next['model'], 'url' => bt_rent_url($next)] : null,
-    'beans' => array_map(fn($c) => ['code' => $c['code'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null], $beans),
+    'beans' => array_map(fn($c) => ['code' => $c['code'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'img' => $c['img'] ?? '', 'par' => $c['par'] ?? '', 'url' => $c['url']], $beans),
     'g' => 8,
 ];
 
@@ -73,7 +74,7 @@ $ld = ['@context' => 'https://schema.org', '@type' => 'Product', 'name' => $APPL
         'seller' => ['@id' => 'https://beverteam.ru/#org']]];
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
 ?>
-<div class="wrap rentp repp rep2 ar2 rmp">
+<div class="wrap rentp repp rep2 ar2 ofp rmp">
   <?php bt_crumbs() ?>
 
   <div class="rmhero">
@@ -104,12 +105,17 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <p class="muted r2lead">Укажите, сколько чашек в день пьют у вас, — посчитаем расход кофе и оба варианта оплаты для <?= $e($m['model']) ?>.</p>
     <div class="ar2calc" data-rmcalc='<?= htmlspecialcharsbx(json_encode($calc, JSON_UNESCAPED_UNICODE)) ?>'>
       <div class="ar2calc__in">
-        <label class="ar2q" for="rmCups">Чашек в день <b data-rm-nv><?= $cups0 ?></b></label>
-        <input class="rng" id="rmCups" type="range" min="5" max="<?= max(30, (int)ceil($m['cups'] * 1.5 / 5) * 5) ?>" step="5" value="<?= $cups0 ?>" data-rm-n>
-        <span class="ar2q">График работы</span>
-        <div class="opts" role="group" aria-label="График работы" data-rm-days><?php foreach ([22 => 'Пятидневка', 26 => 'Шестидневка', 30 => 'Без выходных'] as $v => $t): ?><button type="button" class="chipx" data-v="<?= $v ?>" aria-pressed="<?= $v === 22 ? 'true' : 'false' ?>"><?= $e($t) ?></button><?php endforeach ?></div>
-        <label class="ar2q" for="rmBean">Кофе</label>
-        <select id="rmBean" class="ar2sel" data-rm-bean><?php foreach ($calc['beans'] as $b): ?><option value="<?= $e($b['code']) ?>"<?= $b['code'] === $bean0 ? ' selected' : '' ?>><?= $e($b['n']) ?> — <?= $e(bt_fmt($b['p'])) ?>/кг</option><?php endforeach ?></select>
+        <div class="ofg"><label class="ar2q" for="rmCups">Чашек в день <b data-rm-nv><?= $cups0 ?></b></label>
+        <input class="rng" id="rmCups" type="range" min="5" max="<?= max(30, (int)ceil($m['cups'] * 1.5 / 5) * 5) ?>" step="5" value="<?= $cups0 ?>" data-rm-n></div>
+        <div class="ofg"><span class="ar2q">График работы</span>
+        <div class="opts" role="group" aria-label="График работы" data-rm-days><?php foreach ([22 => 'Пятидневка', 26 => 'Шестидневка', 30 => 'Без выходных'] as $v => $t): ?><button type="button" class="chipx" data-v="<?= $v ?>" aria-pressed="<?= $v === 22 ? 'true' : 'false' ?>"><?= $e($t) ?></button><?php endforeach ?></div></div>
+        <div class="ofg"><label class="ar2q" for="rmBean">Кофе</label>
+        <select id="rmBean" class="ar2sel" data-rm-bean><?php foreach ($calc['beans'] as $b): ?><option value="<?= $e($b['code']) ?>"<?= $b['code'] === $bean0 ? ' selected' : '' ?>><?= $e($b['n']) ?> — <?= $e(bt_fmt($b['p'])) ?>/кг</option><?php endforeach ?></select></div>
+        <?php $b0 = array_values(array_filter($calc['beans'], fn($b) => $b['code'] === $bean0))[0] ?? $calc['beans'][0]; ?>
+        <a class="ofsort" href="<?= $e($b0['url']) ?>" data-rm-info>
+          <img src="<?= $e($b0['img']) ?>" alt="" width="96" height="96" loading="lazy">
+          <span><b data-rm-in><?= $e(preg_replace('/^BOTANICA\s+/u', '', $b0['n'])) ?></b><small data-rm-ip><?= $e($b0['par']) ?></small><i>О сорте →</i></span>
+        </a>
       </div>
       <div class="ar2calc__out" aria-live="polite">
         <span class="mono" style="color:var(--lime)">Расчёт для <?= $e($m['model']) ?></span>

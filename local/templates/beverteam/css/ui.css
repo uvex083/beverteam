@@ -2284,6 +2284,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .chipx[aria-pressed=true] s{color:var(--ink)}
 .ofsteps{grid-template-columns:repeat(4,1fr)}
 .ofp .ar2calc__in{display:flex;flex-direction:column;justify-content:space-between;gap:22px}
+.ofp .ofg .rng{margin-bottom:0}
 .ofp .ofg .opts{margin-bottom:0}
 .ofsort{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:center;padding:18px;border-radius:var(--rad-s);background:var(--paper);border:1px solid var(--line);transition:border-color .2s}
 .ofsort img{width:96px;height:96px;object-fit:contain;mix-blend-mode:multiply}
