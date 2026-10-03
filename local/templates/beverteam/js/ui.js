@@ -2287,14 +2287,14 @@ document.addEventListener('DOMContentLoaded',()=>{
         <button class="btn btn--sm" type="button" data-ed-save disabled>Сохранить</button>
       </div>
       <div class="prced__wrap"><table class="prced__tb">
-        <thead><tr><th scope="col">Товар</th><th scope="col">Розница, ₽</th><th scope="col">Старая цена, ₽</th><th scope="col">Оптовые ступени — цена за кг от объёма</th></tr></thead>
+        <thead><tr><th scope="col">Товар</th><th scope="col">Розница, ₽</th><th scope="col">Старая цена, ₽</th><th scope="col">Оптовые ступени — цена за кг от объёма, только для товаров на вес</th></tr></thead>
         <tbody data-ed-rows><tr><td colspan="4" class="prced__empty">Загружаем цены…</td></tr></tbody>
       </table></div>
     </div>`;
   box.hidden=false;
   const $=s=>box.querySelector(s), body=$('[data-ed-body]'), tb=$('[data-ed-rows]'), qIn=$('[data-ed-q]'), catSel=$('[data-ed-cat]'), note=$('[data-ed-note]'), logBox=$('[data-ed-log]');
 
-  const tierHtml=(id,r)=>!r.kg?`<span class="prced__na">Только для товаров на вес (единица «кг»)</span>`
+  const tierHtml=(id,r)=>!r.kg?`<span class="prced__na" title="Ступени — только для товаров, которые продаются на вес (единица «кг» в каталоге)">—</span>`
     :cur[id].tiers.map(([k,p],i)=>`<span class="prced__tier">от <input class="prced__k" type="text" inputmode="numeric" value="${esc(k)}" aria-label="Объём ступени, кг" data-f="k" data-i="${i}"> кг
       <input type="text" inputmode="decimal" value="${esc(p)}" aria-label="Цена ступени за кг" data-f="t" data-i="${i}"><button type="button" data-ed-tdel="${i}" aria-label="Убрать ступень">×</button></span>`).join('')
       +`<button class="prced__add" type="button" data-ed-tadd>+ ступень</button>`;
