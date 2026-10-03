@@ -1217,21 +1217,38 @@ function bt_sum_discounts(): array
     return $out;
 }
 
-// Агент: цены каталога изменились — письмо подписчикам прайса. Раз в час; ждёт 2 часа тишины, чтобы правка цен пачкой дала одно письмо
+// Агент: цены каталога изменились (обмен с 1С, админка) — письмо подписчикам прайса. Раз в час; ждёт 2 часа тишины, чтобы правка цен пачкой дала одно письмо
 function bt_price_notify_agent(): string
 {
     $ts = bt_price_date();
-    $last = (int)\Bitrix\Main\Config\Option::get('bt', 'price_notified', '0');
-    $ib = bt_iblock('price_subs');
-    if ($ib && $ts > $last && time() - $ts >= 7200) {
-        $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_TOKEN']);
-        while ($s = $r->Fetch()) {
-            check_email($s['NAME'], true) && $s['PROPERTY_TOKEN_VALUE'] and \CEvent::Send('BT_PRICE_CHANGED', 's1',
-                ['EMAIL_TO' => $s['NAME'], 'TOKEN' => $s['PROPERTY_TOKEN_VALUE'], 'DATE' => FormatDate('j F Y', $ts)]);
-        }
-        \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)$ts);
+    if ($ts > (int)\Bitrix\Main\Config\Option::get('bt', 'price_notified', '0') && time() - $ts >= 7200) {
+        bt_price_notify_send($ts);
     }
     return 'bt_price_notify_agent();';
+}
+
+// Письмо «Цены обновились» всем активным подписчикам прайса; отметка, чтобы агент не повторил. Возвращает число писем
+function bt_price_notify_send(int $ts): int
+{
+    $n = 0;
+    if ($ib = bt_iblock('price_subs')) {
+        $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_TOKEN']);
+        while ($s = $r->Fetch()) {
+            if (check_email($s['NAME'], true) && $s['PROPERTY_TOKEN_VALUE']) {
+                \CEvent::Send('BT_PRICE_CHANGED', 's1', ['EMAIL_TO' => $s['NAME'], 'TOKEN' => $s['PROPERTY_TOKEN_VALUE'], 'DATE' => FormatDate('j F Y', $ts)]);
+                $n++;
+            }
+        }
+    }
+    \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)$ts);
+    return $n;
+}
+
+// Может ли текущий пользователь править цены прямо на странице прайса (право каталога «Изменение цен»; у администраторов есть всегда)
+function bt_price_editor(): bool
+{
+    global $USER;
+    return is_object($USER) && $USER->IsAuthorized() && $USER->CanDoOperation('catalog_price');
 }
 
 // Дата последнего изменения товаров или цен каталога — «Цены актуальны на …»
@@ -1393,7 +1410,7 @@ function bt_user_js(): ?array
     $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN', 'PERSONAL_PHONE', 'PERSONAL_MOBILE']])->fetch();
     $phone = (string)($u['PERSONAL_PHONE'] ?: $u['PERSONAL_MOBILE']);
     return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN']),
-        'phone' => $phone !== '' ? bt_phone_fmt($phone) : ''] : null;
+        'phone' => $phone !== '' ? bt_phone_fmt($phone) : '', 'priceEdit' => bt_price_editor()] : null;
 }
 
 // Кнопки входа через сервисы для ui.js: только включённые в модуле «Социальные сервисы» и с заполненными ключами

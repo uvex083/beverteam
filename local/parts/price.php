@@ -68,6 +68,8 @@ if (\Bitrix\Main\Loader::includeModule('sale')) {
     </div>
   </div>
 
+  <section class="prced" data-prc-ed hidden></section>
+
   <?php if ($disc): ?>
   <div class="prcdisc">
     <span class="prcdisc__t">Скидка от суммы заказа</span>

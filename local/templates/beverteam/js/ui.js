@@ -2238,3 +2238,154 @@ document.addEventListener('DOMContentLoaded',()=>{
     finally{ delete subF.dataset.busy; } });
   rows.forEach(draw); drawBag(); filter();
 });
+
+/* Прайс-лист: редактор цен для сотрудников с правом «Изменение цен» — розница, старая цена, оптовые ступени; загрузка из Excel, изменение на %, журнал с возвратом.
+   Разметку рисует только этот скрипт и только по BT_USER.priceEdit — в кеш страницы редактор не попадает */
+document.addEventListener('DOMContentLoaded',()=>{
+  const box=document.querySelector('[data-prc-ed]'); if(!box||!window.BT_USER?.priceEdit) return;
+  const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const num=s=>{ s=String(s??'').replace(/[\s ₽]/g,'').replace(',','.'); return s===''?0:(/^\d+(\.\d{1,2})?$/.test(s)?+s:NaN); };
+  const rub=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
+  const str=n=>n?String(Math.round(n*100)/100):'';
+  const post=async(action,data={})=>{ const fd=data instanceof FormData?data:new FormData(); fd.append('action',action); fd.append('sessid',window.BT_SID||'');
+    if(!(data instanceof FormData)) Object.entries(data).forEach(([k,v])=>fd.append(k,v));
+    const r=await fetch('/local/ajax/price.php',{method:'POST',body:fd,credentials:'same-origin'}); if(r.status===403) throw new Error('access'); return r.json(); };
+  let rows=[], orig={}, cur={}, log=[], subs=0, onlyCh=false;
+  const pack=r=>({p:str(r.p),old:str(r.old),tiers:r.tiers.map(([k,p])=>[String(k),str(p)])});
+  const canon=s=>JSON.stringify([num(s.p),num(s.old),s.tiers.map(([k,p])=>[num(k),num(p)]).sort((a,b)=>a[0]-b[0])]);
+  const isCh=id=>canon(cur[id])!==canon(orig[id]);
+  const rowOf=id=>rows.find(r=>r.id==id);
+  const check=id=>{ const s=cur[id], r=rowOf(id), p=num(s.p), old=num(s.old), ks=s.tiers.map(t=>num(t[0]));
+    if(isNaN(p)||isNaN(old)) return ['err','Цена — число, например 1900 или 1900.50'];
+    if(s.tiers.some(([k,tp])=>!Number.isInteger(num(k))||num(k)<2||!(num(tp)>0))) return ['err','Ступень: объём — целое от 2, цена больше нуля'];
+    if(new Set(ks).size!==ks.length) return ['err','Две ступени с одинаковым объёмом'];
+    if(s.tiers.length&&!(p>0)) return ['err','Со ступенями нужна розничная цена'];
+    const o=num(orig[id].p); if(o>0&&p>0&&Math.abs(p/o-1)>.5) return ['warn',`Цена изменилась на ${p>o?'+':''}${Math.round((p/o-1)*100)}% — проверьте`];
+    if(old>0&&old<=p) return ['warn','Старая цена не больше новой — зачёркнутой на сайте не будет'];
+    if(s.tiers.some(([,tp])=>num(tp)>=p)) return ['warn','Оптовая цена не ниже розничной'];
+    return null; };
+
+  box.innerHTML=`<div class="prced__hd"><div><div class="prced__t">Редактор цен</div>
+      <p class="prced__s">Видно только сотрудникам с правом менять цены. Новые цены сразу попадают в каталог, корзину, PDF и Excel. Цены, пришедшие из 1С, перезапишут ручные правки.</p></div>
+      <button class="btn btn--dark btn--sm" type="button" data-ed-open aria-expanded="false">Открыть редактор</button></div>
+    <div class="prced__body" data-ed-body hidden>
+      <div class="prced__tools">
+        <a class="btn btn--line btn--sm" href="?format=csv" download>Скачать Excel</a>
+        <label class="btn btn--line btn--sm prced__file">Загрузить из Excel<input type="file" accept=".xlsx,.csv" data-ed-file></label>
+        <span class="prced__pct">Все показанные цены на <input type="text" inputmode="decimal" placeholder="+5" aria-label="Процент изменения" data-ed-pct> % <button class="btn btn--line btn--sm" type="button" data-ed-pct-go>Применить</button></span>
+        <button class="btn btn--line btn--sm" type="button" data-ed-logb aria-expanded="false">Журнал изменений</button>
+      </div>
+      <div class="prced__note" data-ed-note hidden></div>
+      <div class="prced__log" data-ed-log hidden></div>
+      <div class="prced__bar">
+        <label class="prcsearch prced__q"><input type="search" placeholder="Найти товар" aria-label="Поиск в редакторе" autocomplete="off" data-ed-q></label>
+        <select class="prced__sel" aria-label="Раздел" data-ed-cat><option value="">Все разделы</option></select>
+        <label class="check prced__only"><input type="checkbox" data-ed-only> <span>Только изменённые</span></label>
+        <span class="prced__cnt" data-ed-cnt></span>
+        <label class="check prced__ntf"><input type="checkbox" data-ed-ntf checked> <span>Письмо подписчикам <s data-ed-subs></s></span></label>
+        <button class="btn btn--line btn--sm" type="button" data-ed-reset disabled>Отменить</button>
+        <button class="btn btn--sm" type="button" data-ed-save disabled>Сохранить</button>
+      </div>
+      <div class="prced__wrap"><table class="prced__tb">
+        <thead><tr><th scope="col">Товар</th><th scope="col">Розница, ₽</th><th scope="col">Старая цена, ₽</th><th scope="col">Оптовые ступени — цена за кг от объёма</th></tr></thead>
+        <tbody data-ed-rows><tr><td colspan="4" class="prced__empty">Загружаем цены…</td></tr></tbody>
+      </table></div>
+    </div>`;
+  box.hidden=false;
+  const $=s=>box.querySelector(s), body=$('[data-ed-body]'), tb=$('[data-ed-rows]'), qIn=$('[data-ed-q]'), catSel=$('[data-ed-cat]'), note=$('[data-ed-note]'), logBox=$('[data-ed-log]');
+
+  const tierHtml=(id,r)=>!r.kg?`<span class="prced__na">Только для товаров на вес (единица «кг»)</span>`
+    :cur[id].tiers.map(([k,p],i)=>`<span class="prced__tier">от <input class="prced__k" type="text" inputmode="numeric" value="${esc(k)}" aria-label="Объём ступени, кг" data-f="k" data-i="${i}"> кг
+      <input type="text" inputmode="decimal" value="${esc(p)}" aria-label="Цена ступени за кг" data-f="t" data-i="${i}"><button type="button" data-ed-tdel="${i}" aria-label="Убрать ступень">×</button></span>`).join('')
+      +`<button class="prced__add" type="button" data-ed-tadd>+ ступень</button>`;
+  const rowHtml=r=>{ const s=cur[r.id];
+    return `<tr data-ed-row="${r.id}"><td class="prced__n"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.n)}</a><small>${esc(r.catN)}${r.sub?' · '+esc(r.sub):''}</small><em data-ed-msg></em></td>
+      <td><input type="text" inputmode="decimal" value="${esc(s.p)}" placeholder="по запросу" aria-label="Розничная цена: ${esc(r.n)}" data-f="p"><small data-ed-was></small></td>
+      <td><input type="text" inputmode="decimal" value="${esc(s.old)}" placeholder="—" aria-label="Старая цена: ${esc(r.n)}" data-f="old"></td>
+      <td class="prced__tiers" data-ed-tiers>${tierHtml(r.id,r)}</td></tr>`; };
+  const mark=id=>{ const tr=tb.querySelector(`[data-ed-row="${id}"]`); if(!tr) return; const ch=isCh(id), m=ch?check(id):null, o=orig[id];
+    tr.classList.toggle('is-ch',ch); tr.classList.toggle('is-err',m?.[0]==='err');
+    tr.querySelector('[data-ed-was]').textContent=ch&&num(cur[id].p)!==num(o.p)?'было '+(num(o.p)?rub(num(o.p)):'по запросу'):'';
+    const msg=tr.querySelector('[data-ed-msg]'); msg.textContent=m?m[1]:''; msg.className=m?'is-'+m[0]:''; };
+  const counter=()=>{ const ch=rows.filter(r=>isCh(r.id)).length;
+    $('[data-ed-cnt]').textContent=ch?`Изменено: ${ch}`:'Изменений нет'; $('[data-ed-save]').disabled=!ch; $('[data-ed-reset]').disabled=!ch;
+    $('[data-ed-save]').textContent=ch?`Сохранить ${ch}`:'Сохранить'; };
+  const filter=()=>{ const w=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean), c=catSel.value;
+    tb.querySelectorAll('[data-ed-row]').forEach(tr=>{ const r=rowOf(tr.dataset.edRow), h=(r.n+' '+r.sub+' '+r.catN).toLowerCase().replace(/ё/g,'е');
+      tr.hidden=!(w.every(x=>h.includes(x))&&(!c||r.cat===c)&&(!onlyCh||isCh(r.id))); }); };
+  const draw=()=>{ tb.innerHTML=rows.length?rows.map(rowHtml).join(''):'<tr><td colspan="4" class="prced__empty">В прайсе нет товаров</td></tr>'; rows.forEach(r=>mark(r.id)); counter(); filter(); };
+  const redrawTiers=id=>{ const tr=tb.querySelector(`[data-ed-row="${id}"]`); tr.querySelector('[data-ed-tiers]').innerHTML=tierHtml(id,rowOf(id)); mark(id); counter(); };
+  const load=data=>{ rows=data.rows; log=data.log||[]; orig={}; rows.forEach(r=>{ orig[r.id]=pack(r); cur[r.id]&&isChKeep(r.id)||(cur[r.id]=pack(r)); }); };
+  let keep=new Set(); const isChKeep=id=>keep.has(String(id));
+  const fmtState=s=>[s.p?rub(s.p):'по запросу',s.old?'старая '+rub(s.old):'',s.tiers.length?'ступени '+s.tiers.map(([k,p])=>`от ${k} — ${rub(p)}`).join(', '):''].filter(Boolean).join('; ');
+  const drawLog=()=>{ logBox.innerHTML=log.length?`<ol>${log.map((e,i)=>`<li><span class="prced__ld">${new Date(e.t*1000).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})} · ${esc(e.u)}</span>
+      <b>${esc(e.n)}</b><span>было: ${esc(fmtState(e.b))}</span><span>стало: ${esc(fmtState(e.a))}</span>${orig[e.id]?`<button class="link" type="button" data-ed-undo="${i}">Вернуть как было</button>`:''}</li>`).join('')}</ol>`
+      :'<p class="prced__empty">Изменений через редактор ещё не было.</p>'; };
+
+  const open=(on,silent)=>{ body.hidden=!on; const b=$('[data-ed-open]'); b.setAttribute('aria-expanded',String(on)); b.textContent=on?'Свернуть':'Открыть редактор';
+    try{ on?sessionStorage.setItem('bt_ed','1'):sessionStorage.removeItem('bt_ed'); }catch(e){}
+    if(on&&!rows.length) post('ed_load').then(d=>{ load(d); subs=d.subs; $('[data-ed-subs]').textContent=subs?`(${subs})`:'(нет подписчиков)';
+      const seen={}; rows.forEach(r=>{ if(!seen[r.cat]){ seen[r.cat]=1; catSel.insertAdjacentHTML('beforeend',`<option value="${esc(r.cat)}">${esc(r.catN)}</option>`); } });
+      draw(); drawLog(); }).catch(()=>{ tb.innerHTML='<tr><td colspan="4" class="prced__empty">Не удалось загрузить цены — обновите страницу. Возможно, закончилась сессия.</td></tr>'; });
+    silent||on&&matchMedia('(min-width:761px)').matches&&setTimeout(()=>qIn.focus(),50); };
+  box.addEventListener('click',e=>{ const t=e.target;
+    if(t.closest('[data-ed-open]')) return open(body.hidden);
+    const tr=t.closest('[data-ed-row]'), id=tr?.dataset.edRow;
+    if(t.closest('[data-ed-tadd]')){ const tl=cur[id].tiers, last=tl.length?num(tl[tl.length-1][0]):0; tl.push([String(last?last*2:5),'']); redrawTiers(id);
+      tr.querySelector(`[data-f="t"][data-i="${tl.length-1}"]`).focus(); return; }
+    const del=t.closest('[data-ed-tdel]'); if(del){ cur[id].tiers.splice(+del.dataset.edTdel,1); redrawTiers(id); return; }
+    if(t.closest('[data-ed-reset]')){ if(!confirm('Отменить все несохранённые изменения?')) return; rows.forEach(r=>cur[r.id]=JSON.parse(JSON.stringify(orig[r.id]))); note.hidden=true; draw(); return; }
+    if(t.closest('[data-ed-save]')) return save();
+    if(t.closest('[data-ed-logb]')){ const on=logBox.hidden; logBox.hidden=!on; t.closest('[data-ed-logb]').setAttribute('aria-expanded',String(on)); return; }
+    const u=t.closest('[data-ed-undo]'); if(u){ const e2=log[+u.dataset.edUndo]; cur[e2.id]=pack({p:e2.b.p,old:e2.b.old,tiers:e2.b.tiers}); draw();
+      tb.querySelector(`[data-ed-row="${e2.id}"]`)?.scrollIntoView({block:'center'}); BT_toast('Вернули прежние цены в редактор — проверьте и нажмите «Сохранить»'); return; }
+    if(t.closest('[data-ed-pct-go]')){ const v=parseFloat(String($('[data-ed-pct]').value).replace(',','.').replace(/\s/g,''));
+      if(!v||v<=-100||Math.abs(v)>300){ BT_toast('Укажите процент, например 5 или −3'); return; }
+      const vis=[...tb.querySelectorAll('[data-ed-row]:not([hidden])')].map(x=>x.dataset.edRow); if(!vis.length) return;
+      if(!confirm(`Изменить розничные и оптовые цены у ${vis.length} товаров на ${v>0?'+':''}${v}%? Округление до рубля. До сохранения можно отменить.`)) return;
+      const k=1+v/100, f=s=>{ const n=num(s); return n>0?String(Math.round(n*k)):s; };
+      vis.forEach(id=>{ const s=cur[id]; s.p=f(s.p); s.tiers=s.tiers.map(([q,p])=>[q,f(p)]); }); draw(); BT_toast(`Цены изменены у ${vis.length} товаров — проверьте и сохраните`); return; } });
+  box.addEventListener('input',e=>{ const t=e.target;
+    if(t===qIn) return filter();
+    const tr=t.closest('[data-ed-row]'); if(!tr||!t.dataset.f) return; const s=cur[tr.dataset.edRow], f=t.dataset.f;
+    f==='p'||f==='old'?s[f]=t.value:s.tiers[+t.dataset.i][f==='k'?0:1]=t.value; mark(tr.dataset.edRow); counter(); });
+  box.addEventListener('change',e=>{ const t=e.target;
+    if(t===catSel) return filter();
+    if(t.matches('[data-ed-only]')){ onlyCh=t.checked; return filter(); }
+    if(t.matches('[data-ed-file]')&&t.files[0]) importFile(t); });
+  box.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.matches('[data-ed-pct]')){ e.preventDefault(); $('[data-ed-pct-go]').click(); } });
+
+  const importFile=async inp=>{ const fd=new FormData(); fd.append('file',inp.files[0]); inp.value='';
+    try{ const r=await post('ed_import',fd); if(!r.ok){ BT_toast(esc(r.error||'Не получилось прочитать файл')); return; }
+      let ch=0;
+      r.items.forEach(it=>{ const s=cur[it.id]; if(!s) return; const was=isCh(it.id);
+        'p' in it&&(s.p=str(it.p)); 'old' in it&&(s.old=str(it.old)); 'tiers' in it&&(s.tiers=it.tiers.map(([k,p])=>[String(k),str(p)]));
+        !was&&isCh(it.id)&&ch++; });
+      const parts=[`Из файла: изменится <b>${ch}</b> ${ch%10===1&&ch%100!==11?'товар':ch%10>=2&&ch%10<=4&&(ch%100<10||ch%100>=20)?'товара':'товаров'}, без изменений ${r.items.length-ch}.`];
+      r.unknownCnt&&parts.push(`Не нашли в прайсе ${r.unknownCnt}: ${r.unknown.map(esc).join('; ')}${r.unknownCnt>r.unknown.length?'…':''}.`);
+      r.notKg&&parts.push(`Ступени пропущены у ${r.notKg} товаров не на вес.`);
+      parts.push(ch?'Изменённые строки подсвечены — проверьте и нажмите «Сохранить».':'');
+      note.innerHTML=parts.join(' '); note.hidden=false;
+      onlyCh=ch>0; $('[data-ed-only]').checked=onlyCh; draw();
+    }catch(err){ BT_toast(err.message==='access'?'Сессия закончилась — обновите страницу':'Не получилось загрузить файл. Попробуйте ещё раз'); } };
+
+  const save=async()=>{ const ids=rows.filter(r=>isCh(r.id)).map(r=>r.id); if(!ids.length) return;
+    const bad=ids.find(id=>check(id)?.[0]==='err'); if(bad){ onlyCh=true; $('[data-ed-only]').checked=true; filter();
+      tb.querySelector(`[data-ed-row="${bad}"]`)?.scrollIntoView({block:'center'}); BT_toast('Исправьте строки с ошибкой — они подсвечены красным'); return; }
+    const warn=ids.filter(id=>check(id)?.[0]==='warn').length;
+    if(warn&&!confirm(`У ${warn} товаров цена изменилась сильно или выглядит странно (подсвечено жёлтым). Сохранить всё равно?`)) return;
+    const btn=$('[data-ed-save]'); btn.disabled=true; btn.textContent='Сохраняем…';
+    const items=ids.map(id=>{ const s=cur[id]; return {id,p:num(s.p),old:num(s.old),tiers:s.tiers.map(([k,p])=>[num(k),num(p)]).sort((a,b)=>a[0]-b[0])}; });
+    try{ const r=await post('ed_save',{items:JSON.stringify(items),notify:$('[data-ed-ntf]').checked?'Y':'N'});
+      const errs=r.errors||{}; keep=new Set(Object.keys(errs)); load(r); keep=new Set(); drawLog();
+      const msg=`Сохранено: ${r.saved}`+(r.sent?` · письмо ушло ${r.sent} подписчикам`:'');
+      if(!Object.keys(errs).length){ try{ sessionStorage.setItem('bt_ed_msg',msg); }catch(e){} location.reload(); return; }
+      draw(); Object.entries(errs).forEach(([id,m])=>{ const em=tb.querySelector(`[data-ed-row="${id}"] [data-ed-msg]`); if(em){ em.textContent=m; em.className='is-err'; } });
+      BT_toast(msg+` · не сохранено: ${Object.keys(errs).length}`);
+    }catch(err){ BT_toast(err.message==='access'?'Сессия закончилась — обновите страницу, изменения в ней не сохранятся':'Нет связи с сервером. Изменения не сохранены — попробуйте ещё раз'); counter(); } };
+
+  addEventListener('beforeunload',e=>{ if(rows.some(r=>isCh(r.id))){ e.preventDefault(); e.returnValue=''; } });
+  let reopen=false, msg=''; try{ reopen=sessionStorage.getItem('bt_ed')==='1'; msg=sessionStorage.getItem('bt_ed_msg')||''; sessionStorage.removeItem('bt_ed_msg'); }catch(e){}
+  if(reopen) open(true,true);
+  msg&&setTimeout(()=>BT_toast(esc(msg)),300);
+});
