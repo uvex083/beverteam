@@ -1141,6 +1141,65 @@ function bt_clients(): array
     return $list;
 }
 
+// Прайс-лист (/price/): товары каталога по разделам — [код раздела => [name, url, subs => [название подраздела => [товары bt_product]]]]
+function bt_price_list(): array
+{
+    $catId = bt_iblock('catalog');
+    if (!$catId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_price_list', '/bt/catalog')) {
+        [$tree, $map] = $cache->getVars();
+    } else {
+        $cache->startDataCache();
+        $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/catalog');
+        $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $catId);
+        $tree = $parent = [];
+        $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y', '<=DEPTH_LEVEL' => 2], false,
+            ['ID', 'NAME', 'CODE', 'DEPTH_LEVEL', 'IBLOCK_SECTION_ID', 'SECTION_PAGE_URL']);
+        while ($s = $r->GetNext()) {
+            if ((int)$s['DEPTH_LEVEL'] === 1) {
+                $tree[$s['CODE']] = ['name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL'], 'subs' => []];
+                $parent[$s['ID']] = [$s['CODE'], ''];
+            } else {
+                $code = $parent[$s['IBLOCK_SECTION_ID']][0] ?? '';
+                $parent[$s['ID']] = [$code, $s['~NAME']];
+                $code !== '' and $tree[$code]['subs'][$s['~NAME']] = [];
+            }
+        }
+        $map = [];
+        $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'NAME' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_SECTION_ID']);
+        while ($f = $r->Fetch()) {
+            isset($parent[$f['IBLOCK_SECTION_ID']]) and $map[] = [(string)$f['ID'], $parent[$f['IBLOCK_SECTION_ID']]];
+        }
+        $GLOBALS['CACHE_MANAGER']->EndTagCache();
+        $cache->endDataCache([$tree, $map]);
+    }
+    foreach ($map as [$id, [$code, $sub]]) {
+        ($m = bt_product($id)) and $tree[$code]['subs'][$sub][] = $m;
+    }
+    foreach ($tree as $code => &$t) {
+        $t['subs'] = array_filter($t['subs']);
+        $t['cnt'] = array_sum(array_map('count', $t['subs']));
+    }
+    unset($t);
+    return array_filter($tree, fn($t) => $t['cnt'] > 0);
+}
+
+// Дата последнего изменения товаров или цен каталога — «Цены актуальны на …»
+function bt_price_date(): int
+{
+    $catId = bt_iblock('catalog');
+    $el = \CIBlockElement::GetList(['TIMESTAMP_X' => 'DESC'], ['IBLOCK_ID' => $catId], false, ['nTopCount' => 1], ['ID', 'TIMESTAMP_X'])->Fetch();
+    $ts = $el ? MakeTimeStamp($el['TIMESTAMP_X']) : 0;
+    if (\Bitrix\Main\Loader::includeModule('catalog')) {
+        $p = \Bitrix\Catalog\PriceTable::getList(['select' => ['TIMESTAMP_X'], 'order' => ['TIMESTAMP_X' => 'DESC'], 'limit' => 1])->fetch();
+        $p && $p['TIMESTAMP_X'] instanceof \Bitrix\Main\Type\DateTime and $ts = max($ts, $p['TIMESTAMP_X']->getTimestamp());
+    }
+    return $ts ?: time();
+}
+
 // Область, общая для всех городов, в родительном падеже («Свердловской области») по справочнику местоположений; города из разных областей или не найдены — пусто
 function bt_cities_region(array $cities): string
 {
@@ -1513,7 +1572,7 @@ function bt_sitemap_build(): string
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
     $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
-        '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
+        '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/price/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
@@ -1587,6 +1646,7 @@ function bt_search_pages(): array
         ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],
         ['t' => 'О компании', 'u' => '/o-kompanii/', 'd' => 'BEVERTEAM с 2010 года', 'k' => 'о компании beverteam'],
         ['t' => 'Отзывы', 'u' => '/otzyvy-o-nas/', 'd' => 'Что говорят клиенты', 'k' => 'отзывы'],
+        ['t' => 'Прайс-лист', 'u' => '/price/', 'd' => 'Кофе, чай, кофемашины и аксессуары с оптовыми ценами', 'k' => 'прайс цены опт оптом прайс-лист'],
         ['t' => 'Наши клиенты', 'u' => '/nashi-klienty/', 'd' => 'Установки кофемашин Jetinno в офисах, кафе и бизнес-центрах', 'k' => 'наши клиенты установки объекты'],
         ['t' => 'Журнал', 'u' => '/blog/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
         ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],

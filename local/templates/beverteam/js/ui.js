@@ -2120,3 +2120,53 @@ document.addEventListener('DOMContentLoaded',()=>{
     BT_lightbox(items,start); });
   draw();
 });
+
+/* Прайс-лист: поиск и категории на лету (адрес с фильтром), количество в строке пишет в общую корзину, подсветка оптовой ступени, панель корзины снизу */
+document.addEventListener('DOMContentLoaded',()=>{
+  const bar=document.querySelector('[data-prc-bar]'); if(!bar) return;
+  const rows=[...document.querySelectorAll('[data-prc-row]')], secs=[...document.querySelectorAll('[data-prc-sec]')], qIn=bar.querySelector('[data-prc-q]'), cats=[...bar.querySelectorAll('[data-prc-cat]')];
+  const u0=new URL(location.href), c0=u0.searchParams.get('cat')||''; let cat=cats.some(b=>b.dataset.prcCat===c0)?c0:''; qIn.value=u0.searchParams.get('q')||'';
+  const hdr=document.querySelector('.hdr'), top=()=>document.documentElement.style.setProperty('--prc-top',(hdr?Math.round(hdr.getBoundingClientRect().height):0)+'px');
+  top(); addEventListener('resize',top);
+  const secOf=r=>r.closest('[data-prc-sec]').dataset.prcSec;
+  const filter=()=>{
+    const words=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean); let shown=0;
+    rows.forEach(r=>{ const h=r.dataset.q.replace(/ё/g,'е'); r.hidden=!words.every(w=>h.includes(w)); });
+    cats.forEach(b=>{ const c=b.dataset.prcCat; b.setAttribute('aria-pressed',String(c===cat)); b.querySelector('s').textContent=rows.filter(r=>!r.hidden&&(!c||secOf(r)===c)).length; });
+    secs.forEach(s=>{ let n=0; s.querySelectorAll('[data-prc-group]').forEach(g=>{ const k=g.querySelectorAll('[data-prc-row]:not([hidden])').length; g.hidden=!k; n+=k; });
+      s.hidden=!n||(!!cat&&s.dataset.prcSec!==cat); s.hidden||(shown+=n); });
+    document.querySelector('[data-prc-empty]').hidden=shown>0;
+    const u=new URL(location.href), q=qIn.value.trim(); cat?u.searchParams.set('cat',cat):u.searchParams.delete('cat'); q?u.searchParams.set('q',q):u.searchParams.delete('q'); history.replaceState(history.state,'',u);
+  };
+  qIn.addEventListener('input',filter);
+  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(!b) return; cat=b.dataset.prcCat; filter(); });
+  document.addEventListener('click',e=>{
+    if(e.target.closest('[data-prc-reset]')){ cat=''; qIn.value=''; filter(); return; }
+    if(e.target.closest('[data-prc-print]')){ print(); return; }
+    if(e.target.closest('[data-prc-share]')){ const url=location.href; (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); }
+  });
+  /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
+  const keyOf=r=>BT_key(r.dataset.id,+r.dataset.kg);
+  const qOf=r=>(BT_cartItems().find(c=>c.key===keyOf(r))||{}).q||0;
+  const draw=r=>{ const m=BT_find(r.dataset.id), inp=r.querySelector('[data-prc-in]'); if(!m||!inp) return;
+    const kg=+r.dataset.kg, q=qOf(r), sum=r.querySelector('[data-prc-sum]');
+    document.activeElement===inp||(inp.value=q);
+    r.classList.toggle('is-in',q>0);
+    let txt=q?BT_fmt(BT_piece(m,kg,q)*q):'';
+    if(kg&&m.bulk){ const w=kg*q, t=BT_tier(m,Math.max(w,1)), nx=m.bulk.find(b=>b.kg>w);
+      r.querySelectorAll('[data-prc-kg]').forEach(td=>td.classList.toggle('is-cur',q>0&&+td.dataset.prcKg===t.kg));
+      if(q&&nx) txt+=` · ещё ${nx.kg-w} кг — и ${BT_fmt(nx.p)} за кг`; }
+    sum.textContent=txt; };
+  const bag=document.querySelector('[data-prc-bag]');
+  const drawBag=()=>{ const items=BT_cartItems(), t=BT_cartTotal(), n=items.length;
+    bag.hidden=!n; if(!n) return;
+    bag.querySelector('[data-prc-bag-n]').textContent=`${n} ${n%10===1&&n%100!==11?'позиция':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'позиции':'позиций'}`;
+    bag.querySelector('[data-prc-bag-s]').textContent=' на '+BT_fmt(t.sum); };
+  const set=(r,q)=>{ q=Math.max(0,Math.min(999,Math.round(+q)||0)); BT_cartSet(keyOf(r),q); draw(r); drawBag(); };
+  document.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-step]'); if(!b) return; const r=b.closest('[data-prc-row]'); set(r,qOf(r)+(+b.dataset.prcStep)); });
+  document.addEventListener('input',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) i.value=i.value.replace(/\D/g,'').slice(0,3); });
+  document.addEventListener('change',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) set(i.closest('[data-prc-row]'),i.value); });
+  document.addEventListener('keydown',e=>{ const i=e.target.closest('[data-prc-in]'); if(i&&e.key==='Enter'){ e.preventDefault(); i.blur(); } });
+  document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); });
+  rows.forEach(draw); drawBag(); filter();
+});
