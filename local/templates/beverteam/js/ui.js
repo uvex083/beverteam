@@ -2334,7 +2334,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(t.closest('[data-ed-tadd]')){ const tl=cur[id].tiers, last=tl.length?num(tl[tl.length-1][0]):0; tl.push([String(last?last*2:5),'']); redrawTiers(id);
       tr.querySelector(`[data-f="t"][data-i="${tl.length-1}"]`).focus(); return; }
     const del=t.closest('[data-ed-tdel]'); if(del){ cur[id].tiers.splice(+del.dataset.edTdel,1); redrawTiers(id); return; }
-    if(t.closest('[data-ed-reset]')){ if(!confirm('Отменить все несохранённые изменения?')) return; rows.forEach(r=>cur[r.id]=JSON.parse(JSON.stringify(orig[r.id]))); note.hidden=true; draw(); return; }
+    if(t.closest('[data-ed-reset]')){ if(!confirm('Отменить все несохранённые изменения?')) return; rows.forEach(r=>cur[r.id]=JSON.parse(JSON.stringify(orig[r.id]))); note.hidden=true; onlyCh=false; $('[data-ed-only]').checked=false; draw(); return; }
     if(t.closest('[data-ed-save]')) return save();
     if(t.closest('[data-ed-logb]')){ const on=logBox.hidden; logBox.hidden=!on; t.closest('[data-ed-logb]').setAttribute('aria-expanded',String(on)); return; }
     const u=t.closest('[data-ed-undo]'); if(u){ const e2=log[+u.dataset.edUndo]; cur[e2.id]=pack({p:e2.b.p,old:e2.b.old,tiers:e2.b.tiers}); draw();
