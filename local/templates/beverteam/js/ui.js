@@ -277,7 +277,7 @@ window.BT_cartSync = (key,q,was) => { const id=BT_kid(key);
 window.BT_cartUpdate = pulse => {
   const t=BT_cartTotal(), a=document.querySelector('.hact[href="/personal/cart/"]'); if(!a) return;
   const c=a.querySelector('.cnt'); if(c){ c.textContent=t.n; c.hidden=!t.n; }
-  const l=a.querySelector('span:not(.cnt)'); if(l) l.textContent=t.n?fmt(t.sum):'Корзина';
+  const l=a.querySelector('span:not(.cnt)'); if(l) l.textContent=t.n?fmt(t.sum-BT_sumDisc(t.sum).cut):'Корзина';
   if(pulse){a.classList.remove('is-pulse');void a.offsetWidth;a.classList.add('is-pulse');}
 };
 
