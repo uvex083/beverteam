@@ -29,7 +29,7 @@ $tier = function (array $m, int $kg) {
     <div class="prcact">
       <a class="btn btn--line" href="?format=csv" download><?= bt_icon('doc') ?>Скачать Excel</a>
       <button class="btn btn--line" type="button" data-prc-print>Печать / PDF</button>
-      <button class="btn btn--line" type="button" data-prc-share>Скопировать ссылку</button>
+      <button class="btn btn--line" type="button" data-prc-share><?= bt_icon('share') ?>Поделиться ссылкой</button>
     </div>
   </div>
 

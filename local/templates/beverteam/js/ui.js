@@ -2143,7 +2143,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('click',e=>{
     if(e.target.closest('[data-prc-reset]')){ cat=''; qIn.value=''; filter(); return; }
     if(e.target.closest('[data-prc-print]')){ print(); return; }
-    if(e.target.closest('[data-prc-share]')){ const url=location.href; (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); }
+    if(e.target.closest('[data-prc-share]')){ const url=location.href; if(navigator.share&&matchMedia('(hover:none)').matches){ navigator.share({title:document.title,url}).catch(()=>{}); return; } (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); }
   });
   /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
   const keyOf=r=>BT_key(r.dataset.id,+r.dataset.kg);
@@ -2155,7 +2155,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     let txt=q?BT_fmt(BT_piece(m,kg,q)*q):'';
     if(kg&&m.bulk){ const w=kg*q, t=BT_tier(m,Math.max(w,1)), nx=m.bulk.find(b=>b.kg>w);
       r.querySelectorAll('[data-prc-kg]').forEach(td=>td.classList.toggle('is-cur',q>0&&+td.dataset.prcKg===t.kg));
-      if(q&&nx) txt+=` · ещё ${nx.kg-w} кг — и ${BT_fmt(nx.p)} за кг`; }
+      if(q&&nx) txt+=` · ещё ${nx.kg-w} кг — ${BT_fmt(nx.p)}/кг`; }
     sum.textContent=txt; };
   const bag=document.querySelector('[data-prc-bag]');
   const drawBag=()=>{ const items=BT_cartItems(), t=BT_cartTotal(), n=items.length;

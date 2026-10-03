@@ -1,0 +1,2 @@
+<?php
+$sSectionName = 'Прайс-лист';
