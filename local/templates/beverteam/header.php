@@ -10,6 +10,7 @@ $asset = Asset::getInstance();
 // товары для поиска, корзины и сравнения в ui.js — до подключения скриптов
 $asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';window.BT_CATS=' . Json::encode(bt_mega_cats()) . ';window.BT_SUMDISC=' . Json::encode(bt_sum_discounts()) . ';window.BT_BASKET=' . Json::encode(bt_basket_state()) . ';window.BT_POSTS=' . Json::encode(bt_posts()) . ';window.BT_SRCH=' . Json::encode(bt_search_cfg()) . bt_map_js() . ';window.BT_PAGES=' . Json::encode(bt_search_pages())
     . ';window.BT_UTP=' . Json::encode(array_map(fn($u) => [$u['icon'], $u['name'], $u['text']], bt_list('main_utp_items'))) . ';window.BT_USER=' . Json::encode(bt_user_js()) . ';window.BT_IDP=' . Json::encode(bt_idp()) . ';window.BT_SID=' . Json::encode(bitrix_sessid())
+    . ';window.BT_YMAPS_KEY=' . Json::encode(\Bitrix\Main\Config\Option::get('fileman', 'yandex_map_api_key', ''))
     . (isset($_GET['auth_service_error']) ? ';window.BT_AUTH_ERR=' . Json::encode(bt_idp_error()) : '') . ';</script>', false, AssetLocation::AFTER_CSS);
 $asset->addCss(SITE_TEMPLATE_PATH . '/vendor/swiper-bundle.min.css');
 $asset->addCss(SITE_TEMPLATE_PATH . '/css/ui.css');
