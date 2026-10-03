@@ -1240,7 +1240,7 @@ function bt_price_notify_send(int $ts): int
             }
         }
     }
-    \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)$ts);
+    \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)max($ts, bt_price_date()));
     return $n;
 }
 

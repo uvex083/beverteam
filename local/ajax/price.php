@@ -139,6 +139,7 @@ function bt_pe_save(array $items, bool $notify): array
     global $USER;
     $catId = bt_iblock('catalog');
     $base = (int)(\Bitrix\Catalog\GroupTable::getList(['filter' => ['=BASE' => 'Y'], 'select' => ['ID']])->fetch()['ID'] ?? 0);
+    $cur = \Bitrix\Currency\CurrencyManager::getBaseCurrency();
     $names = array_column(bt_pe_rows(), 'n', 'id');
     $ids = array_values(array_intersect(array_map(fn($i) => (int)($i['id'] ?? 0), $items), array_keys($names)));
     $before = bt_pe_state($ids);
@@ -195,7 +196,7 @@ function bt_pe_save(array $items, bool $notify): array
                 $from = $tiers ? array_merge([1], array_keys($tiers)) : [null];
                 $price = array_merge([$p], array_values($tiers));
                 foreach ($p > 0 ? $from : [] as $i => $f) {
-                    $res = \Bitrix\Catalog\Model\Price::add(['PRODUCT_ID' => $id, 'CATALOG_GROUP_ID' => $base, 'PRICE' => $price[$i], 'CURRENCY' => 'RUB',
+                    $res = \Bitrix\Catalog\Model\Price::add(['PRODUCT_ID' => $id, 'CATALOG_GROUP_ID' => $base, 'PRICE' => $price[$i], 'CURRENCY' => $cur,
                         'QUANTITY_FROM' => $f, 'QUANTITY_TO' => isset($from[$i + 1]) ? $from[$i + 1] - 1 : null]);
                     $res->isSuccess() or throw new RuntimeException(implode('; ', $res->getErrorMessages()));
                 }
@@ -217,12 +218,12 @@ function bt_pe_save(array $items, bool $notify): array
         CIBlock::clearIblockTagCache($catId);
         \Bitrix\Main\Config\Option::set('bt', 'price_log', json_encode(array_slice(array_merge(array_reverse($log), bt_pe_log()), 0, 150), JSON_UNESCAPED_UNICODE));
         // письмо подписчикам сразу; без галочки — только отметка, чтобы агент не разослал его позже
-        $notify ? $sent = bt_price_notify_send(time()) : \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)time());
+        $notify ? $sent = bt_price_notify_send(time()) : \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)max(time(), bt_price_date()));
     }
     return ['ok' => !$errors, 'saved' => $saved, 'sent' => $sent, 'errors' => (object)$errors, 'rows' => bt_pe_rows(), 'log' => bt_pe_log()];
 }
 
-// разбор файла: тот же формат, что «Скачать Excel» (колонки «Товар», «Цена, ₽», «от N кг», «Ссылка»; «Старая цена» — по желанию), .xlsx или .csv
+// разбор файла: тот же формат, что «Скачать Excel» в редакторе (колонки «Товар», «Цена, ₽», «Старая цена, ₽», «от N кг», «Ссылка»), .xlsx или .csv; пустая ячейка — цена не меняется
 function bt_pe_import($file): array
 {
     if (!is_array($file) || ($file['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
@@ -302,7 +303,7 @@ function bt_pe_import($file): array
         }
         $it = ['id' => $id];
         isset($col['p']) && ($v = $num($row[$col['p']] ?? '')) !== null and $it['p'] = $v;
-        isset($col['old']) and $it['old'] = (float)$num($row[$col['old']] ?? '');
+        isset($col['old']) && ($v = $num($row[$col['old']] ?? '')) !== null and $it['old'] = $v;
         if ($col['tiers']) {
             // в выгрузке пустая ступень повторяет предыдущую цену — такие повторы не ступени
             $prev = $it['p'] ?? null;

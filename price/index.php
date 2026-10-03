@@ -17,9 +17,10 @@ if (($_GET['format'] ?? '') === 'csv') {
     }
     ksort($kgs);
     $kgs = array_slice(array_keys($kgs), 1);
+    $ed = !empty($_GET['ed']) && bt_price_editor();
     $host = 'https://' . preg_replace('/[^a-z0-9.\-]/i', '', $_SERVER['HTTP_HOST'] ?? 'beverteam.ru');
     $cell = fn($s) => '"' . str_replace('"', '""', (string)$s) . '"';
-    $rows = [array_merge(['Категория', 'Раздел', 'Товар', 'Описание', 'Цена, ₽'], array_map(fn($k) => "от $k кг, ₽ за кг", $kgs), ['Наличие', 'Ссылка'])];
+    $rows = [array_merge(['Категория', 'Раздел', 'Товар', 'Описание', 'Цена, ₽'], $ed ? ['Старая цена, ₽'] : [], array_map(fn($k) => "от $k кг, ₽ за кг", $kgs), ['Наличие', 'Ссылка'])];
     foreach ($list as $t) {
         foreach ($t['subs'] as $sub => $items) {
             foreach ($items as $m) {
@@ -31,7 +32,7 @@ if (($_GET['format'] ?? '') === 'csv') {
                     }
                     $tiers[] = $p;
                 }
-                $rows[] = array_merge([$t['name'], $sub, $m['n'], $m['par'] ?? '', $m['p'] ?: 'по запросу'], $tiers,
+                $rows[] = array_merge([$t['name'], $sub, $m['n'], $m['par'] ?? '', $m['p'] ?: 'по запросу'], $ed ? [!empty($m['old']) ? $m['old'] : ''] : [], $tiers,
                     [!empty($m['pre']) ? 'предзаказ' : (!empty($m['stock']) ? 'в наличии' : 'под заказ'), $host . $m['url']]);
             }
         }

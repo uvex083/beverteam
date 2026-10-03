@@ -2250,7 +2250,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const post=async(action,data={})=>{ const fd=data instanceof FormData?data:new FormData(); fd.append('action',action); fd.append('sessid',window.BT_SID||'');
     if(!(data instanceof FormData)) Object.entries(data).forEach(([k,v])=>fd.append(k,v));
     const r=await fetch('/local/ajax/price.php',{method:'POST',body:fd,credentials:'same-origin'}); if(r.status===403) throw new Error('access'); return r.json(); };
-  let rows=[], orig={}, cur={}, log=[], subs=0, onlyCh=false;
+  let rows=[], orig={}, cur={}, log=[], subs=0, onlyCh=false, restoreY=0;
   const pack=r=>({p:str(r.p),old:str(r.old),tiers:r.tiers.map(([k,p])=>[String(k),str(p)])});
   const canon=s=>JSON.stringify([num(s.p),num(s.old),s.tiers.map(([k,p])=>[num(k),num(p)]).sort((a,b)=>a[0]-b[0])]);
   const isCh=id=>canon(cur[id])!==canon(orig[id]);
@@ -2270,7 +2270,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <button class="btn btn--dark btn--sm" type="button" data-ed-open aria-expanded="false">Открыть редактор</button></div>
     <div class="prced__body" data-ed-body hidden>
       <div class="prced__tools">
-        <a class="btn btn--line btn--sm" href="?format=csv" download>Скачать Excel</a>
+        <a class="btn btn--line btn--sm" href="?format=csv&amp;ed=1" download>Скачать Excel</a>
         <label class="btn btn--line btn--sm prced__file">Загрузить из Excel<input type="file" accept=".xlsx,.csv" data-ed-file></label>
         <span class="prced__pct">Все показанные цены на <input type="text" inputmode="decimal" placeholder="+5" aria-label="Процент изменения" data-ed-pct> % <button class="btn btn--line btn--sm" type="button" data-ed-pct-go>Применить</button></span>
         <button class="btn btn--line btn--sm" type="button" data-ed-logb aria-expanded="false">Журнал изменений</button>
@@ -2300,9 +2300,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       +`<button class="prced__add" type="button" data-ed-tadd>+ ступень</button>`;
   const rowHtml=r=>{ const s=cur[r.id];
     return `<tr data-ed-row="${r.id}"><td class="prced__n"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.n)}</a><small>${esc(r.catN)}${r.sub?' · '+esc(r.sub):''}</small><em data-ed-msg></em></td>
-      <td><input type="text" inputmode="decimal" value="${esc(s.p)}" placeholder="по запросу" aria-label="Розничная цена: ${esc(r.n)}" data-f="p"><small data-ed-was></small></td>
-      <td><input type="text" inputmode="decimal" value="${esc(s.old)}" placeholder="—" aria-label="Старая цена: ${esc(r.n)}" data-f="old"></td>
-      <td class="prced__tiers" data-ed-tiers>${tierHtml(r.id,r)}</td></tr>`; };
+      <td data-l="Розница, ₽"><input type="text" inputmode="decimal" value="${esc(s.p)}" placeholder="по запросу" aria-label="Розничная цена: ${esc(r.n)}" data-f="p"><small data-ed-was></small></td>
+      <td data-l="Старая цена, ₽"><input type="text" inputmode="decimal" value="${esc(s.old)}" placeholder="—" aria-label="Старая цена: ${esc(r.n)}" data-f="old"></td>
+      <td class="prced__tiers" data-l="Оптовые ступени, ₽ за кг" data-ed-tiers>${tierHtml(r.id,r)}</td></tr>`; };
   const mark=id=>{ const tr=tb.querySelector(`[data-ed-row="${id}"]`); if(!tr) return; const ch=isCh(id), m=ch?check(id):null, o=orig[id];
     tr.classList.toggle('is-ch',ch); tr.classList.toggle('is-err',m?.[0]==='err');
     tr.querySelector('[data-ed-was]').textContent=ch&&num(cur[id].p)!==num(o.p)?'было '+(num(o.p)?rub(num(o.p)):'по запросу'):'';
@@ -2326,7 +2326,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     try{ on?sessionStorage.setItem('bt_ed','1'):sessionStorage.removeItem('bt_ed'); }catch(e){}
     if(on&&!rows.length) post('ed_load').then(d=>{ load(d); subs=d.subs; $('[data-ed-subs]').textContent=subs?`(${subs})`:'(нет подписчиков)';
       const seen={}; rows.forEach(r=>{ if(!seen[r.cat]){ seen[r.cat]=1; catSel.insertAdjacentHTML('beforeend',`<option value="${esc(r.cat)}">${esc(r.catN)}</option>`); } });
-      draw(); drawLog(); }).catch(()=>{ tb.innerHTML='<tr><td colspan="4" class="prced__empty">Не удалось загрузить цены — обновите страницу. Возможно, закончилась сессия.</td></tr>'; });
+      draw(); drawLog(); if(restoreY){ scrollTo(0,restoreY); restoreY=0; } }).catch(()=>{ tb.innerHTML='<tr><td colspan="4" class="prced__empty">Не удалось загрузить цены — обновите страницу. Возможно, закончилась сессия.</td></tr>'; });
     silent||on&&matchMedia('(min-width:761px)').matches&&setTimeout(()=>qIn.focus(),50); };
   box.addEventListener('click',e=>{ const t=e.target;
     if(t.closest('[data-ed-open]')) return open(body.hidden);
@@ -2339,7 +2339,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(t.closest('[data-ed-logb]')){ const on=logBox.hidden; logBox.hidden=!on; t.closest('[data-ed-logb]').setAttribute('aria-expanded',String(on)); return; }
     const u=t.closest('[data-ed-undo]'); if(u){ const e2=log[+u.dataset.edUndo]; cur[e2.id]=pack({p:e2.b.p,old:e2.b.old,tiers:e2.b.tiers}); draw();
       tb.querySelector(`[data-ed-row="${e2.id}"]`)?.scrollIntoView({block:'center'}); BT_toast('Вернули прежние цены в редактор — проверьте и нажмите «Сохранить»'); return; }
-    if(t.closest('[data-ed-pct-go]')){ const v=parseFloat(String($('[data-ed-pct]').value).replace(',','.').replace(/\s/g,''));
+    if(t.closest('[data-ed-pct-go]')){ const v=parseFloat(String($('[data-ed-pct]').value).replace(',','.').replace('−','-').replace(/\s/g,''));
       if(!v||v<=-100||Math.abs(v)>300){ BT_toast('Укажите процент, например 5 или −3'); return; }
       const vis=[...tb.querySelectorAll('[data-ed-row]:not([hidden])')].map(x=>x.dataset.edRow); if(!vis.length) return;
       if(!confirm(`Изменить розничные и оптовые цены у ${vis.length} товаров на ${v>0?'+':''}${v}%? Округление до рубля. До сохранения можно отменить.`)) return;
@@ -2379,13 +2379,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     try{ const r=await post('ed_save',{items:JSON.stringify(items),notify:$('[data-ed-ntf]').checked?'Y':'N'});
       const errs=r.errors||{}; keep=new Set(Object.keys(errs)); load(r); keep=new Set(); drawLog();
       const msg=`Сохранено: ${r.saved}`+(r.sent?` · письмо ушло ${r.sent} подписчикам`:'');
-      if(!Object.keys(errs).length){ try{ sessionStorage.setItem('bt_ed_msg',msg); }catch(e){} location.reload(); return; }
+      if(!Object.keys(errs).length){ try{ sessionStorage.setItem('bt_ed_msg',msg); sessionStorage.setItem('bt_ed_y',String(scrollY)); }catch(e){} location.reload(); return; }
       draw(); Object.entries(errs).forEach(([id,m])=>{ const em=tb.querySelector(`[data-ed-row="${id}"] [data-ed-msg]`); if(em){ em.textContent=m; em.className='is-err'; } });
       BT_toast(msg+` · не сохранено: ${Object.keys(errs).length}`);
     }catch(err){ BT_toast(err.message==='access'?'Сессия закончилась — обновите страницу, изменения в ней не сохранятся':'Нет связи с сервером. Изменения не сохранены — попробуйте ещё раз'); counter(); } };
 
   addEventListener('beforeunload',e=>{ if(rows.some(r=>isCh(r.id))){ e.preventDefault(); e.returnValue=''; } });
-  let reopen=false, msg=''; try{ reopen=sessionStorage.getItem('bt_ed')==='1'; msg=sessionStorage.getItem('bt_ed_msg')||''; sessionStorage.removeItem('bt_ed_msg'); }catch(e){}
+  let reopen=false, msg=''; try{ reopen=sessionStorage.getItem('bt_ed')==='1'; msg=sessionStorage.getItem('bt_ed_msg')||''; restoreY=+sessionStorage.getItem('bt_ed_y')||0; sessionStorage.removeItem('bt_ed_msg'); sessionStorage.removeItem('bt_ed_y'); }catch(e){}
   if(reopen) open(true,true);
   msg&&setTimeout(()=>BT_toast(esc(msg)),300);
 });
