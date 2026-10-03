@@ -2139,22 +2139,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   const secOf=r=>r.closest('[data-prc-sec]').dataset.prcSec;
   const keyOf=r=>BT_key(r.dataset.id,+r.dataset.kg);
   const qOf=r=>(BT_cartItems().find(c=>c.key===keyOf(r))||{}).q||0;
+  /* «Только выбранные» — отдельный режим просмотра поверх категории и поиска, а не ещё одна категория */
+  const onlyBtn=bar.querySelector('[data-prc-only]'); let only=false;
   const filter=()=>{
     const words=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean);
     rows.forEach(r=>{ const h=r.dataset.q.replace(/ё/g,'е'); r.dataset.hit=words.every(w=>h.includes(w))?'1':''; });
-    const inCat=(r,c)=>r.dataset.hit&&(!c||(c==='sel'?qOf(r)>0:secOf(r)===c));
-    cats.forEach(b=>{ const c=b.dataset.prcCat, n=rows.filter(r=>inCat(r,c)).length; b.querySelector('s').textContent=n;
-      b.setAttribute('aria-pressed',String(c===cat)); c==='sel'&&b.setAttribute('aria-disabled',String(!n&&cat!=='sel')); });
-    if(cat==='sel'&&!rows.some(r=>inCat(r,'sel'))&&!words.length){ cat=''; return filter(); }
-    rows.forEach(r=>{ r.hidden=!inCat(r,cat); });
+    const sel=rows.filter(r=>qOf(r)>0).length;
+    if(!sel) only=false;
+    const ok=(r,c)=>r.dataset.hit&&(!c||secOf(r)===c)&&(!only||qOf(r)>0);
+    cats.forEach(b=>{ const c=b.dataset.prcCat; b.querySelector('s').textContent=rows.filter(r=>ok(r,c)).length; b.setAttribute('aria-pressed',String(c===cat)); });
+    onlyBtn.setAttribute('aria-checked',String(only)); onlyBtn.setAttribute('aria-disabled',String(!sel)); onlyBtn.querySelector('[data-prc-only-n]').textContent=sel;
+    rows.forEach(r=>{ r.hidden=!ok(r,cat); });
     let shown=0;
     secs.forEach(s=>{ let n=0; s.querySelectorAll('[data-prc-group]').forEach(g=>{ const k=g.querySelectorAll('[data-prc-row]:not([hidden])').length; g.hidden=!k; n+=k; });
       s.hidden=!n; shown+=n; });
     document.querySelector('[data-prc-empty]').hidden=shown>0;
-    const u=new URL(location.href), q=qIn.value.trim(); cat&&cat!=='sel'?u.searchParams.set('cat',cat):u.searchParams.delete('cat'); q?u.searchParams.set('q',q):u.searchParams.delete('q'); history.replaceState(history.state,'',u);
+    const u=new URL(location.href), q=qIn.value.trim(); cat?u.searchParams.set('cat',cat):u.searchParams.delete('cat'); q?u.searchParams.set('q',q):u.searchParams.delete('q'); history.replaceState(history.state,'',u);
   };
   qIn.addEventListener('input',filter);
-  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(!b||b.getAttribute('aria-disabled')==='true') return; cat=b.dataset.prcCat; filter(); });
+  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(b){ cat=b.dataset.prcCat; filter(); return; }
+    if(e.target.closest('[data-prc-only]')&&onlyBtn.getAttribute('aria-disabled')!=='true'){ only=!only; filter(); } });
   /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
   const draw=r=>{ const m=BT_find(r.dataset.id), inp=r.querySelector('[data-prc-in]'); if(!m||!inp) return;
     const kg=+r.dataset.kg, q=qOf(r), sum=r.querySelector('[data-prc-sum]');
@@ -2186,11 +2190,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(navigator.share&&matchMedia('(hover:none)').matches){ navigator.share({title:document.title,url}).catch(()=>{}); return; }
       (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); return; }
     if(e.target.closest('[data-prc-inv]')){ invOpen(); return; }
+    if(e.target.closest('[data-prc-show]')){ only=true; cat=''; qIn.value=''; filter(); bar.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'}); return; }
   });
   document.addEventListener('input',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) i.value=i.value.replace(/\D/g,'').slice(0,3); });
   document.addEventListener('change',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) set(i.closest('[data-prc-row]'),i.value); });
   document.addEventListener('keydown',e=>{ const i=e.target.closest('[data-prc-in]'); if(i&&e.key==='Enter'){ e.preventDefault(); i.blur(); } });
-  document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); cats.find(b=>b.dataset.prcCat==='sel')&&filter(); });
+  document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); filter(); });
   /* превью фото товара при наведении на название — только с мышью */
   if(matchMedia('(hover:hover)').matches){
     const pv=document.createElement('img'); pv.className='prcpv'; pv.alt=''; pv.hidden=true; document.body.appendChild(pv);

@@ -100,10 +100,12 @@ if (\Bitrix\Main\Loader::includeModule('sale')) {
 
   <div class="prcbar" data-prc-bar>
     <label class="prcsearch"><?= bt_icon('search') ?><input type="search" placeholder="Поиск: Оромия, улун, чайник" aria-label="Поиск по прайсу" autocomplete="off" data-prc-q></label>
-    <div class="prccats" role="group" aria-label="Категория">
-      <button class="chipx" type="button" data-prc-cat="" aria-pressed="true">Весь прайс <s><?= $total ?></s></button>
-      <button class="chipx prccats__sel" type="button" data-prc-cat="sel" aria-pressed="false">Выбранные <s>0</s></button>
-      <?php foreach ($list as $code => $t): ?><button class="chipx" type="button" data-prc-cat="<?= $e($code) ?>" aria-pressed="false"><?= $e($t['name']) ?> <s><?= $t['cnt'] ?></s></button><?php endforeach ?>
+    <div class="prcbar__row">
+      <div class="prccats" role="group" aria-label="Категория">
+        <button class="chipx" type="button" data-prc-cat="" aria-pressed="true">Весь прайс <s><?= $total ?></s></button>
+        <?php foreach ($list as $code => $t): ?><button class="chipx" type="button" data-prc-cat="<?= $e($code) ?>" aria-pressed="false"><?= $e($t['name']) ?> <s><?= $t['cnt'] ?></s></button><?php endforeach ?>
+      </div>
+      <button class="prcsw" type="button" role="switch" aria-checked="false" aria-disabled="true" data-prc-only><span class="prcsw__k" aria-hidden="true"></span>Только выбранные <s data-prc-only-n>0</s></button>
     </div>
   </div>
 
@@ -211,6 +213,7 @@ if (\Bitrix\Main\Loader::includeModule('sale')) {
       <small data-prc-bag-h></small>
     </div>
     <div class="prcbag__b">
+      <button class="btn btn--line prcbag__show" type="button" data-prc-show>Показать выбранные</button>
       <?php if ($inv): ?><button class="btn btn--line" type="button" data-prc-inv>Запросить счёт</button><?php endif ?>
       <a class="btn" href="/personal/cart/">Оформить заказ</a>
     </div>
