@@ -1187,6 +1187,53 @@ function bt_price_list(): array
     return array_filter($tree, fn($t) => $t['cnt'] > 0);
 }
 
+// Скидки от суммы заказа — из правил корзины с XML_ID bt_sum_*: [['from' => 20000, 'pct' => 5], …] по возрастанию порога.
+// Порог и процент меняют в админке (Магазин → Правила работы с корзиной), сайт подхватывает их сам.
+function bt_sum_discounts(): array
+{
+    if (!\Bitrix\Main\Loader::includeModule('sale')) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(3600, 'bt_sum_discounts', '/bt/sale')) {
+        return $cache->getVars();
+    }
+    $out = [];
+    $r = \Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=ACTIVE' => 'Y', '%=XML_ID' => 'bt_sum_%'], 'select' => ['ID', 'CONDITIONS_LIST', 'ACTIONS_LIST']]);
+    while ($d = $r->fetch()) {
+        $from = 0;
+        foreach ((array)($d['CONDITIONS_LIST']['CHILDREN'] ?? []) as $c) {
+            ($c['CLASS_ID'] ?? '') === 'CondBsktAmtGroup' && ($c['DATA']['logic'] ?? '') === 'EqGr' and $from = (float)$c['DATA']['Value'];
+        }
+        $pct = 0;
+        foreach ((array)($d['ACTIONS_LIST']['CHILDREN'] ?? []) as $a) {
+            ($a['CLASS_ID'] ?? '') === 'ActSaleBsktGrp' && ($a['DATA']['Unit'] ?? '') === 'Perc' and $pct = (float)$a['DATA']['Value'];
+        }
+        $from > 0 && $pct > 0 and $out[] = ['from' => $from, 'pct' => $pct];
+    }
+    usort($out, fn($a, $b) => $a['from'] <=> $b['from']);
+    $cache->startDataCache();
+    $cache->endDataCache($out);
+    return $out;
+}
+
+// Агент: цены каталога изменились — письмо подписчикам прайса. Раз в час; ждёт 2 часа тишины, чтобы правка цен пачкой дала одно письмо
+function bt_price_notify_agent(): string
+{
+    $ts = bt_price_date();
+    $last = (int)\Bitrix\Main\Config\Option::get('bt', 'price_notified', '0');
+    $ib = bt_iblock('price_subs');
+    if ($ib && $ts > $last && time() - $ts >= 7200) {
+        $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PROPERTY_TOKEN']);
+        while ($s = $r->Fetch()) {
+            check_email($s['NAME'], true) && $s['PROPERTY_TOKEN_VALUE'] and \CEvent::Send('BT_PRICE_CHANGED', 's1',
+                ['EMAIL_TO' => $s['NAME'], 'TOKEN' => $s['PROPERTY_TOKEN_VALUE'], 'DATE' => FormatDate('j F Y', $ts)]);
+        }
+        \Bitrix\Main\Config\Option::set('bt', 'price_notified', (string)$ts);
+    }
+    return 'bt_price_notify_agent();';
+}
+
 // Дата последнего изменения товаров или цен каталога — «Цены актуальны на …»
 function bt_price_date(): int
 {

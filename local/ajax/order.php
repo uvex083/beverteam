@@ -151,10 +151,16 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
 
 if ($action === 'calc') {
     $basket = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems();
-    $sum = (float)$basket->getPrice();
+    // сумма товаров с правилами корзины (скидка от суммы заказа) — та же, что попадёт в заказ
+    $base = (float)$basket->getPrice();
+    $sum = $base;
+    if (!$basket->isEmpty()) {
+        $o = bt_order_build($userId, $ptypes[$pt], $locOk ? $loc : '', $locOk ? $delivery : 0, 0);
+        $sum = (float)$o->getPrice() - (float)$o->getDeliveryPrice();
+    }
     $dPrice = $deliveries[$delivery]['price'] ?? 0;
     $out(['ok' => true, 'loc' => $locOk ? $loc : '', 'deliveries' => array_values($deliveries), 'delivery' => $delivery,
-        'pays' => array_values($pays), 'pay' => $pay, 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice]);
+        'pays' => array_values($pays), 'pay' => $pay, 'base' => $base, 'disc' => round($base - $sum, 2), 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice]);
 }
 
 if ($action !== 'create') {
@@ -231,6 +237,11 @@ $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
 $order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay);
 $order->setField('USER_DESCRIPTION', mb_substr($f['comment'], 0, 2000));
+// для менеджера: заказ пришёл запросом счёта из прайс-листа и/или по персональной ссылке прайса (?m=…)
+$note = [];
+$in('src') === 'price' and $note[] = 'Запрос счёта из прайс-листа: доставку и сроки согласовать с клиентом.';
+preg_match('/^[a-z0-9_-]{1,40}$/i', (string)($_COOKIE['bt_pm'] ?? ''), $pm) and $note[] = 'Персональная ссылка прайса: ' . $pm[0];
+$note and $order->setField('COMMENTS', implode("\n", $note));
 $addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
 $values = ['ZIP' => '', 'EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $f['pvz'] : '']
     + ($pt === 'UR'

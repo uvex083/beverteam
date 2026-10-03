@@ -23,21 +23,13 @@ $pdf->AddPage();
 $t = fn($s) => CSalePdf::prepareToPdf((string)$s);
 $w = $pdf->GetPageWidth() - 100;
 
-// шапка: фирменная полоса, знак и название
+// шапка: фирменная полоса и логотип (JPG — PDF-библиотека не понимает прозрачность PNG)
 $pdf->SetFillColor(14, 14, 12);
 $pdf->Rect(0, 0, $pdf->GetPageWidth(), 110, 'F');
-$pdf->SetFillColor(215, 232, 92);
-$pdf->Rect(50, 36, 38, 38, 'F');
-$pdf->SetFont('Font', 'B', 22);
-$pdf->SetTextColor(14, 14, 12);
-$pdf->SetXY(50, 36);
-$pdf->Cell(38, 38, 'B', 0, 0, 'C');
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetXY(100, 38);
-$pdf->Cell(300, 20, 'BEVERTEAM');
+$pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/local/templates/beverteam/brand/logo-pdf.jpg', 50, 30, 162, 34);
 $pdf->SetFont('Font', '', 10);
 $pdf->SetTextColor(201, 201, 194);
-$pdf->SetXY(100, 58);
+$pdf->SetXY(50, 72);
 $pdf->Cell(300, 14, $t('Чай, кофе и оборудование для дома и бизнеса'));
 
 $pdf->SetXY(50, 140);
