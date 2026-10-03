@@ -1141,6 +1141,34 @@ function bt_clients(): array
     return $list;
 }
 
+// Область, общая для всех городов, в родительном падеже («Свердловской области») по справочнику местоположений; города из разных областей или не найдены — пусто
+function bt_cities_region(array $cities): string
+{
+    $cities = array_values(array_unique(array_filter($cities)));
+    if (!$cities || !\Bitrix\Main\Loader::includeModule('sale')) {
+        return '';
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400 * 7, 'bt_cities_region_' . md5(implode('|', $cities)), '/bt/loc')) {
+        return $cache->getVars();
+    }
+    $common = null;
+    foreach ($cities as $city) {
+        $ids = array_column(\Bitrix\Sale\Location\LocationTable::getList(['filter' => ['=NAME.NAME' => $city, '=NAME.LANGUAGE_ID' => 'ru', '>REGION_ID' => 0],
+            'select' => ['REGION_ID']])->fetchAll(), 'REGION_ID');
+        $common = $common === null ? $ids : array_intersect($common, $ids);
+    }
+    $out = '';
+    if (count(array_unique((array)$common)) === 1) {
+        $name = (string)(\Bitrix\Sale\Location\LocationTable::getList(['filter' => ['=ID' => reset($common), '=NAME.LANGUAGE_ID' => 'ru'], 'select' => ['N' => 'NAME.NAME']])->fetch()['N'] ?? '');
+        $gen = preg_replace(['/ая область$/u', '/ий край$/u', '/ой край$/u'], ['ой области', 'ого края', 'ого края'], $name);
+        $out = $gen !== $name ? $gen : '';
+    }
+    $cache->startDataCache();
+    $cache->endDataCache($out);
+    return $out;
+}
+
 // Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и иконкой + аренда
 function bt_home_tiles(): array
 {

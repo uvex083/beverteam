@@ -43,7 +43,7 @@ $icons = [
 $ico = fn(string $k) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . ($icons[$k] ?? $icons['drugoe']) . '</svg>';
 $stats = array_filter([
     [$n, $word($n, 'объект', 'объекта', 'объектов') . ' с нашими кофемашинами'],
-    [count($cities), $word(count($cities), 'город', 'города', 'городов') . ' Свердловской области'],
+    [count($cities), $word(count($cities), 'город', 'города', 'городов') . (($reg = bt_cities_region(array_keys($cities))) !== '' ? ' ' . $reg : '')],
     [count($models), $word(count($models), 'модель', 'модели', 'моделей') . ' Jetinno'],
     [$cups ? '≈ ' . number_format($cups, 0, '', "\u{00A0}") : 0, 'чашек в день на всех машинах'],
 ], fn($s) => $s[0]);
