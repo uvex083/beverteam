@@ -16,9 +16,44 @@ $tier = function (array $m, int $kg) {
     }
     return $p;
 };
+$disc = bt_sum_discounts();
+$fmtFrom = fn($d) => $d['pct'] . '% от ' . number_format($d['from'], 0, '', "\u{00A0}") . "\u{00A0}₽";
+// подборки сверху: «Рекомендуем» — хиты, топ продаж и новинки, «Акции» — товары со старой ценой или меткой скидки
+$all = [];
+foreach ($list as $t) {
+    foreach ($t['subs'] as $items) {
+        foreach ($items as $m) {
+            $m['p'] and $all[$m['id']] = $m;
+        }
+    }
+}
+$hasBadge = fn($m, array $b) => (bool)array_intersect(array_map('mb_strtolower', (array)($m['badges'] ?? [])), $b);
+$tabs = array_filter([
+    'rec' => ['Рекомендуем', array_slice(array_filter($all, fn($m) => $hasBadge($m, ['хит', 'топ продаж', 'новинка'])), 0, 12)],
+    'promo' => ['Акции', array_slice(array_filter($all, fn($m) => (!empty($m['old']) && $m['old'] > $m['p']) || $hasBadge($m, ['скидка', 'распродажа'])), 0, 12)],
+], fn($x) => $x[1]);
+// запрос счёта: заказ на юрлицо — самовывоз в Екатеринбурге и оплата по счёту, доставку менеджер согласует отдельно
+$inv = [];
+if (\Bitrix\Main\Loader::includeModule('sale')) {
+    $inv = [
+        'loc' => (string)(\Bitrix\Sale\Location\LocationTable::getList(['filter' => ['=NAME.NAME' => 'Екатеринбург', '=NAME.LANGUAGE_ID' => 'ru', '=TYPE.CODE' => 'CITY'], 'select' => ['CODE'], 'limit' => 1])->fetch()['CODE'] ?? ''),
+        'delivery' => (int)(\Bitrix\Sale\Delivery\Services\Table::getList(['filter' => ['=XML_ID' => 'bt_pickup', '=ACTIVE' => 'Y'], 'select' => ['ID']])->fetch()['ID'] ?? 0),
+        'pay' => (int)(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill', '=ACTIVE' => 'Y'], 'select' => ['ID']])->fetch()['ID'] ?? 0),
+    ];
+    $inv = array_filter($inv) === $inv ? $inv : [];
+}
 ?>
 <div class="wrap prcp">
   <?php bt_crumbs() ?>
+
+  <div class="demo-note prcask"><b>Уточнить у клиента</b>
+    <ul>
+      <li><b>Скидка от суммы заказа</b> 5% от 20&nbsp;000&nbsp;₽ и 10% от 40&nbsp;000&nbsp;₽ — придумали мы, уже работает в корзине, заказе и счёте. Подтвердить пороги и проценты или отключить: Магазин → Правила работы с корзиной.</li>
+      <li><b>Оптовые ступени по весу</b> (1/5/10/20/30 кг) есть только у Эфиопии Оромии — нужны ли по остальным сортам кофе и какие.</li>
+      <li><b>Отдельные цены для юрлиц и оптовиков</b>, ниже розничных, — нужны ли.</li>
+      <li><b>Персональные ссылки</b> вида /price/?m=ivanov — метка попадает в заказ: какие метки раздавать менеджерам.</li>
+    </ul>
+  </div>
 
   <div class="prchead">
     <div>
@@ -28,15 +63,46 @@ $tier = function (array $m, int $kg) {
     </div>
     <div class="prcact">
       <a class="btn btn--line" href="?format=csv" download><?= bt_icon('doc') ?>Скачать Excel</a>
-      <button class="btn btn--line" type="button" data-prc-print>Печать / PDF</button>
+      <a class="btn btn--line" href="?format=pdf" target="_blank" rel="noopener"><?= bt_icon('doc') ?>PDF</a>
       <button class="btn btn--line" type="button" data-prc-share><?= bt_icon('share') ?>Поделиться ссылкой</button>
     </div>
   </div>
+
+  <?php if ($disc): ?>
+  <div class="prcdisc">
+    <span class="prcdisc__t">Скидка от суммы заказа</span>
+    <?php foreach ($disc as $d): ?><span class="prcdisc__i"><?= $e($fmtFrom($d)) ?></span><?php endforeach ?>
+    <span class="prcdisc__n">Считается автоматически в корзине, заказе и счёте</span>
+  </div>
+  <?php endif ?>
+
+  <?php if ($tabs): ?>
+  <section class="prcrec" data-prc-rec>
+    <div class="prcrec__tabs" role="tablist">
+      <?php foreach (array_keys($tabs) as $i => $k): ?><button type="button" role="tab" aria-selected="<?= $i ? 'false' : 'true' ?>" data-prc-tab="<?= $k ?>"><?= $e($tabs[$k][0]) ?></button><?php endforeach ?>
+    </div>
+    <?php foreach (array_keys($tabs) as $i => $k): ?>
+    <div class="prcrec__list" role="tabpanel" data-prc-pane="<?= $k ?>"<?= $i ? ' hidden' : '' ?>>
+      <?php foreach ($tabs[$k][1] as $m): ?>
+      <div class="prcrec__c">
+        <?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" width="72" height="72" loading="lazy"><?php endif ?>
+        <div>
+          <a href="<?= $e($m['url']) ?>"><?= $e($m['n']) ?></a>
+          <span class="prcrec__p"><?= $rub($m['p']) ?><?= !empty($m['bulk']) ? ' за кг' : '' ?><?php if (!empty($m['old']) && $m['old'] > $m['p']): ?> <s><?= $rub($m['old']) ?></s><?php endif ?></span>
+        </div>
+        <button class="prcrec__add" type="button" data-prc-add="<?= $e($m['id']) ?>" aria-label="Добавить в заказ: <?= $e($m['n']) ?>">+</button>
+      </div>
+      <?php endforeach ?>
+    </div>
+    <?php endforeach ?>
+  </section>
+  <?php endif ?>
 
   <div class="prcbar" data-prc-bar>
     <label class="prcsearch"><?= bt_icon('search') ?><input type="search" placeholder="Поиск: Оромия, улун, чайник" aria-label="Поиск по прайсу" autocomplete="off" data-prc-q></label>
     <div class="prccats" role="group" aria-label="Категория">
       <button class="chipx" type="button" data-prc-cat="" aria-pressed="true">Весь прайс <s><?= $total ?></s></button>
+      <button class="chipx prccats__sel" type="button" data-prc-cat="sel" aria-pressed="false">Выбранные <s>0</s></button>
       <?php foreach ($list as $code => $t): ?><button class="chipx" type="button" data-prc-cat="<?= $e($code) ?>" aria-pressed="false"><?= $e($t['name']) ?> <s><?= $t['cnt'] ?></s></button><?php endforeach ?>
     </div>
   </div>
@@ -99,12 +165,54 @@ $tier = function (array $m, int $kg) {
   <?php endforeach ?>
   <p class="prcempty" data-prc-empty hidden>Ничего не нашлось. <button class="link" type="button" data-prc-reset>Показать весь прайс</button></p>
 
-  <p class="prcfoot">Цены в рублях. Окончательную стоимость, наличие и сроки подтвердит менеджер после оформления заказа. Нужен счёт на юрлицо — выберите «Юридическое лицо / ИП» при оформлении.</p>
+  <section class="prcsubs">
+    <div>
+      <div class="prcsubs__t th th3">Сообщим, когда изменятся цены</div>
+      <p>Одно письмо со ссылкой на прайс после изменения цен. Отписаться — в один клик из письма.</p>
+      <?php if (!empty($_GET['unsub'])): ?><p class="prcsubs__ok">Вы отписались — писем об изменении цен больше не будет.</p><?php endif ?>
+    </div>
+    <form class="prcsubs__f" data-prc-subf novalidate>
+      <div class="field"><label for="prcSubEmail">E-mail</label><input id="prcSubEmail" name="email" type="email" autocomplete="email" placeholder="mail@company.ru"></div>
+      <?= bt_form_tail('Подписаться') ?>
+    </form>
+  </section>
+
+  <p class="prcfoot">Цены в рублях. Окончательную стоимость, наличие и сроки подтвердит менеджер после оформления заказа.</p>
 </div>
+
+<?php if ($inv): ?>
+<div class="modal modal--revf" id="prcInv" role="dialog" aria-modal="true" aria-labelledby="prcInvT">
+  <div class="modal__bg" data-close></div>
+  <div class="modal__p">
+    <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+    <h3 class="h3" id="prcInvT" style="margin:0 0 6px;padding-right:36px">Запросить счёт</h3>
+    <p class="muted" style="margin:0 0 18px;font-size:14px">Оформим заказ на организацию по товарам из корзины — <b data-prc-inv-sum></b>. Менеджер подтвердит наличие и доставку, счёт придёт на e-mail.</p>
+    <form data-prc-invf data-loc="<?= $e($inv['loc']) ?>" data-delivery="<?= $inv['delivery'] ?>" data-pay="<?= $inv['pay'] ?>" novalidate>
+      <div class="grid g2" style="gap:0 14px">
+        <div class="field"><label for="prcInvCo">Название организации *</label><input id="prcInvCo" name="company" autocomplete="organization" placeholder="ООО «Ромашка»"></div>
+        <div class="field"><label for="prcInvInn">ИНН *</label><input id="prcInvInn" name="inn" inputmode="numeric" maxlength="12" placeholder="10 или 12 цифр"></div>
+        <div class="field"><label for="prcInvName">Контактное лицо *</label><input id="prcInvName" name="name" autocomplete="name"></div>
+        <div class="field"><label for="prcInvTel">Телефон *</label><input id="prcInvTel" name="phone" type="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__"></div>
+        <div class="field"><label for="prcInvMail">E-mail для счёта *</label><input id="prcInvMail" name="email" type="email" autocomplete="email"></div>
+        <div class="field"><label for="prcInvKpp">КПП</label><input id="prcInvKpp" name="kpp" inputmode="numeric" maxlength="9" placeholder="Для ООО"></div>
+      </div>
+      <div class="field"><label for="prcInvCom">Комментарий</label><textarea id="prcInvCom" name="comment" rows="2" maxlength="2000" placeholder="Адрес доставки, удобное время, вопросы"></textarea></div>
+      <?= bt_form_tail('Запросить счёт') ?>
+      <p class="err-form" data-prc-inv-err role="alert"></p>
+    </form>
+  </div>
+</div>
+<?php endif ?>
 
 <div class="prcbag" data-prc-bag hidden>
   <div class="wrap prcbag__in">
-    <span class="prcbag__t">В корзине <b data-prc-bag-n></b><span data-prc-bag-s></span></span>
-    <a class="btn" href="/personal/cart/">Оформить заказ</a>
+    <div class="prcbag__t">
+      <span>В корзине <b data-prc-bag-n></b> на <b data-prc-bag-s></b><span class="prcbag__d" data-prc-bag-d></span></span>
+      <small data-prc-bag-h></small>
+    </div>
+    <div class="prcbag__b">
+      <?php if ($inv): ?><button class="btn btn--line" type="button" data-prc-inv>Запросить счёт</button><?php endif ?>
+      <a class="btn" href="/personal/cart/">Оформить заказ</a>
+    </div>
   </div>
 </div>

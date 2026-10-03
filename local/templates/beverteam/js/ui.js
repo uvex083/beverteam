@@ -304,6 +304,11 @@ window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
   return sum>=T ? `Доставка по Екатеринбургу — бесплатно, по России — СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
 
+/* скидка от суммы заказа — по правилам корзины Битрикса (window.BT_SUMDISC: [{from,pct}]): сколько срежет и сколько до следующей ступени */
+window.BT_sumDisc = sum => { const L=window.BT_SUMDISC||[]; let cur=null, next=null;
+  L.forEach(d=>{ if(sum>=d.from) cur=d; else if(!next) next=d; });
+  return {pct:cur?cur.pct:0, cut:cur?Math.round(sum*cur.pct)/100:0, next:next?{...next,need:next.from-sum}:null}; };
+window.BT_sumDiscHint = sum => { const d=BT_sumDisc(sum); return d.next&&sum>0 ? `До скидки ${d.next.pct}% не хватает ${BT_fmt(Math.ceil(d.next.need))}` : ''; };
 /* кнопка/степпер для карточки: в корзине — степпер с ценой на месте кнопки */
 /* подвал карточки: цена + контрол. Обновляется точечно, без пересборки карточки */
 /* Единица продажи. kg — кофе: цена за килограмм, действует оптовая сетка.
@@ -2121,33 +2126,36 @@ document.addEventListener('DOMContentLoaded',()=>{
   draw();
 });
 
-/* Прайс-лист: поиск и категории на лету (адрес с фильтром), количество в строке пишет в общую корзину, подсветка оптовой ступени, панель корзины снизу */
+/* Прайс-лист: поиск, категории и «Выбранные» на лету (адрес с фильтром), количество в строке пишет в общую корзину, подсветка оптовой ступени,
+   скидка от суммы заказа в панели снизу, подборки сверху, превью фото, запрос счёта, подписка на цены, персональная метка ?m= */
 document.addEventListener('DOMContentLoaded',()=>{
   const bar=document.querySelector('[data-prc-bar]'); if(!bar) return;
   const rows=[...document.querySelectorAll('[data-prc-row]')], secs=[...document.querySelectorAll('[data-prc-sec]')], qIn=bar.querySelector('[data-prc-q]'), cats=[...bar.querySelectorAll('[data-prc-cat]')];
+  const plural=(n,a)=>a[n%10===1&&n%100!==11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2];
   const u0=new URL(location.href), c0=u0.searchParams.get('cat')||''; let cat=cats.some(b=>b.dataset.prcCat===c0)?c0:''; qIn.value=u0.searchParams.get('q')||'';
+  const pm=u0.searchParams.get('m')||''; if(/^[a-z0-9_-]{1,40}$/i.test(pm)) document.cookie=`bt_pm=${pm};path=/;max-age=${60*86400};samesite=lax`;
   const hdr=document.querySelector('.hdr'), top=()=>document.documentElement.style.setProperty('--prc-top',(hdr?Math.round(hdr.getBoundingClientRect().height):0)+'px');
   top(); addEventListener('resize',top);
   const secOf=r=>r.closest('[data-prc-sec]').dataset.prcSec;
-  const filter=()=>{
-    const words=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean); let shown=0;
-    rows.forEach(r=>{ const h=r.dataset.q.replace(/ё/g,'е'); r.hidden=!words.every(w=>h.includes(w)); });
-    cats.forEach(b=>{ const c=b.dataset.prcCat; b.setAttribute('aria-pressed',String(c===cat)); b.querySelector('s').textContent=rows.filter(r=>!r.hidden&&(!c||secOf(r)===c)).length; });
-    secs.forEach(s=>{ let n=0; s.querySelectorAll('[data-prc-group]').forEach(g=>{ const k=g.querySelectorAll('[data-prc-row]:not([hidden])').length; g.hidden=!k; n+=k; });
-      s.hidden=!n||(!!cat&&s.dataset.prcSec!==cat); s.hidden||(shown+=n); });
-    document.querySelector('[data-prc-empty]').hidden=shown>0;
-    const u=new URL(location.href), q=qIn.value.trim(); cat?u.searchParams.set('cat',cat):u.searchParams.delete('cat'); q?u.searchParams.set('q',q):u.searchParams.delete('q'); history.replaceState(history.state,'',u);
-  };
-  qIn.addEventListener('input',filter);
-  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(!b) return; cat=b.dataset.prcCat; filter(); });
-  document.addEventListener('click',e=>{
-    if(e.target.closest('[data-prc-reset]')){ cat=''; qIn.value=''; filter(); return; }
-    if(e.target.closest('[data-prc-print]')){ print(); return; }
-    if(e.target.closest('[data-prc-share]')){ const url=location.href; if(navigator.share&&matchMedia('(hover:none)').matches){ navigator.share({title:document.title,url}).catch(()=>{}); return; } (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); }
-  });
-  /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
   const keyOf=r=>BT_key(r.dataset.id,+r.dataset.kg);
   const qOf=r=>(BT_cartItems().find(c=>c.key===keyOf(r))||{}).q||0;
+  const filter=()=>{
+    const words=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean);
+    rows.forEach(r=>{ const h=r.dataset.q.replace(/ё/g,'е'); r.dataset.hit=words.every(w=>h.includes(w))?'1':''; });
+    const inCat=(r,c)=>r.dataset.hit&&(!c||(c==='sel'?qOf(r)>0:secOf(r)===c));
+    cats.forEach(b=>{ const c=b.dataset.prcCat, n=rows.filter(r=>inCat(r,c)).length; b.querySelector('s').textContent=n;
+      b.setAttribute('aria-pressed',String(c===cat)); c==='sel'&&b.setAttribute('aria-disabled',String(!n&&cat!=='sel')); });
+    if(cat==='sel'&&!rows.some(r=>inCat(r,'sel'))&&!words.length){ cat=''; return filter(); }
+    rows.forEach(r=>{ r.hidden=!inCat(r,cat); });
+    let shown=0;
+    secs.forEach(s=>{ let n=0; s.querySelectorAll('[data-prc-group]').forEach(g=>{ const k=g.querySelectorAll('[data-prc-row]:not([hidden])').length; g.hidden=!k; n+=k; });
+      s.hidden=!n; shown+=n; });
+    document.querySelector('[data-prc-empty]').hidden=shown>0;
+    const u=new URL(location.href), q=qIn.value.trim(); cat&&cat!=='sel'?u.searchParams.set('cat',cat):u.searchParams.delete('cat'); q?u.searchParams.set('q',q):u.searchParams.delete('q'); history.replaceState(history.state,'',u);
+  };
+  qIn.addEventListener('input',filter);
+  bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(!b||b.getAttribute('aria-disabled')==='true') return; cat=b.dataset.prcCat; filter(); });
+  /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
   const draw=r=>{ const m=BT_find(r.dataset.id), inp=r.querySelector('[data-prc-in]'); if(!m||!inp) return;
     const kg=+r.dataset.kg, q=qOf(r), sum=r.querySelector('[data-prc-sum]');
     document.activeElement===inp||(inp.value=q);
@@ -2158,15 +2166,70 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(q&&nx) txt+=` · ещё ${nx.kg-w} кг — ${BT_fmt(nx.p)}/кг`; }
     sum.textContent=txt; };
   const bag=document.querySelector('[data-prc-bag]');
-  const drawBag=()=>{ const items=BT_cartItems(), t=BT_cartTotal(), n=items.length;
+  const drawBag=()=>{ const items=BT_cartItems(), t=BT_cartTotal(), n=items.length, d=BT_sumDisc(t.sum);
     bag.hidden=!n; if(!n) return;
-    bag.querySelector('[data-prc-bag-n]').textContent=`${n} ${n%10===1&&n%100!==11?'позиция':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'позиции':'позиций'}`;
-    bag.querySelector('[data-prc-bag-s]').textContent=' на '+BT_fmt(t.sum); };
+    bag.querySelector('[data-prc-bag-n]').textContent=`${n} ${plural(n,['позиция','позиции','позиций'])}`;
+    bag.querySelector('[data-prc-bag-s]').textContent=BT_fmt(t.sum-d.cut);
+    bag.querySelector('[data-prc-bag-d]').textContent=d.cut?` · скидка ${d.pct}% −${BT_fmt(d.cut)}`:'';
+    bag.querySelector('[data-prc-bag-h]').textContent=BT_sumDiscHint(t.sum); };
   const set=(r,q)=>{ q=Math.max(0,Math.min(999,Math.round(+q)||0)); BT_cartSet(keyOf(r),q); draw(r); drawBag(); };
-  document.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-step]'); if(!b) return; const r=b.closest('[data-prc-row]'); set(r,qOf(r)+(+b.dataset.prcStep)); });
+  document.addEventListener('click',e=>{
+    const st=e.target.closest('[data-prc-step]'); if(st){ const r=st.closest('[data-prc-row]'); set(r,qOf(r)+(+st.dataset.prcStep)); return; }
+    const add=e.target.closest('[data-prc-add]');
+    if(add){ const r=rows.find(x=>x.dataset.id===add.dataset.prcAdd); if(!r) return; set(r,qOf(r)+1);
+      BT_toast(`«${BT_find(r.dataset.id)?.n||'Товар'}» — ${qOf(r)} ${+r.dataset.kg?'кг':'шт'} в заказе`); return; }
+    const tab=e.target.closest('[data-prc-tab]');
+    if(tab){ const box=tab.closest('[data-prc-rec]'); box.querySelectorAll('[data-prc-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===tab)));
+      box.querySelectorAll('[data-prc-pane]').forEach(p=>p.hidden=p.dataset.prcPane!==tab.dataset.prcTab); return; }
+    if(e.target.closest('[data-prc-reset]')){ cat=''; qIn.value=''; filter(); return; }
+    if(e.target.closest('[data-prc-share]')){ const url=location.href;
+      if(navigator.share&&matchMedia('(hover:none)').matches){ navigator.share({title:document.title,url}).catch(()=>{}); return; }
+      (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>BT_toast('Ссылка на прайс скопирована')).catch(()=>prompt('Ссылка на прайс',url)); return; }
+    if(e.target.closest('[data-prc-inv]')){ invOpen(); return; }
+  });
   document.addEventListener('input',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) i.value=i.value.replace(/\D/g,'').slice(0,3); });
   document.addEventListener('change',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) set(i.closest('[data-prc-row]'),i.value); });
   document.addEventListener('keydown',e=>{ const i=e.target.closest('[data-prc-in]'); if(i&&e.key==='Enter'){ e.preventDefault(); i.blur(); } });
-  document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); });
+  document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); cats.find(b=>b.dataset.prcCat==='sel')&&filter(); });
+  /* превью фото товара при наведении на название — только с мышью */
+  if(matchMedia('(hover:hover)').matches){
+    const pv=document.createElement('img'); pv.className='prcpv'; pv.alt=''; pv.hidden=true; document.body.appendChild(pv);
+    const at=e=>{ const x=e.clientX+24, y=e.clientY-90; pv.style.left=Math.min(x,innerWidth-240)+'px'; pv.style.top=Math.max(8,Math.min(y,innerHeight-230))+'px'; };
+    document.addEventListener('mouseover',e=>{ const a=e.target.closest('.prct__n a'); if(!a) return; const m=BT_find(a.closest('[data-prc-row]').dataset.id);
+      if(!m||!m.img) return; pv.src=m.img; pv.hidden=false; at(e); });
+    document.addEventListener('mousemove',e=>{ if(!pv.hidden) at(e); });
+    document.addEventListener('mouseout',e=>{ if(e.target.closest('.prct__n a')&&!e.relatedTarget?.closest?.('.prct__n a')) pv.hidden=true; });
+  }
+  /* запрос счёта: заказ на организацию из корзины — самовывоз и оплата по счёту, менеджер согласует доставку */
+  const inv=document.getElementById('prcInv'), invF=inv?.querySelector('[data-prc-invf]');
+  const invOpen=()=>{ if(!inv) return; const t=BT_cartTotal(), d=BT_sumDisc(t.sum); inv.querySelector('[data-prc-inv-sum]').textContent=BT_fmt(t.sum-d.cut);
+    const u=window.BT_USER; if(u){ invF.elements.name.value||=u.name||''; invF.elements.phone.value||=u.phone||''; invF.elements.email.value||=u.email||''; }
+    inv.classList.add('open'); innerWidth>768&&setTimeout(()=>[...invF.querySelectorAll('.field input')].find(x=>!x.value)?.focus(),60); };
+  inv?.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) inv.classList.remove('open'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') inv?.classList.remove('open'); });
+  invF?.addEventListener('submit',async e=>{ e.preventDefault(); if(invF.dataset.busy) return;
+    const fd=new FormData(invF), btn=invF.querySelector('button[type=submit]'), errBox=invF.querySelector('[data-prc-inv-err]');
+    Object.entries({action:'create',ptype:'UR',loc:invF.dataset.loc,delivery:invF.dataset.delivery,pay:invF.dataset.pay,mode:'pickup',src:'price'}).forEach(([k,v])=>fd.set(k,v));
+    invF.dataset.busy='1'; btn.disabled=true; errBox.textContent='';
+    try{ const r=await fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(x=>x.json());
+      if(r.ok){ location.href=r.redirect; return; }
+      let first=null; const other=[];
+      Object.entries(r.errors||{}).forEach(([k,msg])=>{ const el=invF.elements[k];
+        if(!el){ other.push(msg); return; }
+        if(el.type==='checkbox') el.closest('.check')?.classList.add('is-err'); else BT_fieldErr(el,msg); first=first||el; });
+      errBox.textContent=other.join('. ')||(r.errors?'':'Не получилось отправить запрос. Попробуйте ещё раз или позвоните нам.');
+      first&&first.focus();
+    }catch(err){ errBox.textContent='Нет связи с сервером. Попробуйте ещё раз.'; }
+    finally{ delete invF.dataset.busy; btn.disabled=false; } });
+  /* подписка на изменение цен */
+  const subF=document.querySelector('[data-prc-subf]');
+  subF?.addEventListener('submit',async e=>{ e.preventDefault(); if(subF.dataset.busy) return; subF.dataset.busy='1';
+    const fd=new FormData(subF); fd.append('action','sub');
+    try{ const r=await fetch('/local/ajax/price.php',{method:'POST',body:fd,credentials:'same-origin'}).then(x=>x.json());
+      if(r.ok){ subF.reset(); BT_toast('Готово — напишем, когда изменятся цены'); return; }
+      Object.entries(r.errors||{}).forEach(([k,msg])=>{ const el=subF.elements[k]; if(!el) return; el.type==='checkbox'?el.closest('.check')?.classList.add('is-err'):BT_fieldErr(el,msg); });
+      r.errors||BT_toast('Не получилось подписаться — попробуйте ещё раз');
+    }catch(err){ BT_toast('Нет связи с сервером. Попробуйте ещё раз'); }
+    finally{ delete subF.dataset.busy; } });
   rows.forEach(draw); drawBag(); filter();
 });

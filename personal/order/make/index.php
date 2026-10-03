@@ -149,6 +149,7 @@ $co = bt_contacts();
         <div class="it"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif ?><span><?= $e($bi->getField('NAME')) ?><small><?= bt_basket_qty($bi) ?></small></span><b><?= bt_fmt($bi->getFinalPrice()) ?></b></div>
       <?php endforeach ?></div>
       <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <div class="l" id="sDiscRow" hidden><span>Скидка от суммы заказа</span><span id="sDisc" style="color:var(--ok)"></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
@@ -199,6 +200,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(on?desc:why)}</div></div></label>`;}).join('');
   }
   function renderSum(r){ if(!r) return;
+    sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
     const cdek=sel&&sel.d.code==='bt_cdek';
     sDel.textContent=!sel?'—':cdek?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total); sTotNote.hidden=!cdek;
