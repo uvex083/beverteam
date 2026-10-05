@@ -19,6 +19,12 @@ if (!$ib) {
     die("нет инфоблока journal\n");
 }
 
+// без флага «Есть разделы» у типа инфоблока админка прячет вкладку «Разделы» — рубрику статье не выбрать
+if (CIBlockType::GetByID($ib['IBLOCK_TYPE_ID'])->Fetch()['SECTIONS'] !== 'Y') {
+    $say("тип инфоблока {$ib['IBLOCK_TYPE_ID']}: разделы включены — в форме статьи появится вкладка «Разделы»");
+    $apply and ((new CIBlockType())->Update($ib['IBLOCK_TYPE_ID'], ['SECTIONS' => 'Y']) or die("ошибка типа инфоблока\n"));
+}
+
 $urls = ['LIST_PAGE_URL' => '/blog/', 'SECTION_PAGE_URL' => '/blog/#SECTION_CODE#/', 'DETAIL_PAGE_URL' => '/blog/#ELEMENT_CODE#/'];
 if (array_diff_assoc($urls, array_intersect_key($ib, $urls))) {
     $say('адреса инфоблока: ' . implode(', ', $urls));
