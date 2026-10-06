@@ -62,7 +62,7 @@ if (!$order) {
     $dPrice = (float)$order->getDeliveryPrice();
     $delivText = $shipment ? $shipment->getDeliveryName() . ($city ? ', ' . $city : '') . ' — '
         . ($dCode === 'bt_cdek' ? 'стоимость сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? 'бесплатно (заказ от 3 000 ₽)' : 'бесплатно'))) : '';
-    $where = $props['ADDRESS'] ?? '' ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
+    $where = preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
     $date = $order->getDateInsert();
 ?>
   <div class="steps" style="max-width:760px;margin:24px auto 0"><div class="done"><b>1</b>Корзина</div><div class="done"><b>2</b>Регион и доставка</div><div class="done"><b>3</b>Оплата</div><div class="cur"><b>4</b>Подтверждение</div></div>

@@ -80,7 +80,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Способ</dt><dd><?= $e($shipment ? $shipment->getDeliveryName() : '—') ?></dd>
     <?php if ($dCode === 'bt_pickup'): ?><dt>Адрес склада</dt><dd><?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?></dd>
     <?php elseif (($props['PVZ'] ?? '') !== ''): ?><dt>Пункт выдачи</dt><dd><?= $e(($city ? $city . ', ' : '') . $props['PVZ']) ?></dd>
-    <?php else: ?><dt>Адрес</dt><dd><?= $e(trim(($city ? $city . ', ' : '') . ($props['ADDRESS'] ?? ''), ', ') ?: '—') ?></dd><?php endif ?>
+    <?php else: ?><dt>Адрес</dt><dd><?= $e(trim(($city ? $city . ', ' : '') . preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? ''), ', ') ?: '—') ?></dd><?php endif ?>
     <dt>Получатель</dt><dd><?= $e($name ?: ($phone ? '' : '—')) ?><?= $phone ? ($name ? ', ' : '') . '<span style="white-space:nowrap">' . $e($phone) . '</span>' : '' ?></dd>
     <?php if ($order->getField('USER_DESCRIPTION')): ?><dt>Комментарий</dt><dd><?= $e($order->getField('USER_DESCRIPTION')) ?></dd><?php endif ?>
   </dl></div>

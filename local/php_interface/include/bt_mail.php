@@ -112,7 +112,7 @@ function bt_mail_order(Sale\Order $order): array
         . '<td colspan="2" align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . bt_fmt($order->getPrice()) . '</td></tr></table>';
 
     // детали: доставка, адрес, оплата, покупатель, получатель
-    $where = $props['ADDRESS'] ?? '' ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
+    $where = preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
     $det = [];
     if ($shipment) {
         $det['Доставка'] = $e($shipment->getDeliveryName() . ($city ? ', ' . $city : ''));
