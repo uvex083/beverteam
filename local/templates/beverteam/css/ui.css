@@ -913,7 +913,8 @@ input,textarea{caret-color:var(--ink)}
 .pmeta .ptools button#bFav[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--lime)}
 .pmeta .ptools button#bFav[aria-pressed=true] svg{fill:currentColor}
 .pmeta .ptools svg{width:17px;height:17px;display:block;flex:0 0 17px}
-.tiers__wrap{margin-top:18px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:6px 20px 14px}
+.tiers__wrap{margin-top:18px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:6px 20px}
+.tiers__wrap[open]{padding-bottom:14px}
 .tiers__wrap summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
   padding:12px 0;font-weight:700;font-size:14.5px}
 .tiers__wrap summary::-webkit-details-marker{display:none}
