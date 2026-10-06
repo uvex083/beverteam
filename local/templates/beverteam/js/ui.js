@@ -505,7 +505,7 @@ function authModal(){
     <form data-step="pick" novalidate>
       <div class="display modal__t th th3" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</div>
       <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'войдите через сервис или получите код на почту':'пришлём код на почту'}.</p>
-      ${IDP.length?BT_idpHtml('')+'<div class="or">или получить код</div>':''}
+      ${IDP.length?BT_idpHtml('')+'<p class="muted" style="margin:8px 0 0;font-size:12.5px;line-height:1.4">Входя через сервис, вы принимаете <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a></p><div class="or">или получить код</div>':''}
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
@@ -883,13 +883,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
   let pending=null, timer=null, busy=false;
 
-  /* без явного согласия с правилами — ни кода, ни входа через сервис */
+  /* без явного согласия — кода нет; вход через сервис — с пассивным согласием под кнопками */
   /* согласие запоминаем на устройстве после первого явного — при следующем входе галочка уже стоит */
   const agree=$a('#aAgree'), agreeOk=()=>{ if(agree.checked){ try{localStorage.setItem('bt_agree','1');}catch(e){} return true; }
     agree.closest('.check').classList.add('is-err'); agree.focus(); BT_toast('Отметьте согласие с условиями'); return false; };
   try{ agree.checked=localStorage.getItem('bt_agree')==='1'; }catch(e){}
   agree.addEventListener('change',()=>agree.closest('.check').classList.remove('is-err'));
-  au.addEventListener('click',e=>{ if(e.target.closest('.idp a')&&!agreeOk()) e.preventDefault(); });
 
   window.BT_auth=login=>{ au.classList.add('open');
     if(typeof login==='string'&&login&&!USER){ $a('#aLogin').value=login; step('pick'); if(agree.checked) send(login); else setTimeout(()=>agree.focus(),60); return; }
