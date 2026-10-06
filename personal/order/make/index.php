@@ -128,9 +128,13 @@ $co = bt_contacts();
         </div>
         <div id="pvz" hidden>
           <div class="alert alert--info pvzsel" id="pvzSel" hidden></div>
-          <div class="pvzmap" id="pvzMap" hidden></div>
-          <div class="field"><label for="pvzQ">Найти пункт</label><input id="pvzQ" placeholder="Улица, метро или код пункта" autocomplete="new-password" spellcheck="false"></div>
-          <div class="pvzlist" id="pvzList" role="radiogroup" aria-label="Пункты выдачи"></div>
+          <div class="pvzwrap">
+            <div class="pvzside">
+              <div class="field"><label for="pvzQ">Найти пункт</label><input id="pvzQ" placeholder="Улица, метро или код пункта" autocomplete="new-password" spellcheck="false"></div>
+              <div class="pvzlist" id="pvzList" role="radiogroup" aria-label="Пункты выдачи"></div>
+            </div>
+            <div class="pvzmap" id="pvzMap" hidden></div>
+          </div>
           <input type="hidden" name="pvz" id="pvzIn" value="">
         </div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
@@ -200,7 +204,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 
   /* пункты выдачи СДЭК: список города + карта, если загрузились Яндекс Карты */
-  let pvzAll=[], pvzLoc='', pvzMap=null, pvzDots={}, pvzWant=<?= Json::encode((string)($ship['pvz'] ?? '')) ?>;
+  let pvzAll=[], pvzLoc='', pvzMap=null, pvzWant=<?= Json::encode((string)($ship['pvz'] ?? '')) ?>;
   const pvzOf=c=>pvzAll.find(p=>p.c===c);
   function loadPvz(){
     if(!locIn.value||pvzLoc===locIn.value) return;
@@ -220,27 +224,35 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div><div class="t">${esc(p.a)}</div><div class="d">${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</div></div></label>`).join('');
     pvzSel.hidden=!cur;
     if(cur) pvzSel.innerHTML=`<div><b>Пункт выдачи:</b> ${esc(cur.a)}${cur.w?`<br>${esc(cur.w)}`:''}${cur.n?`<br><small>${esc(cur.n)}</small>`:''}</div>`;
-    Object.entries(pvzDots).forEach(([c,el])=>el.classList.toggle('on',c===pvzIn.value));
+    if(pvzOm) pvzAll.forEach((p,i)=>pvzOm.objects.setObjectOptions(i,{preset:p.c===pvzIn.value?'islands#redDotIcon':'islands#blackCircleDotIcon',zIndex:p.c===pvzIn.value?1000:0}));
   }
-  function pickPvz(c){ pvzIn.value=c; renderPvz(); setErr(pvzQ,''); ready();
-    const p=pvzOf(c); if(p&&pvzMap) pvzMap.update({location:{center:[p.lon,p.lat],zoom:Math.max(pvzMap.zoom||13,14),duration:300}}); }
+  function pickPvz(c,fromMap){ pvzIn.value=c; if(fromMap) pvzQ.value=''; renderPvz(); setErr(pvzQ,''); ready();
+    const p=pvzOf(c); if(p&&pvzMap&&!fromMap) pvzMap.setCenter([p.lat,p.lon],Math.max(pvzMap.getZoom(),15),{duration:300});
+    if(fromMap){const r=pvzList.querySelector(`input[value="${CSS.escape(c)}"]`);r&&r.closest('.radio-card').scrollIntoView({block:'nearest',behavior:'smooth'});} }
   pvzList.addEventListener('change',e=>{if(e.target.name==='pvzr')pickPvz(e.target.value);});
   pvzQ.addEventListener('input',renderPvz);
   pvzQ.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault();});
-  const ymapsLoad=()=>window.ymaps3?Promise.resolve(window.ymaps3):new Promise((res,rej)=>{const s=document.createElement('script');
-    s.src=`https://api-maps.yandex.ru/v3/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>res(window.ymaps3);s.onerror=rej;document.head.appendChild(s);});
+  /* Яндекс Карты 2.1 — как на других наших проектах: ключ работает без привязки к адресу сайта */
+  let pvzOm=null;
+  const ymapsLoad=()=>window.ymaps&&ymaps.Map?Promise.resolve(window.ymaps):new Promise((res,rej)=>{const s=document.createElement('script');
+    s.src=`https://api-maps.yandex.ru/2.1/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>ymaps.ready(()=>res(window.ymaps));s.onerror=rej;document.head.appendChild(s);});
   function drawPvzMap(){
-    if(!window.BT_YMAPS_KEY||!pvzAll.length){pvzMap&&(pvzMap.destroy(),pvzMap=null);pvzMapBox.hidden=true;return;}
-    const pts=pvzAll, lons=pts.map(p=>p.lon), lats=pts.map(p=>p.lat);
-    const bounds=[[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]];
-    ymapsLoad().then(async y=>{ if(!y) throw 0; await y.ready; if(pts!==pvzAll) return;
-      const {YMap,YMapDefaultSchemeLayer,YMapDefaultFeaturesLayer,YMapMarker}=y;
-      pvzMap&&pvzMap.destroy(); pvzDots={}; pvzMapBox.hidden=false;
-      pvzMap=new YMap(pvzMapBox,{location:pts.length>1?{bounds}:{center:[pts[0].lon,pts[0].lat],zoom:15}});
-      pvzMap.addChild(new YMapDefaultSchemeLayer()); pvzMap.addChild(new YMapDefaultFeaturesLayer());
-      pts.forEach(p=>{const el=document.createElement('div');el.className='pvzdot'+(p.c===pvzIn.value?' on':'');el.title=p.a;
-        el.addEventListener('click',()=>{pickPvz(p.c);const r=pvzList.querySelector(`input[value="${CSS.escape(p.c)}"]`);r&&r.closest('.radio-card').scrollIntoView({block:'nearest'});});
-        pvzDots[p.c]=el; pvzMap.addChild(new YMapMarker({coordinates:[p.lon,p.lat]},el));});
+    if(!window.BT_YMAPS_KEY||!pvzAll.length){pvzMap&&(pvzMap.destroy(),pvzMap=null,pvzOm=null);pvzMapBox.hidden=true;return;}
+    const pts=pvzAll;
+    ymapsLoad().then(y=>{ if(pts!==pvzAll) return;
+      pvzMapBox.hidden=false;
+      if(!pvzMap){ pvzMap=new y.Map(pvzMapBox,{center:[pts[0].lat,pts[0].lon],zoom:11,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true}); pvzMap.behaviors.disable('scrollZoom'); }
+      else pvzMap.geoObjects.removeAll();
+      pvzOm=new y.ObjectManager({clusterize:true,gridSize:64});
+      pvzOm.clusters.options.set('preset','islands#blackClusterIcons');
+      pvzOm.add({type:'FeatureCollection',features:pts.map((p,i)=>({type:'Feature',id:i,geometry:{type:'Point',coordinates:[p.lat,p.lon]},
+        properties:{hintContent:esc(p.a)},options:{preset:p.c===pvzIn.value?'islands#redDotIcon':'islands#blackCircleDotIcon'}}))});
+      pvzOm.objects.events.add('click',e=>pickPvz(pts[e.get('objectId')].c,true));
+      pvzMap.geoObjects.add(pvzOm);
+      const cur=pvzOf(pvzIn.value);
+      if(cur) pvzMap.setCenter([cur.lat,cur.lon],15);
+      else if(pts.length>1) pvzMap.setBounds(pvzOm.getBounds(),{checkZoomRange:true,zoomMargin:30});
+      pvzMap.container.fitToViewport();
     }).catch(()=>{pvzMapBox.hidden=true;});
   }
   const pvzMapBox=document.getElementById('pvzMap');

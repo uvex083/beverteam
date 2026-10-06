@@ -66,8 +66,9 @@ if (!CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'USER_ID'])->
     }
 }
 
-// паролей у покупателей нет: штатные регистрация и восстановление пароля Битрикса посетителям не нужны
-foreach (['new_user_registration' => 'N', 'new_user_registration_email_confirmation' => 'N', 'store_password' => 'N'] as $opt => $val) {
+// паролей у покупателей нет: штатные регистрация и восстановление пароля Битрикса посетителям не нужны;
+// store_password = «запоминать авторизацию» — без неё вход по коду слетает вместе с сессией
+foreach (['new_user_registration' => 'N', 'new_user_registration_email_confirmation' => 'N', 'store_password' => 'Y'] as $opt => $val) {
     if (COption::GetOptionString('main', $opt) !== $val) {
         $say("главный модуль: $opt = $val");
         $apply and COption::SetOptionString('main', $opt, $val);
