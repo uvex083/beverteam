@@ -1,5 +1,6 @@
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
+// пустая корзина — редирект до вывода шапки: после неё обработчики буфера с кешем дают белый экран
+require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 /** @global CMain $APPLICATION */
 /** @global CUser $USER */
 
@@ -7,15 +8,15 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Web\Json;
 use Bitrix\Sale;
 
-$APPLICATION->SetTitle('Оформление заказа');
-$APPLICATION->SetPageProperty('title', 'Оформление заказа — BEVERTEAM');
-$APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 Loader::includeModule('sale');
-
 $basket = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems();
 if ($basket->isEmpty()) {
     LocalRedirect('/personal/cart/');
 }
+require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
+$APPLICATION->SetTitle('Оформление заказа');
+$APPLICATION->SetPageProperty('title', 'Оформление заказа — BEVERTEAM');
+$APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 
 // популярные города из макета; названия и области — из местоположений Битрикса
