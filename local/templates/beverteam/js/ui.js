@@ -1759,44 +1759,39 @@ window.BT_mapWidget = (el, opts) => {
   return box;
 };
 
-/* Интерактивная карта с выбором точки. Без ключа возвращает null — вызывающий код
-   оставляет схематичную подложку и ручной ввод адреса. */
+/* Яндекс Карты 2.1: грузим один раз и только когда карта нужна (2.1, а не 3.0 — ключу не нужна привязка к адресу сайта) */
+window.BT_ymaps = () => window.ymaps&&ymaps.Map ? Promise.resolve(window.ymaps) : (window.BT_ymapsP = window.BT_ymapsP || new Promise((res,rej)=>{
+  if(!BT_YMAPS_KEY) return rej();
+  const s=document.createElement('script');
+  s.src=`https://api-maps.yandex.ru/2.1/?apikey=${BT_YMAPS_KEY}&lang=ru_RU`;
+  s.onload=()=>ymaps.ready(()=>res(window.ymaps)); s.onerror=()=>{ window.BT_ymapsP=null; rej(); }; document.head.appendChild(s);
+}));
+/* метка в стиле сайта: чёрная с лаймовой точкой; выбранная — лаймовая */
+window.BT_mapPin = on => { const s=on?40:28, fill=on?'#D7E85C':'#0E0E0C', dot=on?'#0E0E0C':'#D7E85C';
+  return {iconLayout:'default#image',iconImageSize:[s,s*1.25],iconImageOffset:[-s/2,-s*1.25],
+    iconImageHref:'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s*1.25}" viewBox="0 0 24 30"><path fill="${fill}" stroke="#fff" stroke-width="1.5" d="M12 1.5a9 9 0 0 0-9 9c0 6.6 9 17.5 9 17.5s9-10.9 9-17.5a9 9 0 0 0-9-9Z"/><circle cx="12" cy="10.5" r="3.6" fill="${dot}"/></svg>`)}; };
+
+/* Интерактивная карта с выбором точки. Без ключа или без связи возвращает null — вызывающий код
+   оставляет ручной ввод адреса. */
 window.BT_mapPicker = (el, onPick, opts) => {
   if(!el || !BT_YMAPS_KEY) return null;
-  const load = () => new Promise((res,rej)=>{
-    if(window.ymaps3) return res(window.ymaps3);
-    const s=document.createElement('script');
-    s.src=`https://api-maps.yandex.ru/v3/?apikey=${BT_YMAPS_KEY}&lang=ru_RU`;
-    s.onload=()=>res(window.ymaps3); s.onerror=rej; document.head.appendChild(s);
-  });
-  return load().then(async ymaps3=>{
-    await ymaps3.ready;
-    const {YMap,YMapDefaultSchemeLayer,YMapDefaultFeaturesLayer,YMapMarker,YMapListener}=ymaps3;
-    const center=(opts&&opts.center)||BT_CO_COORDS;
-    const map=new YMap(el,{location:{center,zoom:(opts&&opts.zoom)||14}});
-    map.addChild(new YMapDefaultSchemeLayer()); map.addChild(new YMapDefaultFeaturesLayer());
-    const pin=document.createElement('div');
-    pin.innerHTML='<svg viewBox="0 0 24 24" width="30" height="30" fill="#0E0E0C"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.8" fill="#D7E85C"/></svg>';
-    pin.style.cssText='transform:translate(-50%,-100%)';
-    let marker=null;
-    map.addChild(new YMapListener({layer:'any', onClick:async (_,e)=>{
-      const c=e.coordinates;
-      if(!marker){ marker=new YMapMarker({coordinates:c},pin); map.addChild(marker); }
-      else marker.update({coordinates:c});
+  return BT_ymaps().then(ymaps=>{
+    const c0=(opts&&opts.center)||BT_CO_COORDS;
+    const map=new ymaps.Map(el,{center:[c0[1],c0[0]],zoom:(opts&&opts.zoom)||14,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true,yandexMapDisablePoiInteractivity:true});
+    let mark=null;
+    map.events.add('click',async e=>{
+      const c=e.get('coords');
+      if(!mark){ mark=new ymaps.Placemark(c,{},BT_mapPin(true)); map.geoObjects.add(mark); } else mark.geometry.setCoordinates(c);
       /* обратное геокодирование: адрес по координатам */
       try{
-        const r=await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${window.BT_YGEO_KEY||BT_YMAPS_KEY}&format=json&lang=ru_RU&geocode=${c[0]},${c[1]}`);
+        const r=await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${window.BT_YGEO_KEY||BT_YMAPS_KEY}&format=json&lang=ru_RU&geocode=${c[1]},${c[0]}`);
         const j=await r.json();
         const g=j.response.GeoObjectCollection.featureMember[0]?.GeoObject;
         const a=g?.metaDataProperty?.GeocoderMetaData?.Address||{};
         const comp=(a.Components||[]).reduce((m,x)=>((m[x.kind]=x.name),m),{});
-        onPick&&onPick({
-          city: comp.locality||'',
-          street: [comp.street,comp.house].filter(Boolean).join(', '),
-          full: a.formatted||'', coords:c
-        });
-      }catch(err){ onPick&&onPick({city:'',street:'',full:'',coords:c}); }
-    }}));
+        onPick&&onPick({ city: comp.locality||'', street: [comp.street,comp.house].filter(Boolean).join(', '), full: a.formatted||'', coords:[c[1],c[0]] });
+      }catch(err){ onPick&&onPick({city:'',street:'',full:'',coords:[c[1],c[0]]}); }
+    });
     return map;
   }).catch(()=>null);
 };

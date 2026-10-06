@@ -217,11 +217,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pvzCache={}; let pvzAll=[], pvzLoc='', pvzMap=null, pvzOm=null, pvzOpenId=-1;
   const pvzPick=()=>pvzCur?`<span class="pvzpick"><span class="pvzpick__a">${esc(pvzCur.a)}</span><button type="button" class="btn btn--dark btn--sm" data-pvz>Изменить</button></span>`
     :`<span class="pvzpick"><button type="button" class="btn btn--sm" data-pvz>Выбрать пункт на карте</button></span>`;
-  const pin=(fill,dot,s)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s*1.25}" viewBox="0 0 24 30"><path fill="${fill}" stroke="#fff" stroke-width="1.5" d="M12 1.5a9 9 0 0 0-9 9c0 6.6 9 17.5 9 17.5s9-10.9 9-17.5a9 9 0 0 0-9-9Z"/><circle cx="12" cy="10.5" r="3.6" fill="${dot}"/></svg>`);
-  const PIN={iconLayout:'default#image',iconImageHref:pin('#0E0E0C','#D7E85C',28),iconImageSize:[28,35],iconImageOffset:[-14,-35],zIndex:0};
-  const PIN_ON={iconLayout:'default#image',iconImageHref:pin('#D7E85C','#0E0E0C',40),iconImageSize:[40,50],iconImageOffset:[-20,-50],zIndex:1000};
-  const ymapsLoad=()=>window.ymaps&&ymaps.Map?Promise.resolve(window.ymaps):(window.BT_ymapsP=window.BT_ymapsP||new Promise((res,rej)=>{const s=document.createElement('script');
-    s.src=`https://api-maps.yandex.ru/2.1/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>ymaps.ready(()=>res(window.ymaps));s.onerror=()=>{window.BT_ymapsP=null;rej();};document.head.appendChild(s);}));
+  const PIN={...BT_mapPin(false),zIndex:0}, PIN_ON={...BT_mapPin(true),zIndex:1000}, ymapsLoad=BT_ymaps;
   const plural=(n,f)=>f[n%10===1&&n%100!==11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2];
   function openPvz(){
     if(!locIn.value) return;

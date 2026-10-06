@@ -1477,7 +1477,7 @@ input,textarea{caret-color:var(--ink)}
 .pvzm__t{margin:0 40px 18px 0;font-family:Unbounded;font-weight:800;font-size:22px;line-height:1.2}
 .pvzm{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:18px}
 .pvzm__map{position:relative;border-radius:var(--rad);overflow:hidden;background:var(--paper);border:1px solid var(--line)}
-.pvzm__map [class*="ground-pane"]{filter:grayscale(1) contrast(.92) brightness(1.04)}
+.pvzm__map [class*="ground-pane"],#addrModal .amap__box [class*="ground-pane"]{filter:grayscale(1) contrast(.92) brightness(1.04)}
 .pvzm__load{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font-size:14px;color:var(--gray);z-index:2;background:var(--paper)}
 .pvzm__load[hidden]{display:none}
 .pvzm__cl{width:44px;height:44px;display:grid;place-items:center;color:#D7E85C;font-weight:800;font-size:13px}
