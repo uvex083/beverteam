@@ -122,6 +122,7 @@ $co = bt_contacts();
       <div class="blk" id="blkD">
         <h2><b>3</b>Доставка</h2>
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
+        <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна — сбой на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
         <div class="opts" id="deliv"></div>
         <div id="addr" hidden style="margin-top:18px">
           <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
@@ -302,7 +303,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const n=++calcN;
     return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId}).then(r=>{
       if(n!==calcN||!r.ok) return;
-      dl=r.deliveries; avail=r.pays; last=r;
+      dl=r.deliveries; avail=r.pays; last=r; cdekDown.hidden=!r.cdekDown;
       if(pvzCur&&pvzCur.loc!==locIn.value){pvzCur=null;pvzIn.value='';}
       const all=opts();
       if(!sel||!all.some(o=>o.key===sel.key)) sel=all.find(o=>o.key===want&&o.tab===tab)||all.find(o=>o.tab===tab)||all[0]||null;

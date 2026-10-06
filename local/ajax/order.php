@@ -164,6 +164,9 @@ $pay = (int)$req->getPost('pay');
 // доступные доставки и оплаты — по ограничениям Битрикса (город, тип плательщика)
 $deliveries = [];
 $pays = [];
+// модуль СДЭК после сбоя API сам не считает доставку несколько минут — тоже показываем покупателю
+$dead = (int)\COption::GetOptionString('ipol.sdek', 'sdekDeadServer', '0');
+$cdekDown = $dead && time() - $dead < 60 * (int)\COption::GetOptionString('ipol.sdek', 'timeoutRollback', '1');
 if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->isEmpty()) {
     $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
     $shipment = bt_order_shipment($probe);
@@ -178,6 +181,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
             // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
             $period = str_starts_with((string)$f['XML_ID'], 'sdek_') ? strip_tags((string)$svc->calculate(bt_order_shipment($o))->getPeriodDescription()) : '';
         } catch (\Throwable $e) {
+            $cdekDown = $cdekDown || str_starts_with((string)$f['XML_ID'], 'sdek_');
             continue;
         }
         $deliveries[(int)$svc->getId()] = ['id' => (int)$svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
@@ -216,7 +220,8 @@ if ($action === 'calc') {
     }
     $dPrice = $deliveries[$delivery]['price'] ?? 0;
     $out(['ok' => true, 'loc' => $locOk ? $loc : '', 'deliveries' => array_values($deliveries), 'delivery' => $delivery,
-        'pays' => array_values($pays), 'pay' => $pay, 'base' => $base, 'disc' => round($base - $sum, 2), 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice]);
+        'pays' => array_values($pays), 'pay' => $pay, 'base' => $base, 'disc' => round($base - $sum, 2), 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice,
+        'cdekDown' => $cdekDown && !array_filter($deliveries, fn($d) => str_starts_with($d['code'], 'sdek_'))]);
 }
 
 if ($action !== 'create') {

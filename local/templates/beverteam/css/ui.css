@@ -1471,6 +1471,7 @@ input,textarea{caret-color:var(--ink)}
 .cop .dtabs{margin-bottom:14px}
 .cop .pill-tabs button[aria-disabled=true]{opacity:.4;cursor:not-allowed}
 /* пункт выдачи СДЭК: выбранный адрес в карточке доставки + окно с картой */
+.cop .cdekdown{margin-bottom:12px;background:var(--paper);border:1px solid var(--line)}
 .cop .pvzpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .cop .pvzpick__a{flex:1 1 220px;font-size:14px;font-weight:600;color:var(--ink)}
 .modal--pvz .modal__p{width:min(1120px,100%);height:min(720px,calc(100dvh - 48px));padding:26px 28px 28px;display:flex;flex-direction:column;overflow:hidden}
