@@ -68,6 +68,34 @@ if ($action === 'city') {
     $out(['ok' => true, 'list' => $list]);
 }
 
+// Пункты выдачи СДЭК города — из таблицы модуля ipol.sdek (синхронизирует агент модуля)
+function bt_pvz_list(string $loc, string $code = ''): array
+{
+    $l = Sale\Location\LocationTable::getList(['filter' => ['=CODE' => $loc], 'select' => ['ID']])->fetch();
+    if (!$l || !Loader::includeModule('ipol.sdek')) {
+        return [];
+    }
+    $db = \Bitrix\Main\Application::getConnection();
+    $c = $db->query('SELECT SDEK_ID FROM ipol_sdekcities WHERE BITRIX_ID = ' . (int)$l['ID'])->fetch();
+    if (!$c) {
+        return [];
+    }
+    $sql = "SELECT CODE, ADDRESS, WORK_TIME, NEAREST_METRO_STATION, ADDRESS_COMMENT, LAT, LON, WEIGHT_MAX FROM ipol_sdek_points
+        WHERE CITY_CODE = " . (int)$c['SDEK_ID'] . " AND TYPE = 'PVZ' AND IS_HANDOUT = 'Y' AND SYNC_IS_ACTIVE = 'Y'"
+        . ($code !== '' ? " AND CODE = '" . $db->getSqlHelper()->forSql($code) . "'" : '') . ' ORDER BY ADDRESS';
+    $list = [];
+    foreach ($db->query($sql) as $p) {
+        $list[] = ['c' => $p['CODE'], 'a' => $p['ADDRESS'], 'w' => (string)$p['WORK_TIME'], 'm' => (string)$p['NEAREST_METRO_STATION'],
+            'n' => (string)$p['ADDRESS_COMMENT'], 'lat' => (float)$p['LAT'], 'lon' => (float)$p['LON'], 'kg' => (float)$p['WEIGHT_MAX']];
+    }
+    return $list;
+}
+
+if ($action === 'pvz') {
+    $kg = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->getWeight() / 1000;
+    $out(['ok' => true, 'list' => array_values(array_filter(bt_pvz_list($in('loc')), fn($p) => !$p['kg'] || $p['kg'] >= $kg))]);
+}
+
 $ptypes = [];
 foreach (Sale\Internals\PersonTypeTable::getList(['filter' => ['=ACTIVE' => 'Y', '=LID' => SITE_ID], 'select' => ['ID', 'CODE']])->fetchAll() as $p) {
     $ptypes[$p['CODE']] = (int)$p['ID'];
@@ -132,8 +160,10 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
         }
         $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
+        // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
+        $period = str_starts_with((string)$f['XML_ID'], 'sdek_') ? strip_tags((string)$svc->calculate(bt_order_shipment($o))->getPeriodDescription()) : '';
         $deliveries[(int)$svc->getId()] = ['id' => (int)$svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
-            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY')];
+            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY'), 'period' => $period];
     }
     if (!isset($deliveries[$delivery])) {
         $delivery = (int)array_key_first($deliveries);
@@ -204,6 +234,8 @@ if (!$locOk) {
     $err['street'] = 'Это поле нужно заполнить';
 } elseif ($f['mode'] === 'addr' && !preg_match('/\p{L}{2,}.*\d/u', $f['street'])) {
     $err['street'] = 'Укажите номер дома';
+} elseif ($f['mode'] === 'pvz' && !($pvz = bt_pvz_list($loc, $f['pvz'])[0] ?? null)) {
+    $err['pvz'] = 'Выберите пункт выдачи';
 }
 if ($locOk && !isset($pays[(int)$req->getPost('pay')])) {
     $err['pay'] = 'Выберите способ оплаты';
@@ -243,7 +275,9 @@ $in('src') === 'price' and $note[] = 'Запрос счёта из прайс-л
 preg_match('/^[a-z0-9_-]{1,40}$/i', (string)($_COOKIE['bt_pm'] ?? ''), $pm) and $note[] = 'Персональная ссылка прайса: ' . $pm[0];
 $note and $order->setField('COMMENTS', implode("\n", $note));
 $addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
-$values = ['ZIP' => '', 'EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $f['pvz'] : '']
+// модуль СДЭК берёт код пункта из адреса после «#S»
+$f['mode'] === 'pvz' and $addr = 'Пункт выдачи СДЭК: ' . $pvz['a'] . ' #S' . $pvz['c'];
+$values = ['ZIP' => '', 'EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $pvz['c'] : '']
     + ($pt === 'UR'
         ? ['CONTACT_PERSON' => $f['name'], 'COMPANY' => $f['company'], 'INN' => $f['inn'], 'KPP' => $f['kpp'], 'COMPANY_ADR' => $f['company_adr']]
         : ['FIO' => $f['name']]);
@@ -264,7 +298,7 @@ $_SESSION['BT_ORDERS'][] = (int)$order->getId();
 // для следующего заказа: плательщик, способ доставки и последний адрес; гость с чужим e-mail в чужой кабинет не пишет
 if ($USER->IsAuthorized() || !empty($fresh)) {
     $prev = CUserOptions::GetOption('bt', 'last_ship', [], $userId);
-    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc];
+    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? '')];
     $ship += $f['mode'] === 'addr' ? ['street' => $f['street'], 'flat' => $f['flat'], 'entrance' => $f['entrance']]
         : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
     CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);

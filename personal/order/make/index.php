@@ -127,6 +127,11 @@ $co = bt_contacts();
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <div id="pvz" hidden>
+          <div class="alert alert--info pvzsel" id="pvzSel" hidden></div>
+          <div class="pvzmap" id="pvzMap" hidden></div>
+          <div class="field"><label for="pvzQ">Найти пункт</label><input id="pvzQ" placeholder="Улица, метро или код пункта" autocomplete="new-password" spellcheck="false"></div>
+          <div class="pvzlist" id="pvzList" role="radiogroup" aria-label="Пункты выдачи"></div>
+          <input type="hidden" name="pvz" id="pvzIn" value="">
         </div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
       </div>
@@ -170,15 +175,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
   let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, payId=0, calcN=0, sending=false;
 
-  /* доставки Битрикса → варианты макета. СДЭК — курьером до двери (расчёт по весу); пункт выдачи добавим с картой пунктов */
-  const opts=()=>dl.flatMap(d=>d.code==='bt_cdek'
-    ?[{key:'cdek_door',tab:'addr',d,t:'СДЭК — курьер до двери',desc:'Доставка по адресу'}]
-    :[{key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':'addr',d,t:d.name,desc:d.desc}]);
+  /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
+  const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);
+  const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
   const dateOf=o=>{const x=BT_dates(1);
+    if(o.d.period) return o.d.period;
     if(o.tab==='pickup') return 'готов '+(x.relPack||BT_fmtDate(x.pack,true));
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
     return '';};
-  const priceOf=o=>o.d.price>0?fmt(o.d.price):o.d.code==='bt_cdek'?'сообщит менеджер':'бесплатно';
+  const priceOf=o=>o.d.price>0?fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
   function renderDeliv(){
     const all=opts();
     [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab);
@@ -191,17 +196,64 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="d">${esc(o.desc)}</div></div></label>`;}).join('')
       :`<p class="muted" style="margin:0;font-size:14px">${dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'Выберите город из списка, чтобы увидеть способы доставки.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pvz.hidden=!sel||sel.tab!=='pvz'; pickupNote.hidden=!sel||sel.tab!=='pickup';
+    if(sel&&sel.tab==='pvz') loadPvz();
   }
+
+  /* пункты выдачи СДЭК: список города + карта, если загрузились Яндекс Карты */
+  let pvzAll=[], pvzLoc='', pvzMap=null, pvzDots={}, pvzWant=<?= Json::encode((string)($ship['pvz'] ?? '')) ?>;
+  const pvzOf=c=>pvzAll.find(p=>p.c===c);
+  function loadPvz(){
+    if(!locIn.value||pvzLoc===locIn.value) return;
+    const loc=pvzLoc=locIn.value; pvzAll=[]; pvzIn.value=''; pvzQ.value='';
+    pvzList.innerHTML='<p class="muted" style="margin:0;font-size:14px">Загружаем пункты выдачи…</p>'; pvzSel.hidden=true;
+    post({action:'pvz',loc}).then(r=>{ if(loc!==locIn.value) return;
+      pvzAll=r.list||[]; const w=pvzOf(pvzWant); if(w) pvzIn.value=w.c;
+      renderPvz(); drawPvzMap(); ready();
+    }).catch(()=>{pvzLoc='';pvzList.innerHTML='<p class="muted" style="margin:0;font-size:14px">Не получилось загрузить пункты — обновите страницу</p>';});
+  }
+  function renderPvz(){
+    const q=pvzQ.value.trim().toLowerCase(), cur=pvzOf(pvzIn.value);
+    const list=pvzAll.filter(p=>!q||(p.a+' '+p.m+' '+p.c).toLowerCase().includes(q)).slice(0,60);
+    pvzList.innerHTML=!pvzAll.length?'<p class="muted" style="margin:0;font-size:14px">В этом городе нет пунктов выдачи СДЭК — выберите доставку курьером.</p>'
+      :!list.length?'<p class="muted" style="margin:0;font-size:14px">Ничего не нашли — попробуйте другую улицу.</p>'
+      :list.map(p=>`<label class="radio-card ${p.c===pvzIn.value?'on':''}"><input type="radio" name="pvzr" value="${esc(p.c)}" ${p.c===pvzIn.value?'checked':''}>
+        <div><div class="t">${esc(p.a)}</div><div class="d">${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</div></div></label>`).join('');
+    pvzSel.hidden=!cur;
+    if(cur) pvzSel.innerHTML=`<b>Пункт выдачи:</b> ${esc(cur.a)}${cur.w?`<br><span class="muted">${esc(cur.w)}</span>`:''}${cur.n?`<br><span class="muted">${esc(cur.n)}</span>`:''}`;
+    Object.entries(pvzDots).forEach(([c,el])=>el.classList.toggle('on',c===pvzIn.value));
+  }
+  function pickPvz(c){ pvzIn.value=c; renderPvz(); setErr(pvzQ,''); ready();
+    const p=pvzOf(c); if(p&&pvzMap) pvzMap.update({location:{center:[p.lon,p.lat],zoom:Math.max(pvzMap.zoom||13,14),duration:300}}); }
+  pvzList.addEventListener('change',e=>{if(e.target.name==='pvzr')pickPvz(e.target.value);});
+  pvzQ.addEventListener('input',renderPvz);
+  pvzQ.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault();});
+  const ymapsLoad=()=>window.ymaps3?Promise.resolve(window.ymaps3):new Promise((res,rej)=>{const s=document.createElement('script');
+    s.src=`https://api-maps.yandex.ru/v3/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>res(window.ymaps3);s.onerror=rej;document.head.appendChild(s);});
+  function drawPvzMap(){
+    if(!window.BT_YMAPS_KEY||!pvzAll.length){pvzMap&&(pvzMap.destroy(),pvzMap=null);pvzMapBox.hidden=true;return;}
+    const pts=pvzAll, lons=pts.map(p=>p.lon), lats=pts.map(p=>p.lat);
+    const bounds=[[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]];
+    ymapsLoad().then(async y=>{ if(!y) throw 0; await y.ready; if(pts!==pvzAll) return;
+      const {YMap,YMapDefaultSchemeLayer,YMapDefaultFeaturesLayer,YMapMarker}=y;
+      pvzMap&&pvzMap.destroy(); pvzDots={}; pvzMapBox.hidden=false;
+      pvzMap=new YMap(pvzMapBox,{location:pts.length>1?{bounds}:{center:[pts[0].lon,pts[0].lat],zoom:15}});
+      pvzMap.addChild(new YMapDefaultSchemeLayer()); pvzMap.addChild(new YMapDefaultFeaturesLayer());
+      pts.forEach(p=>{const el=document.createElement('div');el.className='pvzdot'+(p.c===pvzIn.value?' on':'');el.title=p.a;
+        el.addEventListener('click',()=>{pickPvz(p.c);const r=pvzList.querySelector(`input[value="${CSS.escape(p.c)}"]`);r&&r.closest('.radio-card').scrollIntoView({block:'nearest'});});
+        pvzDots[p.c]=el; pvzMap.addChild(new YMapMarker({coordinates:[p.lon,p.lat]},el));});
+    }).catch(()=>{pvzMapBox.hidden=true;});
+  }
+  const pvzMapBox=document.getElementById('pvzMap');
   function renderPay(){
     pay.innerHTML=PAYS.map(p=>{const on=avail.some(a=>a.id===p.id);
       const why=p.code==='bill'?'Только для юрлиц и ИП':p.code==='cash'&&pt==='UR'?'Юрлица оплачивают по счёту':'Недоступно для выбранной доставки';
-      const desc=p.code==='cash'&&sel&&sel.d.code==='bt_cdek'?'Наложенным платежом при получении в СДЭК':p.desc;
+      const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${on&&payId===p.id?'on':''} ${on?'':'off'}"><input type="radio" name="pay" value="${p.id}" ${on&&payId===p.id?'checked':''} ${on?'':'disabled'}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(on?desc:why)}</div></div></label>`;}).join('');
   }
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
-    const cdekUnknown=sel&&sel.d.code==='bt_cdek'&&!(r.deliveryPrice>0);
+    const cdekUnknown=sel&&isCdek(sel.d)&&!(r.deliveryPrice>0);
     sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total); sTotNote.hidden=!cdekUnknown;
     const p=PAYS.find(x=>x.id===payId);
@@ -317,6 +369,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!locIn.value)miss.push('город');
     else if(!sel)miss.push('способ доставки');
     else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(val('street')?'номер дома':'адрес доставки');
+    else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     if(!coAgree.checked)miss.push('согласие с условиями');
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):'Всё заполнено — можно подтверждать';

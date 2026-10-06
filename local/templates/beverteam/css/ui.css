@@ -1469,6 +1469,14 @@ input,textarea{caret-color:var(--ink)}
 .cop .opts{display:grid;gap:10px}
 .cop .dtabs{margin-bottom:14px}
 .cop .pill-tabs button[aria-disabled=true]{opacity:.4;cursor:not-allowed}
+.cop #pvz{margin-top:18px}
+.cop .pvzmap{position:relative;height:340px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--line);background:var(--paper);margin-bottom:14px}
+.cop .pvzdot{width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.35);transform:translate(-50%,-50%);cursor:pointer}
+.cop .pvzdot.on{width:24px;height:24px;background:var(--lime);border-color:var(--ink)}
+.cop .pvzlist{display:grid;gap:8px;max-height:380px;overflow:auto;padding-right:4px}
+.cop .pvzlist .radio-card .d{font-size:13px}
+.cop .pvzsel{margin-bottom:12px}
+@media(max-width:600px){.cop .pvzmap{height:260px}.cop .pvzlist{max-height:320px}}
 .field.city{position:relative}
 .field.city ul{position:absolute;left:0;right:0;top:calc(100% - 20px);background:var(--white);border:1px solid var(--line);border-radius:12px;list-style:none;margin:4px 0 0;padding:6px;z-index:5;display:none;box-shadow:0 12px 30px rgba(0,0,0,.1);max-height:320px;overflow:auto}
 .field.city ul.open{display:block}
