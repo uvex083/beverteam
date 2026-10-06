@@ -171,17 +171,26 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
         if ($svc instanceof Sale\Delivery\Services\EmptyDeliveryService) {
             continue;
         }
-        $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
-        // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
-        $period = str_starts_with((string)$f['XML_ID'], 'sdek_') ? strip_tags((string)$svc->calculate(bt_order_shipment($o))->getPeriodDescription()) : '';
+        // модуль СДЭК падает, если API не ответил: такую службу просто не показываем, остальные работают
+        try {
+            $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
+            // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
+            $period = str_starts_with((string)$f['XML_ID'], 'sdek_') ? strip_tags((string)$svc->calculate(bt_order_shipment($o))->getPeriodDescription()) : '';
+        } catch (\Throwable $e) {
+            continue;
+        }
         $deliveries[(int)$svc->getId()] = ['id' => (int)$svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
             'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY'), 'period' => $period];
     }
     if (!isset($deliveries[$delivery])) {
         $delivery = (int)array_key_first($deliveries);
     }
-    $probe = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, 0);
+    try {
+        $probe = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, 0);
+    } catch (\Throwable $e) {
+        $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
+    }
     foreach (Sale\PaySystem\Manager::getListWithRestrictions(bt_order_payment($probe)) as $ps) {
         if ($ps['ACTIVE'] === 'Y' && $ps['ACTION_FILE'] !== 'inner') {
             $pays[(int)$ps['ID']] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE']];
@@ -198,7 +207,11 @@ if ($action === 'calc') {
     $base = (float)$basket->getPrice();
     $sum = $base;
     if (!$basket->isEmpty()) {
-        $o = bt_order_build($userId, $ptypes[$pt], $locOk ? $loc : '', $locOk ? $delivery : 0, 0);
+        try {
+            $o = bt_order_build($userId, $ptypes[$pt], $locOk ? $loc : '', $locOk ? $delivery : 0, 0);
+        } catch (\Throwable $e) {
+            $o = bt_order_build($userId, $ptypes[$pt], $locOk ? $loc : '', 0, 0);
+        }
         $sum = (float)$o->getPrice() - (float)$o->getDeliveryPrice();
     }
     $dPrice = $deliveries[$delivery]['price'] ?? 0;

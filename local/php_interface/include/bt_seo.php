@@ -62,7 +62,8 @@ function bt_landing_meta(): void
 // OnEndBufferContent: H1 в готовой разметке (товар, раздел каталога) и SEO-текст — вместо текста раздела или под содержимым; на 2-й и дальше страницах списка текста нет
 function bt_landing_body(&$content): void
 {
-    if (!str_contains($content, '</head>') || !($l = bt_landing())) {
+    // редирект после вывода шапки: обработчик идёт внутри ob-колбэка, кеш Битрикса там роняет страницу
+    if (intdiv(http_response_code() ?: 200, 100) === 3 || !str_contains($content, '</head>') || !($l = bt_landing())) {
         return;
     }
     if ($l['h1'] !== '') {
