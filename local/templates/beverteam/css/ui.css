@@ -1491,7 +1491,7 @@ input,textarea{caret-color:var(--ink)}
 .pvzm__it span{display:block;margin-top:3px;font-size:12.5px;color:var(--gray)}
 .pvzm__it.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 @media(hover:hover){.pvzm__it:hover{border-color:var(--ink)}}
-.pvzm__card{min-height:0;overflow:auto;display:flex;flex-direction:column;overscroll-behavior:contain;padding-right:4px}
+.pvzm__card{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;overscroll-behavior:contain;padding-right:4px}
 .pvzm__back{align-self:flex-start;background:none;border:0;padding:4px 0;margin-bottom:12px;font:inherit;font-size:13px;color:var(--gray);cursor:pointer}
 @media(hover:hover){.pvzm__back:hover{color:var(--ink)}}
 .pvzm__code{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
