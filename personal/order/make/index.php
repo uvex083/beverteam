@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function showPvz(i,fromMap){
     const p=pvzAll[i]; if(!p) return;
-    if(pvzOm){ if(pvzOpenId>=0) pvzOm.objects.setObjectOptions(pvzOpenId,PIN); pvzOm.objects.setObjectOptions(i,PIN_ON); }
+    if(pvzOm){ if(pvzOpenId>=0&&pvzOpenId!==i) pvzOm.objects.setObjectOptions(pvzOpenId,PIN); pvzOm.objects.setObjectOptions(i,PIN_ON); }
     pvzOpenId=i;
     if(pvzMap) pvzMap.setCenter([p.lat,p.lon],Math.max(pvzMap.getZoom(),15),{duration:fromMap?200:300});
     const pay=[p.card&&'картой',p.cash&&'наличными'].filter(Boolean).join(' или ');
