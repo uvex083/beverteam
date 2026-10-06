@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       :list.map(p=>`<label class="radio-card ${p.c===pvzIn.value?'on':''}"><input type="radio" name="pvzr" value="${esc(p.c)}" ${p.c===pvzIn.value?'checked':''}>
         <div><div class="t">${esc(p.a)}</div><div class="d">${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</div></div></label>`).join('');
     pvzSel.hidden=!cur;
-    if(cur) pvzSel.innerHTML=`<b>Пункт выдачи:</b> ${esc(cur.a)}${cur.w?`<br><span class="muted">${esc(cur.w)}</span>`:''}${cur.n?`<br><span class="muted">${esc(cur.n)}</span>`:''}`;
+    if(cur) pvzSel.innerHTML=`<div><b>Пункт выдачи:</b> ${esc(cur.a)}${cur.w?`<br>${esc(cur.w)}`:''}${cur.n?`<br><small>${esc(cur.n)}</small>`:''}</div>`;
     Object.entries(pvzDots).forEach(([c,el])=>el.classList.toggle('on',c===pvzIn.value));
   }
   function pickPvz(c){ pvzIn.value=c; renderPvz(); setErr(pvzQ,''); ready();
