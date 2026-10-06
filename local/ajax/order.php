@@ -68,6 +68,18 @@ if ($action === 'city') {
     $out(['ok' => true, 'list' => $list]);
 }
 
+// Фото пункта: модуль хранит список сериализованным, элементы — строка-ссылка или ['url' => …]
+function bt_pvz_images(string $raw): array
+{
+    $list = $raw === '' ? [] : @unserialize($raw, ['allowed_classes' => false]);
+    $urls = [];
+    foreach (is_array($list) ? $list : [] as $i) {
+        $u = is_array($i) ? (string)($i['url'] ?? $i['URL'] ?? '') : (string)$i;
+        str_starts_with($u, 'https://') and $urls[] = $u;
+    }
+    return array_slice($urls, 0, 4);
+}
+
 // Пункты выдачи СДЭК города — из таблицы модуля ipol.sdek (синхронизирует агент модуля)
 function bt_pvz_list(string $loc, string $code = ''): array
 {
@@ -80,13 +92,14 @@ function bt_pvz_list(string $loc, string $code = ''): array
     if (!$c) {
         return [];
     }
-    $sql = "SELECT CODE, ADDRESS, WORK_TIME, NEAREST_METRO_STATION, ADDRESS_COMMENT, LAT, LON, WEIGHT_MAX FROM ipol_sdek_points
+    $sql = "SELECT CODE, ADDRESS, WORK_TIME, NEAREST_METRO_STATION, ADDRESS_COMMENT, LAT, LON, WEIGHT_MAX, HAVE_CASH, HAVE_CASHLESS, OFFICE_IMAGE_LIST FROM ipol_sdek_points
         WHERE CITY_CODE = " . (int)$c['SDEK_ID'] . " AND TYPE = 'PVZ' AND IS_HANDOUT = 'Y' AND SYNC_IS_ACTIVE = 'Y'"
         . ($code !== '' ? " AND CODE = '" . $db->getSqlHelper()->forSql($code) . "'" : '') . ' ORDER BY ADDRESS';
     $list = [];
     foreach ($db->query($sql) as $p) {
         $list[] = ['c' => $p['CODE'], 'a' => $p['ADDRESS'], 'w' => (string)$p['WORK_TIME'], 'm' => (string)$p['NEAREST_METRO_STATION'],
-            'n' => (string)$p['ADDRESS_COMMENT'], 'lat' => (float)$p['LAT'], 'lon' => (float)$p['LON'], 'kg' => (float)$p['WEIGHT_MAX']];
+            'n' => (string)$p['ADDRESS_COMMENT'], 'lat' => (float)$p['LAT'], 'lon' => (float)$p['LON'], 'kg' => (float)$p['WEIGHT_MAX'],
+            'cash' => $p['HAVE_CASH'] === 'Y', 'card' => $p['HAVE_CASHLESS'] === 'Y', 'img' => bt_pvz_images((string)$p['OFFICE_IMAGE_LIST'])];
     }
     return $list;
 }
@@ -298,7 +311,7 @@ $_SESSION['BT_ORDERS'][] = (int)$order->getId();
 // для следующего заказа: плательщик, способ доставки и последний адрес; гость с чужим e-mail в чужой кабинет не пишет
 if ($USER->IsAuthorized() || !empty($fresh)) {
     $prev = CUserOptions::GetOption('bt', 'last_ship', [], $userId);
-    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? '')];
+    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? ''), 'pvza' => $f['mode'] === 'pvz' ? $pvz['a'] : ($prev['pvza'] ?? '')];
     $ship += $f['mode'] === 'addr' ? ['street' => $f['street'], 'flat' => $f['flat'], 'entrance' => $f['entrance']]
         : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
     CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);

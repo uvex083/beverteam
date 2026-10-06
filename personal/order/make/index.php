@@ -126,17 +126,7 @@ $co = bt_contacts();
           <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
-        <div id="pvz" hidden>
-          <div class="alert alert--info pvzsel" id="pvzSel" hidden></div>
-          <div class="pvzwrap">
-            <div class="pvzside">
-              <div class="field"><label for="pvzQ">Найти пункт</label><input id="pvzQ" placeholder="Улица, метро или код пункта" autocomplete="new-password" spellcheck="false"></div>
-              <div class="pvzlist" id="pvzList" role="radiogroup" aria-label="Пункты выдачи"></div>
-            </div>
-            <div class="pvzmap" id="pvzMap" hidden></div>
-          </div>
-          <input type="hidden" name="pvz" id="pvzIn" value="">
-        </div>
+        <input type="hidden" name="pvz" id="pvzIn" value="">
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
       </div>
 
@@ -169,6 +159,24 @@ $co = bt_contacts();
       <p class="muted" style="font-size:12px;margin:12px 0 0;text-align:center">Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.</p>
     </aside>
   </form>
+  <div class="modal modal--pvz" id="pvzModal" role="dialog" aria-modal="true" aria-labelledby="pvzT">
+    <div class="modal__bg" data-close></div>
+    <div class="modal__p">
+      <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+      <h2 class="pvzm__t" id="pvzT">Выберите пункт выдачи</h2>
+      <div class="pvzm">
+        <div class="pvzm__map" id="pvzMap"><div class="pvzm__load" id="pvzLoad">Загружаем пункты выдачи…</div></div>
+        <div class="pvzm__side">
+          <div class="pvzm__list" id="pvzListV">
+            <div class="field"><input id="pvzQ" placeholder="Улица, метро или код пункта" autocomplete="new-password" spellcheck="false" aria-label="Найти пункт выдачи"></div>
+            <p class="pvzm__n" id="pvzN"></p>
+            <div class="pvzm__items" id="pvzList"></div>
+          </div>
+          <div class="pvzm__card" id="pvzCard" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
 window.BT_CO_DATA=<?= Json::encode(['popular' => $popular, 'pays' => $pays]) ?>;
@@ -197,64 +205,85 @@ document.addEventListener('DOMContentLoaded',()=>{
     deliv.innerHTML=list.length?list.map(o=>{const free=o.d.price===0&&o.d.base>0;
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
         <div style="flex:1"><div class="t"><span>${esc(o.t)}${free?' <span class="badge badge--ok">Бесплатно</span>':''}</span><span class="p">${priceOf(o)}${dateOf(o)?`<span class="dd">${dateOf(o)}</span>`:''}</span></div>
-        <div class="d">${esc(o.desc)}</div></div></label>`;}).join('')
+        <div class="d">${esc(o.desc)}</div>${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
       :`<p class="muted" style="margin:0;font-size:14px">${dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'Выберите город из списка, чтобы увидеть способы доставки.'}</p>`;
-    addr.hidden=!sel||sel.tab!=='addr'; pvz.hidden=!sel||sel.tab!=='pvz'; pickupNote.hidden=!sel||sel.tab!=='pickup';
-    if(sel&&sel.tab==='pvz') loadPvz();
+    addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
   }
 
-  /* пункты выдачи СДЭК: список города + карта, если загрузились Яндекс Карты */
-  let pvzAll=[], pvzLoc='', pvzMap=null, pvzWant=<?= Json::encode((string)($ship['pvz'] ?? '')) ?>;
-  const pvzOf=c=>pvzAll.find(p=>p.c===c);
-  function loadPvz(){
-    if(!locIn.value||pvzLoc===locIn.value) return;
-    const loc=pvzLoc=locIn.value; pvzAll=[]; pvzIn.value=''; pvzQ.value='';
-    pvzList.innerHTML='<p class="muted" style="margin:0;font-size:14px">Загружаем пункты выдачи…</p>'; pvzSel.hidden=true;
-    post({action:'pvz',loc}).then(r=>{ if(loc!==locIn.value) return;
-      pvzAll=r.list||[]; const w=pvzOf(pvzWant); if(w) pvzIn.value=w.c;
-      renderPvz(); drawPvzMap(); ready();
-    }).catch(()=>{pvzLoc='';pvzList.innerHTML='<p class="muted" style="margin:0;font-size:14px">Не получилось загрузить пункты — обновите страницу</p>';});
+  /* пункты выдачи СДЭК: карточка доставки показывает выбранный пункт, выбор — в окне с картой.
+     Пункты и Яндекс Карты грузим только при открытии окна */
+  let pvzCur=<?= Json::encode(($ship['pvz'] ?? '') !== '' && ($ship['pvza'] ?? '') !== '' ? ['c' => $ship['pvz'], 'a' => $ship['pvza'], 'loc' => $ship['loc'] ?? ''] : null) ?>;
+  if(pvzCur&&pvzCur.loc===locIn.value) pvzIn.value=pvzCur.c; else pvzCur=null;
+  const pvzCache={}; let pvzAll=[], pvzLoc='', pvzMap=null, pvzOm=null, pvzOpenId=-1;
+  const pvzPick=()=>pvzCur?`<span class="pvzpick"><span class="pvzpick__a">${esc(pvzCur.a)}</span><button type="button" class="btn btn--dark btn--sm" data-pvz>Изменить</button></span>`
+    :`<span class="pvzpick"><button type="button" class="btn btn--sm" data-pvz>Выбрать пункт на карте</button></span>`;
+  const pin=(fill,dot,s)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s*1.25}" viewBox="0 0 24 30"><path fill="${fill}" stroke="#fff" stroke-width="1.5" d="M12 1.5a9 9 0 0 0-9 9c0 6.6 9 17.5 9 17.5s9-10.9 9-17.5a9 9 0 0 0-9-9Z"/><circle cx="12" cy="10.5" r="3.6" fill="${dot}"/></svg>`);
+  const PIN={iconLayout:'default#image',iconImageHref:pin('#0E0E0C','#D7E85C',28),iconImageSize:[28,35],iconImageOffset:[-14,-35],zIndex:0};
+  const PIN_ON={iconLayout:'default#image',iconImageHref:pin('#D7E85C','#0E0E0C',40),iconImageSize:[40,50],iconImageOffset:[-20,-50],zIndex:1000};
+  const ymapsLoad=()=>window.ymaps&&ymaps.Map?Promise.resolve(window.ymaps):(window.BT_ymapsP=window.BT_ymapsP||new Promise((res,rej)=>{const s=document.createElement('script');
+    s.src=`https://api-maps.yandex.ru/2.1/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>ymaps.ready(()=>res(window.ymaps));s.onerror=()=>{window.BT_ymapsP=null;rej();};document.head.appendChild(s);}));
+  const plural=(n,f)=>f[n%10===1&&n%100!==11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2];
+  function openPvz(){
+    if(!locIn.value) return;
+    pvzModal.classList.add('open'); pvzCard.hidden=true; pvzListV.hidden=false;
+    if(pvzLoc===locIn.value){ if(pvzMap) pvzMap.container.fitToViewport(); renderPvzList(); const c=pvzAll.findIndex(p=>p.c===pvzIn.value); if(c>=0) showPvz(c); return; }
+    const loc=pvzLoc=locIn.value; pvzLoad.hidden=false; pvzLoad.textContent='Загружаем пункты выдачи…'; pvzList.innerHTML=''; pvzN.textContent=''; pvzQ.value='';
+    const pts=pvzCache[loc]?Promise.resolve(pvzCache[loc]):post({action:'pvz',loc}).then(r=>pvzCache[loc]=r.list||[]);
+    Promise.all([pts,ymapsLoad().catch(()=>null)]).then(([list,y])=>{ if(loc!==pvzLoc) return;
+      pvzAll=list; pvzOpenId=-1; renderPvzList();
+      if(!list.length){pvzLoad.textContent='В этом городе нет пунктов выдачи СДЭК — выберите доставку курьером';return;}
+      if(!y){pvzLoad.textContent='Карта не загрузилась — выберите пункт из списка';return;}
+      pvzLoad.hidden=true; drawPvzMap(y);
+      const c=pvzAll.findIndex(p=>p.c===pvzIn.value); if(c>=0) showPvz(c);
+    }).catch(()=>{pvzLoc='';pvzLoad.textContent='Не получилось загрузить пункты — попробуйте ещё раз';});
   }
-  function renderPvz(){
-    const q=pvzQ.value.trim().toLowerCase(), cur=pvzOf(pvzIn.value);
-    const list=pvzAll.filter(p=>!q||(p.a+' '+p.m+' '+p.c).toLowerCase().includes(q)).slice(0,60);
-    pvzList.innerHTML=!pvzAll.length?'<p class="muted" style="margin:0;font-size:14px">В этом городе нет пунктов выдачи СДЭК — выберите доставку курьером.</p>'
-      :!list.length?'<p class="muted" style="margin:0;font-size:14px">Ничего не нашли — попробуйте другую улицу.</p>'
-      :list.map(p=>`<label class="radio-card ${p.c===pvzIn.value?'on':''}"><input type="radio" name="pvzr" value="${esc(p.c)}" ${p.c===pvzIn.value?'checked':''}>
-        <div><div class="t">${esc(p.a)}</div><div class="d">${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</div></div></label>`).join('');
-    pvzSel.hidden=!cur;
-    if(cur) pvzSel.innerHTML=`<div><b>Пункт выдачи:</b> ${esc(cur.a)}${cur.w?`<br>${esc(cur.w)}`:''}${cur.n?`<br><small>${esc(cur.n)}</small>`:''}</div>`;
-    if(pvzOm) pvzAll.forEach((p,i)=>pvzOm.objects.setObjectOptions(i,{preset:p.c===pvzIn.value?'islands#redDotIcon':'islands#blackCircleDotIcon',zIndex:p.c===pvzIn.value?1000:0}));
+  function drawPvzMap(y){
+    if(!pvzMap) pvzMap=new y.Map(pvzMapBox,{center:[pvzAll[0].lat,pvzAll[0].lon],zoom:11,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true,yandexMapDisablePoiInteractivity:true});
+    else pvzMap.geoObjects.removeAll();
+    pvzOm=new y.ObjectManager({clusterize:true,gridSize:72});
+    pvzOm.clusters.options.set({clusterIcons:[{href:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><circle cx="22" cy="22" r="20" fill="#0E0E0C" stroke="#fff" stroke-width="3"/></svg>'),size:[44,44],offset:[-22,-22]}],
+      clusterIconContentLayout:y.templateLayoutFactory.createClass('<div class="pvzm__cl">{{ properties.geoObjects.length }}</div>')});
+    pvzOm.objects.options.set(PIN);
+    pvzOm.add({type:'FeatureCollection',features:pvzAll.map((p,i)=>({type:'Feature',id:i,geometry:{type:'Point',coordinates:[p.lat,p.lon]},properties:{hintContent:esc(p.a)}}))});
+    pvzOm.objects.events.add('click',e=>showPvz(e.get('objectId'),true));
+    pvzMap.geoObjects.add(pvzOm);
+    if(pvzAll.length>1) pvzMap.setBounds(pvzOm.getBounds(),{checkZoomRange:true,zoomMargin:40}); else pvzMap.setCenter([pvzAll[0].lat,pvzAll[0].lon],15);
+    pvzMap.container.fitToViewport();
   }
-  function pickPvz(c,fromMap){ pvzIn.value=c; if(fromMap) pvzQ.value=''; renderPvz(); setErr(pvzQ,''); ready();
-    const p=pvzOf(c); if(p&&pvzMap&&!fromMap) pvzMap.setCenter([p.lat,p.lon],Math.max(pvzMap.getZoom(),15),{duration:300});
-    if(fromMap){const r=pvzList.querySelector(`input[value="${CSS.escape(c)}"]`);r&&r.closest('.radio-card').scrollIntoView({block:'nearest',behavior:'smooth'});} }
-  pvzList.addEventListener('change',e=>{if(e.target.name==='pvzr')pickPvz(e.target.value);});
-  pvzQ.addEventListener('input',renderPvz);
-  pvzQ.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault();});
-  /* Яндекс Карты 2.1 — как на других наших проектах: ключ работает без привязки к адресу сайта */
-  let pvzOm=null;
-  const ymapsLoad=()=>window.ymaps&&ymaps.Map?Promise.resolve(window.ymaps):new Promise((res,rej)=>{const s=document.createElement('script');
-    s.src=`https://api-maps.yandex.ru/2.1/?apikey=${window.BT_YMAPS_KEY}&lang=ru_RU`;s.onload=()=>ymaps.ready(()=>res(window.ymaps));s.onerror=rej;document.head.appendChild(s);});
-  function drawPvzMap(){
-    if(!window.BT_YMAPS_KEY||!pvzAll.length){pvzMap&&(pvzMap.destroy(),pvzMap=null,pvzOm=null);pvzMapBox.hidden=true;return;}
-    const pts=pvzAll;
-    ymapsLoad().then(y=>{ if(pts!==pvzAll) return;
-      pvzMapBox.hidden=false;
-      if(!pvzMap){ pvzMap=new y.Map(pvzMapBox,{center:[pts[0].lat,pts[0].lon],zoom:11,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true}); pvzMap.behaviors.disable('scrollZoom'); }
-      else pvzMap.geoObjects.removeAll();
-      pvzOm=new y.ObjectManager({clusterize:true,gridSize:64});
-      pvzOm.clusters.options.set('preset','islands#blackClusterIcons');
-      pvzOm.add({type:'FeatureCollection',features:pts.map((p,i)=>({type:'Feature',id:i,geometry:{type:'Point',coordinates:[p.lat,p.lon]},
-        properties:{hintContent:esc(p.a)},options:{preset:p.c===pvzIn.value?'islands#redDotIcon':'islands#blackCircleDotIcon'}}))});
-      pvzOm.objects.events.add('click',e=>pickPvz(pts[e.get('objectId')].c,true));
-      pvzMap.geoObjects.add(pvzOm);
-      const cur=pvzOf(pvzIn.value);
-      if(cur) pvzMap.setCenter([cur.lat,cur.lon],15);
-      else if(pts.length>1) pvzMap.setBounds(pvzOm.getBounds(),{checkZoomRange:true,zoomMargin:30});
-      pvzMap.container.fitToViewport();
-    }).catch(()=>{pvzMapBox.hidden=true;});
+  function renderPvzList(){
+    const q=pvzQ.value.trim().toLowerCase().replace(/ё/g,'е');
+    const list=pvzAll.map((p,i)=>[p,i]).filter(([p])=>!q||(p.a+' '+p.m+' '+p.c).toLowerCase().replace(/ё/g,'е').includes(q));
+    pvzN.textContent=pvzAll.length?(q?`Найдено: ${list.length}`:`${pvzAll.length} ${plural(pvzAll.length,['пункт','пункта','пунктов'])} в городе`):'';
+    pvzList.innerHTML=list.slice(0,150).map(([p,i])=>`<button type="button" class="pvzm__it${p.c===pvzIn.value?' on':''}" data-i="${i}"><b>${esc(p.a)}</b><span>${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</span></button>`).join('')
+      +(list.length>150?'<p class="pvzm__n">Уточните поиск, чтобы увидеть остальные</p>':'')+(q&&!list.length?'<p class="pvzm__n">Ничего не нашли — попробуйте другую улицу</p>':'');
   }
+  function showPvz(i,fromMap){
+    const p=pvzAll[i]; if(!p) return;
+    if(pvzOm){ if(pvzOpenId>=0) pvzOm.objects.setObjectOptions(pvzOpenId,PIN); pvzOm.objects.setObjectOptions(i,PIN_ON); }
+    pvzOpenId=i;
+    if(pvzMap) pvzMap.setCenter([p.lat,p.lon],Math.max(pvzMap.getZoom(),15),{duration:fromMap?200:300});
+    const pay=[p.card&&'картой',p.cash&&'наличными'].filter(Boolean).join(' или ');
+    pvzCard.innerHTML=`<button type="button" class="pvzm__back" data-back>← Все пункты</button>
+      <div class="pvzm__code">Пункт ${esc(p.c)}</div><h3 class="pvzm__a">${esc(p.a)}</h3>
+      <dl class="pvzm__dl">${p.w?`<dt>Время работы</dt><dd>${esc(p.w)}</dd>`:''}${p.m?`<dt>Метро</dt><dd>${esc(p.m)}</dd>`:''}${p.n?`<dt>Как найти</dt><dd>${esc(p.n)}</dd>`:''}${pay?`<dt>Оплата при получении</dt><dd>${pay}</dd>`:''}</dl>
+      ${p.img&&p.img.length?`<div class="pvzm__img">${p.img.slice(0,4).map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join('')}</div>`:''}
+      <button type="button" class="btn btn--block pvzm__take" data-take="${i}">Заберу здесь</button>`;
+    pvzListV.hidden=true; pvzCard.hidden=false; pvzCard.scrollTop=0;
+  }
+  function takePvz(i){ const p=pvzAll[i]; if(!p) return;
+    pvzCur={c:p.c,a:p.a,loc:pvzLoc}; pvzIn.value=p.c; pvzModal.classList.remove('open'); renderDeliv(); ready(); }
+  pvzQ.addEventListener('input',renderPvzList);
+  pvzQ.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const b=pvzList.querySelector('.pvzm__it');if(b)b.click();}});
+  pvzList.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)showPvz(+b.dataset.i);});
+  pvzCard.addEventListener('click',e=>{ if(e.target.closest('[data-back]')){pvzCard.hidden=true;pvzListV.hidden=false;renderPvzList();return;}
+    const t=e.target.closest('[data-take]'); if(t) takePvz(+t.dataset.take); });
+  pvzModal.addEventListener('click',e=>{if(e.target.closest('[data-close]'))pvzModal.classList.remove('open');});
+  /* кнопка в карточке или клик по карточке, пока пункт не выбран, — открывают окно */
+  deliv.addEventListener('click',e=>{const card=e.target.closest('.radio-card'); const r=card&&card.querySelector('input[value="sdek_pickup"]'); if(!r) return;
+    const btn=e.target.closest('[data-pvz]'); if(btn) e.preventDefault();
+    if(!btn&&pvzIn.value) return;
+    if(!r.checked){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));}
+    openPvz();});
   const pvzMapBox=document.getElementById('pvzMap');
   function renderPay(){
     pay.innerHTML=PAYS.map(p=>{const on=avail.some(a=>a.id===p.id);
@@ -277,6 +306,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId}).then(r=>{
       if(n!==calcN||!r.ok) return;
       dl=r.deliveries; avail=r.pays; last=r;
+      if(pvzCur&&pvzCur.loc!==locIn.value){pvzCur=null;pvzIn.value='';}
       const all=opts();
       if(!sel||!all.some(o=>o.key===sel.key)) sel=all.find(o=>o.key===want&&o.tab===tab)||all.find(o=>o.tab===tab)||all[0]||null;
       else sel=all.find(o=>o.key===sel.key);
