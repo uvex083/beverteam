@@ -1507,7 +1507,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       am.classList.add('open');
       if(window.BT_YMAPS_KEY&&!mapOn){ mapOn=true; am.classList.add('has-map'); box.hidden=false;
         BT_mapPicker(box,r=>{ if(r.street){ f.elements.street.value=r.street; fieldErr(f.elements.street,''); }
-          if(r.city&&r.city!==ci.value) cityPost(r.city).then(x=>{ const c=(x.list||[])[0]; if(c){ ci.value=c.n; f.elements.loc.value=c.code; fieldErr(ci,''); } }); }); }
+          if(r.city&&r.city!==ci.value) cityPost(r.city).then(x=>{ const c=(x.list||[])[0]; if(c){ ci.value=c.n; f.elements.loc.value=c.code; fieldErr(ci,''); } }); })?.catch(()=>{ am.classList.remove('has-map'); box.hidden=true; }); }
       if(innerWidth>768) setTimeout(()=>f.elements.tag.focus(),60);
     };
     document.getElementById('addrAdd').addEventListener('click',()=>open({loc:D.loc,city:D.city,who:D.who}));
