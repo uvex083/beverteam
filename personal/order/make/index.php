@@ -170,15 +170,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
   let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, payId=0, calcN=0, sending=false;
 
-  /* доставки Битрикса → варианты макета: СДЭК до двери и в пункт выдачи — одна служба с разным адресом */
+  /* доставки Битрикса → варианты макета. СДЭК — курьером до двери (расчёт по весу); пункт выдачи добавим с картой пунктов */
   const opts=()=>dl.flatMap(d=>d.code==='bt_cdek'
-    ?[{key:'cdek_door',tab:'addr',d,t:'СДЭК — курьер до двери',desc:'Доставка по адресу, 2–7 дней'},{key:'cdek_pvz',tab:'pvz',d,t:'СДЭК — пункт выдачи',desc:'Заберите в удобном пункте, 2–7 дней'}]
+    ?[{key:'cdek_door',tab:'addr',d,t:'СДЭК — курьер до двери',desc:'Доставка по адресу'}]
     :[{key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':'addr',d,t:d.name,desc:d.desc}]);
   const dateOf=o=>{const x=BT_dates(1);
     if(o.tab==='pickup') return 'готов '+(x.relPack||BT_fmtDate(x.pack,true));
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
     return '';};
-  const priceOf=o=>o.d.code==='bt_cdek'?'сообщит менеджер':o.d.price===0?'бесплатно':fmt(o.d.price);
+  const priceOf=o=>o.d.price>0?fmt(o.d.price):o.d.code==='bt_cdek'?'сообщит менеджер':'бесплатно';
   function renderDeliv(){
     const all=opts();
     [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab);
@@ -201,9 +201,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
-    const cdek=sel&&sel.d.code==='bt_cdek';
-    sDel.textContent=!sel?'—':cdek?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
-    sTot.textContent=fmt(r.total); sTotNote.hidden=!cdek;
+    const cdekUnknown=sel&&sel.d.code==='bt_cdek'&&!(r.deliveryPrice>0);
+    sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
+    sTot.textContent=fmt(r.total); sTotNote.hidden=!cdekUnknown;
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
