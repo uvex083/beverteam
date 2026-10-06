@@ -43,7 +43,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
       <li><span class="muted"><?= $co['hours'] ?? '' ?></span></li>
     </ul></div>
   </div>
-  <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ОГРНИП <?= $co['ogrnip'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/sitemap/">Карта сайта</a></span></div>
+  <div class="ftr__b"><span>© 2010–<?= date('Y') ?> BEVERTEAM · <?= $co['legal'] ?? '' ?> · ОГРНИП <?= $co['ogrnip'] ?? '' ?> · ИНН <?= $co['inn'] ?? '' ?></span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/soglasie-na-obrabotku/">Согласие на обработку данных</a> · <a href="/sitemap/">Карта сайта</a></span></div>
 </div></footer>
 <?php endif ?>
 <div class="modal" id="lead" role="dialog" aria-modal="true" aria-labelledby="leadTitle">

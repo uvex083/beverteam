@@ -5,4 +5,5 @@ $aMenuLinks = [
     ['Возврат и обмен', '/vozvrat-i-obmen/', [], [], ''],
     ['Политика конфиденциальности', '/politika-konfidencialnosti/', [], [], ''],
     ['Пользовательское соглашение', '/polzovatelskoe-soglashenie/', [], [], ''],
+    ['Согласие на обработку персональных данных', '/soglasie-na-obrabotku/', [], [], ''],
 ];

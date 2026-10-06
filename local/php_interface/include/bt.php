@@ -666,7 +666,7 @@ function bt_review_form(array $o = []): string
         . '<label class="drop"><input type="file" accept="image/png,image/jpeg' . ($pdf ? ',application/pdf' : '') . '" multiple hidden>'
         . '<span class="drop__i">' . bt_icon('camera') . '</span><span class="drop__t"><b>Перетащите ' . ($pdf ? 'файлы' : 'фото') . ' сюда</b><small>или нажмите, чтобы выбрать — ' . $fileNote . '</small></span></label>'
         . '<div class="thumbs"></div></div>'
-        . '<label class="check check--top" style="margin:4px 0 18px"><input type="checkbox" data-agree> <span>Согласен с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">обработкой персональных данных</a></span></label>'
+        . '<label class="check check--top" style="margin:4px 0 18px"><input type="checkbox" data-agree> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>'
         . '<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">'
         . '<button class="btn" type="button" data-send>Отправить отзыв</button><p class="err-form" data-err role="alert"></p></div>';
 }
@@ -1335,7 +1335,7 @@ function bt_form_tail(string $btn = 'Отправить заявку'): string
 {
     return '<input type="hidden" name="sessid" value="' . bitrix_sessid() . '">'
         . '<div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>'
-        . '<label class="check check--top" style="margin-bottom:16px"><input type="checkbox" name="agree" value="Y"> <span>Я ознакомлен(а) с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">политикой конфиденциальности</a></span></label>'
+        . '<label class="check check--top" style="margin-bottom:16px"><input type="checkbox" name="agree" value="Y"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>'
         . '<button class="btn btn--block" type="submit">' . htmlspecialcharsbx($btn) . '</button>';
 }
 
@@ -1637,7 +1637,7 @@ function bt_sitemap_build(): string
     $host = 'https://beverteam.ru';
     $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
         '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/price/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
-        '/polzovatelskoe-soglashenie/', '/sitemap/'];
+        '/polzovatelskoe-soglashenie/', '/soglasie-na-obrabotku/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
         $urls[] = $s['SECTION_PAGE_URL'];

@@ -505,12 +505,12 @@ function authModal(){
     <form data-step="pick" novalidate>
       <div class="display modal__t th th3" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</div>
       <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'войдите через сервис или получите код на почту':'пришлём код на почту'}.</p>
-      ${IDP.length?BT_idpHtml('')+'<p class="muted" style="margin:8px 0 0;font-size:12.5px;line-height:1.4">Входя через сервис, вы принимаете <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a></p><div class="or">или получить код</div>':''}
+      ${IDP.length?BT_idpHtml('')+'<p class="muted" style="margin:8px 0 0;font-size:12.5px;line-height:1.4">Входя через сервис, вы даёте <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаете <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></p><div class="or">или получить код</div>':''}
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
       <div class="alert alert--info auth__note" id="aNote" hidden></div>
-      <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Я принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank" rel="noopener">пользовательское соглашение</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank" rel="noopener">политику обработки персональных данных</a></span></label>
+      <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       <button class="btn btn--block" id="aSend" type="submit">Продолжить</button>
     </form>
 

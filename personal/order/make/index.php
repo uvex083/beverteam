@@ -139,7 +139,7 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>5</b>Комментарий</h2>
         <div class="field"><label for="coComment">Комментарий к заказу</label><textarea id="coComment" name="comment" rows="3" maxlength="2000" placeholder="Например: позвонить за час до доставки"></textarea></div>
-        <label class="check check--top"><input type="checkbox" name="agree" value="Y" id="coAgree"> <span>Согласен с <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a> и <a class="link" href="/politika-konfidencialnosti/" target="_blank">политикой конфиденциальности</a></span></label>
+        <label class="check check--top"><input type="checkbox" name="agree" value="Y" id="coAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       </div>
     </div>
 
