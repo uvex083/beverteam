@@ -504,14 +504,14 @@ function authModal(){
     <!-- шаг 1: e-mail или телефон -->
     <form data-step="pick" novalidate>
       <div class="display modal__t th th3" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</div>
-      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'получите код на почту или войдите через сервис':'пришлём код на почту'}.</p>
+      <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'войдите через сервис или получите код на почту':'пришлём код на почту'}.</p>
+      ${IDP.length?BT_idpHtml('')+'<div class="or">или получить код</div>':''}
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
       <div class="alert alert--info auth__note" id="aNote" hidden></div>
       <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       <button class="btn btn--block" id="aSend" type="submit">Продолжить</button>
-      ${IDP.length?'<div class="or">или войти с помощью</div>'+BT_idpHtml(''):''}
     </form>
 
     <!-- шаг 2: код -->
