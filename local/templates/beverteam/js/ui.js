@@ -1784,7 +1784,7 @@ window.BT_mapPicker = (el, onPick, opts) => {
       else marker.update({coordinates:c});
       /* обратное геокодирование: адрес по координатам */
       try{
-        const r=await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${BT_YMAPS_KEY}&format=json&lang=ru_RU&geocode=${c[0]},${c[1]}`);
+        const r=await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${window.BT_YGEO_KEY||BT_YMAPS_KEY}&format=json&lang=ru_RU&geocode=${c[0]},${c[1]}`);
         const j=await r.json();
         const g=j.response.GeoObjectCollection.featureMember[0]?.GeoObject;
         const a=g?.metaDataProperty?.GeocoderMetaData?.Address||{};
