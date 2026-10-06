@@ -37,6 +37,12 @@ AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save'
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);
 AddEventHandler('socialservices', 'OnFindSocialservicesUser', ['BtOAuth', 'findUser']);
 
+// обработчик доставки СДЭК (расчёт по весу через калькулятор; заказы в СДЭК не создаём)
+\Bitrix\Main\Loader::registerAutoLoadClasses(null, ['Bt\\Cdek\\Api' => '/local/php_interface/include/cdek.php', 'Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php']);
+AddEventHandler('sale', 'onSaleDeliveryHandlersClassNamesBuildList', function () {
+    return ['Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php'];
+});
+
 // тестовые домены хостинга закрыты от индексации
 if (preg_match('/\.na4u\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
     header('X-Robots-Tag: noindex, nofollow');
