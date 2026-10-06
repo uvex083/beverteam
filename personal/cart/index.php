@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const set=(id,q)=>{busy=true;BT_cartSet(id,q);busy=false;};
   tl.innerHTML=BT_timeline();
   const line=c=>{const p=BT_piece(c,c.kg,c.q);
-    return `<span class="price">${fmt(p*c.q)}${c.q>1?`<s>${fmt(p)} × ${c.q} шт</s>`:''}</span>`;};
+    return `<span class="price">${fmt(p*c.q)}${c.q>1?`<s>${fmt(p)} × ${c.q} ${c.kg?'кг':'шт'}</s>`:''}</span>`;};
   const totals=()=>{const cart=BT_cartItems(),t=BT_cartTotal(),full=cart.reduce((a,c)=>a+(c.old||c.p)*c.q,0);
     cnt.textContent=cart.length+' '+plural(cart.length,['позиция','позиции','позиций']);
     const sd=BT_sumDisc(t.sum), hint=BT_sumDiscHint(t.sum);
@@ -52,15 +52,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!cart.length){items.innerHTML=`<div class="card empty"><div class="display">Корзина пуста</div><p>Добавьте кофе, чай или оборудование из каталога.</p><a class="btn" href="/catalog/">В каталог</a></div>`;}
     else items.innerHTML=cart.map(c=>`<div class="ci">
       <a class="ci__ph" href="${esc(c.url)}" aria-label="${esc(c.n)}">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy" width="90" height="90">`:''}</a>
-      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Фасовка <b>${c.kg} кг</b> · ${fmt(BT_perKg(c,c.kg,c.q))} за кг</p>`:''}<p class="par">${esc(c.par)}</p>
-        <div class="qty"><button type="button" data-d="-" aria-label="Уменьшить количество">−</button><input value="${c.q}" data-id="${c.key}" inputmode="numeric" aria-label="Количество, шт"><button type="button" data-d="+" aria-label="Увеличить количество">+</button></div></div>
+      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг</p>`:''}<p class="par">${esc(c.par)}</p>
+        <div class="qty"><button type="button" data-d="-" aria-label="Уменьшить количество">−</button><input value="${c.q}" data-id="${c.key}" inputmode="numeric" aria-label="Количество${c.kg?', кг':', шт'}"><button type="button" data-d="+" aria-label="Увеличить количество">+</button></div></div>
       <div class="ci__r">${line(c)}<button type="button" class="del" data-id="${c.key}">Удалить</button></div>
     </div>`).join('');
     totals();
     tl.hidden=sumBox.hidden=clearCart.hidden=shareCart.hidden=!cart.length; cartl.classList.toggle('is-empty',!cart.length);
   }
   // удаление — только после подтверждения; «Вернуть» в уведомлении остаётся
-  const remove=id=>{const q=BT_CART[id],m=BT_find(BT_kid(id)),n=esc((m?m.n:'Товар')+(BT_kkg(id)?`, фасовка ${BT_kkg(id)} кг`:''));
+  const remove=id=>{const q=BT_CART[id],m=BT_find(BT_kid(id)),n=esc(m?m.n:'Товар');
     BT_confirm({title:'Удалить товар?',text:`«${n}» будет удалён из корзины.`,ok:'Удалить',cancel:'Оставить'}).then(yes=>{
       if(!yes){render();return;}
       set(id,0); render();
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   else if(got.length){
     const sum=got.reduce((a,x)=>{const m=BT_find(BT_kid(x.k));return a+BT_piece(m,BT_kkg(x.k)||1,x.q)*x.q;},0);
     shared.innerHTML=`<div><b>Вам поделились корзиной</b> — ${got.length} ${plural(got.length,['товар','товара','товаров'])} на ${fmt(sum)}</div>
-      <ul>${got.map(x=>{const m=BT_find(BT_kid(x.k));return `<li>${esc(m.n)}${BT_kkg(x.k)?`, ${BT_kkg(x.k)} кг`:''} — ${x.q} шт</li>`;}).join('')}</ul>
+      <ul>${got.map(x=>{const m=BT_find(BT_kid(x.k));return `<li>${esc(m.n)} — ${x.q} ${BT_kkg(x.k)?'кг':'шт'}</li>`;}).join('')}</ul>
       <div class="row"><button type="button" class="btn btn--sm" id="sharedAdd">Добавить в мою корзину</button><button type="button" class="btn btn--line btn--sm" id="sharedNo">Не нужно</button></div>`;
     shared.hidden=false;
     sharedAdd.onclick=()=>{ addShared(); BT_toast('Товары добавлены в корзину'); };
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const q=Math.max(1,parseInt(i.value,10)||1);i.value=q;set(i.dataset.id,q);
     const c=BT_cartItems().find(x=>x.key===i.dataset.id);
     if(c){const ci=i.closest('.ci');ci.querySelector('.price').outerHTML=line(c);const pk=ci.querySelector('.ci__pack b');
-      if(pk)pk.parentNode.innerHTML=`Фасовка <b>${c.kg} кг</b> · ${fmt(BT_perKg(c,c.kg,c.q))} за кг`;}
+      if(pk)pk.parentNode.innerHTML=`Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг`;}
     totals();});
   items.addEventListener('bt:qtyzero',e=>remove(e.target.dataset.id));
   items.addEventListener('click',e=>{const b=e.target.closest('.del');if(b)remove(b.dataset.id);});

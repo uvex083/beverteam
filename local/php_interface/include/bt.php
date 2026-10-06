@@ -181,7 +181,7 @@ function bt_card(array $m, bool $eager = false): string
     }
     $rent = !empty($m['rent']);
     $price = $m['p'] ? bt_fmt($m['p']) : 'По запросу';
-    $sub = !empty($m['unit']) ? '<s>' . $e($m['unit']) . '</s>' : (!empty($m['bulk']) ? '<s>' . bt_fmt($m['bulk'][0]['p']) . ' за кг · ' . $m['bulk'][0]['kg'] . ' кг</s>' : (!empty($m['pre']) ? '<s>предзаказ</s>' : ''));
+    $sub = !empty($m['unit']) ? '<s>' . $e($m['unit']) . '</s>' : (!empty($m['bulk']) ? '<s>' . bt_fmt($m['bulk'][0]['p']) . ' за кг</s>' : (!empty($m['pre']) ? '<s>предзаказ</s>' : ''));
     $old = !empty($m['old']) ? '<span class="price--old">' . bt_fmt($m['old']) . '</span>' : '';
     $ctl = $rent ? '<a class="btn btn--sm" href="/arenda-kofemashin/#calc">Арендовать</a>'
         : '<button class="btn btn--sm" data-add="' . $e($m['id'] . (!empty($m['bulk']) ? ':' . $m['bulk'][0]['kg'] : '')) . '">' . (!empty($m['pre']) ? 'Предзаказ' : 'В корзину') . '</button>';
@@ -235,7 +235,7 @@ function bt_basket_pack(\Bitrix\Sale\BasketItemBase $bi): int
 function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
 {
     $kg = bt_basket_pack($bi);
-    return $kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт';
+    return $kg === 1 ? (float)$bi->getQuantity() . ' кг' : ($kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт');
 }
 
 // Положить в корзину: $kg — фасовка кофе на развес (каждая фасовка — своя строка, количество в Битриксе — в кг), $q — штук.
@@ -247,7 +247,7 @@ function bt_basket_put(\Bitrix\Sale\BasketBase $basket, int $id, int $kg, float 
         return 'product';
     }
     $packs = array_column($m['bulk'] ?? [], 'kg');
-    $kg = $packs ? (in_array($kg, $packs) ? $kg : (int)$packs[0]) : 0;
+    $kg = $packs ? (int)$packs[0] : 0; // кофе — только пачки по 1 кг, количество в кг
     $item = null;
     foreach ($basket as $bi) {
         if ((int)$bi->getProductId() === $id && bt_basket_pack($bi) === $kg) {

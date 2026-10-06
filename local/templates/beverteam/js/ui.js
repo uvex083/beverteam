@@ -244,11 +244,9 @@ window.BT_cmpUpdate = () => {
 window.BT_key = (id,kg) => kg ? `${id}:${kg}` : String(id);
 window.BT_kid = k => String(k).split(':')[0];
 window.BT_kkg = k => +(String(k).split(':')[1]||0);
-/* выбранная фасовка товара: последняя нажатая, иначе та, что уже в корзине, иначе самая маленькая */
-const PACK={};
-window.BT_packOf = m => { if(!m||!m.bulk) return 0; if(PACK[m.id]) return PACK[m.id];
-  const k=Object.keys(CART).find(x=>BT_kid(x)===String(m.id)&&BT_kkg(x)); return k?BT_kkg(k):m.bulk[0].kg; };
-window.BT_packSet = (id,kg) => { PACK[id]=kg; };
+/* кофе продаётся пачками по 1 кг: фасовка одна, плашки 5/10/20/30 кг — быстрый выбор количества по оптовой сетке */
+window.BT_packOf = m => m&&m.bulk ? m.bulk[0].kg : 0;
+window.BT_packSet = () => {};
 window.BT_keyOf = m => BT_key(m.id, BT_packOf(m));
 /* цена одной штуки строки: у кофе — упаковка по цене ступени, считанной от всего веса строки (так же считает корзина Битрикса) */
 window.BT_perKg = (m,kg,q) => BT_tier(m,kg*Math.max(1,q)).p;
@@ -320,22 +318,26 @@ window.BT_tier = (m,kg) => {
   let t=m.bulk[0]; m.bulk.forEach(x=>{ if(kg>=x.kg) t=x; }); return t;
 };
 window.BT_tierPct = (m,t) => m.bulk&&t.p<m.bulk[0].p ? Math.round((1-t.p/m.bulk[0].p)*100) : 0;
-/* Ряд быстрого выбора объёма — торговые предложения по весу */
+/* Ряд быстрого выбора объёма: ставит количество в корзине, подсвечена ступень сетки, по которой сейчас цена */
 window.BT_packs = (m,big) => {
   if(!m.bulk) return '';
-  const kg=BT_packOf(m);
+  const on=BT_tier(m,CART[BT_keyOf(m)]||1);
   return `<div class="packs ${big?'packs--lg':''}" data-packs="${m.id}">
-    ${big?'<span class="packs__lab">Фасовка</span>':''}
-    ${m.bulk.map(t=>{const pct=BT_tierPct(m,t), n=CART[BT_key(m.id,t.kg)]||0;
-      return `<button type="button" data-kg="${t.kg}" aria-pressed="${kg===t.kg}">${t.kg} кг${pct?`<s>−${pct}%</s>`:''}${n?`<em>${n}</em>`:''}</button>`;}).join('')}
+    ${big?'<span class="packs__lab">Объём заказа</span>':''}
+    ${m.bulk.map(t=>{const pct=BT_tierPct(m,t);
+      return `<button type="button" data-kg="${t.kg}" aria-pressed="${on.kg===t.kg}">${t.kg} кг${pct?`<s>−${pct}%</s>`:''}</button>`;}).join('')}
   </div>`;
 };
+/* плашка объёма: столько кг в корзину сразу */
+window.BT_packPut = (id,kg) => { const m=BT_find(id); if(!m) return; BT_cartSet(BT_keyOf(m),kg);
+  const t=BT_tier(m,kg), pct=BT_tierPct(m,t);
+  BT_toast(`${kg} кг в корзине${pct?` · ${BT_fmt(t.p)} за кг, выгода ${pct}%`:''} · <a href="/personal/cart/">Оформить</a>`); };
 /* цена в подвале карточки: у кофе — за упаковку выбранной фасовки */
 window.BT_priceBox = m => {
   const kg=BT_packOf(m), q=m.rent?0:(CART[BT_keyOf(m)]||0), n=q||1;
   const price = m.p ? fmt(BT_piece(m,kg,n)*n) : 'По запросу';
   const sub = m.unit ? `<s>${m.unit}</s>`
-    : m.bulk ? `<s>${fmt(BT_perKg(m,kg,n))} за кг · ${kg} кг${n>1?` × ${n} шт`:''}</s>`
+    : m.bulk ? `<s>${fmt(BT_perKg(m,kg,n))} за кг${n>1?` × ${n} кг`:''}</s>`
     : (n>1 ? `<s>${fmt(m.p)} × ${n} шт</s>` : (m.pre ? '<s>предзаказ</s>' : ''));
   const old = m.old ? `<span class="price--old">${fmt(m.old*n)}</span>` : '';
   return `${old}<span class="price">${price}${sub}</span>`;
@@ -346,7 +348,7 @@ window.BT_addCtl = m => {
   if(m.rent) return `<a class="btn btn--sm" href="/arenda-kofemashin/#calc">Арендовать</a>`;
   const key=BT_keyOf(m), q=CART[key]||0;
   if(!q) return `<button class="btn btn--sm" data-add="${key}">${m.pre?'Предзаказ':'В корзину'}</button>`;
-  return `<span class="addq" data-id="${key}" title="В корзине"><button data-q="-" aria-label="Уменьшить">−</button><b>${q}<i>шт</i></b><button data-q="+" aria-label="Увеличить">+</button></span>`;
+  return `<span class="addq" data-id="${key}" title="В корзине"><button data-q="-" aria-label="Уменьшить">−</button><b>${q}<i>${m.bulk?'кг':'шт'}</i></b><button data-q="+" aria-label="Увеличить">+</button></span>`;
 };
 
 window.BT_card = function(m){
@@ -1032,7 +1034,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const k=BT_keyOf(m), cur=foot.querySelector('.addq'), q0=CART[k]||0;
       if(cur && q0>0 && cur.dataset.id===k){
         /* степпер уже на месте: меняем только число и цену — ничего не пересобираем */
-        cur.querySelector('b').innerHTML=q0+'<i>шт</i>';
+        cur.querySelector('b').innerHTML=q0+'<i>'+(m.bulk?'кг':'шт')+'</i>';
         const box=foot.querySelector('div'); if(box) box.innerHTML=BT_priceBox(m);
       } else {
         const keep=[...foot.children].filter(n=>n.tagName==='META'||n.tagName==='LINK').map(n=>n.outerHTML).join('');
@@ -1051,7 +1053,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const k=b.dataset.add; BT_cartSet(k,(CART[k]||0)+1); rerender(k);});
   // фасовка только выбирается: счётчик и цена переключаются на неё, в корзину — кнопкой
   document.addEventListener('click',e=>{const b=e.target.closest('.pc [data-packs] button');if(!b)return;
-    const id=b.closest('[data-packs]').dataset.packs; BT_packSet(id,+b.dataset.kg); rerender(id);});
+    const id=b.closest('[data-packs]').dataset.packs; BT_packPut(id,+b.dataset.kg); rerender(id);});
   document.addEventListener('click',e=>{const b=e.target.closest('.addq button');if(!b)return;
     const k=b.closest('.addq').dataset.id, q=(CART[k]||0)+(b.dataset.q==='-'?-1:1);
     BT_cartSet(k,q); if(b.closest('.pc')) rerender(k);});

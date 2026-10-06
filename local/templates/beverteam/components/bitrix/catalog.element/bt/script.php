@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(n<1){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } else BT_cartSet(key(),n);
     sync();
   });
-  // фасовка: блок показывает, сколько этой фасовки уже в корзине
-  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_packSet(PID,+b.dataset.kg); sync(); });
+  // объём заказа: плашка ставит столько кг в корзину
+  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_packPut(PID,+b.dataset.kg); sync(true); });
   document.addEventListener('bt:cart',e=>{ if(e.detail&&String(e.detail.id).split(':')[0]===String(PID)) sync(); });
   sync();
 
