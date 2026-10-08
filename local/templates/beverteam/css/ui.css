@@ -918,8 +918,6 @@ input,textarea{caret-color:var(--ink)}
 .tiers__wrap summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
   padding:12px 0;font-weight:700;font-size:14.5px}
 .tiers__wrap summary::-webkit-details-marker{display:none}
-.tiers__wrap summary::after{content:"";flex:none;width:12px;height:12px;background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat,linear-gradient(var(--gray),var(--gray)) center/1.5px 12px no-repeat}
-.tiers__wrap[open] summary::after{background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat}
 @media(min-width:901px){
   /* блок покупки остаётся на виду при прокрутке описания */
   .prod>div:last-child{position:relative}
@@ -1046,8 +1044,11 @@ input,textarea{caret-color:var(--ink)}
 .faq details{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:10px}
 .faq summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:15px}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"";flex:none;width:12px;height:12px;background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat,linear-gradient(var(--gray),var(--gray)) center/1.5px 12px no-repeat}
-.faq details[open] summary::after{background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat}
+:root{--i-plus:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1.5v9M1.5 6h9' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");--i-minus:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1.5 6h9' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")}
+/* плюс/минус по всему сайту — одна маска: аккордеоны и кнопки количества */
+.faq summary::after,.tiers__wrap summary::after,.qty button::before,.addq button::before,.bb__step button::before,.prcq button::before,.prcrec__add::before{content:"";flex:none;width:12px;height:12px;background:currentColor;-webkit-mask:var(--i-plus) center/12px no-repeat;mask:var(--i-plus) center/12px no-repeat}
+.faq summary::after,.tiers__wrap summary::after{background:var(--ink)}
+.faq details[open] summary::after,.tiers__wrap[open] summary::after,.qty [data-d="-"]::before,.addq [data-q="-"]::before,.bb__step [data-q="-"]::before,.prcq [data-prc-step="-1"]::before{-webkit-mask-image:var(--i-minus);mask-image:var(--i-minus)}
 .faq p{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .faq details>ul,.faq details>ol{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .post__body .faq{margin:4px 0 24px}
@@ -2754,3 +2755,5 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   .prct__n a{color:#000;text-decoration:none}
   .prct__n small{font-size:10px}
 }
+/* кнопки ±: глиф шрифта прячем, рисует маска --i-plus/--i-minus (правило в конце — перебивает font-size блоков) */
+.qty button,.addq button,.bb__step button,.prcq button,.prcrec__add{display:inline-grid;place-items:center;font-size:0}
