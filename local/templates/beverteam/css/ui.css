@@ -1049,6 +1049,8 @@ input,textarea{caret-color:var(--ink)}
 .faq summary::after{content:"+";color:var(--gray);font-weight:400;font-size:18px;line-height:1}
 .faq details[open] summary::after{content:"–"}
 .faq p{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
+.faq details>ul,.faq details>ol{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
+.post__body .faq{margin:4px 0 24px}
 
 /* — карта (заглушка под виджет Яндекс.Карт) — */
 .ymap{border-radius:var(--rad);min-height:380px;border:1px solid var(--line);position:relative;overflow:hidden;

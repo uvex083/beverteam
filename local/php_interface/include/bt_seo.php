@@ -81,12 +81,12 @@ function bt_landing_body(&$content): void
             $depth += $t[1][0] === '/' ? -1 : 1;
             $pos = $t[0][1] + strlen($t[0][0]);
             if (!$depth) {
-                $content = substr($content, 0, $start) . bt_br_list($l['text']) . substr($content, $t[0][1]);
+                $content = substr($content, 0, $start) . bt_seo_html($l['text']) . substr($content, $t[0][1]);
                 return;
             }
         }
     }
-    $content = preg_replace('~<footer class="ftr"~', '<section class="sec sec--t0 seo-landing"><div class="wrap"><div class="seo post__body">' . bt_br_list($l['text']) . '</div></div></section>$0', $content, 1);
+    $content = preg_replace('~<footer class="ftr"~', '<section class="sec sec--t0 seo-landing"><div class="wrap"><div class="seo post__body">' . bt_seo_html($l['text']) . '</div></div></section>$0', $content, 1);
 }
 
 // Понятные коды значений списка для ЧПУ фильтра (/filter/country-is-efiopiya/apply/): Битрикс сам ставит хеш — меняем его на транслит названия

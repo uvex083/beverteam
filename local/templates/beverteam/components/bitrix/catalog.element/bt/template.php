@@ -113,7 +113,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <?php endif ?>
       <?php if (trim($arResult['~DETAIL_TEXT']) !== ''): ?>
         <h3 class="h3" style="margin:0 0 12px">Описание</h3>
-        <div class="post__body pdesc"><?= bt_br_list($arResult['~DETAIL_TEXT']) ?></div>
+        <div class="post__body pdesc"><?= bt_seo_html($arResult['~DETAIL_TEXT']) ?></div>
       <?php endif ?>
     </div>
     <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_TECH']) ?></div></div><?php endif ?>

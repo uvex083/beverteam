@@ -722,6 +722,37 @@ function bt_br_list(string $html): string
     return preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $html);
 }
 
+// SEO-текст из админки: списки через <br> → <ul> и блок вопросов → аккордеон (разметку FAQPage добавляет bt_faq_ld)
+function bt_seo_html(string $html): string
+{
+    return bt_faq_html(bt_br_list($html));
+}
+
+// После заголовка со словом «вопрос» абзац, который кончается на «?» (или заголовок h3), — вопрос, следующие блоки до нового вопроса — ответ
+function bt_faq_html(string $html): string
+{
+    return preg_replace_callback('~(<h2\b[^>]*>(?:(?!</h2>).)*вопрос(?:(?!</h2>).)*</h2>)(.*?)(?=<h2\b|$)~isu', function ($m) {
+        preg_match_all('~<(p|ul|ol|h3|div|table)\b[^>]*>.*?</\1>~isu', $m[2], $blocks);
+        $items = [];
+        foreach ($blocks[0] as $i => $b) {
+            $text = trim(html_entity_decode(strip_tags($b), ENT_QUOTES, 'UTF-8'));
+            if ($text === '') {
+                continue;
+            }
+            if ($blocks[1][$i] === 'h3' || ($blocks[1][$i] === 'p' && str_ends_with($text, '?'))) {
+                $items[] = ['q' => $text, 'a' => ''];
+            } elseif ($items) {
+                $items[array_key_last($items)]['a'] .= $b;
+            }
+        }
+        $items = array_filter($items, fn($x) => $x['a'] !== '');
+        if (!$items) {
+            return $m[0];
+        }
+        return $m[1] . '<div class="faq">' . implode('', array_map(fn($x) => '<details><summary>' . htmlspecialcharsbx($x['q']) . '</summary>' . $x['a'] . '</details>', $items)) . '</div>';
+    }, $html);
+}
+
 // Иконки разделов каталога (плитки каталога и окно поиска): спрайт выводится один раз в футере, иконка — <use href="#ico-…">.
 // viewBox — по границам рисунка плюс половина линии: иконка стоит ровно по центру круга
 function bt_cat_sprite(): string

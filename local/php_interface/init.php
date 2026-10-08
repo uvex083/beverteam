@@ -2,9 +2,6 @@
 
 require_once __DIR__ . '/include/bt.php';
 
-// FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы
-AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
-
 // покупатели входят только по коду или через сервисы: пароль — только у администраторов
 AddEventHandler('main', 'OnBeforeUserLogin', 'bt_password_login_guard');
 AddEventHandler('main', 'OnBeforeUserChangePassword', 'bt_password_change_guard');
@@ -28,6 +25,8 @@ AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contact
 require_once __DIR__ . '/include/bt_seo.php';
 AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
+// FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы (после SEO-текста посадочной)
+AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_tokens_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
