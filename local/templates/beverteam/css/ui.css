@@ -918,8 +918,8 @@ input,textarea{caret-color:var(--ink)}
 .tiers__wrap summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;
   padding:12px 0;font-weight:700;font-size:14.5px}
 .tiers__wrap summary::-webkit-details-marker{display:none}
-.tiers__wrap summary::after{content:"−";color:var(--gray);font-size:18px}
-.tiers__wrap:not([open]) summary::after{content:"+"}
+.tiers__wrap summary::after{content:"";flex:none;width:12px;height:12px;background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat,linear-gradient(var(--gray),var(--gray)) center/1.5px 12px no-repeat}
+.tiers__wrap[open] summary::after{background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat}
 @media(min-width:901px){
   /* блок покупки остаётся на виду при прокрутке описания */
   .prod>div:last-child{position:relative}
@@ -1046,8 +1046,8 @@ input,textarea{caret-color:var(--ink)}
 .faq details{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:10px}
 .faq summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:15px}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";color:var(--gray);font-weight:400;font-size:18px;line-height:1}
-.faq details[open] summary::after{content:"–"}
+.faq summary::after{content:"";flex:none;width:12px;height:12px;background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat,linear-gradient(var(--gray),var(--gray)) center/1.5px 12px no-repeat}
+.faq details[open] summary::after{background:linear-gradient(var(--gray),var(--gray)) center/12px 1.5px no-repeat}
 .faq p{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .faq details>ul,.faq details>ol{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .post__body .faq{margin:4px 0 24px}
