@@ -1947,7 +1947,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .ord .btn{position:relative;z-index:2}
 .accp .ord[hidden]{display:none}
 .accp .ord .hd{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-.accp .ord .hd .pay{margin-left:-6px}
+.accp .ord__st{display:inline-flex;gap:8px;flex-wrap:wrap}
 .accp .ord .n{font-family:Unbounded;font-weight:700;font-size:15px}
 .accp .ord .dt{color:var(--gray);font-size:13px}
 .accp .ord .items{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
