@@ -25,6 +25,9 @@ if ($id && (in_array($id, (array)($_SESSION['BT_ORDERS'] ?? []), true) || $USER-
 $co = bt_contacts();
 if (!$order) {
     CHTTP::SetStatus("404 Not Found");
+} elseif ($order->isPaid()) {
+    $APPLICATION->SetTitle('Заказ оплачен');
+    $APPLICATION->SetPageProperty('title', 'Заказ оплачен — BEVERTEAM');
 }
 ?>
 <div class="wrap okp">
@@ -71,7 +74,7 @@ if (!$order) {
   <div class="ok">
     <div class="ok__hd">
       <div class="ic">✓</div>
-      <h1 class="display h1">Заказ принят</h1>
+      <h1 class="display h1"><?= $order->isPaid() ? 'Заказ оплачен' : 'Заказ принят' ?></h1>
       <p>Спасибо<?= $name ? ', ' . $e($name) : '' ?>. Подтверждение отправили на <?= $e($props['EMAIL'] ?? 'почту') ?>. Менеджер позвонит в рабочее время, если потребуется уточнить детали.</p>
       <span class="num">Заказ № <?= $e($order->getField('ACCOUNT_NUMBER')) ?> · <?= $e(FormatDate('j F Y, H:i', $date->getTimestamp())) ?></span>
     </div>
@@ -115,8 +118,9 @@ if (!$order) {
     <?php endif ?>
     <div class="next">
       <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/">личном кабинете</a></span></div>
-      <div><b>Изменить заказ</b><span>Позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a> до отправки</span></div>
-      <div><b>Нужен документ?</b><span><?= $pCode === 'bill' ? 'Счёт и УПД пришлём на e‑mail' : ($pCode === 'tinkoff' ? 'УПД — по запросу' : 'Чек выдадим при получении, УПД — по запросу') ?></span></div>
+      <div><b>Изменить заказ</b><span>Позвоните до отправки:<br><a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>" style="white-space:nowrap"><?= $e($co['phone1'] ?? '') ?></a></span></div>
+      <?php // документы — только по счёту; при онлайн-оплате здесь будет ссылка на чек, когда она появится
+      if ($pCode === 'bill'): ?><div><b>Нужен документ?</b><span>Счёт и УПД пришлём на e‑mail</span></div><?php endif ?>
     </div>
     <div class="row" style="justify-content:center;margin-top:28px;gap:12px"><a class="btn btn--line" href="/catalog/">Продолжить покупки</a></div>
   </div>

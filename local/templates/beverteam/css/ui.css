@@ -1563,11 +1563,11 @@ input,textarea{caret-color:var(--ink)}
 .okp .otot div{display:flex;justify-content:space-between;gap:16px;color:var(--gray)}
 .okp .otot .t{color:var(--ink);border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-family:Unbounded;font-weight:800;font-size:17px}
 @media(max-width:600px){.okp .otot{max-width:none}}
-.okp .next{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.okp .next{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:12px;margin-top:16px}
 .okp .next div{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px}
 .okp .next b{display:block;font-size:14px;margin-bottom:4px}
 .okp .next span{font-size:13px;color:var(--gray)}
-@media(max-width:700px){.okp .next{grid-template-columns:1fr}.okp .dl{grid-template-columns:1fr;gap:4px}.okp .dl dd{margin-bottom:10px}}
+@media(max-width:700px){.okp .next{grid-auto-flow:row;grid-template-columns:1fr}.okp .dl{grid-template-columns:1fr;gap:4px}.okp .dl dd{margin-bottom:10px}}
 
 /* ---------- главная (index.html) ---------- */
 .home .hero{padding:clamp(36px,5vw,64px) 0 var(--pad)}
