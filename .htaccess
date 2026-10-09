@@ -13,7 +13,8 @@ ErrorDocument 404 /404.php
   RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/catalog/aksessuary/$1/ [R=301,L]
   RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/catalog/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
   RewriteRule ^magazin/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
-  RewriteRule ^magazin/product/jl-05-arenda/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl-05/ [R=301,L]
+  # JL 05 в аренду больше не сдаём (только продажа) — старые адреса её аренды ведут на страницу аренды
+  RewriteRule ^(magazin/product/jl-05-arenda|arenda-kofemashin/jetinno-jl-05)/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
   RewriteRule ^magazin/product/jl-15-viva-arenda/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl-15-viva/ [R=301,L]
   RewriteRule ^magazin/product/jl-36-arenda/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl36/ [R=301,L]
   # карта редиректов сеошника: разделы /magazin/folder/…, старые /chaj, /kofe, снятые товары
