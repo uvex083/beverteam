@@ -22,6 +22,8 @@ foreach ($order->getShipmentCollection() as $s) {
 $payment = $order->getPaymentCollection()->current() ?: null;
 $dCode = $shipment ? (string)(Sale\Delivery\Services\Table::getById($shipment->getDeliveryId())->fetch()['XML_ID'] ?? '') : '';
 $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') : '';
+$pCode === 'tinkoff' && !$payment->isPaid() && !$order->isCanceled() && bt_tbank_sync($payment);
+$toPay = $pCode === 'tinkoff' && !$order->isPaid() && !$order->isCanceled();
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
 $o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID')];
 [$st, $cls] = bt_order_status($o);
@@ -86,7 +88,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
-    <dt>Статус</dt><dd><span class="status <?= $order->isPaid() ? 'st-paid' : 'st-new' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if ($pCode === 'tinkoff' && !$order->isPaid() && !$order->isCanceled()): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
+    <dt>Статус</dt><dd><span class="status <?= $order->isPaid() ? 'st-paid' : 'st-new' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
     <dt>Документы</dt><dd><?php if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>"><?= bt_icon('doc') ?> Скачать счёт (PDF)</a><br>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?>Счёт придёт на e‑mail после подтверждения заказа менеджером<br>
@@ -96,7 +98,8 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 </div>
 
 <div class="row" style="margin-top:20px;gap:10px">
-  <button class="btn" type="button" data-reorder="<?= (int)$order->getId() ?>"><?= bt_icon('repeat') ?> Повторить заказ</button>
+  <?php if ($toPay): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить заказ</a>
+  <?php else: ?><button class="btn" type="button" data-reorder="<?= (int)$order->getId() ?>"><?= bt_icon('repeat') ?> Повторить заказ</button><?php endif ?>
   <a class="btn btn--ghost" href="/kontakty/#form" data-lead="Вопрос по заказу № <?= $e($num) ?>">Вопрос по заказу</a>
   <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>">Отменить заказ</a><?php endif ?>
 </div>

@@ -80,19 +80,48 @@ function bt_tbank_url(Sale\Payment $p): string
     return !empty($r['Success']) && str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://') ? (string)$r['PaymentURL'] : '';
 }
 
-// агент: неоплаченные заказы с оплатой через Т-Банк за трое суток — сверка с банком
+// платёжные системы модуля Т-Банка
+function bt_tbank_ps_ids(): array
+{
+    static $ids;
+    return $ids ??= Loader::includeModule('sale') ? array_map('intval', array_column(Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'select' => ['ID']])->fetchAll(), 'ID')) : [];
+}
+
+// неоплаченные платежи через Т-Банк за трое суток (всех или одного покупателя) — сверка с банком
+function bt_tbank_sync_user(int $userId = 0): void
+{
+    if (!($ids = bt_tbank_ps_ids())) {
+        return;
+    }
+    $f = ['@PAY_SYSTEM_ID' => $ids, '=PAID' => 'N', '>=DATE_BILL' => \Bitrix\Main\Type\DateTime::createFromTimestamp(time() - 3 * 86400)];
+    $userId && $f['=ORDER.USER_ID'] = $userId;
+    $r = Sale\Payment::getList(['filter' => $f, 'select' => ['ID', 'ORDER_ID']]);
+    while ($row = $r->fetch()) {
+        $order = Sale\Order::load($row['ORDER_ID']);
+        $p = $order && !$order->isCanceled() ? $order->getPaymentCollection()->getItemById($row['ID']) : null;
+        $p && bt_tbank_sync($p);
+    }
+}
+
+// агент: на случай, если уведомление банка не дошло
 function bt_tbank_agent(): string
 {
-    if (Loader::includeModule('sale')) {
-        $ids = array_column(Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'select' => ['ID']])->fetchAll(), 'ID');
-        if ($ids) {
-            $r = Sale\Payment::getList(['filter' => ['@PAY_SYSTEM_ID' => $ids, '=PAID' => 'N', '>=DATE_BILL' => \Bitrix\Main\Type\DateTime::createFromTimestamp(time() - 3 * 86400)], 'select' => ['ID', 'ORDER_ID']]);
-            while ($row = $r->fetch()) {
-                $order = Sale\Order::load($row['ORDER_ID']);
-                $p = $order && !$order->isCanceled() ? $order->getPaymentCollection()->getItemById($row['ID']) : null;
-                $p && bt_tbank_sync($p);
-            }
+    bt_tbank_sync_user();
+    return 'bt_tbank_agent();';
+}
+
+// main:OnBeforeEventAdd — оплату почти одновременно отмечают уведомление банка и сверка сайта: письмо «Заказ оплачен» — одно
+function bt_tbank_paid_mail_once($event, $lid, $fields)
+{
+    $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
+    if ($event !== 'SALE_ORDER_PAID' || $id <= 0) {
+        return true;
+    }
+    $r = \Bitrix\Main\Mail\Internal\EventTable::getList(['filter' => ['=EVENT_NAME' => $event, '>=DATE_INSERT' => \Bitrix\Main\Type\DateTime::createFromTimestamp(time() - 600)], 'select' => ['C_FIELDS']]);
+    while ($x = $r->fetch()) {
+        if ((int)($x['C_FIELDS']['ORDER_REAL_ID'] ?? 0) === $id) {
+            return false;
         }
     }
-    return 'bt_tbank_agent();';
+    return true;
 }

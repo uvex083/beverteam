@@ -20,6 +20,7 @@ AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_before_send');
 require_once __DIR__ . '/include/bt_bill.php';
 // оплата картой/СБП через Т-Банк: ссылка на оплату, сверка статуса агентом
 require_once __DIR__ . '/include/bt_tbank.php';
+AddEventHandler('main', 'OnBeforeEventAdd', 'bt_tbank_paid_mail_once');
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_bill_attach');
 AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contacts');
 

@@ -14,16 +14,19 @@ if (!bt_acc_guard()) {
 Loader::includeModule('sale');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $uid = (int)$USER->GetID();
+bt_tbank_sync_user($uid);
 $orders = OrderTable::getList(['filter' => ['=USER_ID' => $uid, '=LID' => SITE_ID],
     'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'STATUS_ID', 'CANCELED', 'PRICE', 'PAYED'], 'order' => ['ID' => 'DESC']])->fetchAll();
 $ids = array_column($orders, 'ID');
-$items = $pays = $ships = [];
+$items = $pays = $ships = $toPay = [];
 if ($ids) {
     foreach (BasketTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PRODUCT_ID', 'NAME', 'QUANTITY', 'MEASURE_NAME'], 'order' => ['ID' => 'ASC']])->fetchAll() as $b) {
         $items[$b['ORDER_ID']][] = $b;
     }
-    foreach (PaymentTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PAY_SYSTEM_NAME']])->fetchAll() as $p) {
+    $online = bt_tbank_ps_ids();
+    foreach (PaymentTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PAY_SYSTEM_NAME', 'PAY_SYSTEM_ID', 'PAID']])->fetchAll() as $p) {
         $pays[$p['ORDER_ID']] = trim(explode(' — ', $p['PAY_SYSTEM_NAME'])[0]);
+        $p['PAID'] !== 'Y' && in_array((int)$p['PAY_SYSTEM_ID'], $online, true) && $toPay[$p['ORDER_ID']] = true;
     }
     foreach (ShipmentTable::getList(['filter' => ['@ORDER_ID' => $ids, '=SYSTEM' => 'N'], 'select' => ['ORDER_ID', 'DELIVERY_NAME']])->fetchAll() as $s) {
         $ships[$s['ORDER_ID']] = $s['DELIVERY_NAME'];
@@ -31,7 +34,8 @@ if ($ids) {
 }
 $group = fn(array $o) => $o['CANCELED'] === 'Y' ? 'cancel' : ($o['STATUS_ID'] === 'F' ? 'done' : 'active');
 $cnt = array_count_values(array_map($group, $orders));
-$repeat = current(array_filter($orders, fn($o) => $o['CANCELED'] !== 'Y' && !empty($items[$o['ID']])));
+// повторить предлагаем последний оплаченный или подтверждённый менеджером заказ
+$repeat = current(array_filter($orders, fn($o) => $o['CANCELED'] !== 'Y' && ($o['PAYED'] === 'Y' || $o['STATUS_ID'] !== 'N') && !empty($items[$o['ID']])));
 $word = fn(int $n) => $n . ' ' . (($n % 10 === 1 && $n % 100 !== 11) ? 'товар' : (in_array($n % 10, [2, 3, 4]) && !in_array($n % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
 bt_acc_start('orders', '<h1 class="display h1">Мои заказы</h1>');
@@ -67,7 +71,8 @@ if (!$orders): ?>
         <span><?= $word(count($list)) ?><?= !empty($ships[$o['ID']]) ? ' · ' . $e($ships[$o['ID']]) : '' ?></span></div></div>
     <div class="r"><span class="sum"><?= bt_fmt((float)$o['PRICE']) ?></span>
       <span class="muted" style="font-size:12.5px"><?= $e(trim(($pays[$o['ID']] ?? '') . ' · ' . ($o['PAYED'] === 'Y' ? 'оплачен' : 'не оплачен'), ' ·')) ?></span>
-      <?php if ($list): ?><button class="btn btn--ghost btn--xs" type="button" data-reorder="<?= (int)$o['ID'] ?>">Повторить</button><?php endif ?></div>
+      <?php if (!empty($toPay[$o['ID']]) && $o['CANCELED'] !== 'Y'): ?><a class="btn btn--xs" href="/personal/order/pay/?id=<?= (int)$o['ID'] ?>">Оплатить</a>
+      <?php elseif ($list): ?><button class="btn btn--ghost btn--xs" type="button" data-reorder="<?= (int)$o['ID'] ?>">Повторить</button><?php endif ?></div>
   </div>
   <?php endforeach ?>
 <?php endif;
