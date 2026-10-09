@@ -57,12 +57,27 @@ function bt_tbank_sync(Sale\Payment $p): bool
 // ссылка на страницу оплаты банка; каждый вызов — новый платёж в банке, поэтому только по действию покупателя
 function bt_tbank_url(Sale\Payment $p): string
 {
-    $service = Sale\PaySystem\Manager::getObjectById($p->getPaymentSystemId());
-    if (!$service) {
-        return '';
+    $param = ($ps = $p->getPaySystem()) ? $ps->getParamsBusValue($p) : [];
+    // с чеком платёж создаёт сам модуль (он собирает позиции чека), адреса возврата тогда — из настроек терминала в кабинете банка
+    if ((string)($param['ENABLE_TAXATION'] ?? '0') === '1') {
+        $r = $ps->initiatePay($p, null, Sale\PaySystem\BaseServiceHandler::STRING);
+        return $r->isSuccess() && preg_match('~action="(https://[^"]+)"~i', (string)$r->getTemplate(), $m) ? htmlspecialchars_decode($m[1]) : '';
     }
-    $r = $service->initiatePay($p, null, Sale\PaySystem\BaseServiceHandler::STRING);
-    return $r->isSuccess() && preg_match('~action="(https://[^"]+)"~i', (string)$r->getTemplate(), $m) ? htmlspecialchars_decode($m[1]) : '';
+    // модуль не передаёт банку адреса возврата — без них кнопка «В магазин» у банка никуда не ведёт
+    $order = $p->getOrder();
+    $props = $order->getPropertyCollection();
+    $host = 'https://' . \Bitrix\Main\Context::getCurrent()->getRequest()->getHttpHost();
+    $back = $host . '/personal/order/success/?id=' . (int)$order->getId();
+    $r = bt_tbank_api($p, 'Init', [
+        'Amount' => (int)round($p->getSum() * 100),
+        'OrderId' => (string)$p->getField('ACCOUNT_NUMBER'),
+        'Description' => 'Заказ № ' . $order->getField('ACCOUNT_NUMBER') . ' в BEVERTEAM',
+        'SuccessURL' => $back,
+        'FailURL' => $back . '&pay=fail',
+        'NotificationURL' => $host . '/personal/order/notification.php',
+        'DATA' => array_filter(['Email' => (string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''), 'Phone' => (string)($props->getPhone() ? $props->getPhone()->getValue() : '')]),
+    ]);
+    return !empty($r['Success']) && str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://') ? (string)$r['PaymentURL'] : '';
 }
 
 // агент: неоплаченные заказы с оплатой через Т-Банк за трое суток — сверка с банком
