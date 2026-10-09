@@ -99,7 +99,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 
 <div class="row" style="margin-top:20px;gap:10px">
   <?php if ($toPay): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить заказ</a>
-  <?php else: ?><button class="btn" type="button" data-reorder="<?= (int)$order->getId() ?>"><?= bt_icon('repeat') ?> Повторить заказ</button><?php endif ?>
+  <?php elseif ($order->isCanceled() || $order->getField('STATUS_ID') === 'F'): ?><button class="btn" type="button" data-reorder="<?= (int)$order->getId() ?>"><?= bt_icon('repeat') ?> Повторить заказ</button><?php endif ?>
   <a class="btn btn--ghost" href="/kontakty/#form" data-lead="Вопрос по заказу № <?= $e($num) ?>">Вопрос по заказу</a>
   <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>">Отменить заказ</a><?php endif ?>
 </div>

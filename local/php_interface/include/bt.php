@@ -1554,7 +1554,7 @@ function bt_acc_start(string $cur, string $head, string $sub = ''): void
     $cnt = \Bitrix\Sale\Internals\OrderTable::getCount(['=USER_ID' => (int)$USER->GetID(), '=LID' => SITE_ID]);
     $nav = [['profile', '/personal/', 'Профиль', ''], ['orders', '/personal/orders/', 'Заказы', $cnt ? '<span class="cnt">' . $cnt . '</span>' : ''],
         ['addr', '/personal/addresses/', 'Адреса доставки', ''], ['docs', '/personal/docs/', 'Счета и документы', ''],
-        ['sub', '/personal/podpiska/', 'Поставки кофе', ''], ['fav', '/personal/favorites/', 'Избранное', '']];
+        ['sub', '/personal/podpiska/', 'Поставки кофе', '']];
     echo '<div class="wrap accp">';
     bt_crumbs();
     echo '<div class="pagehead">' . $head . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . '</div><div class="acc-l"><aside class="acc-nav">'

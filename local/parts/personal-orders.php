@@ -36,8 +36,8 @@ if ($ids) {
 }
 $group = fn(array $o) => $o['CANCELED'] === 'Y' ? 'cancel' : ($o['STATUS_ID'] === 'F' ? 'done' : 'active');
 $cnt = array_count_values(array_map($group, $orders));
-// повторить предлагаем последний оплаченный или подтверждённый менеджером заказ
-$repeat = current(array_filter($orders, fn($o) => $o['CANCELED'] !== 'Y' && ($o['PAYED'] === 'Y' || $o['STATUS_ID'] !== 'N') && !empty($items[$o['ID']])));
+// повторить предлагаем только завершённый заказ: активный ещё не доехал — повтор дал бы случайный дубль
+$repeat = current(array_filter($orders, fn($o) => $group($o) === 'done' && !empty($items[$o['ID']])));
 $word = fn(int $n) => $n . ' ' . (($n % 10 === 1 && $n % 100 !== 11) ? 'товар' : (in_array($n % 10, [2, 3, 4]) && !in_array($n % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
 bt_acc_start('orders', '<h1 class="display h1">Мои заказы</h1>');
@@ -74,7 +74,7 @@ if (!$orders): ?>
     <div class="r"><span class="sum"><?= bt_fmt((float)$o['PRICE']) ?></span>
       <?php if (!empty($pays[$o['ID']])): ?><span class="muted" style="font-size:12.5px"><?= $e($pays[$o['ID']]) ?></span><?php endif ?>
       <?php if (!empty($toPay[$o['ID']]) && $o['CANCELED'] !== 'Y'): ?><a class="btn btn--xs" href="/personal/order/pay/?id=<?= (int)$o['ID'] ?>">Оплатить</a>
-      <?php elseif ($list): ?><button class="btn btn--ghost btn--xs" type="button" data-reorder="<?= (int)$o['ID'] ?>">Повторить</button><?php endif ?></div>
+      <?php elseif ($list && $group($o) !== 'active'): ?><button class="btn btn--ghost btn--xs" type="button" data-reorder="<?= (int)$o['ID'] ?>">Повторить</button><?php endif ?></div>
   </div>
   <?php endforeach ?>
 <?php endif;
