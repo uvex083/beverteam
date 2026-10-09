@@ -27,6 +27,8 @@ $co = bt_contacts();
 $order && !$order->isCanceled() && ($tp = bt_tbank_payment($order)) && bt_tbank_sync($tp);
 if (!$order) {
     CHTTP::SetStatus("404 Not Found");
+    $APPLICATION->SetTitle('Заказ не найден');
+    $APPLICATION->SetPageProperty('title', 'Заказ не найден — BEVERTEAM');
 } elseif ($order->isPaid()) {
     $APPLICATION->SetTitle('Заказ оплачен');
     $APPLICATION->SetPageProperty('title', 'Заказ оплачен — BEVERTEAM');
@@ -67,7 +69,7 @@ if (!$order) {
     $dPrice = (float)$order->getDeliveryPrice();
     $delivText = $shipment ? $shipment->getDeliveryName() . ($city ? ', ' . $city : '') . ' — '
         . ($dCode === 'bt_cdek' ? 'стоимость сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? 'бесплатно (заказ от 3 000 ₽)' : 'бесплатно'))) : '';
-    $where = preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
+    $where = preg_replace(['/\s*#S\S+$/u', '/^Пункт выдачи СДЭК:\s*/u'], '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
     $date = $order->getDateInsert();
 ?>
   <div class="ok">
