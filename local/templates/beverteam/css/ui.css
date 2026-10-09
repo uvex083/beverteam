@@ -460,6 +460,10 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 /* status */
 .status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:999px}
 .status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+/* оплата заказа: «Оплачен» — зелёная с галочкой, «Не оплачен» — только контур */
+.pay{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--gray)}
+.pay--ok{border-color:transparent;background:var(--ok-s);color:var(--ok)}
+.pay--ok::before{content:"";width:4px;height:8px;margin:-3px 1px 0 1px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .st-new{background:var(--warn-s);color:var(--warn)}.st-paid{background:#E5EEF9;color:#2C5AA0}.st-ship{background:var(--lime-soft);color:#5A6A0E}.st-done{background:var(--ok-s);color:var(--ok)}.st-cancel{background:var(--err-s);color:var(--err)}
 
 /* alerts / empty */
@@ -1943,6 +1947,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .ord .btn{position:relative;z-index:2}
 .accp .ord[hidden]{display:none}
 .accp .ord .hd{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.accp .ord .hd .pay{margin-left:-6px}
 .accp .ord .n{font-family:Unbounded;font-weight:700;font-size:15px}
 .accp .ord .dt{color:var(--gray);font-size:13px}
 .accp .ord .items{display:flex;gap:8px;align-items:center;flex-wrap:wrap}

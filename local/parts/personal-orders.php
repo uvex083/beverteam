@@ -65,12 +65,12 @@ if (!$orders): ?>
   <?php foreach ($orders as $o): [$st, $cls] = bt_order_status($o); $list = $items[$o['ID']] ?? [] ?>
   <div class="ord" data-g="<?= $group($o) ?>">
     <a class="ord__lnk" href="/personal/orders/<?= (int)$o['ID'] ?>/" aria-label="Заказ № <?= $e($o['ACCOUNT_NUMBER']) ?>"></a>
-    <div><div class="hd"><span class="n">№ <?= $e($o['ACCOUNT_NUMBER']) ?></span><span class="dt"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></span><span class="status <?= $cls ?>"><?= $e($st) ?></span></div>
+    <div><div class="hd"><span class="n">№ <?= $e($o['ACCOUNT_NUMBER']) ?></span><span class="dt"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></span><span class="status <?= $cls ?>"><?= $e($st) ?></span><?php if ($o['PAYED'] === 'Y'): ?><span class="pay pay--ok">Оплачен</span><?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="pay">Не оплачен</span><?php endif ?></div>
       <div class="items"><?php foreach (array_slice($list, 0, 4) as $b): $m = bt_product((string)$b['PRODUCT_ID']);
           if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif; endforeach ?>
         <span><?= $word(count($list)) ?><?= !empty($ships[$o['ID']]) ? ' · ' . $e($ships[$o['ID']]) : '' ?></span></div></div>
     <div class="r"><span class="sum"><?= bt_fmt((float)$o['PRICE']) ?></span>
-      <span class="muted" style="font-size:12.5px"><?= $e(trim(($pays[$o['ID']] ?? '') . ' · ' . ($o['PAYED'] === 'Y' ? 'оплачен' : 'не оплачен'), ' ·')) ?></span>
+      <?php if (!empty($pays[$o['ID']])): ?><span class="muted" style="font-size:12.5px"><?= $e($pays[$o['ID']]) ?></span><?php endif ?>
       <?php if (!empty($toPay[$o['ID']]) && $o['CANCELED'] !== 'Y'): ?><a class="btn btn--xs" href="/personal/order/pay/?id=<?= (int)$o['ID'] ?>">Оплатить</a>
       <?php elseif ($list): ?><button class="btn btn--ghost btn--xs" type="button" data-reorder="<?= (int)$o['ID'] ?>">Повторить</button><?php endif ?></div>
   </div>
