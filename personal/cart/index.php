@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('bt:cart',()=>{if(!busy)render();});
   render();
   BT_mbar(goOrder,tot);
-  const inCart=new Set(Object.keys(BT_CART));
+  const inCart=new Set(Object.keys(BT_CART).map(k=>k.split(':')[0])); // ключ кофе — «id:кг»
   rec.innerHTML=[...BT_PRODUCTS.coffee,...BT_PRODUCTS.tea].filter(m=>!inCart.has(m.id)&&m.p).slice(0,4).map(BT_card).join('');
   BT_favUpdate(); BT_cmpUpdate();
 });
