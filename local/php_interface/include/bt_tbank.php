@@ -47,15 +47,30 @@ function bt_tbank_sync(Sale\Payment $p): bool
         if (($x['Status'] ?? '') === 'CONFIRMED' && (int)($x['Amount'] ?? 0) === $sum) {
             $p->setPaid('Y');
             $p->setField('PS_INVOICE_ID', (string)($x['PaymentId'] ?? ''));
-            $p->getOrder()->save();
-            return $p->isPaid();
+            if (!$p->getOrder()->save()->isSuccess() || !$p->isPaid()) {
+                return false;
+            }
+            bt_tbank_mark((string)$p->getField('ACCOUNT_NUMBER'), (string)($x['PaymentId'] ?? ''));
+            return true;
         }
     }
     return false;
 }
 
-// ссылка на страницу оплаты банка; каждый вызов — новый платёж в банке, поэтому только по действию покупателя
-function bt_tbank_url(Sale\Payment $p): string
+// платёж подтверждён — то же в таблицу модуля: его запоздалое уведомление AUTHORIZED иначе снимет оплату, а возврат (REFUNDED) не найдёт платёж
+function bt_tbank_mark(string $acc, string $paymentId): void
+{
+    if ($paymentId === '') {
+        return;
+    }
+    $c = \Bitrix\Main\Application::getConnection();
+    $h = $c->getSqlHelper();
+    $c->queryExecute("INSERT INTO tb_payment_status (OrderId, PaymentId, current_status) VALUES ('" . $h->forSql($acc) . "', '" . $h->forSql($paymentId) . "', 'CONFIRMED')"
+        . " ON DUPLICATE KEY UPDATE current_status = 'CONFIRMED'");
+}
+
+// ссылка на страницу оплаты банка: прошлая, пока банк держит её открытой, иначе новый платёж — только по действию покупателя
+function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
 {
     $param = ($ps = $p->getPaySystem()) ? $ps->getParamsBusValue($p) : [];
     // с чеком платёж создаёт сам модуль (он собирает позиции чека), адреса возврата тогда — из настроек терминала в кабинете банка
@@ -63,13 +78,23 @@ function bt_tbank_url(Sale\Payment $p): string
         $r = $ps->initiatePay($p, null, Sale\PaySystem\BaseServiceHandler::STRING);
         return $r->isSuccess() && preg_match('~action="(https://[^"]+)"~i', (string)$r->getTemplate(), $m) ? htmlspecialchars_decode($m[1]) : '';
     }
+    // две вкладки или «Назад» не должны плодить платежи: прошлая ссылка жива — отдаём её
+    $amount = (int)round($p->getSum() * 100);
+    $prevId = (string)$p->getField('PS_INVOICE_ID');
+    $prevUrl = (string)$p->getField('PS_STATUS_DESCRIPTION');
+    if ($prevId !== '' && str_starts_with($prevUrl, 'https://')) {
+        $st = bt_tbank_api($p, 'GetState', ['PaymentId' => $prevId]);
+        if (in_array($st['Status'] ?? '', ['NEW', 'FORM_SHOWED'], true) && (int)($st['Amount'] ?? 0) === $amount) {
+            return $prevUrl;
+        }
+    }
     // модуль не передаёт банку адреса возврата — без них кнопка «В магазин» у банка никуда не ведёт
     $order = $p->getOrder();
     $props = $order->getPropertyCollection();
     $host = 'https://' . \Bitrix\Main\Context::getCurrent()->getRequest()->getHttpHost();
     $back = $host . '/personal/order/success/?id=' . (int)$order->getId();
     $r = bt_tbank_api($p, 'Init', [
-        'Amount' => (int)round($p->getSum() * 100),
+        'Amount' => $amount,
         'OrderId' => (string)$p->getField('ACCOUNT_NUMBER'),
         'Description' => 'Заказ № ' . $order->getField('ACCOUNT_NUMBER') . ' в BEVERTEAM',
         'SuccessURL' => $back,
@@ -77,7 +102,47 @@ function bt_tbank_url(Sale\Payment $p): string
         'NotificationURL' => $host . '/personal/order/notification.php',
         'DATA' => array_filter(['Email' => (string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''), 'Phone' => (string)($props->getPhone() ? $props->getPhone()->getValue() : '')]),
     ]);
-    return !empty($r['Success']) && str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://') ? (string)$r['PaymentURL'] : '';
+    if (empty($r['Success']) || !str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://')) {
+        // номер уже занят прошлой попыткой (банк не даёт его повторить даже после отмены) — платим новым платежом заказа
+        return ($r['ErrorCode'] ?? '') === '8' && !$renewed && ($n = bt_tbank_renew($p)) ? bt_tbank_url($n, true) : '';
+    }
+    $p->setField('PS_INVOICE_ID', (string)($r['PaymentId'] ?? ''));
+    $p->setField('PS_STATUS_DESCRIPTION', mb_substr((string)$r['PaymentURL'], 0, 250));
+    $order->save();
+    return (string)$r['PaymentURL'];
+}
+
+// заменить неоплаченный платёж новым (новый номер для банка); прошлые попытки в банке сначала отменяем, чтобы по старой ссылке не заплатили
+function bt_tbank_renew(Sale\Payment $p): ?Sale\Payment
+{
+    $final = ['CONFIRMED', 'CANCELED', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED', 'REJECTED', 'DEADLINE_EXPIRED'];
+    foreach ((array)(bt_tbank_api($p, 'CheckOrder', ['OrderId' => (string)$p->getField('ACCOUNT_NUMBER')])['Payments'] ?? []) as $x) {
+        if (($x['Status'] ?? '') === 'CONFIRMED' || (!in_array($x['Status'] ?? '', $final, true) && empty(bt_tbank_api($p, 'Cancel', ['PaymentId' => (string)$x['PaymentId']])['Success']))) {
+            return null;
+        }
+    }
+    $order = $p->getOrder();
+    $service = Sale\PaySystem\Manager::getObjectById($p->getPaymentSystemId());
+    if (!$service) {
+        return null;
+    }
+    $n = $order->getPaymentCollection()->createItem($service);
+    $n->setField('SUM', $p->getSum());
+    $p->delete();
+    return $order->save()->isSuccess() ? $n : null;
+}
+
+// sale:OnSaleOrderBeforeSaved — уведомление модуля пишет статус платежа в комментарий заказа поверх заметки менеджера: заметку сохраняем, статус — строкой ниже
+function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
+{
+    $order = $e->getParameter('ENTITY');
+    $rx = '/^(AUTHORIZED|CONFIRMED|REJECTED|CANCELED|REVERSED|REFUNDED): .*$/mu';
+    $new = (string)$order->getField('COMMENTS');
+    if (!$order instanceof Sale\Order || !preg_match($rx, $new) || str_contains($new, "\n")) {
+        return;
+    }
+    $keep = trim(preg_replace($rx, '', (string)($order->getFields()->getOriginalValues()['COMMENTS'] ?? '')));
+    $keep !== '' && $order->setField('COMMENTS', $keep . "\n" . $new);
 }
 
 // платёжные системы модуля Т-Банка

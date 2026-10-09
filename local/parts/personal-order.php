@@ -23,7 +23,7 @@ $payment = $order->getPaymentCollection()->current() ?: null;
 $dCode = $shipment ? (string)(Sale\Delivery\Services\Table::getById($shipment->getDeliveryId())->fetch()['XML_ID'] ?? '') : '';
 $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') : '';
 $pCode === 'tinkoff' && !$payment->isPaid() && !$order->isCanceled() && bt_tbank_sync($payment);
-$toPay = $pCode === 'tinkoff' && !$order->isPaid() && !$order->isCanceled();
+$toPay = !$order->isCanceled() && bt_tbank_payment($order);
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
 $o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID')];
 [$st, $cls] = bt_order_status($o);

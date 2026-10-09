@@ -82,7 +82,7 @@ if (!$order) {
       <b><?= bt_fmt($order->getPrice()) ?></b>
       <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : ($pCode === 'tinkoff' ? ($order->isPaid() ? 'оплачено, спасибо' : 'заказ ждёт оплаты') : 'оплата при получении заказа') ?></small></div>
       <?php if ($pCode === 'tinkoff' && !$order->isPaid() && ($_GET['pay'] ?? '') === 'fail'): ?><small style="flex-basis:100%;color:#fff">Оплата не прошла. Попробуйте ещё раз или позвоните нам — поможем.</small><?php endif ?>
-      <?php if ($pCode === 'tinkoff' && !$order->isPaid() && !$order->isCanceled()): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить <?= bt_fmt($order->getPrice()) ?></a><?php endif ?></div>
+      <?php if (!$order->isCanceled() && bt_tbank_payment($order)): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить <?= bt_fmt($order->getPrice()) ?></a><?php endif ?></div>
 
     <div class="card">
       <h3 class="h3" style="margin-bottom:12px">Состав заказа</h3>
