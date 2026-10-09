@@ -18,24 +18,14 @@ $arResult['BT_PHOTOS'] = array_map(fn($f) => [
     'og' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900])['src'] ?? '',
 ], array_values($files));
 
-// характеристики «Подробнее»: только заполненные
-$place = implode(', ', array_filter([$val('COUNTRY'), $val('REGION')]));
-$arResult['BT_SPECS'] = array_filter([
-    'Оценка Q-грейдера' => $val('Q_SCORE'),
-    'Степень обжарки' => $val('ROAST'),
-    'Регион' => $place,
-    'Способ обработки' => $val('PROCESSING'),
-    'Состав' => $val('MIX'),
-    'Вид чая' => $val('TEA_KIND'),
-    'Вкус' => $val('TASTE'),
-    'Действие' => $val('EFFECT'),
-    'Фасовка' => $val('PACKING'),
-    'Вес упаковки' => $val('NET_WEIGHT'),
-    'Чашек в день' => $val('CUPS_PER_DAY'),
-    'Габариты' => $val('DIMENSIONS'),
-    'Экран' => $val('SCREEN'),
-    'Артикул' => $val('ARTICLE'),
-], fn($v) => $v !== '');
+// характеристики «Подробнее»: все заполненные свойства с названием и порядком из админки, кроме служебных, шкал и текстов вкладок
+$skip = ['SHOW_MAIN', 'BADGES', 'SHORT_DESC', 'OLD_PRICE', 'STRENGTH', 'AROMA', 'DENSITY', 'ACIDITY'];
+$arResult['BT_SPECS'] = [];
+foreach ($pr as $code => $p) {
+    if (!in_array($code, $skip, true) && in_array($p['PROPERTY_TYPE'], ['S', 'L', 'N'], true) && !$p['USER_TYPE'] && ($v = $val($code)) !== '') {
+        $arResult['BT_SPECS'][htmlspecialcharsbx($p['NAME'])] = $v;
+    }
+}
 $arResult['BT_NOTES'] = $val('NOTES');
 $arResult['BT_Q'] = $val('Q_SCORE');
 
