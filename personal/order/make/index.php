@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
-  let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, payId=0, calcN=0, sending=false;
+  let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, wantPay=<?= (int)($ship['pay'] ?? 0) ?>, payId=0, calcN=0, sending=false;
 
   /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
   const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       else sel=all.find(o=>o.key===sel.key);
       if(sel) tab=sel.tab;
       if(sel&&sel.d.id!==r.delivery&&!again) return calc(true);
-      payId=avail.some(a=>a.id===payId)?payId:(avail[0]?avail[0].id:0);
+      payId=avail.some(a=>a.id===payId)?payId:avail.some(a=>a.id===wantPay)?wantPay:(avail[0]?avail[0].id:0);
       renderDeliv(); renderPay(); renderSum(r); ready();
     }).catch(()=>BT_toast('Не получилось пересчитать доставку — обновите страницу'));
   }
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();}});
   deliv.addEventListener('change',e=>{const o=opts().find(x=>x.key===e.target.value);if(!o)return;const same=sel&&sel.d.id===o.d.id;sel=o;
     if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();});
-  pay.addEventListener('change',e=>{payId=+e.target.value;renderPay();renderSum(last);ready();});
+  pay.addEventListener('change',e=>{payId=wantPay=+e.target.value;renderPay();renderSum(last);ready();});
   ptypeTabs.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b||b.dataset.t===pt)return;
     [...ptypeTabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));pt=b.dataset.t;urFields.hidden=pt!=='UR';
     coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';calc();ready();});

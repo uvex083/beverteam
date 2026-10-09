@@ -326,10 +326,10 @@ if (!$r->isSuccess()) {
 }
 $_SESSION['BT_ORDERS'][] = (int)$order->getId();
 
-// для следующего заказа: плательщик, способ доставки и последний адрес; гость с чужим e-mail в чужой кабинет не пишет
+// для следующего заказа: плательщик, способы доставки и оплаты, последний адрес; гость с чужим e-mail в чужой кабинет не пишет
 if ($USER->IsAuthorized() || !empty($fresh)) {
     $prev = CUserOptions::GetOption('bt', 'last_ship', [], $userId);
-    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? ''), 'pvza' => $f['mode'] === 'pvz' ? $pvz['a'] : ($prev['pvza'] ?? '')];
+    $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'pay' => $pay, 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? ''), 'pvza' => $f['mode'] === 'pvz' ? $pvz['a'] : ($prev['pvza'] ?? '')];
     $ship += $f['mode'] === 'addr' ? ['street' => $f['street'], 'flat' => $f['flat'], 'entrance' => $f['entrance']]
         : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
     CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);
