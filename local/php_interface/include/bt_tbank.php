@@ -126,8 +126,12 @@ function bt_tbank_renew(Sale\Payment $p): ?Sale\Payment
     if (!$service) {
         return null;
     }
+    // два сохранения: при удалении старого в том же сохранении ядро выдало бы новому занятый номер и оставило его пустым
     $n = $order->getPaymentCollection()->createItem($service);
     $n->setField('SUM', $p->getSum());
+    if (!$order->save()->isSuccess() || (string)$n->getField('ACCOUNT_NUMBER') === '') {
+        return null;
+    }
     $p->delete();
     return $order->save()->isSuccess() ? $n : null;
 }
