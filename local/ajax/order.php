@@ -333,6 +333,7 @@ if ($USER->IsAuthorized() || !empty($fresh)) {
     $ship += $f['mode'] === 'addr' ? ['street' => $f['street'], 'flat' => $f['flat'], 'entrance' => $f['entrance']]
         : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
     CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);
+    $f['mode'] === 'addr' and bt_address_remember($userId, $loc, $f['street'], $f['flat'], $f['entrance'], $f['name'], '+' . $phone);
     // реквизиты организации — в профиль покупателя (по ИНН), чтобы в следующий раз выбрать её из списка
     if ($pt === 'UR') {
         $urId = $ptypes['UR'];

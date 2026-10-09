@@ -1512,6 +1512,32 @@ function bt_addresses(int $userId): array
     return $list;
 }
 
+// Адрес доставки из заказа — в кабинет покупателя и основным; такой же адрес (город, улица и дом, квартира) второй раз не добавляем
+function bt_address_remember(int $userId, string $loc, string $street, string $flat, string $entr, string $who, string $tel): void
+{
+    if ($userId <= 0 || $loc === '' || trim($street) === '' || !Loader::includeModule('sale')) {
+        return;
+    }
+    $norm = fn(string $s) => preg_replace('/[^\p{L}\p{N}]+/u', '', preg_replace('/(^|[\s.,])(ул|улица|д|дом|кв|офис|г)(?=[\s.,]|$)/u', ' ', str_replace('ё', 'е', mb_strtolower($s))));
+    $key = $loc . '|' . $norm($street) . '|' . $norm($flat);
+    foreach (bt_addresses($userId) as $a) {
+        if ($a['loc'] . '|' . $norm($a['street']) . '|' . $norm($a['flat']) === $key) {
+            return;
+        }
+    }
+    $ptId = (int)(\Bitrix\Sale\Internals\PersonTypeTable::getList(['filter' => ['=CODE' => 'FIZ', '=LID' => SITE_ID], 'select' => ['ID']])->fetch()['ID'] ?? 0);
+    $r = $ptId ? \Bitrix\Sale\Internals\UserPropsTable::add(['NAME' => 'Адрес', 'USER_ID' => $userId, 'PERSON_TYPE_ID' => $ptId, 'DATE_UPDATE' => new \Bitrix\Main\Type\DateTime()]) : null;
+    if (!$r || !$r->isSuccess()) {
+        return;
+    }
+    $values = ['LOCATION' => $loc, 'ADDRESS' => $street, 'FLAT' => $flat, 'ENTRANCE' => $entr, 'FIO' => $who, 'PHONE' => $tel];
+    $props = \Bitrix\Sale\Internals\OrderPropsTable::getList(['filter' => ['=PERSON_TYPE_ID' => $ptId, '@CODE' => array_keys($values)], 'select' => ['ID', 'CODE', 'NAME']]);
+    while ($p = $props->fetch()) {
+        \Bitrix\Sale\Internals\UserPropsValueTable::add(['USER_PROPS_ID' => $r->getId(), 'ORDER_PROPS_ID' => $p['ID'], 'NAME' => $p['NAME'], 'VALUE' => $values[$p['CODE']]]);
+    }
+    CUserOptions::SetOption('bt', 'main_addr', (int)$r->getId(), false, $userId);
+}
+
 // Статус заказа для кабинета: [текст, css-класс]; текст — название статуса из настроек магазина до запятой
 function bt_order_status(array $o): array
 {

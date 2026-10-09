@@ -47,10 +47,10 @@ if ($USER->IsAuthorized()) {
     // основной адрес и первые реквизиты из кабинета
     $a = bt_addresses((int)$USER->GetID())[0] ?? null;
     $u += $a ? ['street' => $a['street'], 'flat' => $a['flat'], 'entrance' => $a['entr']] : [];
-    // прошлый заказ важнее адреса из кабинета: плательщик, способ и адрес доставки, организация
+    // из прошлого заказа — плательщик, способы доставки и оплаты, организация; адрес — основной из кабинета, а нет его — из прошлого заказа
     $ship = CUserOptions::GetOption('bt', 'last_ship', [], (int)$USER->GetID());
     $ship = is_array($ship) ? $ship : [];
-    if (($ship['street'] ?? '') !== '') {
+    if (!$a && ($ship['street'] ?? '') !== '') {
         $u = ['street' => $ship['street'], 'flat' => $ship['flat'] ?? '', 'entrance' => $ship['entrance'] ?? ''] + $u;
     }
     $orgs = bt_profiles((int)$USER->GetID(), 'UR');
@@ -59,7 +59,7 @@ if ($USER->IsAuthorized()) {
     foreach ($orgs as $o) {
         $o['id'] === $orgSel and $u += $o['v'];
     }
-    $city = ($ship['loc'] ?? '') !== '' ? ['loc' => $ship['loc'], 'city' => bt_loc($ship['loc'])['n']] : $a;
+    $city = $a ?: (($ship['loc'] ?? '') !== '' ? ['loc' => $ship['loc'], 'city' => bt_loc($ship['loc'])['n']] : null);
     if ($city && $city['loc'] !== '' && $city['city'] !== '') {
         $popular = array_merge([['code' => $city['loc'], 'n' => $city['city'], 'r' => '']], array_values(array_filter($popular, fn($c) => $c['code'] !== $city['loc'])));
     }

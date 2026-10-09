@@ -37,12 +37,12 @@ $disc = (float)$basket->getBasePrice() - (float)$basket->getPrice();
 $num = $order->getField('ACCOUNT_NUMBER');
 $shipped = in_array($o['STATUS_ID'], ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped());
 
-// ход заказа: по счёту сначала оплата, при получении — сначала доставка
+// ход заказа: по счёту и онлайн сначала оплата, при получении — сначала доставка
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
     'pay' => ['Оплачен', $order->isPaid(), $order->isPaid() ? $date($order->getField('DATE_PAYED')) : ''],
     'ship' => [$dCode === 'bt_pickup' ? 'Готов к выдаче' : 'Передан в доставку', $shipped, ''],
     'done' => ['Выполнен', $o['STATUS_ID'] === 'F', $o['STATUS_ID'] === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
-if ($pCode !== 'bill') {
+if (!in_array($pCode, ['bill', 'tinkoff'], true)) {
     $steps = ['acc' => $steps['acc'], 'ship' => $steps['ship'], 'pay' => $steps['pay'], 'done' => $steps['done']];
 }
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
@@ -90,10 +90,13 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
     <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
+    <?php // онлайн-оплата: здесь будет ссылка на чек, пока её нет — строку не показываем
+    if ($pCode !== 'tinkoff'): ?>
     <dt>Документы</dt><dd><?php if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>"><?= bt_icon('doc') ?> Скачать счёт (PDF)</a><br>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?>Счёт придёт на e‑mail после подтверждения заказа менеджером<br>
       <?php else: ?><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?><br><?php endif ?>
       <a class="link" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
+    <?php endif ?>
   </dl></div>
 </div>
 

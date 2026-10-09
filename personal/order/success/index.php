@@ -117,7 +117,7 @@ if (!$order) {
     <div class="next">
       <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/">личном кабинете</a></span></div>
       <div><b>Изменить заказ</b><span>Позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a> до отправки</span></div>
-      <div><b>Нужен документ?</b><span><?= $pCode === 'bill' ? 'Счёт и УПД пришлём на e‑mail' : 'Чек выдадим при получении, УПД — по запросу' ?></span></div>
+      <div><b>Нужен документ?</b><span><?= $pCode === 'bill' ? 'Счёт и УПД пришлём на e‑mail' : ($pCode === 'tinkoff' ? 'УПД — по запросу' : 'Чек выдадим при получении, УПД — по запросу') ?></span></div>
     </div>
     <div class="row" style="justify-content:center;margin-top:28px;gap:12px"><a class="btn btn--line" href="/catalog/">Продолжить покупки</a></div>
   </div>
