@@ -68,7 +68,6 @@ if (!$order) {
     $where = preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
     $date = $order->getDateInsert();
 ?>
-  <div class="steps" style="max-width:760px;margin:24px auto 0"><div class="done"><b>1</b>Корзина</div><div class="done"><b>2</b>Регион и доставка</div><div class="done"><b>3</b>Оплата</div><div class="cur"><b>4</b>Подтверждение</div></div>
   <div class="ok">
     <div class="ok__hd">
       <div class="ic">✓</div>

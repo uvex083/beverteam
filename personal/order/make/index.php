@@ -71,7 +71,6 @@ $co = bt_contacts();
   <nav class="crumbs" aria-label="Хлебные крошки"><a href="/">Главная</a><span><a href="/personal/cart/">Корзина</a></span><span>Оформление</span></nav>
   <div class="pagehead"><h1 class="display h1">Оформление заказа</h1></div>
 
-  <div class="steps"><div class="done"><b>1</b>Корзина</div><div class="cur"><b>2</b>Регион и доставка</div><div><b>3</b>Оплата</div><div><b>4</b>Подтверждение</div></div>
 
   <form class="co" id="coForm" novalidate>
     <div>
