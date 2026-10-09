@@ -632,9 +632,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.field input,.field textarea,.field select').forEach(el=>{
     if(el.type==='file'||el.type==='checkbox'||el.type==='radio')return;
     if(kindOf(el)==='tel') maskTel(el);
-    el.addEventListener('blur',()=>BT_checkField(el));
-    el.addEventListener('input',()=>{ if(el.closest('.field')?.classList.contains('is-err')) BT_checkField(el); });
+    /* ошибку — только когда человек сам побывал в поле и ушёл; фокус, который ставит скрипт (открытие окна), ошибок не даёт */
+    el.addEventListener('pointerdown',()=>{el.dataset.touched='1';});
+    el.addEventListener('blur',()=>{ if(el.dataset.touched) BT_checkField(el); });
+    el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(el.closest('.field')?.classList.contains('is-err')) BT_checkField(el); });
   });
+  document.addEventListener('reset',e=>e.target.querySelectorAll('[data-touched]').forEach(x=>delete x.dataset.touched),true);
   /* согласие с политикой — обязательный чекбокс */
   const checkAgree = box => {
     const w=box.closest('.check'); if(!w) return true;
