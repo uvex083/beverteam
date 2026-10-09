@@ -18,15 +18,17 @@ bt_tbank_sync_user($uid);
 $orders = OrderTable::getList(['filter' => ['=USER_ID' => $uid, '=LID' => SITE_ID],
     'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'STATUS_ID', 'CANCELED', 'PRICE', 'PAYED'], 'order' => ['ID' => 'DESC']])->fetchAll();
 $ids = array_column($orders, 'ID');
-$items = $pays = $ships = $toPay = [];
+$items = $pays = $ships = $toPay = $billed = [];
 if ($ids) {
     foreach (BasketTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PRODUCT_ID', 'NAME', 'QUANTITY', 'MEASURE_NAME'], 'order' => ['ID' => 'ASC']])->fetchAll() as $b) {
         $items[$b['ORDER_ID']][] = $b;
     }
     $online = bt_tbank_ps_ids();
+    $billPs = array_map('intval', array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill'], 'select' => ['ID']])->fetchAll(), 'ID'));
     foreach (PaymentTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PAY_SYSTEM_NAME', 'PAY_SYSTEM_ID', 'PAID']])->fetchAll() as $p) {
         $pays[$p['ORDER_ID']] = trim(explode(' — ', $p['PAY_SYSTEM_NAME'])[0]);
         $p['PAID'] !== 'Y' && in_array((int)$p['PAY_SYSTEM_ID'], $online, true) && $toPay[$p['ORDER_ID']] = true;
+        in_array((int)$p['PAY_SYSTEM_ID'], $billPs, true) && $billed[$p['ORDER_ID']] = true;
     }
     foreach (ShipmentTable::getList(['filter' => ['@ORDER_ID' => $ids, '=SYSTEM' => 'N'], 'select' => ['ORDER_ID', 'DELIVERY_NAME']])->fetchAll() as $s) {
         $ships[$s['ORDER_ID']] = $s['DELIVERY_NAME'];
@@ -53,7 +55,7 @@ if (!$orders): ?>
       <p>Положим тот же состав в корзину. Доставку и оплату выберете при оформлении.</p>
       <div class="it"><?php foreach (array_slice($items[$repeat['ID']], 0, 6) as $b): ?><span><?= $e($b['NAME']) ?> · <?= (float)$b['QUANTITY'] ?> <?= $e($b['MEASURE_NAME'] ?: 'шт') ?></span><?php endforeach ?></div></div>
     <div style="display:grid;gap:10px"><button class="btn" type="button" data-reorder="<?= (int)$repeat['ID'] ?>"><?= bt_icon('repeat') ?> Повторить заказ</button>
-      <a class="btn btn--line" style="color:#fff;border-color:#fff" href="/personal/docs/">Счета и документы</a></div>
+      <?php if (!empty($billed[$repeat['ID']])): ?><a class="btn btn--line" style="color:#fff;border-color:#fff" href="/personal/docs/">Счета и документы</a><?php endif ?></div>
   </div>
   <?php endif ?>
   <div class="ftabs" data-ftabs>
