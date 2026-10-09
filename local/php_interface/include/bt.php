@@ -1667,7 +1667,7 @@ function bt_sitemap_build(): string
     Loader::includeModule('iblock');
     $host = 'https://beverteam.ru';
     $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
-        '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/price/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
+        '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/soglasie-na-obrabotku/', '/sitemap/'];
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
@@ -1741,7 +1741,6 @@ function bt_search_pages(): array
         ['t' => 'Возврат и обмен', 'u' => '/vozvrat-i-obmen/', 'd' => 'Условия возврата товара', 'k' => 'возврат обмен гарантия'],
         ['t' => 'О компании', 'u' => '/o-kompanii/', 'd' => 'BEVERTEAM с 2010 года', 'k' => 'о компании beverteam'],
         ['t' => 'Отзывы', 'u' => '/otzyvy-o-nas/', 'd' => 'Что говорят клиенты', 'k' => 'отзывы'],
-        ['t' => 'Прайс-лист', 'u' => '/price/', 'd' => 'Кофе, чай, кофемашины и аксессуары с оптовыми ценами', 'k' => 'прайс цены опт оптом прайс-лист'],
         ['t' => 'Наши клиенты', 'u' => '/nashi-klienty/', 'd' => 'Установки кофемашин Jetinno в офисах, кафе и бизнес-центрах', 'k' => 'наши клиенты установки объекты'],
         ['t' => 'Журнал', 'u' => '/blog/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
         ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],

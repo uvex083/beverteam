@@ -1,6 +1,13 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 /** @global CMain $APPLICATION */
+/** @global CUser $USER */
+
+// прайс пока в доработке — видит только администратор, остальным 404 (из меню и карты сайта убран)
+if (!$USER->IsAdmin()) {
+    require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
+    die();
+}
 
 // ?format=csv — тот же прайс файлом для Excel: «;» и BOM, иначе русский Excel откроет кракозябры
 if (($_GET['format'] ?? '') === 'csv') {
