@@ -23,6 +23,8 @@ if ($id && (in_array($id, (array)($_SESSION['BT_ORDERS'] ?? []), true) || $USER-
     }
 }
 $co = bt_contacts();
+// вернулись из банка раньше его уведомления — спрашиваем об оплате сами, до заголовка страницы
+$order && !$order->isCanceled() && ($tp = bt_tbank_payment($order)) && bt_tbank_sync($tp);
 if (!$order) {
     CHTTP::SetStatus("404 Not Found");
 } elseif ($order->isPaid()) {
@@ -52,9 +54,6 @@ if (!$order) {
     foreach ($order->getPaymentCollection() as $p) {
         $payment = $p;
         break;
-    }
-    if ($payment && (Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') === 'tinkoff' && !$payment->isPaid()) {
-        bt_tbank_sync($payment);
     }
     $dCode = $shipment ? (string)(Sale\Delivery\Services\Table::getById($shipment->getDeliveryId())->fetch()['XML_ID'] ?? '') : '';
     $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') : '';
@@ -117,7 +116,7 @@ if (!$order) {
       <button type="button" class="btn btn--dark" onclick="BT_auth(<?= $e(Json::encode($props['EMAIL'])) ?>)">Войти в кабинет</button></div>
     <?php endif ?>
     <div class="next">
-      <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/">личном кабинете</a></span></div>
+      <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/orders/<?= (int)$order->getId() ?>/">личном кабинете</a></span></div>
       <div><b>Изменить заказ</b><span>Позвоните до отправки:<br><a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>" style="white-space:nowrap"><?= $e($co['phone1'] ?? '') ?></a></span></div>
       <?php // документы — только по счёту; при онлайн-оплате здесь будет ссылка на чек, когда она появится
       if ($pCode === 'bill'): ?><div><b>Нужен документ?</b><span>Счёт и УПД пришлём на e‑mail</span></div><?php endif ?>
