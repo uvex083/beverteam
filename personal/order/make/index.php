@@ -11,7 +11,10 @@ use Bitrix\Sale;
 Loader::includeModule('sale');
 $basket = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems();
 if ($basket->isEmpty()) {
-    LocalRedirect('/personal/cart/');
+    // «Назад» со страницы банка: корзина уже стала заказом — ведём на его страницу, там «Оплатить»
+    $last = (int)(array_slice((array)($_SESSION['BT_ORDERS'] ?? []), -1)[0] ?? 0);
+    $lo = $last ? Sale\Order::load($last) : null;
+    LocalRedirect($lo && !$lo->isCanceled() && bt_tbank_payment($lo) && $lo->getDateInsert()->getTimestamp() > time() - 3600 ? '/personal/order/success/?id=' . $last : '/personal/cart/');
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 $APPLICATION->SetTitle('Оформление заказа');
