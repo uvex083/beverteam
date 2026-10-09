@@ -50,6 +50,9 @@ if (!$order) {
         $payment = $p;
         break;
     }
+    if ($payment && (Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') === 'tinkoff' && !$payment->isPaid()) {
+        bt_tbank_sync($payment);
+    }
     $dCode = $shipment ? (string)(Sale\Delivery\Services\Table::getById($shipment->getDeliveryId())->fetch()['XML_ID'] ?? '') : '';
     $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymentSystemId())['ACTION_FILE'] ?? '') : '';
     $city = '';
@@ -76,7 +79,9 @@ if (!$order) {
 
     <div class="payblk"><div><small>Способ оплаты: <?php $pn = $payment ? $payment->getPaymentSystemName() : ''; echo $e(mb_strtolower(mb_substr($pn, 0, 1)) . mb_substr($pn, 1)) ?></small>
       <b><?= bt_fmt($order->getPrice()) ?></b>
-      <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : 'оплата при получении заказа' ?></small></div></div>
+      <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : ($pCode === 'tinkoff' ? ($order->isPaid() ? 'оплачено, спасибо' : 'заказ ждёт оплаты') : 'оплата при получении заказа') ?></small></div>
+      <?php if ($pCode === 'tinkoff' && !$order->isPaid() && ($_GET['pay'] ?? '') === 'fail'): ?><small style="flex-basis:100%;color:#fff">Оплата не прошла. Попробуйте ещё раз или позвоните нам — поможем.</small><?php endif ?>
+      <?php if ($pCode === 'tinkoff' && !$order->isPaid() && !$order->isCanceled()): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить <?= bt_fmt($order->getPrice()) ?></a><?php endif ?></div>
 
     <div class="card">
       <h3 class="h3" style="margin-bottom:12px">Состав заказа</h3>
