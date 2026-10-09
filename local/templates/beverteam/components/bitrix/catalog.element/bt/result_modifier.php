@@ -18,11 +18,11 @@ $arResult['BT_PHOTOS'] = array_map(fn($f) => [
     'og' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900])['src'] ?? '',
 ], array_values($files));
 
-// характеристики «Подробнее»: все заполненные свойства с названием и порядком из админки, кроме служебных, шкал и текстов вкладок
-$skip = ['SHOW_MAIN', 'BADGES', 'SHORT_DESC', 'OLD_PRICE', 'STRENGTH', 'AROMA', 'DENSITY', 'ACIDITY'];
+// характеристики «Подробнее»: заполненные свойства с галочкой «Показывать на детальной странице» — название и порядок из настроек свойства в админке
+$show = (array)\Bitrix\Iblock\Model\PropertyFeature::getDetailPageShowProperties((int)$arResult['IBLOCK_ID'], ['CODE' => 'Y']);
 $arResult['BT_SPECS'] = [];
 foreach ($pr as $code => $p) {
-    if (!in_array($code, $skip, true) && in_array($p['PROPERTY_TYPE'], ['S', 'L', 'N'], true) && !$p['USER_TYPE'] && ($v = $val($code)) !== '') {
+    if (in_array($code, $show, true) && in_array($p['PROPERTY_TYPE'], ['S', 'L', 'N'], true) && !$p['USER_TYPE'] && ($v = $val($code)) !== '') {
         $arResult['BT_SPECS'][htmlspecialcharsbx($p['NAME'])] = $v;
     }
 }
