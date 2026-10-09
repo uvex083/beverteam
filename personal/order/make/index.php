@@ -158,7 +158,7 @@ $co = bt_contacts();
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
       <button class="btn btn--block" type="submit" id="submit" disabled>Подтвердить заказ</button>
       <p class="err-form" id="sErr" role="alert"></p>
-      <p class="muted" style="font-size:12px;margin:12px 0 0;text-align:center">Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.</p>
+      <p class="muted" id="sHint" style="font-size:12px;margin:12px 0 0;text-align:center">Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.</p>
     </aside>
   </form>
   <div class="modal modal--pvz" id="pvzModal" role="dialog" aria-modal="true" aria-labelledby="pvzT">
@@ -412,10 +412,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     if(!coAgree.checked)miss.push('согласие с условиями');
-    sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):'Всё заполнено — можно подтверждать';
+    const online=(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff';
+    sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
+    if(!sending)submit.textContent=btnText();
+    sHint.textContent=online?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.':'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
     submit.disabled=!!miss.length||sending;
     return !miss.length;
   }
+  // онлайн-оплата — кнопка ведёт в банк, поэтому и называется по-другому
+  const btnText=()=>(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff'?'Оплатить заказ':'Подтвердить заказ';
   form.addEventListener('input',ready); form.addEventListener('change',ready);
   BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit));
 
@@ -430,7 +435,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         window.BT_BASKET={items:{},sum:0}; BT_cartUpdate(false);
         location.href=r.redirect; return;
       }
-      sending=false; submit.textContent='Подтвердить заказ';
+      sending=false; submit.textContent=btnText();
       let first=null;
       Object.entries(r.errors||{}).forEach(([k,m])=>{const el=form.elements[k];
         if(el&&el.type!=='hidden'){setErr(el,m);first=first||el;} else sErr.textContent=m;});
@@ -438,7 +443,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(r.errors&&r.errors.agree){setErr(coAgree,'x');first=first||coAgree;}
       if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});}
       BT_toast('Проверьте выделенные поля'); ready();
-    }).catch(()=>{sending=false;submit.textContent='Подтвердить заказ';sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
+    }).catch(()=>{sending=false;submit.textContent=btnText();sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
   });
   renderDeliv(); renderPay(); ready(); calc();
 });
