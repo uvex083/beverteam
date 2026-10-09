@@ -325,30 +325,36 @@ function bt_mega_cats(): array
     return $cats;
 }
 
-// Характеристики для страницы сравнения: id => ключи групп BT_SPEC_GROUPS из ui.js
+// Характеристики каталога: vals — значения свойств товаров (id => код => текст), names — свойства с галочкой «Показывать на детальной странице»
+// в порядке сортировки, [[код, название], …] — по ним строится сравнение
 function bt_catalog_specs(): array
 {
     $catId = bt_iblock('catalog');
     $cache = \Bitrix\Main\Data\Cache::createInstance();
-    if ($cache->initCache(86400, 'bt_catalog_specs', '/bt/catalog')) {
+    if ($cache->initCache(86400, 'bt_catalog_specs2', '/bt/catalog')) {
         return $cache->getVars();
     }
     $cache->startDataCache();
     $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/catalog');
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $catId);
-    $map = ['roast' => 'ROAST', 'mix' => 'MIX', 'w' => 'NET_WEIGHT', 'country' => 'COUNTRY', 'region' => 'REGION', 'proc' => 'PROCESSING',
-        'q' => 'Q_SCORE', 'notes' => 'NOTES', 'kind' => 'TEA_KIND', 'pack' => 'PACKING', 'taste' => 'TASTE', 'effect' => 'EFFECT',
-        'cups' => 'CUPS_PER_DAY', 'dims' => 'DIMENSIONS', 'screen' => 'SCREEN'];
-    $specs = [];
+    $show = (array)\Bitrix\Iblock\Model\PropertyFeature::getDetailPageShowProperties($catId, ['CODE' => 'Y']);
+    $specs = ['names' => [], 'vals' => []];
+    $types = [];
+    $r = \CIBlockProperty::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y']);
+    while ($p = $r->Fetch()) {
+        if (in_array($p['PROPERTY_TYPE'], ['S', 'L', 'N'], true) && !$p['USER_TYPE']) {
+            $types[$p['CODE']] = true;
+            in_array($p['CODE'], $show, true) && $specs['names'][] = [$p['CODE'], htmlspecialcharsbx($p['NAME'])];
+        }
+    }
     $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID']);
     while ($o = $r->GetNextElement()) {
         $f = $o->GetFields();
-        $pr = $o->GetProperties();
-        foreach ($map as $key => $code) {
-            $v = $pr[$code]['~VALUE'] ?? '';
+        foreach ($o->GetProperties() as $code => $p) {
+            $v = $p['~VALUE'] ?? '';
             $v = is_array($v) ? implode(', ', $v) : trim((string)$v);
-            if ($v !== '') {
-                $specs[$f['ID']][$key] = htmlspecialcharsbx($v);
+            if (isset($types[$code]) && $v !== '') {
+                $specs['vals'][$f['ID']][$code] = htmlspecialcharsbx($v);
             }
         }
     }

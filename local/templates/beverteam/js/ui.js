@@ -1645,27 +1645,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('DOMContentLoaded',()=>BT_selects());
 })();
 
-/* ---------- характеристики для страницы сравнения ---------- */
-window.BT_SPEC_GROUPS = {
-  coffee:[
-    ['Основное',[['Обжарка','roast'],['Состав','mix'],['Вес упаковки','w']]],
-    ['Происхождение',[['Страна','country'],['Регион','region'],['Обработка','proc']]],
-    ['Вкус',[['Q-оценка','q'],['Дескрипторы','notes']]]
-  ],
-  tea:[
-    ['Основное',[['Вид чая','kind'],['Фасовка','pack'],['Вес упаковки','w']]],
-    ['Происхождение',[['Страна','country']]],
-    ['Вкус и действие',[['Вкус','taste'],['Действие','effect']]]
-  ],
-  machines:[
-    ['Основное',[['Чашек в день','cups'],['Габариты','dims'],['Экран','screen']]]
-  ],
-  acc:[
-    ['Основное',[['Вес/объём','w']]]
-  ]
-};
-// характеристики для сравнения отдаёт сервер на странице /catalog/compare/
-window.BT_SPECS = window.BT_SPECS || {};
+/* ---------- характеристики для страницы сравнения: отдаёт сервер на /catalog/compare/ ---------- */
+window.BT_SPECS = window.BT_SPECS || {names:[],vals:{}};
 window.BT_cmpCat = id => BT_PRODUCTS.coffee.some(x=>x.id===id)?'coffee'
   : BT_PRODUCTS.tea.some(x=>x.id===id)?'tea'
   : BT_PRODUCTS.machines.some(x=>x.id===id)?'machines'

@@ -43,8 +43,9 @@ document.addEventListener('DOMContentLoaded',()=>{
         <a class="btn" href="/catalog/">Перейти в каталог</a></div>`;
       cmpStickRow.innerHTML=''; cmpStick.classList.remove('on'); return;
     }
-    const groups=BT_SPEC_GROUPS[cat]||[];
-    const P=ids.map(id=>BT_find(id)), S=ids.map(id=>BT_SPECS[id]||{});
+    const P=ids.map(id=>BT_find(id)), S=ids.map(id=>BT_SPECS.vals[id]||{});
+    /* строки — свойства с галочкой «Показывать на детальной странице»; пустые у всех сравниваемых не выводим */
+    const groups=[['Характеристики',BT_SPECS.names.filter(f=>S.some(x=>x[f[0]]))]];
 
     const head=ids.map((id,i)=>{const m=P[i]; if(!m) return '<div class="swiper-slide"></div>';
       return `<div class="swiper-slide"><div class="cc">
@@ -61,10 +62,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     const rows=groups.map(g=>{
       const body=g[1].map(f=>{
-        const vals=S.map(x=>x[f[1]]||'—');
+        const vals=S.map(x=>x[f[0]]||'—');
         const diff=new Set(vals).size>1;
         if(onlyDiff&&!diff) return '';
-        return `<div class="cmp__r ${diff?'diff':''}"><div class="lbl">${f[0]}</div>
+        return `<div class="cmp__r ${diff?'diff':''}"><div class="lbl">${f[1]}</div>
           <div class="swiper cmp-row"><div class="swiper-wrapper">${vals.map(v=>`<div class="swiper-slide">${v}</div>`).join('')}</div></div></div>`;
       }).join('');
       return body.trim() ? `<details class="cmp__grp" open><summary>${g[0]}</summary><div>${body}</div></details>` : '';

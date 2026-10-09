@@ -112,6 +112,8 @@ function bt_enum_codes(int $propId): int
 // OnAfterIBlockPropertyAdd / OnAfterIBlockPropertyUpdate: значения, добавленные в админке
 function bt_enum_codes_on_save(array $f): void
 {
+    // название, сортировка и галочки свойства видны на сайте сразу
+    (int)($f['IBLOCK_ID'] ?? 0) > 0 && \CIBlock::clearIblockTagCache((int)$f['IBLOCK_ID']);
     if (($f['PROPERTY_TYPE'] ?? '') === 'L' && (int)($f['ID'] ?? 0) > 0) {
         bt_enum_codes((int)$f['ID']);
     }

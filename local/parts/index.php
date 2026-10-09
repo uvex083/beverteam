@@ -157,11 +157,11 @@ $c0 = $chips[$cur] ?? null;
 $bp = !empty($bean['product']) ? bt_product((string)$bean['product']) : null;
 if ($bp):
     $bpImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $bp['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bp['img'];
-    $spec = bt_catalog_specs()[$bp['id']] ?? [];
-    $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['notes'] ?? ''))));
+    $spec = bt_catalog_specs()['vals'][$bp['id']] ?? [];
+    $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['NOTES'] ?? ''))));
 ?>
 <section class="sec sec--t0"><div class="wrap"><div class="bean" data-rv>
-  <div class="bean__ph"><?php if (!empty($spec['q'])): ?><div class="qscore"><div><b><?= $spec['q'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bpImg) ?>"<?= bt_img_wh($bpImg) ?> alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
+  <div class="bean__ph"><?php if (!empty($spec['Q_SCORE'])): ?><div class="qscore"><div><b><?= $spec['Q_SCORE'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bpImg) ?>"<?= bt_img_wh($bpImg) ?> alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
   <div class="bean__c">
     <div class="mono"><?= $e($bean['caption'] ?? '') ?></div>
     <div class="display h2 bean__t th th2"><?= bt_title($bean['title'] ?? $bp['n']) ?></div>
