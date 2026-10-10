@@ -707,7 +707,7 @@ function bt_review_form(array $o = []): string
         . '<div class="field"><label>Оценка *</label><div class="rpick" data-rpick>' . $pick . '</div></div>'
         . '<div class="f2"><div class="field"><label>Имя *</label><input name="name" autocomplete="given-name" maxlength="100"></div>'
         . '<div class="field"><label>E-mail</label><input name="email" type="email" autocomplete="email" maxlength="100"><span class="muted" style="font-size:12px">Не публикуется</span></div></div>'
-        . ($product ? '<div class="field"><label>На какой машине готовили</label><input name="machine" maxlength="150" placeholder="Например, Jetinno JL15 VIVA"></div>'
+        . ($product ? '<div class="field"><label>На какой машине готовили</label><input name="machine" maxlength="150" placeholder="Например, Jetinno JL15 (VIVA)"></div>'
             : '<div class="field"><label>Компания</label><input name="company" autocomplete="organization" maxlength="150" placeholder="Если пишете от организации"></div>')
         . '<div class="field"><label>' . ($product ? 'Комментарий' : 'Отзыв') . ' *</label><textarea name="text" rows="4" maxlength="3000" placeholder="' . $e($o['placeholder'] ?? 'Что понравилось, что можно улучшить') . '"></textarea></div>'
         . '<div class="field"><label>' . ($pdf ? 'Фото или благодарственное письмо' : 'Фото') . ' <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">— ' . $fileNote . '</span></label>'
@@ -1192,6 +1192,7 @@ function bt_clients(): array
         $cache->startDataCache();
         $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
         $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+        $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('catalog')); // названия моделей берутся из каталога
         $list = [];
         $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT']);
         while ($el = $r->GetNextElement()) {
