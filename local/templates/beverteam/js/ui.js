@@ -308,7 +308,9 @@ window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100))
 /* скидка от суммы заказа — по правилам корзины Битрикса (window.BT_SUMDISC: [{from,pct}]): сколько срежет и сколько до следующей ступени */
 window.BT_sumDisc = sum => { const L=window.BT_SUMDISC||[]; let cur=null, next=null;
   L.forEach(d=>{ if(sum>=d.from) cur=d; else if(!next) next=d; });
-  return {pct:cur?cur.pct:0, cut:cur?Math.round(sum*cur.pct)/100:0, next:next?{...next,need:next.from-sum}:null}; };
+  /* как в заказе: цена единицы со скидкой округляется вниз до рубля (правило округления каталога) */
+  const cut=cur?BT_cartItems().reduce((a,c)=>{ const p=BT_piece(c,c.kg,c.q); return a+(p-Math.floor(p*(100-cur.pct)/100+1e-6))*c.q; },0):0;
+  return {pct:cur?cur.pct:0, cut, next:next?{...next,need:next.from-sum}:null}; };
 window.BT_sumDiscHint = sum => { const d=BT_sumDisc(sum); return d.next&&sum>0 ? `До скидки ${d.next.pct}% не хватает ${BT_fmt(Math.ceil(d.next.need))}` : ''; };
 /* кнопка/степпер для карточки: в корзине — степпер с ценой на месте кнопки */
 /* подвал карточки: цена + контрол. Обновляется точечно, без пересборки карточки */
