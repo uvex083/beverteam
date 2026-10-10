@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     const head=ids.map((id,i)=>{const m=P[i]; if(!m) return '<div class="swiper-slide"></div>';
       return `<div class="swiper-slide"><div class="cc">
-        <a class="cc__ph" href="${m.url}"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
+        <a class="cc__ph" href="${m.url}">${m.img?`<img src="${m.img}" alt="${m.n}" loading="lazy">`:'<i class="noimg" aria-hidden="true"></i>'}</a>
         <h3><a href="${m.url}">${m.n}</a></h3>
         <div class="cc__tools">
           <button class="fav" data-fav="${id}" aria-pressed="${BT_favHas(id)}" title="В избранное" aria-label="В избранное">${BT_ICONS.heart}</button>
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>`;
 
     cmpStickRow.innerHTML=`<div class="swiper cmp-stick-sw"><div class="swiper-wrapper">${ids.map((id,i)=>{const m=P[i];
-      return m?`<div class="swiper-slide"><div class="cs"><img src="${m.img}" alt=""><div style="min-width:0">
+      return m?`<div class="swiper-slide"><div class="cs">${m.img?`<img src="${m.img}" alt="">`:''}<div style="min-width:0">
         <b>${m.p?BT_fmt(m.p):'—'}</b><span>${m.n}</span></div></div></div>`:'';}).join('')}</div></div>`+BT_sliderBtns();
 
     const wrap=cmpBody.querySelector('.cmp');

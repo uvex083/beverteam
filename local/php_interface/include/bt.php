@@ -1642,7 +1642,8 @@ function bt_acc_end(): void
 function bt_og(): string
 {
     global $APPLICATION;
-    $e = fn($s) => htmlspecialcharsbx(trim(strip_tags((string)$s)));
+    // SEO-значения инфоблоков приходят уже экранированными — снимаем, чтобы не было &amp;quot;
+    $e = fn($s) => htmlspecialcharsbx(trim(htmlspecialchars_decode(strip_tags((string)$s), ENT_QUOTES)));
     $host = 'https://beverteam.ru';
     $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
     // посадочная страница (в т.ч. страница фильтра) — canonical на себя, иначе поисковик склеит её с чистым адресом

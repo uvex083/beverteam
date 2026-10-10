@@ -6,7 +6,7 @@ use Bitrix\Main\Web\Json;
 $m = $arResult['BT'];
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $name = $arResult['~NAME'];
-$h1 = $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'] ?: $name; // H1 из SEO-настроек товара, если задан
+$h1 = htmlspecialchars_decode((string)$arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'], ENT_QUOTES) ?: $name; // H1 из SEO-настроек товара (приходит экранированным)
 $photos = $arResult['BT_PHOTOS'];
 $bulk = $m['bulk'] ?? null;
 $unit = 'шт';
