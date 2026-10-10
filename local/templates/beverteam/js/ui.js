@@ -639,6 +639,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(kindOf(el)==='tel') maskTel(el);
     /* ошибку — только когда человек сам побывал в поле и ушёл; фокус, который ставит скрипт (открытие окна), ошибок не даёт */
     el.addEventListener('pointerdown',()=>{el.dataset.touched='1';});
+    el.addEventListener('keyup',e=>{ if(e.key==='Tab') el.dataset.touched='1'; });
     el.addEventListener('blur',()=>{ if(el.dataset.touched) BT_checkField(el); });
     el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(el.closest('.field')?.classList.contains('is-err')) BT_checkField(el); });
   });
@@ -1293,7 +1294,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const r2=document.querySelector('[data-rcalc2]');
   if(r2){
     const C=JSON.parse(r2.dataset.rcalc2), M=C.models, q=s=>r2.querySelector(s), rng=q('[data-rc2-n]');
-    const kgf=x=>String(Math.round(x*10)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
+    /* расход — с округлением вверх: 7,04 кг показываем как 7,1, иначе восьмая пачка выглядит лишней */
+    const kgf=x=>String(Math.ceil(x*10-1e-9)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
     const st={per:2,days:22}; let cur=null;
     const press=(box,v)=>box.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===v));
     const draw=()=>{
@@ -1307,7 +1309,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rc2-name]').textContent=m.m;
       const cw=k=>k%10===1&&k%100!==11?'чашка':k%10>=2&&k%10<=4&&(k%100<10||k%100>=20)?'чашки':'чашек';
       q('[data-rc2-lbl]').textContent=over?'Самая мощная модель':'Подходит';
-      q('[data-rc2-s]').textContent=over?`До ${m.cups} чашек в день — для ${cups} ${cw(cups)} поставим две машины или подберём модель мощнее`
+      const k=Math.ceil(cups/m.cups);
+      q('[data-rc2-s]').textContent=over?`До ${m.cups} чашек в день — для ${cups} ${cups%10===1&&cups%100!==11?'чашки':'чашек'} нужно ${k} ${k<5?'машины':'машин'}, расчёт ниже — на одну`
         :`До ${m.cups} чашек в день · ${m.aud}`+(m.f?` · ${m.f}`:'');
       q('[data-rc2-cups]').textContent=cups;
       q('[data-rc2-cupsw]').textContent=cw(cups)+' в день';
