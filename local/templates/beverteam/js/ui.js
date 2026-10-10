@@ -1311,7 +1311,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const cw=k=>k%10===1&&k%100!==11?'чашка':k%10>=2&&k%10<=4&&(k%100<10||k%100>=20)?'чашки':'чашек';
       q('[data-rc2-lbl]').textContent=over?'Самая мощная модель':'Подходит';
       const kw=k<5?'машины':'машин';
-      q('[data-rc2-s]').textContent=over?`До ${m.cups} чашек в день — для ${cups} ${cups%10===1&&cups%100!==11?'чашки':'чашек'} нужно ${k} ${kw}, расчёт ниже — на все ${k}`
+      q('[data-rc2-s]').textContent=over?`До ${m.cups} чашек в день — для ${cups} ${cups%10===1&&cups%100!==11?'чашки':'чашек'} нужно ${k} ${kw}, расчёт ниже — ${k===2?'на обе':'на все '+k}`
         :`До ${m.cups} чашек в день · ${m.aud}`+(m.f?` · ${m.f}`:'');
       q('[data-rc2-cups]').textContent=cups;
       q('[data-rc2-cupsw]').textContent=cw(cups)+' в день';
