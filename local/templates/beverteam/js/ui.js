@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* фокус при открытии и возврат после закрытия — только с мышью и клавиатурой: на телефоне фокус рисует кольцо и выдвигает клавиатуру */
   const watch=(el,focusSel)=>{
     new MutationObserver(()=>{const o=el.classList.contains('open');lock();
-      if(TOUCH) return;
+      if(TOUCH||innerWidth<=768) return;
       if(o){lastFocus=document.activeElement;const f=el.querySelector(focusSel);if(f)setTimeout(()=>f.focus(),30);}
       else if(lastFocus&&!anyOpen()){lastFocus.focus();lastFocus=null;}
     }).observe(el,{attributes:true,attributeFilter:['class']});
