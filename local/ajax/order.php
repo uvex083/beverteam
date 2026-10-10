@@ -270,8 +270,10 @@ if (!$locOk) {
     $err['street'] = 'Это поле нужно заполнить';
 } elseif ($f['mode'] === 'addr' && !preg_match('/\p{L}{2,}.*\d/u', $f['street'])) {
     $err['street'] = 'Укажите номер дома';
-} elseif ($f['mode'] === 'pvz' && !($pvz = bt_pvz_list($loc, $f['pvz'])[0] ?? null)) {
+} elseif ($f['mode'] === 'pvz' && ($f['pvz'] === '' || !($pvz = bt_pvz_list($loc, $f['pvz'])[0] ?? null))) {
     $err['pvz'] = 'Выберите пункт выдачи';
+} elseif ($f['mode'] === 'pvz' && $pvz['kg'] && $pvz['kg'] < Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->getWeight() / 1000) {
+    $err['pvz'] = 'Этот пункт не принимает заказы такого веса — выберите другой';
 }
 if ($locOk && !isset($pays[(int)$req->getPost('pay')])) {
     $err['pay'] = 'Выберите способ оплаты';
