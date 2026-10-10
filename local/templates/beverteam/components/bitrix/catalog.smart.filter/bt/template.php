@@ -91,7 +91,7 @@ $FMORE = 6;
       <?php foreach ($item['VALUES'] as $v): $off = !empty($v['DISABLED']) && empty($v['CHECKED']);
           // из меток в фильтре только «Скидка» и «Новинка»: «Хит» и «Топ продаж» — оформление карточки, не критерий выбора
           if (!$yes && !in_array($v['URL_ID'] ?? '', ['sale', 'new'], true)) { continue; }
-          if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $yes ? 'да' : $v['VALUE'], [$v['CONTROL_NAME']]]; } ?>
+          if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $yes ? 'да' : mb_strtolower($v['VALUE']), [$v['CONTROL_NAME']]]; } ?>
         <label class="opt opt--sw"><?= $e($yes ? $item['NAME'] : $v['VALUE']) ?><input type="checkbox" role="switch" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>></label>
       <?php endforeach ?>
       </div>
@@ -100,6 +100,15 @@ $FMORE = 6;
         if (isset($item['PRICE'])):
             $min = $item['VALUES']['MIN'];
             $max = $item['VALUES']['MAX'];
+            // в индексе фильтра лежат и оптовые ступени кофе — границы и подсказки считаем по цене за 1 шт/кг
+            $pk = 'CATALOG_PRICE_' . $item['ID'];
+            $base = ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ACTIVE' => 'Y', 'INCLUDE_SUBSECTIONS' => 'Y', 'CATALOG_SHOP_QUANTITY_' . $item['ID'] => 1, '>' . $pk => 0] + ($sid ? ['SECTION_ID' => $sid] : []);
+            $other = array_filter($GLOBALS[$arParams['FILTER_NAME']] ?? [], fn($k) => !str_contains((string)$k, $pk), ARRAY_FILTER_USE_KEY);
+            $edge = fn(array $f, string $dir) => (float)(CIBlockElement::GetList([$pk => $dir], $f, false, ['nTopCount' => 1], ['ID', 'CATALOG_GROUP_' . $item['ID']])->Fetch()[$pk] ?? 0);
+            $min['VALUE'] = $edge($base, 'ASC');
+            $max['VALUE'] = $edge($base, 'DESC');
+            $min['FILTERED_VALUE'] = $other ? $edge($other + $base, 'ASC') : 0;
+            $max['FILTERED_VALUE'] = $other ? $edge($other + $base, 'DESC') : 0;
             if ($max['VALUE'] - $min['VALUE'] <= 0) {
                 continue;
             }
@@ -132,7 +141,8 @@ $FMORE = 6;
         }
         foreach ($values as $v) {
             if (!empty($v['CHECKED'])) {
-                $chips[] = [$item['NAME'], $v['VALUE'], [$v['CONTROL_NAME']]];
+                // страна и регион — имена собственные, с заглавной
+                $chips[] = [$item['NAME'], in_array($item['CODE'], ['COUNTRY', 'REGION', 'BRAND'], true) ? $v['VALUE'] : mb_strtolower($v['VALUE']), [$v['CONTROL_NAME']]];
             }
         } ?>
       <div class="fgrp"><b class="fgrp__t"><?= $e($item['NAME']) ?></b>
@@ -265,7 +275,7 @@ foreach ($arResult['ITEMS'] as $it) {
 foreach ($chips as [$name, $value, $params]) {
     $rest = array_diff_key($cur, array_flip($params));
     $url = $reset . (($q = http_build_query(($rest ? $rest + ['set_filter' => 'Y'] : []) + $keep)) !== '' ? '?' . $q : '');
-    $html .= '<a class="chip" href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" title="Убрать условие">' . $e($name) . ': ' . $e(mb_strtolower($value)) . '<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
+    $html .= '<a class="chip" href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" title="Убрать условие">' . $e($name) . ': ' . $e($value) . '<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
 }
 if ($chips) {
     $html .= '<a class="chip chip--reset" href="' . $e($reset) . '" data-freset>Сбросить все<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';

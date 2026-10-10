@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded',()=>{
         <a class="cc__ph" href="${m.url}"><img src="${m.img}" alt="${m.n}" loading="lazy"></a>
         <h3><a href="${m.url}">${m.n}</a></h3>
         <div class="cc__tools">
-          <button class="fav" aria-pressed="false" title="В избранное" aria-label="В избранное">${BT_ICONS.heart}</button>
+          <button class="fav" data-fav="${id}" aria-pressed="${BT_favHas(id)}" title="В избранное" aria-label="В избранное">${BT_ICONS.heart}</button>
           <button class="del" data-del="${id}" title="Убрать из сравнения" aria-label="Убрать из сравнения">${BT_ICONS.trash}</button>
         </div>
         <div class="cc__buy">
           <span class="cc__p">${m.p?BT_fmt(m.p):'по запросу'}${m.unit?`<small>${m.unit}</small>`:(m.bulk?'<small>за 1 кг</small>':'')}</span>
-          ${m.p?`<button class="btn btn--sm" data-add="${id}">В корзину</button>`:`<a class="btn btn--sm btn--ghost" href="/kontakty/">Запрос</a>`}
+          <span class="cc__ctl" data-ctl="${id}">${m.p?BT_addCtl(m):`<a class="btn btn--sm btn--ghost" href="/kontakty/">Запрос</a>`}</span>
         </div></div></div>`;}).join('');
 
     const rows=groups.map(g=>{
@@ -109,9 +109,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const a=e.target.closest('[data-add]');
     if(a){ BT_cartAdd(a.dataset.add); BT_toast('Товар в корзине · <a href="/personal/cart/">Оформить</a>'); return; }
     const f=e.target.closest('.fav');
-    if(f){ const on=f.getAttribute('aria-pressed')!=='true'; f.setAttribute('aria-pressed',on);
-      BT_toast(on?'Добавлено в избранное':'Убрано из избранного'); return; }
+    if(f){ const on=BT_favToggle(f.dataset.fav); f.setAttribute('aria-pressed',on);
+      BT_toast(on?'Добавлено в <a href="/personal/favorites/">избранное</a>':'Убрано из избранного'); return; }
   });
+  /* после «В корзину» — степпер количества, как в каталоге */
+  document.addEventListener('bt:cart',e=>{ const id=e.detail&&e.detail.id, m=id&&BT_find(id);
+    cmpBody.querySelectorAll(`[data-ctl="${id}"]`).forEach(c=>{ if(m) c.innerHTML=BT_addCtl(m); }); });
   cmpBody.addEventListener('change',e=>{ if(e.target.id==='cDiff'){ onlyDiff=e.target.checked; renderBody(); } });
 
   /* мини-панель выезжает, когда карточки ушли под шапку */

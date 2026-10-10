@@ -233,6 +233,9 @@ $f = [];
 foreach (['name', 'phone', 'email', 'company', 'inn', 'kpp', 'company_adr', 'mode', 'street', 'flat', 'entrance', 'pvz', 'comment', 'city'] as $k) {
     $f[$k] = $in($k);
 }
+// способ получения — по самой службе доставки, а не по тому, что прислал браузер
+$dCode = $deliveries[(int)$req->getPost('delivery')]['code'] ?? '';
+$f['mode'] = $dCode === 'bt_pickup' ? 'pickup' : ($dCode === 'sdek_pickup' ? 'pvz' : 'addr');
 $err = [];
 $phone = preg_replace('/\D/', '', $f['phone']);
 if (mb_strlen($f['name']) < 2) {
@@ -251,6 +254,8 @@ if ($pt === 'UR') {
     $inn = preg_replace('/\D/', '', $f['inn']);
     if (!in_array(strlen($inn), [10, 12], true)) {
         $err['inn'] = $f['inn'] === '' ? 'Это поле нужно заполнить' : 'ИНН состоит из 10 цифр у компании и 12 у ИП';
+    } elseif (!bt_inn_ok($inn)) {
+        $err['inn'] = 'Проверьте ИНН — в номере ошибка';
     }
     $f['inn'] = $inn;
     if ($f['kpp'] !== '' && !preg_match('/^\d{9}$/', $f['kpp'])) {
@@ -298,7 +303,12 @@ if (!$userId) {
 // ---------- заказ ----------
 $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
-$order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay);
+// модуль СДЭК бросает исключение, если API не ответил
+try {
+    $order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay);
+} catch (\Throwable $e) {
+    $out(['ok' => false, 'errors' => ['form' => 'Служба доставки сейчас не отвечает. Попробуйте через минуту или выберите другой способ доставки.']]);
+}
 $order->setField('USER_DESCRIPTION', mb_substr($f['comment'], 0, 2000));
 // для менеджера: заказ пришёл запросом счёта из прайс-листа и/или по персональной ссылке прайса (?m=…)
 $note = [];

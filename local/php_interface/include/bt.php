@@ -25,6 +25,45 @@ function bt_img($file, int $w, int $h, int $mode = BX_RESIZE_IMAGE_PROPORTIONAL)
     return $src !== '' ? bt_webp($src) : '';
 }
 
+// iblock:OnAfterIBlockElementAdd/Update — метка «Скидка» в каталоге = заполнена старая цена; по метке работает фильтр «Скидка»
+function bt_sale_badge_sync(array $f): void
+{
+    $ib = (int)bt_iblock('catalog');
+    if ((int)($f['IBLOCK_ID'] ?? 0) !== $ib || empty($f['ID']) || ($f['RESULT'] ?? true) === false) {
+        return;
+    }
+    $sale = (int)(CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ib, 'CODE' => 'BADGES', 'XML_ID' => 'sale'])->Fetch()['ID'] ?? 0);
+    if (!$sale) {
+        return;
+    }
+    $old = (float)(CIBlockElement::GetProperty($ib, $f['ID'], [], ['CODE' => 'OLD_PRICE'])->Fetch()['VALUE'] ?? 0);
+    $cur = [];
+    $r = CIBlockElement::GetProperty($ib, $f['ID'], [], ['CODE' => 'BADGES']);
+    while ($x = $r->Fetch()) {
+        $x['VALUE'] && $cur[] = (int)$x['VALUE'];
+    }
+    $want = $old > 0 ? array_unique([...$cur, $sale]) : array_values(array_diff($cur, [$sale]));
+    if (count($want) !== count($cur)) {
+        CIBlockElement::SetPropertyValuesEx($f['ID'], $ib, ['BADGES' => $want ?: false]);
+        CIBlock::clearIblockTagCache($ib);
+    }
+}
+
+// ИНН: 10 цифр у компании, 12 у ИП, контрольные цифры по алгоритму ФНС
+function bt_inn_ok(string $inn): bool
+{
+    $d = array_map('intval', str_split(preg_replace('/\D/', '', $inn)));
+    $k = function (array $w) use ($d): int {
+        $s = 0;
+        foreach ($w as $i => $x) {
+            $s += $x * $d[$i];
+        }
+        return $s % 11 % 10;
+    };
+    return count($d) === 10 ? $k([2, 4, 10, 3, 5, 9, 4, 6, 8]) === $d[9]
+        : count($d) === 12 && $k([7, 2, 4, 10, 3, 5, 9, 4, 6, 8]) === $d[10] && $k([3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]) === $d[11];
+}
+
 // ID файла по пути /upload/<папка>/<имя> — для уменьшенных копий картинок, вставленных в текст
 function bt_upload_file_id(string $src): int
 {
@@ -424,8 +463,11 @@ function bt_catalog_data(): array
         if ($pr['OLD_PRICE']['VALUE']) {
             $m['old'] = (float)$pr['OLD_PRICE']['VALUE'];
         }
-        if ($pr['BADGES']['VALUE']) {
-            $m['badges'] = array_values((array)$pr['BADGES']['VALUE']);
+        // «Скидка» — только у товара со старой ценой, и у него всегда (метку в админке ставит bt_sale_badge_sync)
+        $badges = array_values(array_filter((array)($pr['BADGES']['VALUE'] ?: []), fn($b) => mb_strtolower($b) !== 'скидка'));
+        empty($m['old']) || array_unshift($badges, 'Скидка');
+        if ($badges) {
+            $m['badges'] = $badges;
         }
         if (count($pl) > 1) {
             $m['bulk'] = $pl;

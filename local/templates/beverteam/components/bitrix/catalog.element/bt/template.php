@@ -22,6 +22,8 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
     <meta itemprop="name" content="<?= $e($name) ?>">
     <meta itemprop="description" content="<?= $e(TruncateText(trim(preg_replace('/\s+/u', ' ', strip_tags(($arResult['~PREVIEW_TEXT'] ?? '') ?: ($arResult['~DETAIL_TEXT'] ?? '')))) ?: $name, 300)) ?>">
     <meta itemprop="sku" content="<?= $e($arResult['CODE']) ?>"><?php if ($arResult['BT_BRAND']): ?><div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="<?= $arResult['BT_BRAND'] ?>"></div><?php endif ?>
+    <?php if ($revN): ?><div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><meta itemprop="ratingValue" content="<?= round(array_sum(array_column($reviews, 'r')) / $revN, 1) ?>"><meta itemprop="reviewCount" content="<?= $revN ?>"><meta itemprop="bestRating" content="5"></div>
+    <?php foreach ($reviews as $rv): ?><div itemprop="review" itemscope itemtype="https://schema.org/Review"><div itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="<?= $e($rv['a']) ?>"></div><meta itemprop="datePublished" content="<?= $e($rv['d']) ?>"><div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating"><meta itemprop="ratingValue" content="<?= $rv['r'] ?>"><meta itemprop="bestRating" content="5"></div><meta itemprop="reviewBody" content="<?= $e($rv['t']) ?>"></div><?php endforeach; endif ?>
     <div class="gal">
       <div class="gal__side">
         <button class="gal__ar" id="thUp" type="button" aria-label="Предыдущие фото"<?= count($photos) > 1 ? '' : ' style="visibility:hidden"' ?>><svg viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></svg></button>

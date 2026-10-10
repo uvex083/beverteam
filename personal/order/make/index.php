@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pvzMapBox=document.getElementById('pvzMap');
   function renderPay(){
     pay.innerHTML=PAYS.map(p=>{const on=avail.some(a=>a.id===p.id);
-      const why=p.code==='bill'?'Только для юрлиц и ИП':p.code==='cash'&&pt==='UR'?'Юрлица оплачивают по счёту':'Недоступно для выбранной доставки';
+      const why=p.code==='bill'?'Только для юрлиц и ИП':(p.code==='cash'||p.code==='tinkoff')&&pt==='UR'?'Юрлица оплачивают по счёту':'Недоступно для выбранной доставки';
       const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${on&&payId===p.id?'on':''} ${on?'':'off'}"><input type="radio" name="pay" value="${p.id}" ${on&&payId===p.id?'checked':''} ${on?'':'disabled'}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(on?desc:why)}</div></div></label>`;}).join('');
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const val=n=>(form.elements[n]?.value||'').trim(), dig=n=>val(n).replace(/\D/g,'');
   function ready(){
     const miss=[];
-    if(pt==='UR'){ if(!val('company'))miss.push('название организации'); if(![10,12].includes(dig('inn').length))miss.push('ИНН'); }
+    if(pt==='UR'){ if(!val('company'))miss.push('название организации'); if(!BT_innOk(dig('inn')))miss.push('ИНН'); }
     if(val('name').length<2)miss.push(pt==='UR'?'контактное лицо':'имя');
     if(dig('phone').length!==11)miss.push('телефон');
     if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(val('email')))miss.push('e‑mail');
@@ -443,8 +443,8 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(el&&el.type!=='hidden'){setErr(el,m);first=first||el;} else sErr.textContent=m;});
       if(window.orgFields&&['company','inn','kpp','company_adr'].some(k=>r.errors&&r.errors[k]))orgFields.hidden=false;
       if(r.errors&&r.errors.agree){setErr(coAgree,'x');first=first||coAgree;}
-      if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});}
-      BT_toast('Проверьте выделенные поля'); ready();
+      if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});BT_toast('Проверьте выделенные поля');}
+      ready();
     }).catch(()=>{sending=false;submit.textContent=btnText();sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
   });
   renderDeliv(); renderPay(); ready(); calc();

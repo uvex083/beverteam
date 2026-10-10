@@ -26,7 +26,8 @@ if (!$posts): ?>
 <?php if ($posts): ?><div class="news"><?php foreach ($posts as $p) echo bt_post_card($p) ?></div><?php endif ?>
 <?php if ($nav && $nav->NavPageCount > 1):
     $shown = min($nav->NavRecordCount, $page * $nav->NavPageSize);
-    $next = $page < $nav->NavPageCount ? $APPLICATION->GetCurPageParam('PAGEN_' . $nav->NavNum . '=' . ($page + 1), ['PAGEN_' . $nav->NavNum]) : '';
+    // GetCurPageParam дал бы /blog/index.php?… — адрес без index.php
+    $next = $page < $nav->NavPageCount ? $APPLICATION->GetCurPage(false) . '?' . http_build_query(['PAGEN_' . $nav->NavNum => $page + 1] + array_diff_key($_GET, ['PAGEN_' . $nav->NavNum => 1])) : '';
 ?>
 <div class="jmore">
   <span class="cnt">Показано <?= $shown ?> из <?= (int)$nav->NavRecordCount ?></span>

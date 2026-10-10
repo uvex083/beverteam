@@ -135,10 +135,10 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
       <div class="ar2calc__out" aria-live="polite">
         <div class="ar2pick">
           <img src="<?= $e($models[0]['img']) ?>" alt="" width="120" height="96" data-rc2-img>
-          <div><span class="mono muted">Подходит</span><h3 data-rc2-name></h3><p data-rc2-s></p></div>
+          <div><span class="mono muted" data-rc2-lbl>Подходит</span><h3 data-rc2-name></h3><p data-rc2-s></p></div>
         </div>
         <div class="ar2kpi">
-          <div><b data-rc2-cups></b><span>чашек в день</span></div>
+          <div><b data-rc2-cups></b><span data-rc2-cupsw>чашек в день</span></div>
           <div><b data-rc2-kg></b><span>кофе в месяц</span></div>
           <div><b data-rc2-cup></b><span>себестоимость чашки</span></div>
         </div>

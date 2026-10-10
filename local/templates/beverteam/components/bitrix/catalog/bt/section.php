@@ -65,7 +65,9 @@ if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET)))
         'FILTER_NAME' => $arParams['FILTER_NAME'], 'PRICE_CODE' => $arParams['PRICE_CODE'], 'SAVE_IN_SESSION' => 'N',
         'DISPLAY_ELEMENT_COUNT' => 'Y', 'SEF_MODE' => 'Y', 'SEF_RULE' => $sefRule, 'SMART_FILTER_PATH' => $smartPath, 'INSTANT_RELOAD' => 'N', 'XML_EXPORT' => 'N',
         'HIDE_NOT_AVAILABLE' => 'N', 'CONVERT_CURRENCY' => 'N',
-    ] + $cache, $component, ['HIDE_ICONS' => 'Y']) ?>
+    ] + $cache, $component, ['HIDE_ICONS' => 'Y']);
+    // у кофе оптовые ступени — тоже строки цены: фильтр и сортировка по цене за 1 шт/кг
+    $GLOBALS[$arParams['FILTER_NAME']]['CATALOG_SHOP_QUANTITY_' . (int)CCatalogGroup::GetBaseGroup()['ID']] = 1; ?>
 
     <div>
       <div class="toolbar">

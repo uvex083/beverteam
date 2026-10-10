@@ -83,13 +83,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       ${(r.ph||[]).length?`<div class="rev__ph">${r.ph.map((f,i)=>`<button type="button" data-rev="${esc(r.id)}" data-i="${i}" aria-label="Фото к отзыву"><img src="${esc(f.s)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}</article>`).join('');
     revList.addEventListener('click',e=>{ const b=e.target.closest('[data-rev]'); if(!b) return; const r=RV.find(x=>String(x.id)===b.dataset.rev);
       r&&BT_lightbox(r.ph.map(f=>({src:f.f,cap:r.a})),+b.dataset.i); });
-    /* разметка отзывов — только для реальных отзывов */
-    const ld=document.createElement('script');ld.type='application/ld+json';
-    ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:P.name,
-      aggregateRating:{'@type':'AggregateRating',ratingValue:String(avg),reviewCount:String(n),bestRating:'5'},
-      review:RV.map(r=>({'@type':'Review',author:{'@type':'Person',name:r.a},datePublished:r.d,
-        reviewRating:{'@type':'Rating',ratingValue:String(r.r),bestRating:'5'},reviewBody:r.t}))});
-    document.head.appendChild(ld);
   }
   if(location.hash==='#reviews'){ document.getElementById('tabRev').click(); setTimeout(()=>document.querySelector('.tabsblock')?.scrollIntoView({block:'start'}),50); }
   rTop.addEventListener('click',e=>{e.preventDefault();document.getElementById('tabRev').click();

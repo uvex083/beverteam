@@ -24,6 +24,8 @@ AddEventHandler('main', 'OnBeforeEventAdd', 'bt_tbank_paid_mail_once');
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderBeforeSaved', 'bt_tbank_keep_comments');
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_bill_attach');
 AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contacts');
+AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'bt_sale_badge_sync');
+AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_sale_badge_sync');
 
 // посадочные страницы для SEO: свои title, description, H1 и SEO-текст по адресу
 require_once __DIR__ . '/include/bt_seo.php';

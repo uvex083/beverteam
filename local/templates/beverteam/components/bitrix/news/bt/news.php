@@ -74,7 +74,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <input type="hidden" name="sessid" value="<?= bitrix_sessid() ?>">
         <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
         <div class="jsub__row">
-          <div class="field"><input name="email" type="email" placeholder="mail@company.ru" maxlength="100" aria-label="E-mail" autocomplete="email"></div>
+          <div class="field"><input name="email" type="email" placeholder="mail@company.ru" maxlength="100" aria-label="E-mail" autocomplete="email" required></div>
           <button class="btn" type="submit">Подписаться</button>
         </div>
         <label class="check jsub__agree"><input type="checkbox" name="agree" value="Y"> <span>Даю <a href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>

@@ -225,6 +225,9 @@ window.BT_cmpClear = ids => { (ids||CMP.slice()).forEach(id=>{const i=CMP.indexO
 let FAV; try{ FAV=JSON.parse(localStorage.getItem('bt_fav')||'null'); }catch(e){ FAV=null; }
 if(!Array.isArray(FAV)) FAV=[];
 window.BT_FAV = FAV;
+/* ИНН: длина и контрольные цифры (алгоритм ФНС) — как bt_inn_ok() на сервере */
+window.BT_innOk = s => { const d=String(s).replace(/\D/g,'').split('').map(Number), k=w=>w.reduce((a,x,i)=>a+x*d[i],0)%11%10;
+  return d.length===10?k([2,4,10,3,5,9,4,6,8])===d[9]:d.length===12&&k([7,2,4,10,3,5,9,4,6,8])===d[10]&&k([3,7,2,4,10,3,5,9,4,6,8])===d[11]; };
 window.BT_favHas = id => FAV.indexOf(String(id))>=0;
 window.BT_favToggle = id => { id=String(id); const i=FAV.indexOf(id); if(i<0) FAV.push(id); else FAV.splice(i,1);
   try{ localStorage.setItem('bt_fav',JSON.stringify(FAV)); }catch(e){} BT_favUpdate(); return i<0; };
@@ -389,7 +392,7 @@ const CATS = window.BT_CATS || [];
 const NAV = [
   {t:'О компании', h:'/o-kompanii/', sub:[['Отзывы о нас','/o-kompanii/#reviews'],['Написать нам','/kontakty/#form']]},
   {t:'Магазин', h:'/catalog/', sub:[['Кофе','/catalog/'],['Чай','/catalog/'],['Кофемашины','/catalog/'],['Аксессуары','/catalog/']]},
-  {t:'Аренда кофемашин', h:'/arenda-kofemashin/', sub:[['Для офиса','/arenda-kofemashin/'],['Для кафе и HoReCa','/arenda-kofemashin/'],['На мероприятие','/arenda-kofemashin/'],['Кофе по подписке','/podpiska/']]},
+  {t:'Аренда кофемашин', h:'/arenda-kofemashin/', sub:[['Для офиса','/arenda-kofemashin/'],['Для кафе и HoReCa','/arenda-kofemashin/'],['На мероприятие','/arenda-kofemashin/'],['Кофе в офис','/kofe-v-ofis/']]},
   {t:'Сервис', h:'/servis/', sub:[['Ремонт кофемашин','/servis/remont-kofemashin/'],['Плановое ТО и чистка','/servis/#price'],['Продажа оборудования','/servis/'],['Вызвать инженера','/servis/remont-kofemashin/#form']]},
   {t:'Журнал', h:'/blog/', sub:[['Все материалы','/blog/']]},
   {t:'Ещё', h:'', sub:[['Оплата и доставка','/oplata-i-dostavka/'],['Возврат и обмен','/vozvrat-i-obmen/'],['О компании','/o-kompanii/'],['Контакты','/kontakty/'],['Карта сайта','/sitemap/']]}
@@ -442,7 +445,7 @@ function drawer(){
       <div class="drawer__hd"><a class="brand" href="/"><img src="/local/templates/beverteam/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим"></a><button class="drawer__x" data-close aria-label="Закрыть">×</button></div>
       <div class="drawer__s"><button class="btn btn--ghost btn--block" id="srchBtnM" style="justify-content:flex-start;gap:12px">${I.search} Поиск по каталогу</button></div>
       ${CATS.map(c=>`<details class="acc"><summary>${c.t}</summary><ul>${c.sub.map(s=>`<li><a href="${s[1]}">${s[0]}</a></li>`).join('')}<li><a href="${c.h}" class="link">Все в разделе</a></li></ul></details>`).join('')}
-      <a class="drawer__l" href="/podpiska/">Кофе по подписке</a>
+      <a class="drawer__l" href="/kofe-v-ofis/">Кофе в офис</a>
       <a class="drawer__l" href="/servis/">Услуги и сервис</a>
       <a class="drawer__l" href="/servis/remont-kofemashin/">Ремонт кофемашин</a>
       <a class="drawer__l" href="/blog/">Журнал</a>
@@ -471,7 +474,7 @@ function footer(){
       <div class="ftr__soc" style="margin-top:14px">${msgrHtml()}</div>
       <div class="ftr__hours"><b>Время работы</b>Офис: ${CO.hours}<br>${CO.hoursSvc}<br>Сб–Вс — выходные</div></div>
     <div><div class="ftr__h th th5">Каталог</div><ul><li><a href="/catalog/">Чай</a></li><li><a href="/catalog/">Кофе BOTANICA</a></li><li><a href="/catalog/">Автоматические кофемашины JETINNO</a></li><li><a href="/catalog/">Аксессуары</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li></ul></div>
-    <div><div class="ftr__h th th5">Услуги</div><ul><li><a href="/podpiska/">Кофе по подписке</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/catalog/">Кофе оптом</a></li></ul></div>
+    <div><div class="ftr__h th th5">Услуги</div><ul><li><a href="/kofe-v-ofis/">Кофе в офис</a></li><li><a href="/arenda-kofemashin/">Аренда кофемашин</a></li><li><a href="/arenda-kofemashin/#event">Аренда на мероприятия</a></li><li><a href="/servis/">Продажа оборудования</a></li><li><a href="/servis/remont-kofemashin/">Ремонт кофемашин</a></li><li><a href="/catalog/">Кофе оптом</a></li></ul></div>
     <div><div class="ftr__h th th5">Покупателям</div><ul><li><a href="/oplata-i-dostavka/">Оплата и доставка</a></li><li><a href="/vozvrat-i-obmen/">Возврат и обмен</a></li><li><a href="/politika-konfidencialnosti/">Политика обработки персональных данных</a></li><li><a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a></li><li><a href="/o-kompanii/">О компании</a></li><li><a href="/blog/">Журнал</a></li><li><a href="/podbor-kofe/">Подбор кофе</a></li><li><a href="/personal/">Личный кабинет</a></li><li><a href="/sitemap/">Карта сайта</a></li></ul></div>
     <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><div class="ftr__h th th5">Контакты</div><ul>
       <li><a href="tel:${CO.tel1}" itemprop="telephone">${CO.tel1f}</a></li>
@@ -508,7 +511,7 @@ function authModal(){
       <div class="display modal__t th th3" id="authTitle" style="font-size:20px;margin-bottom:6px">Вход и регистрация</div>
       <p class="muted" style="margin:0 0 18px;font-size:14px">Пароль не нужен: ${IDP.length?'получите код на почту или войдите через сервис':'пришлём код на почту'}.</p>
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
-        <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru">
+        <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru" required>
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
       <div class="alert alert--info auth__note" id="aNote" hidden></div>
       <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
@@ -585,7 +588,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     email:{test:v=>/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(v), msg:'Проверьте адрес: нужен формат mail@company.ru'},
     tel:{test:v=>v.replace(/\D/g,'').length===11, msg:'Введите номер полностью: +7 и 10 цифр'},
     name:{test:v=>v.trim().length>=2, msg:'Как к вам обращаться? Минимум 2 символа'},
-    inn:{test:v=>[10,12].includes(v.replace(/\D/g,'').length), msg:'ИНН состоит из 10 цифр у компании и 12 у ИП'},
+    inn:{test:v=>BT_innOk(v), msg:'Проверьте ИНН: 10 цифр у компании, 12 у ИП'},
     text:{test:v=>v.trim().length>0, msg:'Заполните поле'},
     addr:{test:v=>/[а-яёa-z]{2,}.*\d/i.test(v), msg:'Укажите номер дома'}
   };
@@ -853,7 +856,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     sinner.innerHTML=`${note}<div class="srch__grid"><div>
       ${prods.length?`<h4>Товары · ${prods.length}</h4><div class="sres">${prods.map(m=>
-        `<a href="${m.url}"><img src="${m.img}" alt="" loading="lazy"><span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
+        `<a href="${m.url}">${m.img?`<img src="${m.img}" alt="" loading="lazy">`:'<i class="noimg" aria-hidden="true"></i>'}<span><span class="n">${mark(m.n,q)}</span><span class="p">${esc(m.par)}</span></span><span class="pr">${m.p?BT_fmt(m.p):'по запросу'}</span></a>`).join('')}</div>`:''}
       ${pages.length?`<h4>Разделы</h4><div class="sres">${pages.map(p=>
         `<a href="${p.u}"><span><span class="n">${mark(p.t,q)}</span><span class="p">${esc(p.d)}</span></span></a>`).join('')}</div>`:''}
       ${posts.length?`<h4>Журнал</h4><div class="sres sres--post">${posts.map(p=>postRow(p,q)).join('')}</div>`:''}
@@ -885,7 +888,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const au=document.getElementById('auth');watch(au,'input:not([type=checkbox]):not([type=hidden])');
   const $a=s=>au.querySelector(s);
   const step = n => { au.querySelectorAll('[data-step]').forEach(x=>x.hidden=x.dataset.step!==n);
-    const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f) setTimeout(()=>f.focus(),40); };
+    /* на телефоне окно открывается без фокуса — иначе клавиатура закроет форму; дальше шаги уже с открытой клавиатурой */
+    const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f&&(innerWidth>768||n!=='pick')) setTimeout(()=>f.focus(),40); };
   let pending=null, timer=null, busy=false;
 
   /* без явного согласия — кода нет; вход через сервис — с пассивным согласием под кнопками */
@@ -1299,18 +1303,22 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rc2-nv]').textContent=n;
       const img=q('[data-rc2-img]'); if(img.getAttribute('src')!==m.img) img.src=m.img; img.alt=m.m;
       q('[data-rc2-name]').textContent=m.m;
-      q('[data-rc2-s]').textContent=`До ${m.cups} чашек в день · ${m.aud}`+(m.f?` · ${m.f}`:'');
+      const cw=k=>k%10===1&&k%100!==11?'чашка':k%10>=2&&k%10<=4&&(k%100<10||k%100>=20)?'чашки':'чашек';
+      q('[data-rc2-lbl]').textContent=over?'Самая мощная модель':'Подходит';
+      q('[data-rc2-s]').textContent=over?`До ${m.cups} чашек в день — для ${cups} ${cw(cups)} поставим две машины или подберём модель мощнее`
+        :`До ${m.cups} чашек в день · ${m.aud}`+(m.f?` · ${m.f}`:'');
       q('[data-rc2-cups]').textContent=cups;
+      q('[data-rc2-cupsw]').textContent=cw(cups)+' в день';
       q('[data-rc2-kg]').textContent=kgf(need)+' кг';
       q('[data-rc2-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*st.days,1));
       q('[data-rc2-a]').hidden=!a;
       q('[data-rc2-at]').textContent=rub(costA)+' / мес';
-      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?` — порог модели ${m.kg} кг`:'');
+      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?` — порог модели ${m.kg} кг`:kgA>need?` — расход ${kgf(need)} кг, кофе в пачках по 1 кг`:'');
       q('[data-rc2-bt]').textContent=rub(costB)+' / мес';
       q('[data-rc2-bd]').textContent=`Аренда ${rub(m.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rc2-a]').classList.toggle('is-best',best==='a'); q('[data-rc2-b]').classList.toggle('is-best',best==='b');
       q('[data-rc2-note]').textContent=over?'Для такой нагрузки подберём решение индивидуально: несколько машин или модель мощнее — оставьте заявку.'
-        :`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
+        :`Расчёт: ${C.g} г зерна на чашку × ${cups} ${cw(cups)} × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
     };
     rng.addEventListener('input',draw);
     q('[data-rc2-bean]').addEventListener('change',draw);
@@ -1437,7 +1445,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             <div class="row" style="gap:10px"><button type="button" class="btn" data-qadd>В корзину</button><a class="btn btn--line" href="${escq(p.url)}">Подробнее о сорте</a></div>
           </div>
         </div>
-        ${A.vol==='l'||A.vol==='xl'?'<div class="alert alert--info" style="margin-top:24px">При таком объёме кофемашина в аренду обойдётся в 0 ₽. <a class="link" href="/podpiska/">Посмотреть подписку</a></div>':''}
+        ${A.vol==='l'||A.vol==='xl'?'<div class="alert alert--info" style="margin-top:24px">При таком объёме кофемашина в аренду обойдётся в 0 ₽. <a class="link" href="/kofe-v-ofis/">Кофе в офис</a></div>':''}
         <hr class="hr" style="margin:26px 0">
         <div class="row between" style="gap:14px"><button type="button" class="btn btn--ghost btn--sm" data-qagain>Пройти заново</button><a class="link" href="/kontakty/#form" data-lead="Подбор кофе">Трудности? Поможем с подбором →</a></div>`;
     };
