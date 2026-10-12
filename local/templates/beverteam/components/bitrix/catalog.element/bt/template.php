@@ -101,6 +101,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <button aria-selected="true" data-p="desc">Описание</button>
       <?php if ($arResult['BT_TECH']): ?><button aria-selected="false" data-p="tech">Характеристики</button><?php endif ?>
       <?php if ($arResult['BT_BREW']): ?><button aria-selected="false" data-p="brew"><?= $arResult['PROPERTIES']['HOW_TO_USE']['VALUE'] ? 'Как использовать' : 'Как готовить' ?></button><?php endif ?>
+      <?php if ($arResult['BT_STORE']): ?><button aria-selected="false" data-p="store"><?= $arResult['BT_STORE_T'] ?></button><?php endif ?>
       <button aria-selected="false" data-p="rev" id="tabRev">Отзывы<?= $revN ? ' (' . $revN . ')' : '' ?></button>
       <button aria-selected="false" data-p="deliv">Доставка</button>
     </div>
@@ -120,6 +121,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
     </div>
     <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_TECH']) ?></div></div><?php endif ?>
     <?php if ($arResult['BT_BREW']): ?><div class="pane prose" data-pane="brew" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_BREW']) ?></div></div><?php endif ?>
+    <?php if ($arResult['BT_STORE']): ?><div class="pane prose" data-pane="store" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_STORE']) ?></div></div><?php endif ?>
     <div class="pane" data-pane="rev" hidden id="reviews">
       <div class="rating" id="rating"></div>
       <div id="revList"><?php if (!$revN): ?><a class="rev-empty" href="#revform"><?= bt_icon('star') ?><span><b>Отзывов пока нет — станьте первым!</b>Расскажите, как вам <?= $e($name) ?>: оценка и пара слов помогут другим покупателям.</span></a><?php endif ?></div>

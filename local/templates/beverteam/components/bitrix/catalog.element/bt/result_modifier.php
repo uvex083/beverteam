@@ -29,12 +29,10 @@ foreach ($pr as $code => $p) {
 $arResult['BT_NOTES'] = $val('NOTES');
 $arResult['BT_Q'] = $val('Q_SCORE');
 
-// вкладка «Как готовить» / «Характеристики» — тексты со старого сайта
-$arResult['BT_BREW'] = implode('', array_filter([
-    ($t = $html('HOW_TO_BREW')) ? $t : '',
-    ($t = $html('HOW_TO_USE')) ? $t : '',
-    ($t = $html('STORAGE')) ? '<h3>Хранение</h3>' . $t : '',
-]));
+// вкладки «Как готовить» / «Как хранить» / «Характеристики» — тексты со старого сайта; название вкладки хранения — название свойства в админке
+$arResult['BT_BREW'] = implode('', array_filter([$html('HOW_TO_BREW'), $html('HOW_TO_USE')]));
+$arResult['BT_STORE'] = $html('STORAGE');
+$arResult['BT_STORE_T'] = htmlspecialcharsbx(trim((string)($pr['STORAGE']['NAME'] ?? '')) ?: 'Как хранить');
 $arResult['BT_TECH'] = $html('TECH_SPECS');
 
 // раздел товара
