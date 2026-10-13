@@ -1072,6 +1072,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     const on=BT_favToggle(pc.dataset.pc);
     BT_toast(on?'Добавлено в <a href="/personal/favorites/">избранное</a>':'Убрано из избранного');});
   BT_favUpdate();
+  /* cookie: карточка до нажатия «Понятно», отметка живёт 3 месяца; разметка приходит скрытой всем — из кэша страницы ничего не решается */
+  const ck=document.getElementById('cookie');
+  if(ck&&!/(?:^|;\s*)bt_cookie=1/.test(document.cookie)){
+    setTimeout(()=>{ ck.hidden=false; requestAnimationFrame(()=>requestAnimationFrame(()=>ck.classList.add('on'))); },700);
+    ck.querySelector('.cookie__ok').addEventListener('click',()=>{
+      document.cookie='bt_cookie=1; max-age=7776000; path=/; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
+      ck.classList.remove('on'); setTimeout(()=>{ ck.hidden=true; },300); });
+  }
   document.addEventListener('click',e=>{const c=e.target.closest('.pc__cmpi');if(!c)return;
     const pc=c.closest('[data-pc]'); if(!pc) return;
     const on=BT_cmpToggle(pc.dataset.pc);
