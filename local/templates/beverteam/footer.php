@@ -71,8 +71,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
 </div>
 <div class="cookie" id="cookie" role="region" aria-label="Файлы cookie" hidden>
   <p class="cookie__t">Мы используем cookie</p>
-  <p>Так сайт помнит вашу корзину, избранное и город доставки, а мы видим, какие страницы полезны. Оставаясь на сайте, вы соглашаетесь на использование файлов cookie.</p>
-  <a class="cookie__a" href="/politika-konfidencialnosti/">Подробнее в политике конфиденциальности</a>
+  <p>Так сайт помнит вашу корзину, избранное и город доставки, а мы видим, какие страницы полезны. Оставаясь на сайте, вы соглашаетесь на использование файлов cookie. <a class="cookie__a" href="/politika-konfidencialnosti/">Подробнее</a></p>
   <button class="btn cookie__ok" type="button">Понятно</button>
 </div>
 </body>
