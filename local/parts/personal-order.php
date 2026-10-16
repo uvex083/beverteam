@@ -90,13 +90,15 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
     <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
-    <?php // онлайн-оплата: здесь будет ссылка на чек, пока её нет — строку не показываем
-    if ($pCode !== 'tinkoff'): ?>
-    <dt>Документы</dt><dd><?php if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>"><?= bt_icon('doc') ?> Скачать счёт (PDF)</a><br>
+    <?php // онлайн-оплата: только ссылка на чек из уведомления банка, пока её нет — строку не показываем
+    $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
+    if ($pCode !== 'tinkoff' || $check !== ''): ?>
+    <dt>Документы</dt><dd><?php if ($check !== ''): ?><a class="link" href="<?= $e($check) ?>" target="_blank" rel="noopener">Кассовый чек</a></dd>
+    <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>"><?= bt_icon('doc') ?> Скачать счёт (PDF)</a><br>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?>Счёт придёт на e‑mail после подтверждения заказа менеджером<br>
       <?php else: ?><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?><br><?php endif ?>
       <a class="link" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
-    <?php endif ?>
+    <?php endif; endif ?>
   </dl></div>
 </div>
 

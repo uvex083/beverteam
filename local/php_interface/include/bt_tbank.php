@@ -73,10 +73,10 @@ function bt_tbank_mark(string $acc, string $paymentId): void
 function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
 {
     $param = ($ps = $p->getPaySystem()) ? $ps->getParamsBusValue($p) : [];
-    // с чеком платёж создаёт сам модуль (он собирает позиции чека), адреса возврата тогда — из настроек терминала в кабинете банка
-    if ((string)($param['ENABLE_TAXATION'] ?? '0') === '1') {
-        $r = $ps->initiatePay($p, null, Sale\PaySystem\BaseServiceHandler::STRING);
-        return $r->isSuccess() && preg_match('~action="(https://[^"]+)"~i', (string)$r->getTemplate(), $m) ? htmlspecialchars_decode($m[1]) : '';
+    // чек включён — без состава чека платёж не создаём: оплата без чека нарушает 54-ФЗ
+    $receipt = (string)($param['ENABLE_TAXATION'] ?? '0') === '1' ? bt_tbank_receipt($p, $param) : null;
+    if ((string)($param['ENABLE_TAXATION'] ?? '0') === '1' && !$receipt) {
+        return '';
     }
     // две вкладки или «Назад» не должны плодить платежи: прошлая ссылка жива — отдаём её
     $amount = (int)round($p->getSum() * 100);
@@ -101,7 +101,7 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
         'FailURL' => $back . '&pay=fail',
         'NotificationURL' => $host . '/personal/order/notification.php',
         'DATA' => array_filter(['Email' => (string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''), 'Phone' => (string)($props->getPhone() ? $props->getPhone()->getValue() : '')]),
-    ]);
+    ] + ($receipt ? ['Receipt' => $receipt] : []));
     if (empty($r['Success']) || !str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://')) {
         // номер уже занят прошлой попыткой (банк не даёт его повторить даже после отмены) — платим новым платежом заказа
         return ($r['ErrorCode'] ?? '') === '8' && !$renewed && ($n = bt_tbank_renew($p)) ? bt_tbank_url($n, true) : '';
@@ -110,6 +110,74 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
     $p->setField('PS_STATUS_DESCRIPTION', mb_substr((string)$r['PaymentURL'], 0, 250));
     $order->save();
     return (string)$r['PaymentURL'];
+}
+
+// состав чека из заказа: товары по ценам со скидкой и доставка; признаки расчёта и налоги — из настроек платёжной системы
+function bt_tbank_receipt(Sale\Payment $p, array $param): ?array
+{
+    $order = $p->getOrder();
+    $props = $order->getPropertyCollection();
+    $email = trim((string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''));
+    $phone = preg_replace('/\D/', '', (string)($props->getPhone() ? $props->getPhone()->getValue() : ''));
+    $def = (string)($param['DELIVERY_TAXATION'] ?? '') ?: 'vat5';
+    // НДС товара — из каталога; не задан — как у доставки (у клиента НДС 5 % на всё)
+    $vat = fn($rate) => $rate === null || $rate === '' ? $def
+        : (['0' => 'vat0', '5' => 'vat5', '7' => 'vat7', '10' => 'vat10', '20' => 'vat20', '22' => 'vat22'][(string)round((float)$rate * 100)] ?? $def);
+    $ffd12 = ($param['FFD'] ?? '') === 'Y';
+    $line = fn(string $name, int $price, float $q, string $tax, string $obj, string $unit) => ['Name' => mb_substr($name, 0, 128), 'Price' => $price,
+        'Quantity' => $q, 'Amount' => (int)round($price * $q), 'Tax' => $tax, 'PaymentMethod' => (string)($param['PAYMENT_METHOD'] ?? '') ?: 'full_prepayment',
+        'PaymentObject' => $obj] + ($ffd12 ? ['MeasurementUnit' => $unit] : []);
+    $items = [];
+    foreach ($order->getBasket()->getOrderableItems() as $bi) {
+        $items[] = $line((string)$bi->getField('NAME'), (int)round($bi->getPrice() * 100), (float)$bi->getQuantity(), $vat($bi->getField('VAT_RATE')),
+            (string)($param['PAYMENT_OBJECT'] ?? '') ?: 'commodity', bt_basket_pack($bi) ? 'кг' : 'шт');
+    }
+    if (($d = (int)round($order->getDeliveryPrice() * 100)) > 0) {
+        $items[] = $line('Доставка', $d, 1, $def, 'service', 'шт');
+    }
+    if (!$items || ($email === '' && strlen($phone) !== 11)) {
+        return null;
+    }
+    // копейки округления — на последнюю позицию в одну штуку: банк принимает чек, только если сумма позиций равна сумме платежа
+    if ($diff = (int)round($p->getSum() * 100) - array_sum(array_column($items, 'Amount'))) {
+        $k = array_key_last(array_filter($items, fn($x) => $x['Quantity'] == 1));
+        if ($k === null || abs($diff) > 100) {
+            return null;
+        }
+        $items[$k]['Price'] += $diff;
+        $items[$k]['Amount'] += $diff;
+    }
+    return array_filter(['Email' => $email, 'Phone' => strlen($phone) === 11 ? '+' . $phone : '', 'Taxation' => (string)($param['TAXATION'] ?? ''),
+        'FfdVersion' => $ffd12 ? '1.2' : '', 'Items' => $items]);
+}
+
+// уведомление банка о пробитом чеке: подпись проверяем паролем терминала, ссылку на чек — в свойство заказа RECEIPT_URL («Документы» в кабинете)
+function bt_tbank_receipt_save(array $req): void
+{
+    $acc = (string)($req['OrderId'] ?? '');
+    $order = ($i = strrpos($acc, '/')) ? Sale\Order::loadByAccountNumber(substr($acc, 0, $i)) : null;
+    $pay = null;
+    foreach ($order ? $order->getPaymentCollection() : [] as $x) {
+        $x->getField('ACCOUNT_NUMBER') === $acc && $pay = $x;
+    }
+    $pwd = $pay && ($ps = $pay->getPaySystem()) ? (string)($ps->getParamsBusValue($pay)['SHOP_SECRET_WORD'] ?? '') : '';
+    $flat = array_filter($req, fn($v, $k) => $k !== 'Token' && !is_array($v), ARRAY_FILTER_USE_BOTH) + ['Password' => $pwd];
+    ksort($flat);
+    $sign = hash('sha256', implode('', array_map(fn($v) => is_bool($v) ? ($v ? 'true' : 'false') : (string)$v, $flat)));
+    // чек возврата в кабинет не выводим — там ссылка на чек оплаты
+    if ($pwd === '' || !hash_equals($sign, (string)($req['Token'] ?? '')) || ($req['Type'] ?? 'Income') !== 'Income') {
+        return;
+    }
+    $url = (string)($req['Url'] ?? '');
+    if (!str_starts_with($url, 'https://') && ($req['FnNumber'] ?? '') !== '' && ($req['FiscalDocumentAttribute'] ?? '') !== '') {
+        // чек в «Платформе ОФД» (ОФД кассы Т-Банка): форма проверки с подставленными номерами
+        $url = 'https://lk.platformaofd.ru/web/noauth/cheque?' . http_build_query(['fn' => $req['FnNumber'], 'fp' => $req['FiscalDocumentAttribute'], 'i' => $req['FiscalDocumentNumber'] ?? '']);
+    }
+    $prop = str_starts_with($url, 'https://') ? $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL') : null;
+    if ($prop) {
+        $prop->setValue(mb_substr($url, 0, 500));
+        $order->save();
+    }
 }
 
 // заменить неоплаченный платёж новым (новый номер для банка); прошлые попытки в банке сначала отменяем, чтобы по старой ссылке не заплатили
