@@ -2039,7 +2039,8 @@ window.BT_reviewForm=root=>{
       Object.entries(d.errors||{}).forEach(([k,m])=>{ const el=F(k); el?setErr(el,m):(err.textContent=m); });
       if(d.message) err.textContent=d.message;
       if(!d.errors&&!d.message) err.textContent='Не получилось отправить. Обновите страницу и попробуйте ещё раз.';
-    }).catch(()=>{ err.textContent='Нет связи с сервером. Попробуйте ещё раз.'; })
+      err.textContent&&err.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }).catch(()=>{ err.textContent='Нет связи с сервером. Попробуйте ещё раз.'; err.scrollIntoView({block:'nearest',behavior:'smooth'}); })
       .finally(()=>{ if(root.contains(send)){ send.disabled=false; send.textContent='Отправить отзыв'; } });
   });
 };
