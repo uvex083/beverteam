@@ -229,6 +229,7 @@ if ($action !== 'create') {
 }
 // ловушка для ботов: скрытое поле заполняют только они
 if ($in('website') !== '') {
+    bt_ip_hit('BT_HONEYPOT', $in('src') === 'price' ? 'order:price' : 'order');
     $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ. Позвоните нам, поможем.']]);
 }
 

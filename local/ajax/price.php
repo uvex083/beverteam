@@ -47,6 +47,7 @@ if (!$req->isPost() || !check_bitrix_sessid() || !$ib) {
     $out(403, ['ok' => false, 'error' => 'sessid']);
 }
 if ((string)$req->getPost('website') !== '') {
+    bt_ip_hit('BT_HONEYPOT', 'price_sub');
     $out(200, ['ok' => true]);
 }
 $email = mb_strtolower(trim((string)$req->getPost('email')));
@@ -62,7 +63,7 @@ if ($err) {
 }
 // не чаще раза в 15 секунд из сессии и не больше 5 подписок за 10 минут с одного IP
 if (time() - (int)($_SESSION['BT_PRICE_SUB'] ?? 0) < 15 || bt_ip_flood('BT_PRICE_SUB', 5, 600)) {
-    $out(429, ['ok' => false, 'error' => 'rate']);
+    $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Слишком много подписок подряд. Попробуйте через 10 минут.']);
 }
 $el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, '=NAME' => $email], false, false, ['ID'])->Fetch();
 $o = new CIBlockElement();

@@ -25,6 +25,7 @@ if (!check_bitrix_sessid()) {
 Loader::includeModule('iblock');
 // ловушка для ботов: поле скрыто от людей — делаем вид, что всё хорошо
 if ((string)$req->getPost('website') !== '') {
+    bt_ip_hit('BT_HONEYPOT', 'review');
     $out(200, ['ok' => true]);
 }
 
@@ -81,10 +82,13 @@ if ($errors) {
     $out(200, ['ok' => false, 'errors' => $errors]);
 }
 
-// частота: не чаще раза в 30 секунд
+// частота: не чаще раза в 30 секунд из сессии и не больше 5 отзывов за 10 минут с одного IP
 $ibId = bt_iblock('reviews');
 if (time() - (int)($_SESSION['BT_REVIEW_LAST'] ?? 0) < 30) {
     $out(429, ['ok' => false, 'message' => 'Отзыв уже отправлен. Повторить можно через полминуты.']);
+}
+if (bt_ip_flood('BT_REVIEW', 5, 600)) {
+    $out(429, ['ok' => false, 'message' => 'Слишком много отзывов подряд. Попробуйте через 10 минут.']);
 }
 
 // покупка подтверждена, если у вошедшего покупателя есть заказ с этим товаром
@@ -109,6 +113,7 @@ if (!$id) {
     $out(500, ['ok' => false, 'error' => 'save']);
 }
 $_SESSION['BT_REVIEW_LAST'] = time();
+bt_ip_hit('BT_REVIEW', (string)$id);
 
 $host = (\CMain::IsHTTPS() ? 'https://' : 'http://') . $req->getHttpHost();
 CEvent::Send('BT_FORM_REQUEST', SITE_ID, [

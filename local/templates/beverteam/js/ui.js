@@ -2236,7 +2236,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     try{ const r=await fetch('/local/ajax/price.php',{method:'POST',body:fd,credentials:'same-origin'}).then(x=>x.json());
       if(r.ok){ subF.reset(); BT_toast('Готово — напишем, когда изменятся цены'); return; }
       Object.entries(r.errors||{}).forEach(([k,msg])=>{ const el=subF.elements[k]; if(!el) return; el.type==='checkbox'?el.closest('.check')?.classList.add('is-err'):BT_fieldErr(el,msg); });
-      r.errors||BT_toast('Не получилось подписаться — попробуйте ещё раз');
+      r.errors||BT_toast(r.message||'Не получилось подписаться — попробуйте ещё раз');
     }catch(err){ BT_toast('Нет связи с сервером. Попробуйте ещё раз'); }
     finally{ delete subF.dataset.busy; } });
   rows.forEach(draw); drawBag(); filter();

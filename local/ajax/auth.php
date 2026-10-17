@@ -51,6 +51,10 @@ switch ((string)$req->getPost('action')) {
         $out(['ok' => true, 'sessid' => bitrix_sessid()]);
 
     case 'check':
+        if ($count('BT_AUTH_CHECK', ['=REMOTE_ADDR' => $ip], 600) >= 30) {
+            $out(['ok' => true, 'exists' => false, 'orders' => false]);
+        }
+        bt_ip_hit('BT_AUTH_CHECK');
         $email = mb_strtolower(trim((string)$req->getPost('email')));
         $found = check_email($email, true) ? UserTable::getList(['filter' => ['=EMAIL' => $email], 'select' => ['ID', 'ACTIVE'], 'limit' => 1])->fetch() : null;
         $ok = $found && $allowed($found);
@@ -66,6 +70,7 @@ switch ((string)$req->getPost('action')) {
         }
         // ловушка для ботов: делаем вид, что код отправлен
         if ((string)$req->getPost('website') !== '') {
+            bt_ip_hit('BT_HONEYPOT', 'auth');
             $out(['ok' => true, 'to' => mb_substr(trim((string)$req->getPost('login')), 0, 100), 'wait' => WAIT]);
         }
         $in = trim((string)$req->getPost('login'));

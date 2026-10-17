@@ -2,6 +2,9 @@
 // Характеристики для фильтра каталога: кофемашины (вода, зёрна, экран, растворимые, телеметрия, оплата) и аксессуары (материал, объём, цвет, фильтр).
 // Значения разобраны из «Технических характеристик» и описаний товаров; заполняются только пустые свойства — ручные правки не затираются.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_filter_props_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+if (PHP_SAPI !== 'cli') {
+    die('cli only');
+}
 $_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__, 2);
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);

@@ -1,6 +1,9 @@
 <?php
 // Понятные коды значений списков каталога для ЧПУ фильтра (вместо хешей Битрикса).
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_filter_codes.php [show|apply]. Повторный запуск ничего не меняет.
+if (PHP_SAPI !== 'cli') {
+    die('cli only');
+}
 $_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__, 2);
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);

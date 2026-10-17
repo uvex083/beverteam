@@ -1,6 +1,9 @@
 <?php
 // Тестовые отзывы о товарах (с фото и без) — посмотреть, как выглядит вкладка «Отзывы». Помечены XML_ID «bt-demo-product».
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_product_reviews_demo.php [show|apply|delete]. Перед запуском сайта — delete.
+if (PHP_SAPI !== 'cli') {
+    die('cli only');
+}
 $_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__, 2);
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);

@@ -1420,7 +1420,7 @@ function bt_ip_flood(string $type, int $max, int $sec): bool
 
 function bt_ip_hit(string $type, string $item = ''): void
 {
-    CEventLog::Add(['SEVERITY' => 'SECURITY', 'AUDIT_TYPE_ID' => $type, 'MODULE_ID' => 'main', 'ITEM_ID' => $item]);
+    CEventLog::Add(['SEVERITY' => 'SECURITY', 'AUDIT_TYPE_ID' => $type, 'MODULE_ID' => 'main', 'ITEM_ID' => $item, 'DESCRIPTION' => '']);
 }
 
 // Хвост формы заявки: sessid, ловушка для ботов, согласие, кнопка — одинаково во всех формах
