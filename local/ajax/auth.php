@@ -64,6 +64,10 @@ switch ((string)$req->getPost('action')) {
         if ($req->getPost('agree') !== 'Y') {
             $out(['ok' => false, 'errors' => ['agree' => 'Нужно согласие с условиями']]);
         }
+        // ловушка для ботов: делаем вид, что код отправлен
+        if ((string)$req->getPost('website') !== '') {
+            $out(['ok' => true, 'to' => mb_substr(trim((string)$req->getPost('login')), 0, 100), 'wait' => WAIT]);
+        }
         $in = trim((string)$req->getPost('login'));
         $phone = '';
         $hint = '';

@@ -76,6 +76,7 @@ $co = bt_contacts();
 
 
   <form class="co" id="coForm" novalidate>
+    <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
     <div>
       <div class="blk">
         <h2><b>1</b>Получатель</h2>

@@ -227,6 +227,10 @@ if ($action === 'calc') {
 if ($action !== 'create') {
     $out(['ok' => false, 'error' => 'action']);
 }
+// ловушка для ботов: скрытое поле заполняют только они
+if ($in('website') !== '') {
+    $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ. Позвоните нам, поможем.']]);
+}
 
 // ---------- проверка полей ----------
 $f = [];
@@ -287,6 +291,9 @@ if (Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableIt
 if ($err) {
     $out(['ok' => false, 'errors' => $err]);
 }
+if (bt_ip_flood('BT_ORDER_CREATE', 5, 600)) {
+    $out(['ok' => false, 'errors' => ['form' => 'Слишком много заказов подряд. Позвоните нам или попробуйте через 10 минут.']]);
+}
 
 // ---------- покупатель: текущий, найденный по e-mail (без входа под ним) или новый ----------
 if (!$userId) {
@@ -337,6 +344,7 @@ if (!$r->isSuccess()) {
     $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ: ' . implode('; ', $r->getErrorMessages())]]);
 }
 $_SESSION['BT_ORDERS'][] = (int)$order->getId();
+bt_ip_hit('BT_ORDER_CREATE', (string)$order->getId());
 
 // для следующего заказа: плательщик, способы доставки и оплаты, последний адрес; гость с чужим e-mail в чужой кабинет не пишет
 if ($USER->IsAuthorized() || !empty($fresh)) {

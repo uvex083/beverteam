@@ -1410,6 +1410,19 @@ function bt_home_tiles(): array
     return $tiles;
 }
 
+// защита от ботов: не больше $max записей $type в журнале событий за $sec секунд с этого IP; администраторам не мешает проверять
+function bt_ip_flood(string $type, int $max, int $sec): bool
+{
+    return !(($GLOBALS['USER'] ?? null) instanceof CUser && $GLOBALS['USER']->IsAdmin())
+        && \Bitrix\Main\EventLog\Internal\EventLogTable::getCount(['=AUDIT_TYPE_ID' => $type, '=REMOTE_ADDR' => (string)$_SERVER['REMOTE_ADDR'],
+            '>=TIMESTAMP_X' => \Bitrix\Main\Type\DateTime::createFromTimestamp(time() - $sec)]) >= $max;
+}
+
+function bt_ip_hit(string $type, string $item = ''): void
+{
+    CEventLog::Add(['SEVERITY' => 'SECURITY', 'AUDIT_TYPE_ID' => $type, 'MODULE_ID' => 'main', 'ITEM_ID' => $item]);
+}
+
 // Хвост формы заявки: sessid, ловушка для ботов, согласие, кнопка — одинаково во всех формах
 function bt_form_tail(string $btn = 'Отправить заявку'): string
 {

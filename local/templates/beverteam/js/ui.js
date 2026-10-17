@@ -515,6 +515,7 @@ function authModal(){
       <div class="field"><label for="aLogin" id="aLabel">E-mail или телефон</label>
         <input id="aLogin" name="login" type="email" inputmode="email" autocomplete="email" placeholder="mail@company.ru" required>
         <span class="hint" id="aHint">Пришлём код на почту — пароль не нужен</span></div>
+      <div class="hp" aria-hidden="true"><input id="aHp" name="website" tabindex="-1" autocomplete="off"></div>
       <div class="alert alert--info auth__note" id="aNote" hidden></div>
       <label class="check check--top auth__agree"><input type="checkbox" id="aAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       <button class="btn btn--block" id="aSend" type="submit">Продолжить</button>
@@ -929,7 +930,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   function send(login,again){
     if(busy) return; busy=true; $a('#aSend').disabled=true;
-    BT_authPost({action:'send',login,agree:agree.checked?'Y':''}).then(r=>{
+    BT_authPost({action:'send',login,agree:agree.checked?'Y':'',website:$a('#aHp').value}).then(r=>{
       if(r.ok){
         pending={login,to:r.to}; $a('#aTo').textContent=r.to; $a('#aCodeErr').textContent='';
         cells.forEach(i=>i.value=''); step('code'); tick(r.wait||59);

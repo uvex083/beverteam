@@ -60,6 +60,10 @@ if ($req->getPost('agree') !== 'Y') {
 if ($err) {
     $out(200, ['ok' => false, 'errors' => $err]);
 }
+// не чаще раза в 15 секунд из сессии и не больше 5 подписок за 10 минут с одного IP
+if (time() - (int)($_SESSION['BT_PRICE_SUB'] ?? 0) < 15 || bt_ip_flood('BT_PRICE_SUB', 5, 600)) {
+    $out(429, ['ok' => false, 'error' => 'rate']);
+}
 $el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, '=NAME' => $email], false, false, ['ID'])->Fetch();
 $o = new CIBlockElement();
 if ($el) {
@@ -68,6 +72,8 @@ if ($el) {
     $id = $o->Add(['IBLOCK_ID' => $ib, 'NAME' => $email, 'ACTIVE' => 'Y', 'PROPERTY_VALUES' => ['TOKEN' => md5(random_bytes(16))]]);
     $id or $out(200, ['ok' => false, 'error' => 'save']);
 }
+$_SESSION['BT_PRICE_SUB'] = time();
+bt_ip_hit('BT_PRICE_SUB');
 $out(200, ['ok' => true]);
 
 // ---------- редактор цен ----------
