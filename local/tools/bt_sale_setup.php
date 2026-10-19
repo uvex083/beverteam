@@ -117,8 +117,11 @@ function bt_delivery_only_city(int $id, string $locCode, bool $apply, callable $
 }
 
 $cfg = fn(int $price, int $from, int $to) => ['MAIN' => ['PRICE' => $price, 'CURRENCY' => 'RUB', 'PERIOD' => ['FROM' => $from, 'TO' => $to, 'TYPE' => 'D']]];
+// курьер: 50 ₽ за км от склада (по прямой × 1,3), не меньше 350 ₽ — Bt\Courier\Handler
 $courier = bt_delivery(['XML_ID' => 'bt_courier', '_OLD_NAME' => 'Доставка курьером', 'NAME' => 'Курьер BEVERTEAM', 'ACTIVE' => 'Y', 'SORT' => 10,
-    'DESCRIPTION' => 'По Екатеринбургу за 2 рабочих дня. Бесплатно от 3 000 ₽, юрлицам — от 8 000 ₽.', 'CONFIG' => $cfg(350, 2, 2)], $apply, $say, $check);
+    'CLASS_NAME' => '\\Bt\\Courier\\Handler',
+    'DESCRIPTION' => 'По Екатеринбургу за 2 рабочих дня: 350 ₽ до 7 км от склада, дальше 50 ₽ за км. Бесплатно от 3 000 ₽, юрлицам — от 8 000 ₽.',
+    'CONFIG' => ['MAIN' => ['MIN' => '350', 'PER_KM' => '50', 'K' => '1.3']]], $apply, $say, $check);
 $pickup = bt_delivery(['XML_ID' => 'bt_pickup', '_OLD_NAME' => 'Самовывоз', 'NAME' => 'Самовывоз со склада', 'ACTIVE' => 'Y', 'SORT' => 20,
     'DESCRIPTION' => 'ул. Колокольная, 31А, по договорённости с менеджером.', 'CONFIG' => $cfg(0, 0, 0)], $apply, $say, $check);
 // СДЭК — службы модуля ipol.sdek; своя служба bt_cdek выключена, скрипт её не трогает

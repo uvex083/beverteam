@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(o.tab==='pickup') return 'готов '+(x.relPack||BT_fmtDate(x.pack,true));
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
     return '';};
-  const priceOf=o=>o.d.price>0?fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
+  const priceOf=o=>o.d.price>0?(o.d.from?'от ':'')+fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
   function renderDeliv(){
     const all=opts();
     [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab);
@@ -301,10 +301,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
-  let last=null;
+  let last=null, calcSt='';
   function calc(again){
     const n=++calcN;
-    return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId}).then(r=>{
+    const st=document.getElementById('coStreet').value.trim(); calcSt=st;
+    return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId,street:/\d/.test(st)?st:''}).then(r=>{
       if(n!==calcN||!r.ok) return;
       dl=r.deliveries; avail=r.pays; last=r; cdekDown.hidden=!r.cdekDown;
       if(pvzCur&&pvzCur.loc!==locIn.value){pvzCur=null;pvzIn.value='';}
@@ -375,12 +376,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   const stIn=document.getElementById('coStreet'), stList=document.getElementById('streetList');
   const showStreets=list=>{stList.innerHTML=list.map(s=>`<li role="option" data-v="${esc(s.v)}" data-h="${s.house?1:0}">${esc(s.v)}${s.r?`<small>${esc(s.r)}</small>`:''}</li>`).join('');
     const o=list.length>0;stList.classList.toggle('open',o);stIn.setAttribute('aria-expanded',o);};
-  let stT=0, stN=0;
+  let stT=0, stN=0, stCalcT=0;
+  /* адрес с домом изменился — пересчитать цену курьера (она зависит от расстояния) */
+  const reStreet=()=>{const v=stIn.value.trim();if(v!==calcSt&&/\d/.test(v))calc();};
+  stIn.addEventListener('input',()=>{clearTimeout(stCalcT);stCalcT=setTimeout(reStreet,900);});
   stIn.addEventListener('input',()=>{ready();const v=stIn.value.trim();clearTimeout(stT);if(v.length<2){showStreets([]);return;}
     const n=++stN; stT=setTimeout(()=>post({action:'street',q:v,city:locIn.value?cityIn.value.trim():''}).then(r=>{if(n===stN&&document.activeElement===stIn)showStreets(r.list||[]);}),250);});
   stList.addEventListener('mousedown',e=>e.preventDefault());
   stList.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
-    stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);setErr(stIn,'');stIn.focus();ready();
+    stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);setErr(stIn,'');stIn.focus();ready();reStreet();
     if(li.dataset.h!=='1') stIn.dispatchEvent(new Event('input'));});
   // ввели руками и ушли — улицу берём из справочника, дом оставляем свой, если справочник его не знает
   const autoStreet=()=>{const v=stIn.value.trim();if(v.length<2)return;const n=++stN;clearTimeout(stT);
@@ -388,7 +392,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const s=(r.list||[])[0], num=v.match(/\d.*$/);
       if(!s||!letters(s.v).includes(letters(v.replace(/\d.*$/,'').replace(/(^|[\s.,])(ул|улица|д|дом)(?=[\s.,]|$)/gi,' '))))return;
       stIn.value=s.house&&num&&s.v.replace(/\D/g,'')===num[0].replace(/\D/g,'')?s.v:(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
-      showStreets([]);ready();if(num)setErr(stIn,'');});};
+      showStreets([]);ready();if(num)setErr(stIn,'');reStreet();});};
   stIn.addEventListener('blur',()=>{showStreets([]);autoStreet();});
   stIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();stList.classList.contains('open')&&stList.querySelector('li')?stList.querySelector('li').click():autoStreet();}
     if(e.key==='Escape'){e.preventDefault();showStreets([]);}});

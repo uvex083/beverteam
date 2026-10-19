@@ -118,7 +118,7 @@ $loc = $in('loc');
 $locOk = $loc !== '' && Sale\Location\LocationTable::getList(['filter' => ['=CODE' => $loc], 'select' => ['ID']])->fetch();
 
 // Заказ в памяти: плательщик, корзина, местоположение, отгрузка и оплата (если выбраны)
-function bt_order_build(int $userId, int $ptId, string $loc, int $deliveryId, int $payId): Sale\Order
+function bt_order_build(int $userId, int $ptId, string $loc, int $deliveryId, int $payId, string $addr = ''): Sale\Order
 {
     $order = Sale\Order::create(SITE_ID, $userId ?: null);
     $order->setPersonTypeId($ptId);
@@ -127,6 +127,10 @@ function bt_order_build(int $userId, int $ptId, string $loc, int $deliveryId, in
     $order->setBasket($basket);
     if ($loc !== '' && ($p = $order->getPropertyCollection()->getDeliveryLocation())) {
         $p->setValue($loc);
+    }
+    // адрес — до расчёта доставки: курьер считает цену по расстоянию
+    if ($addr !== '' && ($p = $order->getPropertyCollection()->getItemByOrderPropertyCode('ADDRESS'))) {
+        $p->setValue($addr);
     }
     $shipment = $order->getShipmentCollection()->createItem($deliveryId ? Sale\Delivery\Services\Manager::getObjectById($deliveryId) : null);
     $items = $shipment->getShipmentItemCollection();
@@ -177,7 +181,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
         // модуль СДЭК падает, если API не ответил: такую службу просто не показываем, остальные работают
         try {
-            $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0);
+            $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0, $in('street'));
             // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
             $period = str_starts_with((string)$f['XML_ID'], 'sdek_') ? strip_tags((string)$svc->calculate(bt_order_shipment($o))->getPeriodDescription()) : '';
         } catch (\Throwable $e) {
@@ -185,13 +189,15 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
             continue;
         }
         $deliveries[(int)$svc->getId()] = ['id' => (int)$svc->getId(), 'name' => $svc->getName(), 'desc' => (string)$f['DESCRIPTION'], 'code' => (string)$f['XML_ID'],
-            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY'), 'period' => $period];
+            'price' => (float)$o->getDeliveryPrice(), 'base' => (float)bt_order_shipment($o)->getField('BASE_PRICE_DELIVERY'), 'period' => $period,
+            // курьер без найденного адреса — минимальная цена, показываем «от»
+            'from' => $svc instanceof \Bt\Courier\Handler && \Bt\Courier\Handler::km(bt_loc($loc)['n'], $in('street')) === null];
     }
     if (!isset($deliveries[$delivery])) {
         $delivery = (int)array_key_first($deliveries);
     }
     try {
-        $probe = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, 0);
+        $probe = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, 0, $in('street'));
     } catch (\Throwable $e) {
         $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
     }
@@ -313,9 +319,12 @@ if (!$userId) {
 // ---------- заказ ----------
 $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
+$addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
+// модуль СДЭК берёт код пункта из адреса после «#S»
+$f['mode'] === 'pvz' and $addr = 'Пункт выдачи СДЭК: ' . $pvz['a'] . ' #S' . $pvz['c'];
 // модуль СДЭК бросает исключение, если API не ответил
 try {
-    $order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay);
+    $order = bt_order_build($userId, $ptypes[$pt], $loc, $delivery, $pay, $addr);
 } catch (\Throwable $e) {
     $out(['ok' => false, 'errors' => ['form' => 'Служба доставки сейчас не отвечает. Попробуйте через минуту или выберите другой способ доставки.']]);
 }
@@ -324,10 +333,13 @@ $order->setField('USER_DESCRIPTION', mb_substr($f['comment'], 0, 2000));
 $note = [];
 $in('src') === 'price' and $note[] = 'Запрос счёта из прайс-листа: доставку и сроки согласовать с клиентом.';
 preg_match('/^[a-z0-9_-]{1,40}$/i', (string)($_COOKIE['bt_pm'] ?? ''), $pm) and $note[] = 'Персональная ссылка прайса: ' . $pm[0];
+// курьер считает цену по расстоянию: менеджеру — сколько км, или что адрес не нашёлся и стоимость минимальная
+if ($dCode === 'bt_courier') {
+    $km = \Bt\Courier\Handler::km(bt_loc($loc)['n'], $f['street']);
+    $note[] = $km === null ? 'Курьер: адрес не нашёлся на карте, доставка посчитана по минимальной цене — проверьте стоимость.'
+        : 'Курьер: ' . number_format($km, 1, ',', '') . ' км по прямой от склада.';
+}
 $note and $order->setField('COMMENTS', implode("\n", $note));
-$addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
-// модуль СДЭК берёт код пункта из адреса после «#S»
-$f['mode'] === 'pvz' and $addr = 'Пункт выдачи СДЭК: ' . $pvz['a'] . ' #S' . $pvz['c'];
 $values = ['ZIP' => '', 'EMAIL' => $f['email'], 'PHONE' => '+' . $phone, 'LOCATION' => $loc, 'ADDRESS' => $addr, 'PVZ' => $f['mode'] === 'pvz' ? $pvz['c'] : '']
     + ($pt === 'UR'
         ? ['CONTACT_PERSON' => $f['name'], 'COMPANY' => $f['company'], 'INN' => $f['inn'], 'KPP' => $f['kpp'], 'COMPANY_ADR' => $f['company_adr']]
