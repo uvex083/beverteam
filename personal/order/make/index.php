@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
     const cdekUnknown=sel&&isCdek(sel.d)&&!(r.deliveryPrice>0);
-    sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':fmt(r.deliveryPrice);
+    sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':(sel.d.from?'от ':'')+fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total); sTotNote.hidden=!cdekUnknown;
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';

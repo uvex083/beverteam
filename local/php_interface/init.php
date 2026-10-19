@@ -45,9 +45,8 @@ AddEventHandler('socialservices', 'OnFindSocialservicesUser', ['BtOAuth', 'findU
 // обработчики доставки: СДЭК (расчёт по весу через калькулятор; заказы в СДЭК не создаём) и курьер по расстоянию от склада
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, ['Bt\\Cdek\\Api' => '/local/php_interface/include/cdek.php', 'Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php',
     'Bt\\Courier\\Handler' => '/local/php_interface/include/bt_courier.php']);
-AddEventHandler('sale', 'onSaleDeliveryHandlersClassNamesBuildList', function () {
-    return ['Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php', 'Bt\\Courier\\Handler' => '/local/php_interface/include/bt_courier.php'];
-});
+\Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'onSaleDeliveryHandlersClassNamesBuildList', fn() => new \Bitrix\Main\EventResult(
+    \Bitrix\Main\EventResult::SUCCESS, ['Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php', 'Bt\\Courier\\Handler' => '/local/php_interface/include/bt_courier.php'], 'sale'));
 
 // тестовые домены хостинга закрыты от индексации
 if (preg_match('/\.na4u\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
