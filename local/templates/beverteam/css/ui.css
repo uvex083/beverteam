@@ -420,7 +420,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .idp--big a i{font:800 15px/1 Unbounded,sans-serif;font-style:normal}
 
 /* cookie */
-.cookie{position:fixed;right:24px;bottom:24px;z-index:90;width:360px;max-width:calc(100vw - 32px);background:var(--ink);color:#fff;border-radius:var(--rad);padding:22px 22px 20px;box-shadow:0 18px 44px rgba(14,14,12,.28);opacity:0;transform:translateY(14px);transition:opacity .3s,transform .3s}
+.cookie{position:fixed;right:24px;bottom:24px;z-index:89;width:360px;max-width:calc(100vw - 32px);background:var(--ink);color:#fff;border-radius:var(--rad);padding:22px 22px 20px;box-shadow:0 18px 44px rgba(14,14,12,.28);opacity:0;transform:translateY(14px);transition:opacity .3s,transform .3s}
 .cookie[hidden]{display:none}
 .cookie.on{opacity:1;transform:none}
 .cookie__t{font-family:Unbounded,'BT Fallback',Manrope,sans-serif;font-weight:700;font-size:17px;line-height:1.25;letter-spacing:-.01em;margin:0 0 10px}
