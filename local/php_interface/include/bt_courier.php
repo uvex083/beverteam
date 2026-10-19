@@ -24,7 +24,7 @@ class Handler extends Sale\Delivery\Services\Base
         return 'Цена = км по прямой от склада × коэффициент дорог × цена за км, но не меньше минимальной. Склад — адрес из контактов сайта.';
     }
 
-    public static function isCalculatePriceImmediately()
+    public function isCalculatePriceImmediately()
     {
         return true;
     }
