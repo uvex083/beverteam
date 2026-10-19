@@ -100,7 +100,7 @@ function bt_mail_order(Sale\Order $order): array
     }
     $dPrice = (float)$order->getDeliveryPrice();
     $dText = $dCode === 'bt_cdek' ? 'стоимость сообщит менеджер'
-        : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? "бесплатно (заказ от 3\u{00A0}000\u{00A0}₽)" : 'бесплатно'));
+        : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно');
     $sum = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;color:#6C6C64;padding:10px 0 0';
     $total = bt_fmt($order->getPrice()) . ($dCode === 'bt_cdek' ? ' + доставка' : '');
     $right = fn(string $v, string $css = '') => '<td colspan="2" align="right" style="' . $sum . $css . '">' . $v . '</td>';

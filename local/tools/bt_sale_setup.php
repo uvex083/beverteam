@@ -149,8 +149,13 @@ foreach ([['FIZ', 3000, 'Бесплатная доставка курьером 
         }
     } elseif ($rule['NAME'] !== $ruleName || !str_contains(serialize($rule['CONDITIONS_LIST']), 'CondSalePersonType')) {
         $say("правило корзины {$rule['ID']} → «{$ruleName}»: условие по типу плательщика");
-        $apply and (CSaleDiscount::Update($rule['ID'], ['NAME' => $ruleName, 'CONDITIONS' => $conds, 'ACTIONS' => $acts, 'USER_GROUPS' => [2]])
+        $apply and (CSaleDiscount::Update($rule['ID'], ['NAME' => $ruleName, 'CONDITIONS' => $conds, 'ACTIONS' => $acts])
             or $fail('discount update: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? '')));
+    }
+    // CSaleDiscount::Update стирает группы правила, а без групп правило не действует ни на кого
+    if ($rule && !\Bitrix\Sale\Internals\DiscountGroupTable::getList(['filter' => ['=DISCOUNT_ID' => $rule['ID'], '=GROUP_ID' => 2]])->fetch()) {
+        $say("правило корзины {$rule['ID']}: группа «Все пользователи»");
+        $apply and \Bitrix\Sale\Internals\DiscountGroupTable::updateByDiscount((int)$rule['ID'], [2], 'Y', true);
     }
 }
 

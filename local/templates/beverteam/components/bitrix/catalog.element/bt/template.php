@@ -90,7 +90,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <?php endif ?>
       <div class="ship" style="margin-top:20px">
         <div>Доставка по всей России — СДЭК, 2–7 дней, тариф считается при оформлении</div>
-        <div>Екатеринбург — курьером от 350 ₽, бесплатно от 3 000 ₽</div>
+        <div>Екатеринбург — курьером от 350 ₽, бесплатно от 3 000 ₽, юрлицам — от 8 000 ₽</div>
         <div>Самовывоз: <?= $e($co['street'] ?? '') ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?></div>
       </div>
     </div>

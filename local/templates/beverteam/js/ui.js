@@ -291,7 +291,7 @@ window.BT_fmtDate = (d,short) => d.getDate()+' '+(short?MONTHS_S:MONTHS)[d.getMo
 window.BT_dates = (days) => {
   const now=new Date(); let pack=new Date(now);
   if(!isWork(now)||now.getHours()>=17) pack=nextWork(now,1);           /* после 17:00 и в выходные — первый рабочий день */
-  const ship=nextWork(pack,1), deliver=nextWork(pack,days||2);
+  const deliver=nextWork(pack,days||2), ship=deliver;
   const rel = d => { const t=new Date();t.setHours(0,0,0,0); const x=new Date(d);x.setHours(0,0,0,0); const k=Math.round((x-t)/864e5); return k===0?'сегодня':k===1?'завтра':''; };
   return {pack,ship,deliver,relPack:rel(pack),relShip:rel(ship),relDeliver:rel(deliver)};
 };
@@ -1407,7 +1407,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-of-shipl]').textContent=n>1?`Доставка, ${n} раза в месяц`:'Доставка';
       q('[data-of-ship]').textContent=ship?BT_fmt(ship):'бесплатно';
       q('[data-of-tot]').textContent=BT_fmt(tot);
-      q('[data-of-note]').textContent=`Доставка по Екатеринбургу бесплатная, если одна поставка от ${BT_fmt(S.free)}, иначе ${BT_fmt(S.ship)}. Чашка — ${S.g} г зерна.`;
+      q('[data-of-note]').textContent=`Доставка по Екатеринбургу бесплатная, если одна поставка от ${BT_fmt(S.free)} для юрлиц (от ${BT_fmt(S.freeFiz)} для физлиц), иначе ${BT_fmt(S.ship)}. Чашка — ${S.g} г зерна.`;
       const r=q('[data-of-rent]');
       if(S.rent){ r.hidden=false; r.innerHTML=kg>=S.rent.kg?`При таком объёме кофемашина Jetinno — <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Рассчитать аренду →</a>`
         :`Нет кофемашины? От ${S.rent.kg} кг в месяц даём Jetinno <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Подробнее →</a>`; }

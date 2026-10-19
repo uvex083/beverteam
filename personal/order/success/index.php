@@ -68,7 +68,7 @@ if (!$order) {
     $phoneMask = strlen($phone) === 11 ? '+7 ' . $phone[1] . '•• •••-••-' . substr($phone, 9) : '';
     $dPrice = (float)$order->getDeliveryPrice();
     $delivText = $shipment ? $shipment->getDeliveryName() . ($city ? ', ' . $city : '') . ' — '
-        . ($dCode === 'bt_cdek' ? 'стоимость сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : ($dCode === 'bt_courier' ? 'бесплатно (заказ от 3 000 ₽)' : 'бесплатно'))) : '';
+        . ($dCode === 'bt_cdek' ? 'стоимость сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно')) : '';
     $where = preg_replace(['/\s*#S\S+$/u', '/^Пункт выдачи СДЭК:\s*/u'], '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? ($co['city'] ?? '') . ', ' . ($co['street'] ?? '') : ''));
     $date = $order->getDateInsert();
 ?>
