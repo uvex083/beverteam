@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
   const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);
   const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
-  const dateOf=o=>{const x=BT_dates(1);
+  const dateOf=o=>{const x=BT_dates();
     if(o.d.period) return o.d.period;
     if(o.tab==='pickup') return 'готов '+(x.relPack||BT_fmtDate(x.pack,true));
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
