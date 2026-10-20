@@ -174,8 +174,12 @@ $cdekDown = $dead && time() - $dead < 60 * (int)\COption::GetOptionString('ipol.
 if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->isEmpty()) {
     $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
     $shipment = bt_order_shipment($probe);
-    foreach (Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment) as $svc) {
-        if ($svc instanceof Sale\Delivery\Services\EmptyDeliveryService) {
+    $svcs = array_filter(Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment), fn($s) => !$s instanceof Sale\Delivery\Services\EmptyDeliveryService);
+    $codes = array_column(Sale\Delivery\Services\Table::getList(['filter' => ['@ID' => array_map(fn($s) => $s->getId(), $svcs) ?: [0]], 'select' => ['ID', 'XML_ID']])->fetchAll(), 'XML_ID', 'ID');
+    // где возим сами (курьер, самовывоз — Екатеринбург), СДЭК не предлагаем
+    $own = (bool)array_intersect($codes, ['bt_courier', 'bt_pickup']);
+    foreach ($svcs as $svc) {
+        if ($own && str_starts_with((string)($codes[$svc->getId()] ?? ''), 'sdek_')) {
             continue;
         }
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();

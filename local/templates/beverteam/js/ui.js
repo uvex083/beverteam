@@ -311,7 +311,7 @@ window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT
   </div>`; };
 /* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
-  return sum>=T ? `Доставка по Екатеринбургу — бесплатно${sum<8000?' (юрлицам — от 8 000 ₽)':''}, по России — СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
+  return sum>=T ? `Доставка по Екатеринбургу — бесплатно, по России — СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
 
 /* скидка от суммы заказа — по правилам корзины Битрикса (window.BT_SUMDISC: [{from,pct}]): сколько срежет и сколько до следующей ступени */
 window.BT_sumDisc = sum => { const L=window.BT_SUMDISC||[]; let cur=null, next=null;
@@ -1415,7 +1415,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-of-shipl]').textContent=n>1?`Доставка, ${n} раза в месяц`:'Доставка';
       q('[data-of-ship]').textContent=ship?BT_fmt(ship):'бесплатно';
       q('[data-of-tot]').textContent=BT_fmt(tot);
-      q('[data-of-note]').textContent=`Доставка по Екатеринбургу бесплатная, если одна поставка от ${BT_fmt(S.free)} для юрлиц (от ${BT_fmt(S.freeFiz)} для физлиц), иначе от ${BT_fmt(S.ship)}. Чашка — ${S.g} г зерна.`;
+      q('[data-of-note]').textContent=`Доставка по Екатеринбургу бесплатная, если одна поставка от ${BT_fmt(S.free)}, иначе от ${BT_fmt(S.ship)}. Чашка — ${S.g} г зерна.`;
       const r=q('[data-of-rent]');
       if(S.rent){ r.hidden=false; r.innerHTML=kg>=S.rent.kg?`При таком объёме кофемашина Jetinno — <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Рассчитать аренду →</a>`
         :`Нет кофемашины? От ${S.rent.kg} кг в месяц даём Jetinno <b>в аренду за 0 ₽</b>. <a class="link" href="${S.rent.url}">Подробнее →</a>`; }

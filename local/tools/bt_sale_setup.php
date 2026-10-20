@@ -120,7 +120,7 @@ $cfg = fn(int $price, int $from, int $to) => ['MAIN' => ['PRICE' => $price, 'CUR
 // курьер: 50 ₽ за км от склада (по прямой × 1,3), не меньше 350 ₽ — Bt\Courier\Handler
 $courier = bt_delivery(['XML_ID' => 'bt_courier', '_OLD_NAME' => 'Доставка курьером', 'NAME' => 'Курьер BEVERTEAM', 'ACTIVE' => 'Y', 'SORT' => 10,
     'CLASS_NAME' => '\\Bt\\Courier\\Handler',
-    'DESCRIPTION' => 'По Екатеринбургу за 2 рабочих дня: 350 ₽ до 7 км пути от склада, дальше 50 ₽ за км. Бесплатно от 3 000 ₽, юрлицам — от 8 000 ₽.',
+    'DESCRIPTION' => 'По Екатеринбургу за 2 рабочих дня: 350 ₽ до 7 км пути от склада, дальше 50 ₽ за км. Бесплатно от 3 000 ₽.',
     'CONFIG' => ['MAIN' => ['MIN' => '350', 'PER_KM' => '50', 'K' => '1.3']]], $apply, $say, $check);
 $pickup = bt_delivery(['XML_ID' => 'bt_pickup', '_OLD_NAME' => 'Самовывоз', 'NAME' => 'Самовывоз со склада', 'ACTIVE' => 'Y', 'SORT' => 20,
     'DESCRIPTION' => 'ул. Колокольная, 31А, по договорённости с менеджером.', 'CONFIG' => $cfg(0, 0, 0)], $apply, $say, $check);
@@ -128,38 +128,40 @@ $pickup = bt_delivery(['XML_ID' => 'bt_pickup', '_OLD_NAME' => 'Самовыво
 bt_delivery_only_city($courier, $ekb, $apply, $say);
 bt_delivery_only_city($pickup, $ekb, $apply, $say);
 
-// бесплатная доставка курьером за товары (без доставки): физлицам от 3 000 ₽, юрлицам от 8 000 ₽ — у них оптовые цены и такой порог в договоре
-$ptIds = array_column(PersonTypeTable::getList(['select' => ['ID', 'CODE']])->fetchAll(), 'ID', 'CODE');
+// бесплатная доставка курьером всем от 3 000 ₽ за товары (без доставки)
 $acts = ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND'], 'CHILDREN' => [
     ['CLASS_ID' => 'ActSaleDelivery', 'DATA' => ['Type' => 'Discount', 'Value' => 100, 'Unit' => 'Perc']],
 ]];
-foreach ([['FIZ', 3000, 'Бесплатная доставка курьером физлицам от 3 000 ₽', 'Бесплатная доставка курьером от 3 000 ₽'],
-    ['UR', 8000, 'Бесплатная доставка курьером юрлицам от 8 000 ₽', '']] as [$ptCode, $sum, $ruleName, $oldName]) {
-    $conds = ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND', 'True' => 'True'], 'CHILDREN' => [
-        ['CLASS_ID' => 'CondBsktAmtGroup', 'DATA' => ['logic' => 'EqGr', 'Value' => $sum, 'All' => 'AND'], 'CHILDREN' => []],
-        ['CLASS_ID' => 'CondSaleDelivery', 'DATA' => ['logic' => 'Equal', 'value' => [$courier]]],
-        ['CLASS_ID' => 'CondSalePersonType', 'DATA' => ['logic' => 'Equal', 'value' => [(int)($ptIds[$ptCode] ?? 0)]]],
-    ]];
-    $rule = \Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=NAME' => array_values(array_filter([$ruleName, $oldName]))],
-        'select' => ['ID', 'NAME', 'CONDITIONS_LIST']])->fetch();
-    if (!$rule) {
-        $say("правило корзины «{$ruleName}»");
-        if ($apply && $courier && !empty($ptIds[$ptCode])) {
-            // CSaleDiscount::Add сам собирает условия и действия в исполняемый код правила
-            $id = CSaleDiscount::Add(['LID' => 's1', 'NAME' => $ruleName, 'ACTIVE' => 'Y', 'SORT' => 100, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N',
-                'CURRENCY' => 'RUB', 'USER_GROUPS' => [2], 'CONDITIONS' => $conds, 'ACTIONS' => $acts]);
-            $id or $fail('discount: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? ''));
-        }
-    } elseif ($rule['NAME'] !== $ruleName || !str_contains(serialize($rule['CONDITIONS_LIST']), 'CondSalePersonType')) {
-        $say("правило корзины {$rule['ID']} → «{$ruleName}»: условие по типу плательщика");
-        $apply and (CSaleDiscount::Update($rule['ID'], ['NAME' => $ruleName, 'CONDITIONS' => $conds, 'ACTIONS' => $acts])
-            or $fail('discount update: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? '')));
+$ruleName = 'Бесплатная доставка курьером от 3 000 ₽';
+$conds = ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND', 'True' => 'True'], 'CHILDREN' => [
+    ['CLASS_ID' => 'CondBsktAmtGroup', 'DATA' => ['logic' => 'EqGr', 'Value' => 3000, 'All' => 'AND'], 'CHILDREN' => []],
+    ['CLASS_ID' => 'CondSaleDelivery', 'DATA' => ['logic' => 'Equal', 'value' => [$courier]]],
+]];
+$rule = \Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=NAME' => [$ruleName, 'Бесплатная доставка курьером физлицам от 3 000 ₽']],
+    'select' => ['ID', 'NAME', 'ACTIVE', 'CONDITIONS_LIST']])->fetch();
+if (!$rule) {
+    $say("правило корзины «{$ruleName}»");
+    if ($apply && $courier) {
+        // CSaleDiscount::Add сам собирает условия и действия в исполняемый код правила
+        $id = CSaleDiscount::Add(['LID' => 's1', 'NAME' => $ruleName, 'ACTIVE' => 'Y', 'SORT' => 100, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N',
+            'CURRENCY' => 'RUB', 'USER_GROUPS' => [2], 'CONDITIONS' => $conds, 'ACTIONS' => $acts]);
+        $id or $fail('discount: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? ''));
     }
-    // CSaleDiscount::Update стирает группы правила, а без групп правило не действует ни на кого
-    if ($rule && !\Bitrix\Sale\Internals\DiscountGroupTable::getList(['filter' => ['=DISCOUNT_ID' => $rule['ID'], '=GROUP_ID' => 2]])->fetch()) {
-        $say("правило корзины {$rule['ID']}: группа «Все пользователи»");
-        $apply and \Bitrix\Sale\Internals\DiscountGroupTable::updateByDiscount((int)$rule['ID'], [2], 'Y', true);
-    }
+} elseif ($rule['NAME'] !== $ruleName || str_contains(serialize($rule['CONDITIONS_LIST']), 'CondSalePersonType')) {
+    $say("правило корзины {$rule['ID']} → «{$ruleName}»: для всех покупателей");
+    $apply and (CSaleDiscount::Update($rule['ID'], ['NAME' => $ruleName, 'ACTIVE' => 'Y', 'CONDITIONS' => $conds, 'ACTIONS' => $acts])
+        or $fail('discount update: ' . ($GLOBALS['APPLICATION']->GetException()?->GetString() ?? '')));
+}
+// CSaleDiscount::Update стирает группы правила, а без групп правило не действует ни на кого
+if ($rule && !\Bitrix\Sale\Internals\DiscountGroupTable::getList(['filter' => ['=DISCOUNT_ID' => $rule['ID'], '=GROUP_ID' => 2]])->fetch()) {
+    $say("правило корзины {$rule['ID']}: группа «Все пользователи»");
+    $apply and \Bitrix\Sale\Internals\DiscountGroupTable::updateByDiscount((int)$rule['ID'], [2], 'Y', true);
+}
+// отдельного порога для юрлиц нет — прежнее правило выключаем
+$old = \Bitrix\Sale\Internals\DiscountTable::getList(['filter' => ['=NAME' => 'Бесплатная доставка курьером юрлицам от 8 000 ₽', '=ACTIVE' => 'Y'], 'select' => ['ID']])->fetch();
+if ($old) {
+    $say("правило корзины {$old['ID']} «юрлицам от 8 000 ₽»: выключить");
+    $apply and \Bitrix\Sale\Internals\DiscountTable::update($old['ID'], ['ACTIVE' => 'N']);
 }
 
 // ---------- оплаты ----------

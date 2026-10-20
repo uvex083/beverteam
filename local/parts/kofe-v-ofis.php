@@ -21,13 +21,12 @@ foreach ($coffee as $i => $c) {
 $kgs = [1, 2, 3, 5, 10, 20];
 $kg0 = 3;
 $periods = [[1, 'Раз в месяц'], [2, 'Раз в 2 недели'], [4, 'Раз в неделю']];
-// доставка по Екатеринбургу: курьер 350 ₽, бесплатно за одну доставку юрлицам от 8 000 ₽, физлицам от 3 000 ₽; калькулятор — для организаций
+// доставка по Екатеринбургу: курьер 350 ₽, бесплатно за одну доставку от 3 000 ₽
 $ship = 350;
-$free = 8000;
-$freeFiz = 3000;
+$free = 3000;
 $cfg = [
     'coffee' => array_map(fn($c) => ['id' => $c['id'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'img' => $c['img'] ?? '', 'par' => $c['par'] ?? '', 'url' => $c['url']], $coffee),
-    'ship' => $ship, 'free' => $free, 'freeFiz' => $freeFiz, 'g' => 8,
+    'ship' => $ship, 'free' => $free, 'g' => 8,
     'rent' => $rentKg ? ['kg' => min($rentKg), 'url' => '/arenda-kofemashin/#calc'] : null,
 ];
 $short = fn(string $n) => trim(preg_replace(['/^BOTANICA\s+/u', '/,\s*1\s*кг$/u'], '', $n));
@@ -41,7 +40,7 @@ foreach ($coffee as $c) {
 }
 $facts = array_values(array_filter([
     ['от 1 кг', 'в месяц — без минимальной партии'],
-    ['0 ₽', 'доставка по Екатеринбургу: юрлицам от ' . bt_fmt($free) . ', физлицам от ' . bt_fmt($freeFiz)],
+    ['0 ₽', 'доставка по Екатеринбургу от ' . bt_fmt($free)],
     $maxPct ? ['до −' . $maxPct . '%', 'оптовая цена от объёма'] : null,
     ['BOTANICA', 'свежая обжарка, ' . count($coffee) . ' ' . (count($coffee) % 10 === 1 && count($coffee) % 100 !== 11 ? 'сорт' : (in_array(count($coffee) % 10, [2, 3, 4]) && !in_array(count($coffee) % 100, [12, 13, 14]) ? 'сорта' : 'сортов'))],
 ]));
