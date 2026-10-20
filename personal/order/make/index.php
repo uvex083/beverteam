@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');
     let msg='';
     if(c.code!==curLoc){
-      const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc===c.code||x.city===c.n), st=document.getElementById('coStreet');
+      const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc?x.loc===c.code:x.city===c.n), st=document.getElementById('coStreet');
       st.value=a?a.street:''; document.getElementById('coFlat').value=a?a.flat:''; document.getElementById('coEntr').value=a?a.entr:'';
       setErr(st,''); document.getElementById('streetList').classList.remove('open');
       msg=curLoc?'Город изменён на '+c.n+(a?' — подставили ваш адрес из кабинета':' — укажите адрес доставки'):'';
