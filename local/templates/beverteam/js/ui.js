@@ -197,6 +197,14 @@ window.BT_PRODUCTS = window.BT_DATA || {coffee:[],tea:[],machines:[],acc:[],rent
 
 const fmt = n => n.toLocaleString('ru-RU')+'\u00a0₽';
 window.BT_fmt = fmt;
+/* неразрывные пробелы в числах, суммах и датах для текста, который дорисовывает скрипт (серверный текст — bt_nbsp_buffer) */
+const NB_MON='января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря';
+const NB=[[/(\d) (?=\d{3}(?!\d))/g,'$1\u00a0'],[/(\d) (?=[A-Za-zА-Яа-яЁё₽%°])/g,'$1\u00a0'],[new RegExp('('+NB_MON+') (?=\\d{4})','g'),'$1\u00a0'],
+  [/(^|[^A-Za-zА-Яа-яЁё\d])(с|со|до|от|по|в|во|на|за|из|к|у|о|об|около|после|через|более|менее|свыше|всего|№) (?=[\d+])/gi,'$1$2\u00a0'],[/(\+\d) (?=\d)/g,'$1\u00a0'],[/(\S) (?=—)/g,'$1\u00a0']];
+window.BT_nb = s => NB.reduce((t,[r,v])=>t.replace(r,v),s);
+const nbNode = n => { const p=n.parentNode, t=n.nodeValue; if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName)||!/\d|—/.test(t)) return; const v=BT_nb(t); if(v!==t) n.nodeValue=v; };
+const nbIn = el => { if(el.nodeType===3) return nbNode(el); if(el.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA)$/.test(el.nodeName)) return; const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())) nbNode(n); };
+new MutationObserver(ms=>ms.forEach(m=>m.type==='characterData'?nbNode(m.target):m.addedNodes.forEach(nbIn))).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 
 /* ---------- корзина: состояние в localStorage, общее для всех страниц прототипа ---------- */
 const ALL = () => Object.values(BT_PRODUCTS).flat();
