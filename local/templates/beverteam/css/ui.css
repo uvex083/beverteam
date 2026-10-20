@@ -1308,7 +1308,7 @@ input,textarea{caret-color:var(--ink)}
   .gal__side{height:auto;flex-direction:row;order:2}
   .gal__thumbs{width:100%;flex:1}
   .gal__thumbs .swiper-slide{width:66px;height:66px;flex:0 0 66px}
-  .gal__thumbs .swiper-slide>span{width:66px;height:66px}
+  .gal__thumbs .swiper-slide>span{width:66px;height:66px}.gal__thumbs img{width:50px;height:50px;max-height:none;object-fit:contain}
   .gal__ar{display:none}
 }
 /* блок покупки: плотный, всё главное в одном экране */
