@@ -299,7 +299,7 @@ window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT
   return `<div class="tl3">
     <div>${I.box}<span><small>Соберём</small><b>${f(d.relPack,d.pack)}</b></span></div>
     <div>${I.truck}<span><small>Передадим курьеру</small><b>${f(d.relShip,d.ship)}</b></span></div>
-    <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>${f(d.relDeliver,d.deliver)}</b></span></div>
+    <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>от ${BT_fmtDate(d.deliver)}</b></span></div>
   </div>`; };
 /* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
