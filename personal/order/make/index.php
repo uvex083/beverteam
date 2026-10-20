@@ -41,6 +41,7 @@ foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTIVE' => 'Y', '!=ACTI
 }
 
 $u = ['name' => '', 'email' => '', 'phone' => ''];
+$addrs = [];
 $orgs = [];
 $ship = [];
 $orgSel = 0;
@@ -48,13 +49,15 @@ if ($USER->IsAuthorized()) {
     $cu = CUser::GetByID($USER->GetID())->Fetch() ?: [];
     $u = ['name' => trim(($cu['NAME'] ?? '') . ' ' . ($cu['LAST_NAME'] ?? '')), 'email' => $cu['EMAIL'] ?? '', 'phone' => $cu['PERSONAL_PHONE'] ?: ($cu['PERSONAL_MOBILE'] ?? '')];
     // основной адрес и первые реквизиты из кабинета
-    $a = bt_addresses((int)$USER->GetID())[0] ?? null;
+    $addrs = array_map(fn($x) => ['loc' => $x['loc'], 'city' => $x['city'], 'street' => $x['street'], 'flat' => $x['flat'], 'entr' => $x['entr']], bt_addresses((int)$USER->GetID()));
+    $a = $addrs[0] ?? null;
     $u += $a ? ['street' => $a['street'], 'flat' => $a['flat'], 'entrance' => $a['entr']] : [];
     // из прошлого заказа — плательщик, способы доставки и оплаты, организация; адрес — основной из кабинета, а нет его — из прошлого заказа
     $ship = CUserOptions::GetOption('bt', 'last_ship', [], (int)$USER->GetID());
     $ship = is_array($ship) ? $ship : [];
     if (!$a && ($ship['street'] ?? '') !== '') {
         $u = ['street' => $ship['street'], 'flat' => $ship['flat'] ?? '', 'entrance' => $ship['entrance'] ?? ''] + $u;
+        $addrs[] = ['loc' => $ship['loc'] ?? '', 'city' => bt_loc($ship['loc'] ?? '')['n'], 'street' => $ship['street'], 'flat' => $ship['flat'] ?? '', 'entr' => $ship['entrance'] ?? ''];
     }
     $orgs = bt_profiles((int)$USER->GetID(), 'UR');
     $orgSel = (int)CUserOptions::GetOption('bt', 'last_org', 0, (int)$USER->GetID());
@@ -184,7 +187,7 @@ $co = bt_contacts();
   </div>
 </div>
 <script>
-window.BT_CO_DATA=<?= Json::encode(['popular' => $popular, 'pays' => $pays]) ?>;
+window.BT_CO_DATA=<?= Json::encode(['popular' => $popular, 'pays' => $pays, 'addrs' => $addrs]) ?>;
 document.addEventListener('DOMContentLoaded',()=>{
   const {popular:POP,pays:PAYS}=BT_CO_DATA, fmt=BT_fmt, form=coForm;
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -373,8 +376,18 @@ document.addEventListener('DOMContentLoaded',()=>{
     const n=++cityN; cityT=setTimeout(()=>post({action:'city',q:v}).then(r=>{if(n===cityN&&document.activeElement===cityIn)showCities(r.list||[]);}),200);});
   cityIn.addEventListener('focus',()=>{if(!locIn.value)cityIn.dispatchEvent(new Event('input'));else showCities(POP);});
   cityList.addEventListener('mousedown',e=>e.preventDefault());
+  // сменили город — улица, дом и квартира прежнего города не подходят: сохранённый адрес этого города или пустые поля
+  let curLoc=locIn.value;
   const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');
-    calc().then(()=>BT_toast('Доставка пересчитана для города '+esc(c.n)));};
+    let msg='';
+    if(c.code!==curLoc){
+      const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc===c.code||x.city===c.n), st=document.getElementById('coStreet');
+      st.value=a?a.street:''; document.getElementById('coFlat').value=a?a.flat:''; document.getElementById('coEntr').value=a?a.entr:'';
+      setErr(st,''); document.getElementById('streetList').classList.remove('open');
+      msg=curLoc?'Город изменён на '+c.n+(a?' — подставили ваш адрес из кабинета':' — укажите адрес доставки'):'';
+      curLoc=c.code;
+    }
+    ready(); calc().then(()=>{ if(msg) BT_toast(esc(msg)); });};
   cityList.addEventListener('click',e=>{const li=e.target.closest('li');if(li)pickCity({n:li.dataset.n,code:li.dataset.code});});
   const letters=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
   // ввели не до конца и ушли из поля — берём первое совпадение по началу названия, мусор не подставляем
