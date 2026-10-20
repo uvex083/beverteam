@@ -21,4 +21,10 @@ if (!$conn->isTableExists($t)) {
 } else {
     echo "таблица $t есть, строк: " . \Bt\Attr\Table::getCount() . "\n";
 }
+// отчёт закрыт от посетителей — и из поиска по сайту тоже
+$mask = COption::GetOptionString('search', 'exclude_mask');
+if (!str_contains($mask, '/seo-otchet/*')) {
+    echo ($apply ? '' : '[show] ') . "поиск по сайту: исключить /seo-otchet/*\n";
+    $apply and COption::SetOptionString('search', 'exclude_mask', rtrim($mask, ';') . ';/seo-otchet/*');
+}
 echo "процент: " . \Bt\Attr\percent() . ", с доставкой: " . (\Bt\Attr\withDelivery() ? 'да' : 'нет') . "\n";
