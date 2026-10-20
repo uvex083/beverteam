@@ -38,8 +38,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   let busy=false;
   const set=(id,q)=>{busy=true;BT_cartSet(id,q);busy=false;};
   tl.innerHTML=BT_timeline();
-  const line=c=>{const p=BT_piece(c,c.kg,c.q);
-    return `<span class="price">${fmt(p*c.q)}${c.q>1?`<s>${fmt(p)} × ${c.q} ${c.kg?'кг':'шт'}</s>`:''}</span>`;};
+  // со скидкой (ступень по весу или старая цена) — обычная цена зачёркнута
+  const line=c=>{const p=BT_piece(c,c.kg,c.q),b=c.old||c.p;
+    return `<span class="price">${b>p?`<del>${fmt(b*c.q)}</del>`:''}${fmt(p*c.q)}${c.q>1?`<s>${fmt(p)} × ${c.q} ${c.kg?'кг':'шт'}</s>`:''}</span>`;};
+  const pack=c=>{const p=BT_perKg(c,c.kg,c.q),b=(c.old||c.p)/c.kg;
+    return `Пачки по 1 кг · ${b>p?`<del>${fmt(b)}</del> `:''}<b>${fmt(p)}</b> за кг`;};
   const totals=()=>{const cart=BT_cartItems(),t=BT_cartTotal(),full=cart.reduce((a,c)=>a+(c.old||c.p)*c.q,0);
     cnt.textContent=cart.length+' '+plural(cart.length,['позиция','позиции','позиций']);
     const sd=BT_sumDisc(t.sum), hint=BT_sumDiscHint(t.sum);
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!cart.length){items.innerHTML=`<div class="card empty"><div class="display">Корзина пуста</div><p>Добавьте кофе, чай или оборудование из каталога.</p><a class="btn" href="/catalog/">В каталог</a></div>`;}
     else items.innerHTML=cart.map(c=>`<div class="ci">
       <a class="ci__ph" href="${esc(c.url)}" aria-label="${esc(c.n)}">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy" width="90" height="90">`:''}</a>
-      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг</p>`:''}
+      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">${pack(c)}</p>`:''}
         <div class="qty"><button type="button" data-d="-" aria-label="Уменьшить количество">−</button><input value="${c.q}" data-id="${c.key}" inputmode="numeric" aria-label="Количество${c.kg?', кг':', шт'}"><button type="button" data-d="+" aria-label="Увеличить количество">+</button></div></div>
       <div class="ci__r">${line(c)}<button type="button" class="del" data-id="${c.key}">Удалить</button></div>
     </div>`).join('');
@@ -98,8 +101,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   items.addEventListener('change',e=>{const i=e.target.closest('input[data-id]');if(!i)return;
     const q=Math.max(1,parseInt(i.value,10)||1);i.value=q;set(i.dataset.id,q);
     const c=BT_cartItems().find(x=>x.key===i.dataset.id);
-    if(c){const ci=i.closest('.ci');ci.querySelector('.price').outerHTML=line(c);const pk=ci.querySelector('.ci__pack b');
-      if(pk)pk.parentNode.innerHTML=`Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг`;}
+    if(c){const ci=i.closest('.ci');ci.querySelector('.price').outerHTML=line(c);const pk=ci.querySelector('.ci__pack');
+      if(pk)pk.innerHTML=pack(c);}
     totals();});
   items.addEventListener('bt:qtyzero',e=>remove(e.target.dataset.id));
   items.addEventListener('click',e=>{const b=e.target.closest('.del');if(b)remove(b.dataset.id);});

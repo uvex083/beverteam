@@ -1461,6 +1461,7 @@ input,textarea{caret-color:var(--ink)}
 .cartp .ci h3{font-size:15px;font-weight:700;margin-bottom:4px}
 .cartp .ci .qty{margin-top:4px}
 .cartp .ci__r{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:130px}
+.cartp .ci__r .price del{display:block;font-family:Manrope;font-weight:500;font-size:12px;color:var(--gray)}
 .cartp .ci__r .del{background:none;border:0;color:var(--gray);font-size:12.5px;padding:0;cursor:pointer}
 @media(hover:hover){.cartp .ci__r .del:hover{color:var(--err)}}
 .cartp .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
