@@ -123,7 +123,7 @@ $co = bt_contacts();
       </div>
 
       <div class="blk" id="blkD">
-        <h2><b>3</b>Доставка</h2>
+        <h2><b>3</b>Доставка<span class="calcst" id="calcSt" aria-live="polite"></span></h2>
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button></div>
         <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна — сбой на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
         <div class="opts" id="deliv"></div>
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
         <div style="flex:1"><div class="t"><span>${esc(o.t)}${free?' <span class="badge badge--ok">Бесплатно</span>':''}</span><span class="p">${free?`<s class="muted">${fmt(o.d.base)}</s>`:priceOf(o)}${dateOf(o)?`<span class="dd">${dateOf(o)}</span>`:''}</span></div>
         <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте — точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
-      :`<p class="muted" style="margin:0;font-size:14px">${dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'Выберите город из списка, чтобы увидеть способы доставки.'}</p>`;
+      :calcShown()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'Выберите город из списка, чтобы увидеть способы доставки.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
   }
 
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div></div></label>`;}).join('')
-      :'<p class="muted" style="margin:0;font-size:14px">Выберите город из списка, чтобы увидеть способы оплаты.</p>';
+      :calcShown()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':'<p class="muted" style="margin:0;font-size:14px">Выберите город из списка, чтобы увидеть способы оплаты.</p>';
   }
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
@@ -302,12 +302,25 @@ document.addEventListener('DOMContentLoaded',()=>{
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
-  let last=null, calcSt='';
+  let last=null, calcSt='', busyT=0;
+  // расчёт дольше 250 мс — показываем, что считаем: старые цены приглушены, сумм в итоге нет, кнопка ждёт
+  const cop=document.querySelector('.cop');
+  function calcShown(){ return document.querySelector('.cop').classList.contains('is-calc'); }
+  function busy(on){
+    clearTimeout(busyT);
+    if(!on){ cop.classList.remove('is-calc'); calcSt_.textContent=''; return; }
+    busyT=setTimeout(()=>{ cop.classList.add('is-calc');
+      calcSt_.textContent='Считаем'+(cityIn.value.trim()?' для города '+cityIn.value.trim():'')+'…';
+      sDel.textContent=sTot.textContent='считаем…'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
+  }
+  const calcSt_=document.getElementById('calcSt');
   function calc(again){
-    const n=++calcN;
+    const n=++calcN; busy(true);
     const st=document.getElementById('coStreet').value.trim(); calcSt=st;
     return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId,street:/\d/.test(st)?st:''}).then(r=>{
-      if(n!==calcN||!r.ok) return;
+      if(n!==calcN) return;
+      busy(false);
+      if(!r.ok){ renderDeliv(); renderPay(); renderSum(last); ready(); return; }
       dl=r.deliveries; avail=r.pays; last=r; cdekDown.hidden=!r.cdekDown;
       if(pvzCur&&pvzCur.loc!==locIn.value){pvzCur=null;pvzIn.value='';}
       const all=opts();
@@ -317,7 +330,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(sel&&sel.d.id!==r.delivery&&!again) return calc(true);
       payId=avail.some(a=>a.id===payId)?payId:avail.some(a=>a.id===wantPay)?wantPay:(avail[0]?avail[0].id:0);
       renderDeliv(); renderPay(); renderSum(r); ready();
-    }).catch(()=>BT_toast('Не получилось пересчитать доставку — обновите страницу'));
+    }).catch(()=>{ if(n===calcN){ busy(false); renderDeliv(); renderPay(); renderSum(last); ready(); } BT_toast('Не получилось пересчитать доставку — обновите страницу'); });
   }
   dTabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
     tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();}});
@@ -424,7 +437,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
     if(!sending)submit.textContent=btnText();
     sHint.textContent=online?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.':'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
-    submit.disabled=!!miss.length||sending;
+    if(calcShown()) sLeft.textContent='Считаем доставку…';
+    submit.disabled=!!miss.length||sending||calcShown();
     return !miss.length;
   }
   // онлайн-оплата — кнопка ведёт в банк, поэтому и называется по-другому

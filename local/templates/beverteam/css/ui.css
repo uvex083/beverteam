@@ -1492,6 +1492,16 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:600px){.okp .oklogin{grid-template-columns:1fr}.okp .oklogin .btn{grid-row:auto;margin-top:8px}}
 .cop .blk h2 b{width:26px;height:26px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-family:'JetBrains Mono';font-size:12px}
 .cop .opts{display:grid;gap:10px}
+/* пересчёт доставки: старые варианты приглушены, в заголовке — что считаем */
+.cop .calcst{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray)}
+.cop .calcst:not(:empty)::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
+@keyframes calcPulse{50%{transform:scale(.55);opacity:.5}}
+.cop #deliv,.cop #pay{transition:opacity .15s}
+.cop.is-calc #deliv,.cop.is-calc #pay{opacity:.4;pointer-events:none}
+.cop.is-calc #sDel,.cop.is-calc #sTot{color:var(--gray)}
+.cop .radio-card.skel{min-height:74px;background:var(--paper);border-color:var(--paper);cursor:default}
+@media(prefers-reduced-motion:reduce){.cop .calcst::before{animation:none}}
+@media(max-width:600px){.cop .calcst{font-size:12px}}
 .cop .dtabs{margin-bottom:14px}
 /* пункт выдачи СДЭК: выбранный адрес в карточке доставки + окно с картой */
 .cop .cdekdown{margin-bottom:12px;background:var(--paper);border:1px solid var(--line)}
