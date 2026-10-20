@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!cart.length){items.innerHTML=`<div class="card empty"><div class="display">Корзина пуста</div><p>Добавьте кофе, чай или оборудование из каталога.</p><a class="btn" href="/catalog/">В каталог</a></div>`;}
     else items.innerHTML=cart.map(c=>`<div class="ci">
       <a class="ci__ph" href="${esc(c.url)}" aria-label="${esc(c.n)}">${c.img?`<img src="${esc(c.img)}" alt="" loading="lazy" width="90" height="90">`:''}</a>
-      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг</p>`:''}<p class="par">${esc(c.par)}</p>
+      <div><h3><a href="${esc(c.url)}">${esc(c.n)}</a></h3>${c.kg?`<p class="ci__pack">Пачки по 1 кг · <b>${fmt(BT_perKg(c,c.kg,c.q))}</b> за кг</p>`:''}
         <div class="qty"><button type="button" data-d="-" aria-label="Уменьшить количество">−</button><input value="${c.q}" data-id="${c.key}" inputmode="numeric" aria-label="Количество${c.kg?', кг':', шт'}"><button type="button" data-d="+" aria-label="Увеличить количество">+</button></div></div>
       <div class="ci__r">${line(c)}<button type="button" class="del" data-id="${c.key}">Удалить</button></div>
     </div>`).join('');
