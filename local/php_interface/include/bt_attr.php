@@ -41,21 +41,32 @@ class Table extends \Bitrix\Main\ORM\Data\DataManager
 }
 
 // источник по адресу и referer; null — прямой заход, переход внутри сайта или служебный сайт (оплата, вход, почта)
-function classify(string $ref, array $get, string $host): ?array
+function classify(string $ref, array $get, string $host, string $path = '/', bool $hasSource = false): ?array
 {
-    $refHost = strtolower((string)parse_url($ref, PHP_URL_HOST));
-    $refHost = preg_replace('/^www\./', '', $refHost);
-    $own = $refHost !== '' && ($refHost === preg_replace('/^www\./', '', strtolower($host)) || preg_match('/(^|\.)beverteam\.(ru|na4u\.ru)$/', $refHost));
-    $medium = strtolower((string)($get['utm_medium'] ?? ''));
-    if (isset($get['yclid']) || isset($get['gclid']) || preg_match('/^(cpc|ppc|cpm|paid|cpa)/', $medium)) {
-        return ['s' => 'ads', 'e' => isset($get['gclid']) ? 'google' : (isset($get['yclid']) ? 'yandex' : (string)($get['utm_source'] ?? '')), 'r' => $refHost];
+    $own = fn(string $h) => $h !== '' && ($h === preg_replace('/^www\./', '', strtolower($host)) || preg_match('/(^|\.)beverteam\.(ru|na4u\.ru)$/', $h));
+    // приложения Android присылают android-app://<пакет>/
+    if (str_starts_with($ref, 'android-app://')) {
+        $pkg = strtolower((string)parse_url($ref, PHP_URL_HOST));
+        $apps = ['com.google.android.googlequicksearchbox' => 'google', 'ru.yandex.searchplugin' => 'yandex', 'com.yandex.browser' => 'yandex', 'ru.yandex.mobile' => 'yandex'];
+        if (isset($apps[$pkg])) {
+            return ['s' => 'organic', 'e' => $apps[$pkg], 'r' => mb_substr($pkg, 0, 100)];
+        }
+        $ref = '';   // почта, мессенджеры и прочие приложения — как прямой заход
     }
-    if (isset($get['utm_source']) && $medium !== 'organic') {
-        return ['s' => 'utm', 'e' => mb_substr((string)$get['utm_source'], 0, 20), 'r' => $refHost];
+    $refHost = preg_replace('/^www\./', '', strtolower((string)parse_url($ref, PHP_URL_HOST)));
+    // метки на ссылках внутри своего сайта источник не меняют
+    if (!$own($refHost)) {
+        $medium = strtolower((string)($get['utm_medium'] ?? ''));
+        if (isset($get['yclid']) || isset($get['gclid']) || preg_match('/^(cpc|ppc|cpm|paid|cpa)/', $medium)) {
+            return ['s' => 'ads', 'e' => isset($get['gclid']) ? 'google' : (isset($get['yclid']) ? 'yandex' : (string)($get['utm_source'] ?? '')), 'r' => $refHost];
+        }
+        if (isset($get['utm_source']) && $medium !== 'organic') {
+            return ['s' => 'utm', 'e' => (string)$get['utm_source'], 'r' => $refHost];
+        }
     }
     $engines = [
         'yandex' => '/^(yandex\.(ru|com|by|kz|ua|uz|az|com\.tr|com\.am|com\.ge|co\.il|tm|tj|md|lt|lv|ee|fr|eu)|ya\.ru)$/',
-        'google' => '/^google\.[a-z.]+$/',
+        'google' => '/^(images\.)?google\.(com|[a-z]{2}|com?\.[a-z]{2})$/',
         'bing' => '/^bing\.com$/',
         'mail' => '/^go\.mail\.ru$/',
         'duckduckgo' => '/^duckduckgo\.com$/',
@@ -67,37 +78,58 @@ function classify(string $ref, array $get, string $host): ?array
             return ['s' => 'organic', 'e' => $e, 'r' => $refHost];
         }
     }
-    // Яндекс добавляет ysclid к переходам из поиска — на случай, если браузер не передал referer
-    if (($refHost === '' || $own) && isset($get['ysclid'])) {
-        return ['s' => 'organic', 'e' => 'yandex', 'r' => $refHost];
+    // ysclid Яндекс добавляет к переходам из поиска, но он остаётся и в скопированной ссылке — засчитываем, только если источника ещё нет
+    if ($refHost === '' && isset($get['ysclid']) && !$hasSource) {
+        return ['s' => 'organic', 'e' => 'yandex', 'r' => ''];
     }
-    if ($refHost === '' || $own || preg_match('/(^|\.)(tbank\.ru|tinkoff\.ru|passport\.yandex\.[a-z.]+|oauth\.yandex\.[a-z.]+|mail\.yandex\.[a-z.]+|id\.vk\.com|oauth\.vk\.com|id\.sber\.ru|sberbank\.ru|alfabank\.ru|e\.mail\.ru|mail\.google\.com|mail\.rambler\.ru|outlook\.live\.com)$/', $refHost)) {
+    // служебные сайты (оплата, 3-D Secure, вход через сервисы, почта) и возврат в кабинет после оплаты источник не меняют
+    if ($refHost === '' || $own($refHost) || str_starts_with($path, '/personal/')
+        || preg_match('/(^|\.)(tbank\.ru|tinkoff\.ru|nspk\.ru|sber\.ru|sberbank\.ru|alfabank\.ru|vk\.ru|id\.vk\.com|oauth\.vk\.com|passport\.yandex\.[a-z.]+|oauth\.yandex\.[a-z.]+|mail\.yandex\.[a-z.]+|e\.mail\.ru|mail\.google\.com|mail\.rambler\.ru|outlook\.live\.com)$/', $refHost)) {
         return null;
     }
-    return ['s' => 'referral', 'e' => '', 'r' => mb_substr($refHost, 0, 100)];
+    return ['s' => 'referral', 'e' => '', 'r' => $refHost];
 }
 
-// main:OnProlog — запомнить значимый источник входа; вход из поиска — ещё и строкой статистики
+// адрес страницы входа без index.php и в нижнем регистре: /Kontakty/index.php → /kontakty/
+function landing(string $path): string
+{
+    $p = mb_strtolower(preg_replace('#/index\.php$#', '/', $path));
+    return $p === '' ? '/' : $p;
+}
+
+// подпись cookie: подменённое значение не принимаем
+function sign(string $v): string
+{
+    $key = Option::get('bt', 'attr_secret', '');
+    if ($key === '') {
+        $key = bin2hex(random_bytes(16));
+        Option::set('bt', 'attr_secret', $key);
+    }
+    return substr(hash_hmac('sha256', $v, $key), 0, 20);
+}
+
+// main:OnEpilog — запомнить значимый источник входа; вход из поиска — ещё и строкой статистики.
+// На эпилоге уже известно, что страница не 404 и не редирект (после LocalRedirect эпилога нет)
 function track(): void
 {
-    if (defined('ADMIN_SECTION') || PHP_SAPI === 'cli' || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') {
+    if (defined('ADMIN_SECTION') || defined('ERROR_404') || PHP_SAPI === 'cli' || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET' || headers_sent()) {
         return;
     }
-    $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
-    $path = (string)parse_url($uri, PHP_URL_PATH);
-    if (preg_match('#^/(bitrix|local|upload)/#', $path) || ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== ''
+    $path = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    if (!preg_match('#^/[^/\\\\]#', $path . 'x') || preg_match('#^/(bitrix|local|upload)/#', $path) || ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== ''
         || preg_match('/bot|crawl|spider|slurp|preview|headless|lighthouse|monitor|curl|wget|python/i', (string)($_SERVER['HTTP_USER_AGENT'] ?? ''))) {
         return;
     }
-    $c = classify((string)($_SERVER['HTTP_REFERER'] ?? ''), $_GET, (string)($_SERVER['HTTP_HOST'] ?? ''));
+    $prev = current();
+    $c = classify((string)($_SERVER['HTTP_REFERER'] ?? ''), $_GET, (string)($_SERVER['HTTP_HOST'] ?? ''), $path, (bool)$prev);
     if (!$c) {
         return;
     }
-    $c['l'] = mb_substr($path, 0, 255);
-    $c['b'] = in_array($path, BRAND_PAGES, true) ? 'Y' : 'N';
+    $c = ['s' => $c['s'], 'e' => mb_substr((string)$c['e'], 0, 20), 'r' => mb_substr((string)$c['r'], 0, 100), 'l' => mb_substr(landing($path), 0, 255)];
+    $c['b'] = in_array($c['l'], BRAND_PAGES, true) ? 'Y' : 'N';
     $c['t'] = time();
-    $prev = current();
-    $val = json_encode($c, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $json = json_encode($c, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $val = sign($json) . '.' . $json;
     setcookie(COOKIE, $val, ['expires' => time() + DAYS * 86400, 'path' => '/', 'secure' => \CMain::IsHTTPS(), 'httponly' => true, 'samesite' => 'Lax']);
     $_COOKIE[COOKIE] = $val;
     // обновление страницы и возврат «назад» в выдачу в течение 30 минут — тот же вход
@@ -107,28 +139,34 @@ function track(): void
     }
 }
 
-// действующий источник посетителя (не старше 180 дней) или null
+// действующий источник посетителя (подпись верна, не старше 180 дней) или null
 function current(): ?array
 {
-    $c = json_decode((string)($_COOKIE[COOKIE] ?? ''), true);
-    if (!is_array($c) || !isset($c['s'], $c['t']) || time() - (int)$c['t'] > DAYS * 86400) {
+    [$sig, $json] = array_pad(explode('.', (string)($_COOKIE[COOKIE] ?? ''), 2), 2, '');
+    $c = $json !== '' && hash_equals(sign($json), $sig) ? json_decode($json, true) : null;
+    if (!is_array($c) || !isset(SOURCES[$c['s'] ?? '']) || time() - (int)($c['t'] ?? 0) > DAYS * 86400) {
         return null;
     }
-    return ['s' => (string)$c['s'], 'e' => (string)($c['e'] ?? ''), 'r' => (string)($c['r'] ?? ''), 'l' => (string)($c['l'] ?? ''),
-        'b' => ($c['b'] ?? 'N') === 'Y' ? 'Y' : 'N', 't' => (int)$c['t']];
+    return ['s' => (string)$c['s'], 'e' => mb_substr((string)($c['e'] ?? ''), 0, 20), 'r' => mb_substr((string)($c['r'] ?? ''), 0, 100),
+        'l' => mb_substr((string)($c['l'] ?? ''), 0, 255), 'b' => ($c['b'] ?? 'N') === 'Y' ? 'Y' : 'N', 't' => (int)$c['t']];
 }
 
+// строка отчёта; сбой записи не должен ронять страницу или оформление заказа
 function add(string $type, int $id, ?array $c): void
 {
-    if ($id && Table::getCount(['=TYPE' => $type, '=ENTITY_ID' => $id])) {
-        return;
+    try {
+        if ($type !== 'visit' && (!$id || Table::getCount(['=TYPE' => $type, '=ENTITY_ID' => $id]))) {
+            return;
+        }
+        Table::add([
+            'TYPE' => $type, 'ENTITY_ID' => $id, 'CREATED' => new DateTime(),
+            'SOURCE' => $c['s'] ?? 'direct', 'ENGINE' => mb_substr((string)($c['e'] ?? ''), 0, 20), 'LANDING' => mb_substr((string)($c['l'] ?? ''), 0, 255),
+            'REF_HOST' => mb_substr((string)($c['r'] ?? ''), 0, 100), 'ENTRY_AT' => isset($c['t']) ? DateTime::createFromTimestamp((int)$c['t']) : null,
+            'BRAND_AUTO' => ($c['b'] ?? 'N') === 'Y' ? 'Y' : 'N', 'YM_UID' => mb_substr(preg_replace('/\D/', '', (string)($_COOKIE['_ym_uid'] ?? '')), 0, 40),
+        ]);
+    } catch (\Throwable $e) {
+        \CEventLog::Add(['SEVERITY' => 'ERROR', 'AUDIT_TYPE_ID' => 'BT_ATTR', 'MODULE_ID' => 'main', 'ITEM_ID' => "$type $id", 'DESCRIPTION' => $e->getMessage()]);
     }
-    Table::add([
-        'TYPE' => $type, 'ENTITY_ID' => $id, 'CREATED' => new DateTime(),
-        'SOURCE' => $c['s'] ?? 'direct', 'ENGINE' => mb_substr((string)($c['e'] ?? ''), 0, 20), 'LANDING' => (string)($c['l'] ?? ''),
-        'REF_HOST' => (string)($c['r'] ?? ''), 'ENTRY_AT' => isset($c['t']) ? DateTime::createFromTimestamp((int)$c['t']) : null,
-        'BRAND_AUTO' => $c['b'] ?? 'N', 'YM_UID' => mb_substr((string)($_COOKIE['_ym_uid'] ?? ''), 0, 40),
-    ]);
 }
 
 // sale:OnSaleOrderSaved (D7) — новый заказ с сайта получает источник покупателя; заказы из админки и CLI не трогаем (там cookie менеджера)
@@ -209,6 +247,7 @@ function report(string $type, array $f): array
     }
     if ($type === 'lead' && $ids) {
         $leads = [];
+        \Bitrix\Main\Loader::includeModule('iblock');
         $res = \CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('form_requests'), 'ID' => $ids], false, false,
             ['ID', 'NAME', 'PROPERTY_TOPIC', 'PROPERTY_CLIENT_NAME', 'PROPERTY_PHONE', 'PROPERTY_EMAIL']);
         while ($l = $res->Fetch()) {
@@ -231,7 +270,7 @@ function report(string $type, array $f): array
             $l = $leads[$id] ?? null;
             $r['LEAD'] = $l ? ['topic' => (string)$l['PROPERTY_TOPIC_VALUE'], 'name' => (string)$l['PROPERTY_CLIENT_NAME_VALUE'],
                 'phone' => (string)$l['PROPERTY_PHONE_VALUE'], 'email' => (string)$l['PROPERTY_EMAIL_VALUE']] : null;
-            $why = $why ?: (!$l ? 'заявка удалена' : ($r['AMOUNT'] === null ? 'сумма не указана' : ''));
+            $why = $why ?: (!$l ? 'заявка удалена' : ((float)$r['AMOUNT'] <= 0 ? 'сумма не указана' : ''));
             $r['BASE'] = (float)$r['AMOUNT'];
         }
         $r['WHY'] = $why;

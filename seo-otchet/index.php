@@ -20,8 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid()) {
             $id && Attr\Table::update($id, ['BRAND_MANUAL' => $v]);
             break;
         case 'amount':
-            $a = trim(str_replace([' ', "\u{A0}", ','], ['', '', '.'], (string)($_POST['amount'] ?? '')));
-            $id && Attr\Table::update($id, ['AMOUNT' => $a === '' ? null : max(0, (float)$a)]);
+            // «1 500», «1.500,50», «1500.5»; пусто, ноль и не число — суммы нет
+            $a = str_replace([' ', "\u{A0}"], '', (string)($_POST['amount'] ?? ''));
+            $a = str_contains($a, ',') ? str_replace(['.', ','], ['', '.'], $a) : $a;
+            $id && Attr\Table::update($id, ['AMOUNT' => is_numeric($a) && (float)$a > 0 ? round((float)$a, 2) : null]);
             break;
         case 'settings':
             $pct = (float)str_replace(',', '.', (string)($_POST['pct'] ?? ''));
@@ -44,20 +46,22 @@ if (($_GET['format'] ?? '') === 'csv') {
     $out = fopen('php://output', 'w');
     fwrite($out, "\xEF\xBB\xBF");
     $num = fn($v) => str_replace('.', ',', (string)round((float)$v, 2));
+    // текст, начинающийся с = + - @, Excel принял бы за формулу (телефон «+7…» тоже)
+    $txt = fn($v) => preg_match('/^[=+\-@\t\r]/', (string)$v) ? "'" . $v : (string)$v;
     $head = ['Дата', 'Источник', 'Поисковик', 'Страница входа', 'Вход', 'Запрос'];
     $head = array_merge($head, $tab === 'order' ? ['Заказ', 'Покупатель', 'Сумма заказа', 'Доставка', 'Статус', 'База', 'Вознаграждение', 'Не засчитан']
         : ($tab === 'lead' ? ['Заявка', 'Имя', 'Телефон', 'Сумма сделки', 'Вознаграждение', 'Не засчитана'] : []));
     fputcsv($out, $head, ';');
     foreach ($rows as $r) {
-        $line = [(string)$r['CREATED'], Attr\SOURCES[$r['SOURCE']] ?? $r['SOURCE'], Attr\ENGINES[$r['ENGINE']] ?? $r['ENGINE'], $r['LANDING'],
+        $line = [(string)$r['CREATED'], Attr\SOURCES[$r['SOURCE']] ?? $r['SOURCE'], $txt(Attr\ENGINES[$r['ENGINE']] ?? $r['ENGINE']), $txt($r['LANDING']),
             (string)$r['ENTRY_AT'], $r['BRAND'] === 'Y' ? 'брендовый' : 'не брендовый'];
         if ($tab === 'order') {
             $o = $r['ORDER'];
-            $line = array_merge($line, [$o['num'] ?? $r['ENTITY_ID'], $o['buyer'] ?? '', $num($o['price'] ?? 0), $num($o['delivery'] ?? 0), $o['status'] ?? '',
+            $line = array_merge($line, [$o['num'] ?? $r['ENTITY_ID'], $txt($o['buyer'] ?? ''), $num($o['price'] ?? 0), $num($o['delivery'] ?? 0), $o['status'] ?? '',
                 $num($r['BASE']), $num($r['FEE']), $r['WHY']]);
         } elseif ($tab === 'lead') {
             $l = $r['LEAD'];
-            $line = array_merge($line, [$l['topic'] ?? $r['ENTITY_ID'], $l['name'] ?? '', $l['phone'] ?? '', $r['AMOUNT'] === null ? '' : $num($r['AMOUNT']), $num($r['FEE']), $r['WHY']]);
+            $line = array_merge($line, [$txt($l['topic'] ?? $r['ENTITY_ID']), $txt($l['name'] ?? ''), $txt($l['phone'] ?? ''), $r['AMOUNT'] === null ? '' : $num($r['AMOUNT']), $num($r['FEE']), $r['WHY']]);
         }
         fputcsv($out, $line, ';');
     }

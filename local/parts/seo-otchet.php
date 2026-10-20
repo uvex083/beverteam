@@ -89,7 +89,7 @@ $brand = function (array $r) use ($e) {
       <tbody>
       <?php foreach ($leads as $r): $l = $r['LEAD']; ?>
         <tr id="r<?= (int)$r['ID'] ?>"<?= $r['COUNTED'] ? '' : ' class="is-off"' ?>>
-          <td><b><a href="/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=<?= (int)bt_iblock('form_requests') ?>&amp;type=forms&amp;ID=<?= (int)$r['ENTITY_ID'] ?>&amp;lang=ru" target="_blank"><?= $e($l['topic'] ?? ('Заявка ' . $r['ENTITY_ID'])) ?></a></b>
+          <td><b><a href="/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=<?= (int)bt_iblock('form_requests') ?>&amp;type=forms&amp;ID=<?= (int)$r['ENTITY_ID'] ?>&amp;lang=ru" target="_blank"><?= $e(($l['topic'] ?? '') ?: 'Заявка ' . $r['ENTITY_ID']) ?></a></b>
             <span class="muted"><?= $dt($r['CREATED']) ?></span><?php if ($l): ?><span><?= $e(trim($l['name'] . ' ' . $l['phone'])) ?></span><?php endif ?></td>
           <td><?= $entry($r) ?></td>
           <td><?= $brand($r) ?></td>

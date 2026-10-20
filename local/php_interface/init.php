@@ -40,7 +40,7 @@ AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save'
 
 // источник заказов и заявок (вход из поиска) для отчёта /seo-otchet/
 require_once __DIR__ . '/include/bt_attr.php';
-AddEventHandler('main', 'OnProlog', 'Bt\\Attr\\track');
+AddEventHandler('main', 'OnEpilog', 'Bt\\Attr\\track');
 AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'Bt\\Attr\\onLeadAdd');
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderSaved', 'Bt\\Attr\\onOrderSaved');
 
