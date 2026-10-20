@@ -51,8 +51,8 @@ $brand = function (array $r) use ($e) {
 
   <div class="seor__sum">
     <div class="card"><span class="muted">Входы из поиска</span><b><?= count($visits) ?></b><span class="muted">по выбранному запросу</span></div>
-    <div class="card"><span class="muted">Заказы</span><b><?= $to['n'] ?></b><span class="muted">на <?= $rub($to['base']) ?></span></div>
-    <div class="card"><span class="muted">Заявки</span><b><?= $tl['n'] ?></b><span class="muted">на <?= $rub($tl['base']) ?></span></div>
+    <div class="card"><span class="muted">Засчитано заказов</span><b><?= $to['n'] ?></b><span class="muted">на <?= $rub($to['base']) ?></span></div>
+    <div class="card"><span class="muted">Засчитано заявок</span><b><?= $tl['n'] ?></b><span class="muted">на <?= $rub($tl['base']) ?></span></div>
     <div class="card seor__fee"><span>Вознаграждение <?= $e(str_replace('.', ',', (string)$pct)) ?>%</span><b><?= $rub($to['fee'] + $tl['fee']) ?></b><span>заказы <?= $rub($to['fee']) ?> · заявки <?= $rub($tl['fee']) ?></span></div>
   </div>
 
@@ -94,7 +94,7 @@ $brand = function (array $r) use ($e) {
           <td><?= $entry($r) ?></td>
           <td><?= $brand($r) ?></td>
           <td><form method="post" class="seor__amount"><?= bitrix_sessid_post() ?><input type="hidden" name="action" value="amount"><input type="hidden" name="id" value="<?= (int)$r['ID'] ?>"><input type="hidden" name="anchor" value="r<?= (int)$r['ID'] ?>">
-            <input name="amount" inputmode="decimal" placeholder="0" aria-label="Сумма сделки, ₽" value="<?= $r['AMOUNT'] === null ? '' : $e(round((float)$r['AMOUNT'], 2)) ?>"><button class="btn btn--sm btn--line" type="submit">Сохранить</button></form></td>
+            <input name="amount" inputmode="decimal" placeholder="0" aria-label="Сумма сделки, ₽" value="<?= $r['AMOUNT'] === null ? '' : $e(rtrim(rtrim(number_format((float)$r['AMOUNT'], 2, ',', ' '), '0'), ',')) ?>"><button class="btn btn--sm btn--line" type="submit">Сохранить</button></form></td>
           <td><?= $r['COUNTED'] ? '<b>' . $rub($r['FEE']) . '</b>' : '<span class="muted">' . $e($r['WHY']) . '</span>' ?></td>
         </tr>
       <?php endforeach ?>
