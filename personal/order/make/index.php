@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     clearTimeout(busyT);
     if(!on){ cop.classList.remove('is-calc','is-stale'); calcSt_.textContent=''; return; }
     busyT=setTimeout(()=>{ cop.classList.add('is-calc');
-      calcSt_.textContent='Считаем'+(cityIn.value.trim()?' для города '+cityIn.value.trim():'')+'…';
+      calcSt_.innerHTML='Считаем'+(cityIn.value.trim()?'<span class="calcst__c"> для города '+esc(cityIn.value.trim())+'</span>':'')+'…';
       sDel.textContent=sTot.textContent='считаем…'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
   }
   const calcSt_=document.getElementById('calcSt');

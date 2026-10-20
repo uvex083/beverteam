@@ -1501,7 +1501,7 @@ input,textarea{caret-color:var(--ink)}
 .cop.is-calc #sDel,.cop.is-calc #sTot{color:var(--gray)}
 .cop .radio-card.skel{min-height:74px;background:var(--paper);border-color:var(--paper);cursor:default}
 @media(prefers-reduced-motion:reduce){.cop .calcst::before{animation:none}}
-@media(max-width:600px){.cop .calcst{font-size:12px}}
+@media(max-width:600px){.cop .calcst{font-size:12px}.cop .calcst__c{display:none}}
 .cop .dtabs{margin-bottom:14px}
 /* пункт выдачи СДЭК: выбранный адрес в карточке доставки + окно с картой */
 .cop .cdekdown{margin-bottom:12px;background:var(--paper);border:1px solid var(--line)}
