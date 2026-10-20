@@ -16,7 +16,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
     <aside class="sum" id="sumBox">
       <div class="free" id="free"></div>
       <div class="l"><span>Товары, <span id="cnt"></span></span><span id="sub"></span></div>
-      <div class="l"><span>Скидка</span><span id="disc" style="color:var(--ok)"></span></div>
+      <div class="l" id="discRow" hidden><span>Скидка</span><span id="disc" style="color:var(--ok)"></span></div>
       <div class="l" id="sdRow" hidden><span id="sdName"></span><span id="sdCut" style="color:var(--ok)"></span></div>
       <p class="muted" id="sdHint" style="font-size:12.5px;margin:2px 0 0" hidden></p>
       <div class="l"><span>Доставка</span><span class="muted">рассчитаем при оформлении</span></div>
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const totals=()=>{const cart=BT_cartItems(),t=BT_cartTotal(),full=cart.reduce((a,c)=>a+(c.old||c.p)*c.q,0);
     cnt.textContent=cart.length+' '+plural(cart.length,['позиция','позиции','позиций']);
     const sd=BT_sumDisc(t.sum), hint=BT_sumDiscHint(t.sum);
-    sub.textContent=fmt(full); disc.textContent=full>t.sum?'−'+fmt(full-t.sum):'—'; tot.textContent=fmt(t.sum-sd.cut);
+    sub.textContent=fmt(full); discRow.hidden=!(full>t.sum); disc.textContent='−'+fmt(full-t.sum); tot.textContent=fmt(t.sum-sd.cut);
     sdRow.hidden=!sd.cut; sdName.textContent=`Скидка ${sd.pct}% от суммы заказа`; sdCut.textContent='−'+fmt(sd.cut);
     sdHint.hidden=!hint; sdHint.textContent=hint;
     free.innerHTML=BT_freeBar(t.sum);};
