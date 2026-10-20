@@ -203,9 +203,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const priceOf=o=>o.d.price>0?(o.d.from?'от ':'')+fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
   function renderDeliv(){
     const all=opts();
-    [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab);
-      b.setAttribute('aria-selected',b.dataset.tab===tab);b.setAttribute('aria-disabled',!on);
-      b.title=on?'':'Недоступно для выбранного города';});
+    let nOn=0;
+    [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab); nOn+=on;
+      b.setAttribute('aria-selected',b.dataset.tab===tab); b.hidden=!on;});
+    dTabs.hidden=nOn<2;
     const list=all.filter(o=>o.tab===tab);
     deliv.innerHTML=list.length?list.map(o=>{const free=o.d.price===0&&o.d.base>0;
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
@@ -287,11 +288,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     openPvz();});
   const pvzMapBox=document.getElementById('pvzMap');
   function renderPay(){
-    pay.innerHTML=PAYS.map(p=>{const on=avail.some(a=>a.id===p.id);
-      const why=p.code==='bill'?'Только для юрлиц и ИП':(p.code==='cash'||p.code==='tinkoff')&&pt==='UR'?'Юрлица оплачивают по счёту':'Недоступно для выбранной доставки';
-      const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
-      return `<label class="radio-card ${on&&payId===p.id?'on':''} ${on?'':'off'}"><input type="radio" name="pay" value="${p.id}" ${on&&payId===p.id?'checked':''} ${on?'':'disabled'}>
-        <div><div class="t">${esc(p.name)}</div><div class="d">${esc(on?desc:why)}</div></div></label>`;}).join('');
+    const list=PAYS.filter(p=>avail.some(a=>a.id===p.id));
+    pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
+      return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
+        <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div></div></label>`;}).join('')
+      :'<p class="muted" style="margin:0;font-size:14px">Выберите город из списка, чтобы увидеть способы оплаты.</p>';
   }
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
@@ -318,7 +319,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       renderDeliv(); renderPay(); renderSum(r); ready();
     }).catch(()=>BT_toast('Не получилось пересчитать доставку — обновите страницу'));
   }
-  dTabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b||b.getAttribute('aria-disabled')==='true')return;
+  dTabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
     tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();}});
   deliv.addEventListener('change',e=>{const o=opts().find(x=>x.key===e.target.value);if(!o)return;const same=sel&&sel.d.id===o.d.id;sel=o;
     if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();});
