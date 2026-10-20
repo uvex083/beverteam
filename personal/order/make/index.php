@@ -103,7 +103,7 @@ $co = bt_contacts();
             <div class="field"><label for="coKpp">КПП</label><input id="coKpp" name="kpp" placeholder="9 цифр, если есть" inputmode="numeric" maxlength="9" value="<?= $e($u['KPP'] ?? '') ?>"></div>
             <div class="field"><label for="coAdr">Юридический адрес</label><input id="coAdr" name="company_adr" value="<?= $e($u['COMPANY_ADR'] ?? '') ?>"></div>
           </div>
-          <div class="alert alert--info" style="margin-bottom:18px">Выставим счёт, после оплаты — УПД. Отсрочка платежа для постоянных клиентов — по договорённости.</div>
+          <div class="alert alert--info" style="margin-bottom:18px">Выставим счёт, после оплаты — УПД.</div>
         </div>
         <div class="f2" style="margin-top:18px">
           <div class="field"><label for="coName" id="coNameL">Имя *</label><input id="coName" name="name" autocomplete="name" value="<?= $e($u['name']) ?>"></div>
