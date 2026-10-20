@@ -1,0 +1,250 @@
+<?php
+// Источник заказов и заявок для отчёта /seo-otchet/: вход из поиска запоминается в cookie на 180 дней
+// (последний значимый источник: прямой заход его не перебивает), заказ и заявка берут источник при создании.
+
+namespace Bt\Attr;
+
+use Bitrix\Main\Config\Option;
+use Bitrix\Main\ORM\Fields;
+use Bitrix\Main\Type\DateTime;
+
+const COOKIE = 'bt_src';
+const DAYS = 180;
+// вход из поиска на эти страницы считаем брендовым запросом (ищут компанию по названию)
+const BRAND_PAGES = ['/', '/kontakty/', '/o-kompanii/', '/otzyvy-o-nas/'];
+
+class Table extends \Bitrix\Main\ORM\Data\DataManager
+{
+    public static function getTableName()
+    {
+        return 'bt_attr';
+    }
+
+    public static function getMap()
+    {
+        return [
+            new Fields\IntegerField('ID', ['primary' => true, 'autocomplete' => true]),
+            new Fields\StringField('TYPE', ['required' => true, 'size' => 10]),        // visit | order | lead
+            new Fields\IntegerField('ENTITY_ID', ['default_value' => 0]),
+            new Fields\DatetimeField('CREATED'),
+            new Fields\StringField('SOURCE', ['size' => 20]),                           // organic | ads | utm | referral | direct
+            new Fields\StringField('ENGINE', ['size' => 20]),
+            new Fields\StringField('LANDING', ['size' => 255]),
+            new Fields\StringField('REF_HOST', ['size' => 100]),
+            new Fields\DatetimeField('ENTRY_AT', ['nullable' => true]),
+            new Fields\StringField('BRAND_AUTO', ['size' => 1]),
+            new Fields\StringField('BRAND_MANUAL', ['size' => 1, 'nullable' => true]),
+            new Fields\FloatField('AMOUNT', ['nullable' => true]),
+            new Fields\StringField('YM_UID', ['size' => 40]),
+        ];
+    }
+}
+
+// источник по адресу и referer; null — прямой заход, переход внутри сайта или служебный сайт (оплата, вход, почта)
+function classify(string $ref, array $get, string $host): ?array
+{
+    $refHost = strtolower((string)parse_url($ref, PHP_URL_HOST));
+    $refHost = preg_replace('/^www\./', '', $refHost);
+    $own = $refHost !== '' && ($refHost === preg_replace('/^www\./', '', strtolower($host)) || preg_match('/(^|\.)beverteam\.(ru|na4u\.ru)$/', $refHost));
+    $medium = strtolower((string)($get['utm_medium'] ?? ''));
+    if (isset($get['yclid']) || isset($get['gclid']) || preg_match('/^(cpc|ppc|cpm|paid|cpa)/', $medium)) {
+        return ['s' => 'ads', 'e' => isset($get['gclid']) ? 'google' : (isset($get['yclid']) ? 'yandex' : (string)($get['utm_source'] ?? '')), 'r' => $refHost];
+    }
+    if (isset($get['utm_source']) && $medium !== 'organic') {
+        return ['s' => 'utm', 'e' => mb_substr((string)$get['utm_source'], 0, 20), 'r' => $refHost];
+    }
+    $engines = [
+        'yandex' => '/^(yandex\.(ru|com|by|kz|ua|uz|az|com\.tr|com\.am|com\.ge|co\.il|tm|tj|md|lt|lv|ee|fr|eu)|ya\.ru)$/',
+        'google' => '/^google\.[a-z.]+$/',
+        'bing' => '/^bing\.com$/',
+        'mail' => '/^go\.mail\.ru$/',
+        'duckduckgo' => '/^duckduckgo\.com$/',
+        'rambler' => '/^nova\.rambler\.ru$/',
+        'yahoo' => '/^search\.yahoo\.com$/',
+    ];
+    foreach ($engines as $e => $re) {
+        if (preg_match($re, $refHost)) {
+            return ['s' => 'organic', 'e' => $e, 'r' => $refHost];
+        }
+    }
+    // Яндекс добавляет ysclid к переходам из поиска — на случай, если браузер не передал referer
+    if (($refHost === '' || $own) && isset($get['ysclid'])) {
+        return ['s' => 'organic', 'e' => 'yandex', 'r' => $refHost];
+    }
+    if ($refHost === '' || $own || preg_match('/(^|\.)(tbank\.ru|tinkoff\.ru|passport\.yandex\.[a-z.]+|oauth\.yandex\.[a-z.]+|mail\.yandex\.[a-z.]+|id\.vk\.com|oauth\.vk\.com|id\.sber\.ru|sberbank\.ru|alfabank\.ru|e\.mail\.ru|mail\.google\.com|mail\.rambler\.ru|outlook\.live\.com)$/', $refHost)) {
+        return null;
+    }
+    return ['s' => 'referral', 'e' => '', 'r' => mb_substr($refHost, 0, 100)];
+}
+
+// main:OnProlog — запомнить значимый источник входа; вход из поиска — ещё и строкой статистики
+function track(): void
+{
+    if (defined('ADMIN_SECTION') || PHP_SAPI === 'cli' || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') {
+        return;
+    }
+    $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
+    $path = (string)parse_url($uri, PHP_URL_PATH);
+    if (preg_match('#^/(bitrix|local|upload)/#', $path) || ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== ''
+        || preg_match('/bot|crawl|spider|slurp|preview|headless|lighthouse|monitor|curl|wget|python/i', (string)($_SERVER['HTTP_USER_AGENT'] ?? ''))) {
+        return;
+    }
+    $c = classify((string)($_SERVER['HTTP_REFERER'] ?? ''), $_GET, (string)($_SERVER['HTTP_HOST'] ?? ''));
+    if (!$c) {
+        return;
+    }
+    $c['l'] = mb_substr($path, 0, 255);
+    $c['b'] = in_array($path, BRAND_PAGES, true) ? 'Y' : 'N';
+    $c['t'] = time();
+    $prev = current();
+    $val = json_encode($c, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    setcookie(COOKIE, $val, ['expires' => time() + DAYS * 86400, 'path' => '/', 'secure' => \CMain::IsHTTPS(), 'httponly' => true, 'samesite' => 'Lax']);
+    $_COOKIE[COOKIE] = $val;
+    // обновление страницы и возврат «назад» в выдачу в течение 30 минут — тот же вход
+    $same = $prev && $prev['s'] === $c['s'] && $prev['e'] === $c['e'] && $prev['l'] === $c['l'] && $c['t'] - $prev['t'] < 1800;
+    if ($c['s'] === 'organic' && !$same) {
+        add('visit', 0, $c);
+    }
+}
+
+// действующий источник посетителя (не старше 180 дней) или null
+function current(): ?array
+{
+    $c = json_decode((string)($_COOKIE[COOKIE] ?? ''), true);
+    if (!is_array($c) || !isset($c['s'], $c['t']) || time() - (int)$c['t'] > DAYS * 86400) {
+        return null;
+    }
+    return ['s' => (string)$c['s'], 'e' => (string)($c['e'] ?? ''), 'r' => (string)($c['r'] ?? ''), 'l' => (string)($c['l'] ?? ''),
+        'b' => ($c['b'] ?? 'N') === 'Y' ? 'Y' : 'N', 't' => (int)$c['t']];
+}
+
+function add(string $type, int $id, ?array $c): void
+{
+    if ($id && Table::getCount(['=TYPE' => $type, '=ENTITY_ID' => $id])) {
+        return;
+    }
+    Table::add([
+        'TYPE' => $type, 'ENTITY_ID' => $id, 'CREATED' => new DateTime(),
+        'SOURCE' => $c['s'] ?? 'direct', 'ENGINE' => mb_substr((string)($c['e'] ?? ''), 0, 20), 'LANDING' => (string)($c['l'] ?? ''),
+        'REF_HOST' => (string)($c['r'] ?? ''), 'ENTRY_AT' => isset($c['t']) ? DateTime::createFromTimestamp((int)$c['t']) : null,
+        'BRAND_AUTO' => $c['b'] ?? 'N', 'YM_UID' => mb_substr((string)($_COOKIE['_ym_uid'] ?? ''), 0, 40),
+    ]);
+}
+
+// sale:OnSaleOrderSaved (D7) — новый заказ с сайта получает источник покупателя; заказы из админки и CLI не трогаем (там cookie менеджера)
+function onOrderSaved(\Bitrix\Main\Event $event): void
+{
+    if (!$event->getParameter('IS_NEW') || defined('ADMIN_SECTION') || PHP_SAPI === 'cli') {
+        return;
+    }
+    $order = $event->getParameter('ENTITY');
+    $order && add('order', (int)$order->getId(), current());
+}
+
+// iblock:OnAfterIBlockElementAdd — заявка с сайта
+function onLeadAdd(array &$f): void
+{
+    if (empty($f['ID']) || (int)$f['IBLOCK_ID'] !== (int)bt_iblock('form_requests') || defined('ADMIN_SECTION') || PHP_SAPI === 'cli') {
+        return;
+    }
+    add('lead', (int)$f['ID'], current());
+}
+
+function percent(): float
+{
+    return (float)Option::get('bt', 'seo_pct', '20');
+}
+
+function withDelivery(): bool
+{
+    return Option::get('bt', 'seo_with_delivery', 'N') === 'Y';
+}
+
+const ENGINES = ['yandex' => 'Яндекс', 'google' => 'Google', 'bing' => 'Bing', 'mail' => 'Mail.ru', 'duckduckgo' => 'DuckDuckGo', 'rambler' => 'Рамблер', 'yahoo' => 'Yahoo'];
+const SOURCES = ['organic' => 'Поиск', 'ads' => 'Реклама', 'utm' => 'Ссылка с меткой', 'referral' => 'Переход с сайта', 'direct' => 'Прямой заход'];
+
+// фильтр отчёта из запроса: период (по умолчанию текущий месяц), источник, брендовость
+function filter(array $q): array
+{
+    $d = fn($v, $def) => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$v) ? (string)$v : $def;
+    return [
+        'from' => $d($q['from'] ?? '', date('Y-m-01')),
+        'to' => $d($q['to'] ?? '', date('Y-m-d')),
+        'src' => ($q['src'] ?? '') === 'all' ? 'all' : 'organic',
+        'brand' => in_array($q['brand'] ?? '', ['brand', 'all'], true) ? $q['brand'] : 'nonbrand',
+    ];
+}
+
+// строки отчёта одного типа (order | lead | visit) за период с расчётом: засчитана ли строка, база и вознаграждение
+function report(string $type, array $f): array
+{
+    $flt = ['=TYPE' => $type,
+        '>=CREATED' => new DateTime($f['from'] . ' 00:00:00', 'Y-m-d H:i:s'),
+        '<=CREATED' => new DateTime($f['to'] . ' 23:59:59', 'Y-m-d H:i:s')];
+    if ($f['src'] === 'organic') {
+        $flt['=SOURCE'] = 'organic';
+    }
+    $rows = [];
+    foreach (Table::getList(['filter' => $flt, 'order' => ['CREATED' => 'DESC', 'ID' => 'DESC']])->fetchAll() as $r) {
+        $r['BRAND'] = $r['BRAND_MANUAL'] ?: $r['BRAND_AUTO'];
+        if ($f['brand'] === 'nonbrand' && $r['BRAND'] === 'Y' || $f['brand'] === 'brand' && $r['BRAND'] !== 'Y') {
+            continue;
+        }
+        $rows[(int)$r['ID']] = $r;
+    }
+    $pct = percent();
+    $ids = array_filter(array_map(fn($r) => (int)$r['ENTITY_ID'], $rows));
+    if ($type === 'order' && $ids && \Bitrix\Main\Loader::includeModule('sale')) {
+        $orders = [];
+        foreach (\Bitrix\Sale\Internals\OrderTable::getList(['filter' => ['@ID' => $ids],
+            'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'PRICE', 'PRICE_DELIVERY', 'CANCELED', 'STATUS_ID', 'PAYED', 'PERSON_TYPE_ID']])->fetchAll() as $o) {
+            $orders[(int)$o['ID']] = $o;
+        }
+        $names = [];
+        foreach (\Bitrix\Sale\Internals\OrderPropsValueTable::getList(['filter' => ['@ORDER_ID' => $ids, '@CODE' => ['FIO', 'CONTACT_PERSON', 'COMPANY']],
+            'select' => ['ORDER_ID', 'CODE', 'VALUE']])->fetchAll() as $p) {
+            $names[(int)$p['ORDER_ID']][$p['CODE']] = (string)$p['VALUE'];
+        }
+        $st = array_column(\Bitrix\Sale\Internals\StatusLangTable::getList(['filter' => ['=LID' => 'ru'], 'select' => ['STATUS_ID', 'NAME']])->fetchAll(), 'NAME', 'STATUS_ID');
+    }
+    if ($type === 'lead' && $ids) {
+        $leads = [];
+        $res = \CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('form_requests'), 'ID' => $ids], false, false,
+            ['ID', 'NAME', 'PROPERTY_TOPIC', 'PROPERTY_CLIENT_NAME', 'PROPERTY_PHONE', 'PROPERTY_EMAIL']);
+        while ($l = $res->Fetch()) {
+            $leads[(int)$l['ID']] = $l;
+        }
+    }
+    foreach ($rows as &$r) {
+        $id = (int)$r['ENTITY_ID'];
+        $why = $r['SOURCE'] !== 'organic' ? 'не из поиска' : ($r['BRAND'] === 'Y' ? 'брендовый запрос' : '');
+        $r['BASE'] = 0.0;
+        if ($type === 'order') {
+            $o = $orders[$id] ?? null;
+            $n = $names[$id] ?? [];
+            $r['ORDER'] = $o ? ['num' => $o['ACCOUNT_NUMBER'], 'date' => $o['DATE_INSERT'], 'price' => (float)$o['PRICE'],
+                'delivery' => (float)$o['PRICE_DELIVERY'], 'canceled' => $o['CANCELED'] === 'Y', 'paid' => $o['PAYED'] === 'Y',
+                'status' => $st[$o['STATUS_ID']] ?? $o['STATUS_ID'], 'buyer' => trim(($n['COMPANY'] ?? '') . ' ' . ($n['CONTACT_PERSON'] ?? $n['FIO'] ?? ''))] : null;
+            $why = $why ?: (!$o ? 'заказ удалён' : ($o['CANCELED'] === 'Y' ? 'заказ отменён' : ''));
+            $r['BASE'] = $o ? (withDelivery() ? (float)$o['PRICE'] : (float)$o['PRICE'] - (float)$o['PRICE_DELIVERY']) : 0.0;
+        } elseif ($type === 'lead') {
+            $l = $leads[$id] ?? null;
+            $r['LEAD'] = $l ? ['topic' => (string)$l['PROPERTY_TOPIC_VALUE'], 'name' => (string)$l['PROPERTY_CLIENT_NAME_VALUE'],
+                'phone' => (string)$l['PROPERTY_PHONE_VALUE'], 'email' => (string)$l['PROPERTY_EMAIL_VALUE']] : null;
+            $why = $why ?: (!$l ? 'заявка удалена' : ($r['AMOUNT'] === null ? 'сумма не указана' : ''));
+            $r['BASE'] = (float)$r['AMOUNT'];
+        }
+        $r['WHY'] = $why;
+        $r['COUNTED'] = $why === '';
+        $r['FEE'] = $r['COUNTED'] && $type !== 'visit' ? round($r['BASE'] * $pct / 100, 2) : 0.0;
+    }
+    unset($r);
+    return $rows;
+}
+
+// итоги по строкам: сколько засчитано, база, вознаграждение
+function totals(array $rows): array
+{
+    $c = array_filter($rows, fn($r) => $r['COUNTED']);
+    return ['all' => count($rows), 'n' => count($c), 'base' => array_sum(array_column($c, 'BASE')), 'fee' => array_sum(array_column($c, 'FEE'))];
+}

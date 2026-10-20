@@ -38,6 +38,12 @@ AddEventHandler('main', 'OnEndBufferContent', 'bt_nbsp_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
 
+// источник заказов и заявок (вход из поиска) для отчёта /seo-otchet/
+require_once __DIR__ . '/include/bt_attr.php';
+AddEventHandler('main', 'OnProlog', 'Bt\\Attr\\track');
+AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'Bt\\Attr\\onLeadAdd');
+\Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderSaved', 'Bt\\Attr\\onOrderSaved');
+
 // вход через Яндекс ID, VK ID, T-Bank, Сбер, Альфа (модуль «Социальные сервисы»)
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, array_fill_keys(['BtOAuth', 'BtOAuthBank', 'BtOAuthTbank', 'BtOAuthSber', 'BtOAuthAlfa'], '/local/php_interface/include/bt_oauth.php'));
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);
