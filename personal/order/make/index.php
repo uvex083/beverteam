@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function calcShown(){ return document.querySelector('.cop').classList.contains('is-calc'); }
   function busy(on){
     clearTimeout(busyT);
-    if(!on){ cop.classList.remove('is-calc'); calcSt_.textContent=''; return; }
+    if(!on){ cop.classList.remove('is-calc','is-stale'); calcSt_.textContent=''; return; }
     busyT=setTimeout(()=>{ cop.classList.add('is-calc');
       calcSt_.textContent='Считаем'+(cityIn.value.trim()?' для города '+cityIn.value.trim():'')+'…';
       sDel.textContent=sTot.textContent='считаем…'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;
   const showCities=list=>{cityList.innerHTML=list.map(cityRow).join('');const o=list.length>0;cityList.classList.toggle('open',o);cityIn.setAttribute('aria-expanded',o);};
   let cityT=0, cityN=0;
-  cityIn.addEventListener('input',()=>{locIn.value='';dl=[];avail=[];sel=null;renderDeliv();renderPay();ready();
+  cityIn.addEventListener('input',()=>{locIn.value='';cop.classList.toggle('is-stale',dl.length>0);sDel.textContent='—';if(last)sTot.textContent=fmt(last.sum);ready();
     const v=cityIn.value.trim(); clearTimeout(cityT);
     if(v.length<2){showCities(POP.filter(c=>c.n.toLowerCase().startsWith(v.toLowerCase())));return;}
     const n=++cityN; cityT=setTimeout(()=>post({action:'city',q:v}).then(r=>{if(n===cityN&&document.activeElement===cityIn)showCities(r.list||[]);}),200);});
