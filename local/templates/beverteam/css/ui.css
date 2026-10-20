@@ -1493,8 +1493,8 @@ input,textarea{caret-color:var(--ink)}
 .cop .blk h2 b{width:26px;height:26px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-family:'JetBrains Mono';font-size:12px}
 .cop .opts{display:grid;gap:10px}
 /* пересчёт доставки: старые варианты приглушены, в заголовке — что считаем */
-.cop .calcst{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray)}
-.cop .calcst:not(:empty)::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
+.cop .calcst{margin-left:auto;font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray)}
+.cop .calcst:not(:empty)::before{content:"";display:inline-block;vertical-align:1px;margin-right:8px;width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
 @keyframes calcPulse{50%{transform:scale(.55);opacity:.5}}
 .cop #deliv,.cop #pay{transition:opacity .15s}
 .cop.is-calc #deliv,.cop.is-calc #pay,.cop.is-stale #deliv,.cop.is-stale #pay{opacity:.4;pointer-events:none}
