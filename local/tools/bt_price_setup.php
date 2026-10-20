@@ -35,7 +35,7 @@ foreach ($rules as $xml => [$name, $pct, $conds]) {
     $say("правило «{$name}»");
     if ($apply) {
         $id = CSaleDiscount::Add([
-            'LID' => 's1', 'XML_ID' => $xml, 'NAME' => $name, 'ACTIVE' => 'Y', 'SORT' => 200, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N', 'LAST_LEVEL_DISCOUNT' => 'N',
+            'LID' => 's1', 'XML_ID' => $xml, 'NAME' => $name, 'ACTIVE' => 'N', 'SORT' => 200, 'PRIORITY' => 1, 'LAST_DISCOUNT' => 'N', 'LAST_LEVEL_DISCOUNT' => 'N',
             'CURRENCY' => 'RUB', 'USER_GROUPS' => [2],
             'CONDITIONS' => ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND', 'True' => 'True'], 'CHILDREN' => $conds],
             'ACTIONS' => ['CLASS_ID' => 'CondGroup', 'DATA' => ['All' => 'AND'], 'CHILDREN' => [
