@@ -34,6 +34,7 @@ AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
 // FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы (после SEO-текста посадочной)
 AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_tokens_buffer');
+AddEventHandler('main', 'OnEndBufferContent', 'bt_nbsp_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
 

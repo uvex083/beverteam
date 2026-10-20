@@ -1123,6 +1123,30 @@ function bt_tokens_buffer(&$content): void
     $content = strtr($content, bt_rent_tokens());
 }
 
+// main:OnEndBufferContent — неразрывные пробелы в числах, суммах и датах: «8 000 ₽», «до 17:00», «20 октября 2026» не рвутся по строкам.
+// Меняется только текст между тегами HTML-страницы: скрипты, стили, атрибуты и ответы не-HTML не трогаем
+function bt_nbsp_buffer(&$content): void
+{
+    if (defined('ADMIN_SECTION') || stripos(substr($content, 0, 300), '<html') === false && stripos(substr($content, 0, 300), '<!doctype') === false) {
+        return;
+    }
+    static $re = null;
+    $re ??= (function () {
+        $mon = 'января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря';
+        $unit = '₽|руб|р\.|%|кг|г|гр|мл|л|км|м|мм|см|шт|мин|ч|час|часа|часов|дн|дня|дней|день|мес|лет|год|года|году|раз|раза|чашек|чашки|°|' . $mon;
+        return [
+            '/(?<=\d) (?=\d{3}(?!\d))/u' => "\u{A0}",                                   // 8 000
+            '/(?<=\d) (?=(?:' . $unit . ')(?![\p{L}\d]))/u' => "\u{A0}",                // 8 000 ₽, 250 г, 20 октября
+            '/(?<=' . $mon . ') (?=\d{4})/u' => "\u{A0}",                               // октября 2026
+            '/(?<![\p{L}\d])(с|со|до|от|по|в|во|на|за|из|к|у|о|об|около|после|через|более|менее|свыше|всего|№) (?=[\d+])/iu' => "$1\u{A0}", // до 17:00
+            '/(?<=\+\d) (?=\d)/u' => "\u{A0}",                                          // +7 995
+            '/(?<=\S) (?=—)/u' => "\u{A0}",                                             // тире не начинает строку
+        ];
+    })();
+    $content = preg_replace_callback('~(<(script|style|textarea|pre|code)\b.*?</\2\s*>|<!--.*?-->|<[^>]*>)|([^<]+)~is',
+        fn($m) => isset($m[3]) && $m[3] !== '' && preg_match('/\d|—/u', $m[3]) ? preg_replace(array_keys($re), $re, $m[3]) : $m[0], $content) ?? $content;
+}
+
 // title и description страницы: вкладка SEO элемента первого блока в админке, если заполнена, иначе текст по умолчанию
 function bt_page_seo(string $blockCode, string $title, string $description): void
 {

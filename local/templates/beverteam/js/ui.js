@@ -195,7 +195,7 @@ window.BT_IMG = IMG;
 // товары отдаёт сервер (header.php → bt_catalog_data)
 window.BT_PRODUCTS = window.BT_DATA || {coffee:[],tea:[],machines:[],acc:[],rent:[]};
 
-const fmt = n => n.toLocaleString('ru-RU')+' ₽';
+const fmt = n => n.toLocaleString('ru-RU')+'\u00a0₽';
 window.BT_fmt = fmt;
 
 /* ---------- корзина: состояние в localStorage, общее для всех страниц прототипа ---------- */
@@ -287,7 +287,7 @@ const MONTHS=['января','февраля','марта','апреля','ма�
 const isWork = d => d.getDay()!==0 && d.getDay()!==6;
 const nextWork = (d,n) => { const x=new Date(d); while(n>0){ x.setDate(x.getDate()+1); if(isWork(x)) n--; } return x; };
 const MONTHS_S=['янв.','февр.','марта','апр.','мая','июня','июля','авг.','сент.','окт.','нояб.','дек.'];
-window.BT_fmtDate = (d,short) => d.getDate()+' '+(short?MONTHS_S:MONTHS)[d.getMonth()];
+window.BT_fmtDate = (d,short) => d.getDate()+'\u00a0'+(short?MONTHS_S:MONTHS)[d.getMonth()];
 window.BT_dates = (days) => {
   const now=new Date(); let pack=new Date(now);
   if(!isWork(now)||now.getHours()>=17) pack=nextWork(now,1);           /* после 17:00 и в выходные — первый рабочий день */
