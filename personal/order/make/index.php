@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
         <div style="flex:1"><div class="t"><span>${esc(o.t)}${free?' <span class="badge badge--ok">Бесплатно</span>':''}</span><span class="p">${free?`<s class="muted">${fmt(o.d.base)}</s>`:priceOf(o)}${dateOf(o)?`<span class="dd">${dateOf(o)}</span>`:''}</span></div>
         <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте — точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
-      :calcShown()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'Выберите город из списка, чтобы увидеть способы доставки.'}</p>`;
+      :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
   }
 
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div></div></label>`;}).join('')
-      :calcShown()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':'<p class="muted" style="margin:0;font-size:14px">Выберите город из списка, чтобы увидеть способы оплаты.</p>';
+      :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;
   }
   function renderSum(r){ if(!r) return;
     sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
@@ -305,25 +305,34 @@ document.addEventListener('DOMContentLoaded',()=>{
     const p=PAYS.find(x=>x.id===payId);
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
   }
-  let last=null, calcSt='', busyT=0;
-  // расчёт дольше 250 мс — показываем, что считаем: старые цены приглушены, сумм в итоге нет, кнопка ждёт
-  const cop=document.querySelector('.cop');
+  let last=null, calcSt='', busyT=0, calcing=false;
+  // расчёт дольше 250 мс — показываем, что считаем: старые цены приглушены, сумм в итоге нет, кнопка ждёт.
+  // Отправку держим с первой миллисекунды (calcing), а вид меняем только после 250 мс, чтобы быстрые расчёты не мигали
+  const cop=document.querySelector('.cop'), sTot0=sTot.textContent;
   function calcShown(){ return document.querySelector('.cop').classList.contains('is-calc'); }
+  function waiting(){ return calcShown()||(!!locIn.value&&!last&&calcing); }
+  // приглушённые варианты недоступны ни мышью, ни с клавиатуры
+  function dim(){ const off=cop.classList.contains('is-calc')||cop.classList.contains('is-stale'); [deliv,pay,dTabs].forEach(x=>x.inert=off); }
   function busy(on){
-    clearTimeout(busyT);
-    if(!on){ cop.classList.remove('is-calc','is-stale'); calcSt_.textContent=''; return; }
-    busyT=setTimeout(()=>{ cop.classList.add('is-calc');
+    clearTimeout(busyT); calcing=on;
+    if(!on){ cop.classList.remove('is-calc'); calcSt_.textContent='';
+      if(sDel.textContent==='считаем…'){ sDel.textContent='—'; sTot.textContent=last?fmt(last.sum):sTot0; }
+      dim(); return; }
+    busyT=setTimeout(()=>{ cop.classList.add('is-calc'); dim();
       calcSt_.innerHTML='Считаем'+(cityIn.value.trim()?'<span class="calcst__c"> для города '+esc(cityIn.value.trim())+'</span>':'')+'…';
-      sDel.textContent=sTot.textContent='считаем…'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
+      sDel.textContent=sTot.textContent='считаем…'; sEta.innerHTML='&nbsp;'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
   }
   const calcSt_=document.getElementById('calcSt');
+  // расчёт не удался: варианты прежнего города остаются приглушёнными, если город уже другой
+  function calcFailed(){ busy(false); cop.classList.toggle('is-stale',!!last&&last.loc!==locIn.value); dim();
+    renderDeliv(); renderPay(); if(last&&last.loc===locIn.value) renderSum(last); ready();
+    BT_toast('Не получилось пересчитать доставку — обновите страницу'); return false; }
   function calc(again){
     const n=++calcN; busy(true);
     const st=document.getElementById('coStreet').value.trim(); calcSt=st;
     return post({action:'calc',ptype:pt,loc:locIn.value,delivery:sel?sel.d.id:0,pay:payId,street:/\d/.test(st)?st:''}).then(r=>{
-      if(n!==calcN) return;
-      busy(false);
-      if(!r.ok){ renderDeliv(); renderPay(); renderSum(last); ready(); return; }
+      if(n!==calcN) return false;
+      if(!r.ok) return calcFailed();
       dl=r.deliveries; avail=r.pays; last=r; cdekDown.hidden=!r.cdekDown;
       if(pvzCur&&pvzCur.loc!==locIn.value){pvzCur=null;pvzIn.value='';}
       const all=opts();
@@ -331,9 +340,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       else sel=all.find(o=>o.key===sel.key);
       if(sel) tab=sel.tab;
       if(sel&&sel.d.id!==r.delivery&&!again) return calc(true);
+      busy(false); cop.classList.remove('is-stale'); dim();
       payId=avail.some(a=>a.id===payId)?payId:avail.some(a=>a.id===wantPay)?wantPay:(avail[0]?avail[0].id:0);
-      renderDeliv(); renderPay(); renderSum(r); ready();
-    }).catch(()=>{ if(n===calcN){ busy(false); renderDeliv(); renderPay(); renderSum(last); ready(); } BT_toast('Не получилось пересчитать доставку — обновите страницу'); });
+      renderDeliv(); renderPay(); renderSum(r); ready(); return true;
+    }).catch(()=>n===calcN?calcFailed():false);
   }
   dTabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
     tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();}});
@@ -370,7 +380,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;
   const showCities=list=>{cityList.innerHTML=list.map(cityRow).join('');const o=list.length>0;cityList.classList.toggle('open',o);cityIn.setAttribute('aria-expanded',o);};
   let cityT=0, cityN=0;
-  cityIn.addEventListener('input',()=>{locIn.value='';cop.classList.toggle('is-stale',dl.length>0);sDel.textContent='—';if(last)sTot.textContent=fmt(last.sum);ready();
+  cityIn.addEventListener('input',()=>{locIn.value='';calcN++;busy(false);cop.classList.toggle('is-stale',dl.length>0);dim();sDel.textContent='—';if(last)sTot.textContent=fmt(last.sum);ready();
     const v=cityIn.value.trim(); clearTimeout(cityT);
     if(v.length<2){showCities(POP.filter(c=>c.n.toLowerCase().startsWith(v.toLowerCase())));return;}
     const n=++cityN; cityT=setTimeout(()=>post({action:'city',q:v}).then(r=>{if(n===cityN&&document.activeElement===cityIn)showCities(r.list||[]);}),200);});
@@ -381,22 +391,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');
     let msg='';
     if(c.code!==curLoc){
-      const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc?x.loc===c.code:x.city===c.n), st=document.getElementById('coStreet');
-      st.value=a?a.street:''; document.getElementById('coFlat').value=a?a.flat:''; document.getElementById('coEntr').value=a?a.entr:'';
+      const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc?x.loc===c.code:x.city===c.n), st=document.getElementById('coStreet'),
+        fl=document.getElementById('coFlat'), en=document.getElementById('coEntr'), had=!!(st.value.trim()||fl.value.trim()||en.value.trim());
+      st.value=a?a.street:''; fl.value=a?a.flat:''; en.value=a?a.entr:'';
       setErr(st,''); document.getElementById('streetList').classList.remove('open');
-      msg=curLoc?'Город изменён на '+c.n+(a?' — подставили ваш адрес из кабинета':' — укажите адрес доставки'):'';
+      msg=curLoc&&(had||a)?'Город изменён на '+c.n+(a?' — подставили ваш сохранённый адрес':' — укажите адрес доставки'):'';
       curLoc=c.code;
     }
-    ready(); calc().then(()=>{ if(msg) BT_toast(esc(msg)); });};
+    ready(); calc().then(ok=>{ if(ok&&msg) BT_toast(esc(msg)); });};
   cityList.addEventListener('click',e=>{const li=e.target.closest('li');if(li)pickCity({n:li.dataset.n,code:li.dataset.code});});
   const letters=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
   // ввели не до конца и ушли из поля — берём первое совпадение по началу названия, мусор не подставляем
   const autoCity=()=>{const v=cityIn.value.trim();if(!v||locIn.value)return;const n=++cityN;clearTimeout(cityT);
     post({action:'city',q:v}).then(r=>{if(n!==cityN||cityIn.value.trim()!==v||locIn.value)return;
-      const c=(r.list||[]).find(c=>letters(c.n).startsWith(letters(v)));
+      const m=(r.list||[]).filter(c=>letters(c.n).startsWith(letters(v))), c=m.find(c=>letters(c.n)===letters(v))||(m.length===1?m[0]:null);
       c?pickCity(c):setErr(cityIn,'Выберите город из списка');});};
   cityIn.addEventListener('blur',()=>{showCities([]);autoCity();});
-  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=cityList.classList.contains('open')&&cityList.querySelector('li');li?li.click():autoCity();}
+  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(locIn.value){showCities([]);return;}const li=cityList.classList.contains('open')&&cityList.querySelector('li');li?li.click():autoCity();}
     if(e.key==='Escape')showCities([]);});
 
   /* улица и дом: подсказки DaData в пределах выбранного города; без дома — дописываем номер дальше */
@@ -441,7 +452,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(dig('phone').length!==11)miss.push('телефон');
     if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(val('email')))miss.push('e‑mail');
     if(!locIn.value)miss.push('город');
-    else if(!sel)miss.push('способ доставки');
+    else if(!sel||!last||last.loc!==locIn.value)miss.push('способ доставки');
     else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(val('street')?'номер дома':'адрес доставки');
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
@@ -459,7 +470,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   form.addEventListener('input',ready); form.addEventListener('change',ready);
   BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit));
 
-  form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||!ready()) return;
+  form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||calcing||!ready()) return;
     sending=true; submit.disabled=true; submit.textContent='Оформляем…'; sErr.textContent='';
     const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,dkey:sel.key,pay:payId,agree:coAgree.checked?'Y':''};
     [...form.elements].forEach(el=>{if(el.name&&el.type!=='radio'&&el.type!=='checkbox'&&!(el.name in data))data[el.name]=el.value;});
@@ -477,10 +488,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(window.orgFields&&['company','inn','kpp','company_adr'].some(k=>r.errors&&r.errors[k]))orgFields.hidden=false;
       if(r.errors&&r.errors.agree){setErr(coAgree,'x');first=first||coAgree;}
       if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});BT_toast('Проверьте выделенные поля');}
+      else if(!r.errors) sErr.textContent='Не получилось оформить заказ — обновите страницу и попробуйте ещё раз';
       ready();
     }).catch(()=>{sending=false;submit.textContent=btnText();sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
   });
-  renderDeliv(); renderPay(); ready(); calc();
+  calcing=!!locIn.value; renderDeliv(); renderPay(); ready(); calc();
 });
 </script>
 <?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

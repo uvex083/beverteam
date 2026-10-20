@@ -177,10 +177,11 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
     $shipment = bt_order_shipment($probe);
     $svcs = array_filter(Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment), fn($s) => !$s instanceof Sale\Delivery\Services\EmptyDeliveryService);
     $codes = array_column(Sale\Delivery\Services\Table::getList(['filter' => ['@ID' => array_map(fn($s) => $s->getId(), $svcs) ?: [0]], 'select' => ['ID', 'XML_ID']])->fetchAll(), 'XML_ID', 'ID');
-    // где возим сами (курьер, самовывоз — Екатеринбург), СДЭК не предлагаем
-    $own = (bool)array_intersect($codes, ['bt_courier', 'bt_pickup']);
+    // где возим сами (курьер, самовывоз — Екатеринбург), СДЭК не предлагаем: сначала свои службы, СДЭК — только если своих не вышло
+    $isCdek = fn($s) => (bool)preg_match('/^(sdek_|bt_cdek)/', (string)($codes[$s->getId()] ?? ''));
+    $svcs = array_merge(array_filter($svcs, fn($s) => !$isCdek($s)), array_filter($svcs, $isCdek));
     foreach ($svcs as $svc) {
-        if ($own && preg_match('/^(sdek_|bt_cdek)/', (string)($codes[$svc->getId()] ?? ''))) {
+        if ($isCdek($svc) && ($own = $own || (bool)array_intersect(array_column($deliveries, 'code'), ['bt_courier', 'bt_pickup']))) {
             continue;
         }
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();

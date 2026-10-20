@@ -1496,8 +1496,8 @@ input,textarea{caret-color:var(--ink)}
 .cop .calcst{margin-left:auto;font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray)}
 .cop .calcst:not(:empty)::before{content:"";display:inline-block;vertical-align:1px;margin-right:8px;width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
 @keyframes calcPulse{50%{transform:scale(.55);opacity:.5}}
-.cop #deliv,.cop #pay{transition:opacity .15s}
-.cop.is-calc #deliv,.cop.is-calc #pay,.cop.is-stale #deliv,.cop.is-stale #pay{opacity:.4;pointer-events:none}
+.cop #deliv,.cop #pay,.cop #dTabs{transition:opacity .15s}
+.cop.is-calc #deliv,.cop.is-calc #pay,.cop.is-calc #dTabs,.cop.is-stale #deliv,.cop.is-stale #pay,.cop.is-stale #dTabs{opacity:.4;pointer-events:none}
 .cop.is-calc #sDel,.cop.is-calc #sTot{color:var(--gray)}
 .cop .radio-card.skel{min-height:74px;background:var(--paper);border-color:var(--paper);cursor:default}
 @media(prefers-reduced-motion:reduce){.cop .calcst::before{animation:none}}
