@@ -124,7 +124,7 @@ $co = bt_contacts();
 
       <div class="blk" id="blkD">
         <h2><b>3</b>Доставка</h2>
-        <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button></div>
+        <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button></div>
         <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна — сбой на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
         <div class="opts" id="deliv"></div>
         <div id="addr" hidden style="margin-top:18px">
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
-  let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'pvz') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, wantPay=<?= (int)($ship['pay'] ?? 0) ?>, payId=0, calcN=0, sending=false;
+  let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'addr') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, wantPay=<?= (int)($ship['pay'] ?? 0) ?>, payId=0, calcN=0, sending=false;
 
   /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
   const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);

@@ -171,6 +171,7 @@ $pays = [];
 // модуль СДЭК после сбоя API сам не считает доставку несколько минут — тоже показываем покупателю
 $dead = (int)\COption::GetOptionString('ipol.sdek', 'sdekDeadServer', '0');
 $cdekDown = $dead && time() - $dead < 60 * (int)\COption::GetOptionString('ipol.sdek', 'timeoutRollback', '1');
+$own = false;
 if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->getOrderableItems()->isEmpty()) {
     $probe = bt_order_build($userId, $ptypes[$pt], $loc, 0, 0);
     $shipment = bt_order_shipment($probe);
@@ -179,7 +180,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
     // где возим сами (курьер, самовывоз — Екатеринбург), СДЭК не предлагаем
     $own = (bool)array_intersect($codes, ['bt_courier', 'bt_pickup']);
     foreach ($svcs as $svc) {
-        if ($own && str_starts_with((string)($codes[$svc->getId()] ?? ''), 'sdek_')) {
+        if ($own && preg_match('/^(sdek_|bt_cdek)/', (string)($codes[$svc->getId()] ?? ''))) {
             continue;
         }
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
@@ -231,7 +232,7 @@ if ($action === 'calc') {
     $dPrice = $deliveries[$delivery]['price'] ?? 0;
     $out(['ok' => true, 'loc' => $locOk ? $loc : '', 'deliveries' => array_values($deliveries), 'delivery' => $delivery,
         'pays' => array_values($pays), 'pay' => $pay, 'base' => $base, 'disc' => round($base - $sum, 2), 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice,
-        'cdekDown' => $cdekDown && !array_filter($deliveries, fn($d) => str_starts_with($d['code'], 'sdek_'))]);
+        'cdekDown' => $cdekDown && !$own && !array_filter($deliveries, fn($d) => str_starts_with($d['code'], 'sdek_'))]);
 }
 
 if ($action !== 'create') {
