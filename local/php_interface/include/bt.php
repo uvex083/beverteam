@@ -1624,6 +1624,14 @@ function bt_address_remember(int $userId, string $loc, string $street, string $f
     CUserOptions::SetOption('bt', 'main_addr', (int)$r->getId(), false, $userId);
 }
 
+// ipol.sdek:onFormation — модуль берёт имя получателя из одного свойства FIO, у юрлица имя в CONTACT_PERSON
+function bt_cdek_formation(array &$f, $orderId, $descr): void
+{
+    if (empty($f['name']) && !empty($descr['properties']['CONTACT_PERSON'])) {
+        $f['name'] = $descr['properties']['CONTACT_PERSON'];
+    }
+}
+
 // Статус заказа для кабинета: [текст, css-класс]; текст — название статуса из настроек магазина до запятой
 function bt_order_status(array $o): array
 {
