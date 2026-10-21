@@ -36,8 +36,10 @@ ksort($popular);
 $popular = array_values($popular);
 
 $pays = [];
-foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTIVE' => 'Y', '!=ACTION_FILE' => 'inner'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'DESCRIPTION', 'ACTION_FILE']]) as $ps) {
-    $pays[] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE']];
+foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTIVE' => 'Y', '!=ACTION_FILE' => 'inner'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'DESCRIPTION', 'ACTION_FILE', 'XML_ID']]) as $ps) {
+    $sbp = $ps['XML_ID'] === 'bt_sbp';
+    $pays[] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE'], 'sbp' => $sbp,
+        'logo' => $ps['ACTION_FILE'] === 'tinkoff' ? bt_tbank_logos($sbp) : ''];
 }
 
 $u = ['name' => '', 'email' => '', 'phone' => ''];
@@ -294,7 +296,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const list=PAYS.filter(p=>avail.some(a=>a.id===p.id));
     pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
-        <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div></div></label>`;}).join('')
+        <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div>${p.logo||''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;
   }
   function renderSum(r){ if(!r) return;
@@ -457,10 +459,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     if(!coAgree.checked)miss.push('согласие с условиями');
-    const online=(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff';
+    const pp=PAYS.find(x=>x.id===payId)||{}, online=pp.code==='tinkoff';
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
     if(!sending)submit.textContent=btnText();
-    sHint.textContent=online?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.':'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
+    sHint.textContent=online?(pp.sbp?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате по СБП.':'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.'):'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
     if(calcShown()) sLeft.textContent='Считаем доставку…';
     submit.disabled=!!miss.length||sending||calcShown();
     return !miss.length;

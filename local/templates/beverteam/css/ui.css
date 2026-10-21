@@ -383,6 +383,11 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .radio-card.off{opacity:.45;pointer-events:none}
 .radio-card .t{font-weight:700;display:flex;justify-content:space-between;gap:10px}
 .radio-card .t .p{font-family:'JetBrains Mono';font-size:13px;white-space:nowrap}
+/* логотипы онлайн-оплаты в плитке способа оплаты */
+.paylogos{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.paylogo{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;min-width:42px;padding:0 8px;background:#fff;border:1px solid var(--line);border-radius:6px}
+.paylogo svg{height:11px;width:auto;display:block}.paylogo--mc svg{height:15px}.paylogo--sbp svg{height:16px}
+.paylogo--sbp b{font:800 11px/1 Unbounded,'BT Fallback',Manrope,sans-serif;letter-spacing:.02em;color:var(--ink-3)}
 .radio-card .d{font-size:13px;color:var(--gray);margin-top:3px}
 .radio-card .lg{margin-left:auto;font-family:Unbounded;font-weight:800;font-size:11px;padding:3px 8px;border-radius:6px;background:var(--paper)}
 
