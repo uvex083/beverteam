@@ -373,8 +373,8 @@ $demoList('about_partners', [
     ['Логотип клиента 1', 'Кофейня'], ['Логотип клиента 2', 'Офис компании'], ['Логотип клиента 3', 'Ресторан'], ['Логотип клиента 4', 'Сеть кофе с собой'],
 ]);
 if (!CIBlockElement::GetList([], ['IBLOCK_ID' => $ibs['about_rating']], false, ['nTopCount' => 1], ['ID'])->Fetch()) {
-    $one('about_rating', ['TITLE' => '4,9', 'SUBTITLE' => 'рейтинг на Яндекс Картах', 'BTN_TEXT' => 'Отзывы на Яндекс Картах',
-        'BTN_LINK' => 'https://yandex.ru/maps/54/yekaterinburg/search/BEVERTEAM/', 'DEMO' => $demo('about_rating')]);
+    $one('about_rating', ['TITLE' => '', 'SUBTITLE' => 'рейтинг на Яндекс Картах', 'BTN_TEXT' => 'Отзывы на Яндекс Картах',
+        'BTN_LINK' => 'https://yandex.ru/maps/org/144981813136/reviews/?add-review=true']);
 }
 $list('about_faq', [
     ['Работаете с юрлицами?', 'Да, работаем с ИП и организациями по договору: оплата по счёту, закрывающие документы.'],

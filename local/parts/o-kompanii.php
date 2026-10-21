@@ -108,7 +108,8 @@ $revs = bt_reviews();
     <?php if (!empty($rating['title'])): ?><?= bt_demo_note('about_rating', !empty($rating['demo'])) ?><?php endif ?>
     <div class="row between" style="margin-bottom:22px;gap:16px;flex-wrap:wrap"><h2 class="display h2">Отзывы клиентов</h2>
       <div class="row" style="gap:18px;flex-wrap:wrap;align-items:center">
-        <?php if (!empty($rating['title'])): ?><a class="arate" href="<?= $e($rating['btn_link'] ?? '') ?>" target="_blank" rel="noopener"><b><?= $e($rating['title']) ?></b><span class="arate__st" aria-hidden="true">★★★★★</span><span><?= $e($rating['subtitle'] ?? '') ?></span></a><?php endif ?>
+        <?php if (!empty($rating['title'])): ?><a class="arate" href="<?= $e($rating['btn_link'] ?? '') ?>" target="_blank" rel="noopener"><b><?= $e($rating['title']) ?></b><span class="arate__st" aria-hidden="true">★★★★★</span><span><?= $e($rating['subtitle'] ?? '') ?></span></a>
+        <?php elseif (!empty($rating['btn_link'])): ?><a class="arate" href="<?= $e($rating['btn_link']) ?>" target="_blank" rel="noopener"><span class="arate__st" aria-hidden="true">★</span><span>Оставить отзыв на Яндекс Картах</span></a><?php endif ?>
         <a class="link" href="/otzyvy-o-nas/">Все отзывы →</a>
       </div></div>
     <div class="grid g3 revs" data-revs><?php foreach ($revs as $r) echo bt_rev_card($r) ?></div>
