@@ -577,10 +577,11 @@ function bt_blocks(string $code, int $limit = 0): array
     return $list;
 }
 
-// Плашка «Демо» над блоком с тестовым наполнением: текст — описание инфоблока (что запросить у клиента)
+// Плашка «Демо» над блоком с тестовым наполнением: текст — описание инфоблока (что запросить у клиента).
+// Выключена на сайте, включается опцией bt/demo_notes = Y; демо-элементы видны в админке по галочке «Демо»
 function bt_demo_note(string $code, bool $on): string
 {
-    if (!$on) {
+    if (!$on || \Bitrix\Main\Config\Option::get('bt', 'demo_notes', 'N') !== 'Y') {
         return '';
     }
     $d = trim(strip_tags((string)(\CIBlock::GetArrayByID(bt_iblock($code), 'DESCRIPTION') ?? '')));
