@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':(sel.d.from?'от ':'')+fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total); sTotNote.hidden=!cdekUnknown;
     const p=PAYS.find(x=>x.id===payId);
-    sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(p.name.charAt(0).toLowerCase()+p.name.slice(1)):''}`:'&nbsp;';
+    sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(/^[А-ЯЁ][а-яё]/.test(p.name)?p.name.charAt(0).toLowerCase()+p.name.slice(1):p.name):''}`:'&nbsp;';
   }
   let last=null, calcSt='', busyT=0, calcing=false;
   // расчёт дольше 250 мс — показываем, что считаем: старые цены приглушены, сумм в итоге нет, кнопка ждёт.

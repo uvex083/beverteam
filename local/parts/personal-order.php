@@ -48,7 +48,7 @@ if (!in_array($pCode, ['bill', 'tinkoff'], true)) {
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
 
 bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № ' . $e($num) . '</h1><span class="status ' . $cls . '">' . $e($st) . '</span></div>',
-    'Оформлен ' . $e(FormatDate('j F Y в H:i', $order->getDateInsert()->getTimestamp())) . ($payName ? ' · ' . $e(mb_strtolower(mb_substr($payName, 0, 1)) . mb_substr($payName, 1)) : ''));
+    'Оформлен ' . $e(FormatDate('j F Y в H:i', $order->getDateInsert()->getTimestamp())) . ($payName ? ' · ' . $e(bt_lcfirst($payName)) : ''));
 ?>
 <div class="card">
   <?php if ($order->isCanceled()): ?>

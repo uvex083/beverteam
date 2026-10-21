@@ -388,7 +388,7 @@ function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
     $keep !== '' && $order->setField('COMMENTS', $keep . "\n" . $new);
 }
 
-// «По СБП» и «Через SberPay» работают на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает отличавшиеся коды: XML_ID => [коды]
+// «СБП» и «SberPay» работают на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает отличавшиеся коды: XML_ID => [коды]
 function bt_tbank_ps_sync(bool $apply = true): array
 {
     $card = 0;

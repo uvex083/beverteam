@@ -1483,6 +1483,12 @@ function bt_phone_digits(string $s): string
     return strlen($d) === 11 && $d[0] === '7' ? $d : '';
 }
 
+// первая буква строчной внутри фразы: «при получении», но «СБП» и «SberPay» как есть
+function bt_lcfirst(string $s): string
+{
+    return preg_match('/^[А-ЯЁ][а-яё]/u', $s) ? mb_strtolower(mb_substr($s, 0, 1)) . mb_substr($s, 1) : $s;
+}
+
 // +7 (904) 384-13-88 — как маска полей телефона
 function bt_phone_fmt(string $s): string
 {

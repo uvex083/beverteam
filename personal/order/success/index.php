@@ -80,7 +80,7 @@ if (!$order) {
       <span class="num">Заказ № <?= $e($order->getField('ACCOUNT_NUMBER')) ?> · <?= $e(FormatDate('j F Y, H:i', $date->getTimestamp())) ?></span>
     </div>
 
-    <div class="payblk"><div><small>Способ оплаты: <?php $pn = $payment ? $payment->getPaymentSystemName() : ''; echo $e(mb_strtolower(mb_substr($pn, 0, 1)) . mb_substr($pn, 1)) ?></small>
+    <div class="payblk"><div><small>Способ оплаты: <?php $pn = $payment ? $payment->getPaymentSystemName() : ''; echo $e(bt_lcfirst($pn)) ?></small>
       <b><?= bt_fmt($order->getPrice()) ?></b>
       <small><?= $pCode === 'bill' ? 'счёт пришлём на e‑mail после подтверждения заказа менеджером' : ($pCode === 'tinkoff' ? ($order->isPaid() ? 'оплачено, спасибо' : 'заказ ждёт оплаты') : 'оплата при получении заказа') ?></small></div>
       <?php if ($pCode === 'tinkoff' && !$order->isPaid() && ($_GET['pay'] ?? '') === 'fail'): ?><small style="flex-basis:100%;color:#fff">Оплата не прошла. Попробуйте ещё раз или позвоните нам — поможем.</small><?php endif ?>
