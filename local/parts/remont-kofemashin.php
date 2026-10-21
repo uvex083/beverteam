@@ -14,6 +14,7 @@ $sympH = bt_block('repair_symptoms_head');
 $symptoms = bt_blocks('repair_symptoms');
 $types = bt_block('repair_types');
 $jet = bt_block('repair_jetinno');
+$cert = bt_block('about_cert'); // сертификат сервисного центра — тот же, что на «О компании»
 $priceH = bt_block('repair_price_head');
 $price = bt_blocks('repair_price');
 $contract = bt_block('repair_contract');
@@ -125,6 +126,13 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <div class="r2models"><?php foreach ($models as $m): ?>
       <a href="<?= $e($m['url']) ?>"><img src="<?= $e($m['img']) ?>" alt="<?= $e($m['n']) ?>" loading="lazy" width="240" height="170"><b><?= $e(preg_replace('/^Кофемашина\s+/u', 'Ремонт ', $m['n'])) ?></b></a>
     <?php endforeach ?></div>
+    <?php if (!empty($cert['pic'])): ?>
+    <div class="certs">
+      <a class="cert__a certs__img" href="<?= $e(bt_img($cert['pic_id'], 2400, 2400)) ?>" aria-label="Открыть сертификат крупно"><img src="<?= $e(bt_img($cert['pic_id'], 400, 400)) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy" width="160" height="113"></a>
+      <div><b><?= $e($cert['title'] ?? '') ?></b><p><?= $e($cert['subtitle'] ?? '') ?></p>
+        <?php if (!empty($cert['file'])): ?><a class="link" href="<?= $e($cert['file']) ?>" target="_blank" rel="noopener"><?= $e(($cert['btn_text'] ?? '') ?: 'Сертификат, PDF') ?></a><?php endif ?></div>
+    </div>
+    <?php endif ?>
   </section>
   <?php endif ?>
 

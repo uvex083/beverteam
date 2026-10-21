@@ -2088,8 +2088,8 @@ document.addEventListener('click',e=>{
 // журнал: остальные темы по кнопке «Ещё N»
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tags-more]');if(!b)return;b.closest('.jtags').classList.add('is-open');});
 
-// «О компании»: сертификат по клику — на весь экран
-document.addEventListener('click',e=>{const a=e.target.closest('.aboutp .cert__a'); if(!a) return; e.preventDefault();
+// сертификат сервисного центра («О компании», «Ремонт кофемашин») по клику — на весь экран
+document.addEventListener('click',e=>{const a=e.target.closest('.cert__a'); if(!a) return; e.preventDefault();
   BT_lightbox([{src:a.getAttribute('href'),cap:a.querySelector('img').alt}],0);});
 // «О компании»: отзывы и фотогалерея — слайдеры, клик по фото — просмотр на весь экран
 document.addEventListener('DOMContentLoaded',()=>{
