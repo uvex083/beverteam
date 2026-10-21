@@ -1776,6 +1776,7 @@ form[data-form]{position:relative}
 .aboutp .cert{background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(26px,3.4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
 .aboutp .cert .ph{border:1px dashed #4A4A42;border-radius:12px;min-height:220px;display:grid;place-items:center;color:#8B8B82;font-size:13px;text-align:center}
 .aboutp .cert__img{border-radius:12px;max-height:420px;width:100%;height:auto;object-fit:contain;justify-self:center}
+.aboutp .cert__a{display:block;justify-self:center;border-radius:12px;cursor:zoom-in}
 .aboutp .vals{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(24px,4vw,56px);align-items:start}
 .aboutp .vals__hd .mono{color:var(--gray);margin-bottom:12px}
 .aboutp .vals__hd h2{margin-bottom:16px}

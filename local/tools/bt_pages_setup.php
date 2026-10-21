@@ -186,7 +186,7 @@ $def = [
     'about_history' => ['about', 'О компании: история', 11, false, $demoProp],
     'about_places' => ['about', 'О компании: офис, склад, сервис', 12, false, $demoProp],
     'about_gallery' => ['about', 'О компании: фотогалерея', 13, false, []],
-    'about_cert' => ['about', 'О компании: сертификат', 14, true, []],
+    'about_cert' => ['about', 'О компании: сертификат', 14, true, ['FILE' => ['Сертификат (PDF)', 'F', ['FILE_TYPE' => 'pdf', 'HINT' => 'Кнопка открывает файл в новой вкладке; без файла кнопки нет']]]],
     'about_partners' => ['about', 'О компании: партнёры и клиенты', 15, false, $demoProp + $linkProp],
     'about_rating' => ['about', 'О компании: рейтинг на Яндекс Картах', 16, true, $demoProp],
     'about_faq' => ['about', 'О компании: вопросы и ответы', 17, false, []],
