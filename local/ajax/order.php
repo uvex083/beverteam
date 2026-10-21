@@ -1,5 +1,5 @@
 <?php
-// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create
+// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create | sbp (пришла ли оплата по СБП)
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -234,6 +234,13 @@ if ($action === 'calc') {
     $out(['ok' => true, 'loc' => $locOk ? $loc : '', 'deliveries' => array_values($deliveries), 'delivery' => $delivery,
         'pays' => array_values($pays), 'pay' => $pay, 'base' => $base, 'disc' => round($base - $sum, 2), 'sum' => $sum, 'deliveryPrice' => $dPrice, 'total' => $sum + $dPrice,
         'cdekDown' => $cdekDown && !$own && !array_filter($deliveries, fn($d) => str_starts_with($d['code'], 'sdek_'))]);
+}
+
+// экран оплаты по СБП спрашивает, пришли ли деньги
+if ($action === 'sbp') {
+    $order = bt_tbank_order((int)$in('id'));
+    $p = $order && !$order->isPaid() && !$order->isCanceled() ? bt_tbank_payment($order) : null;
+    $out(['ok' => (bool)$order, 'state' => !$order ? 'dead' : ($order->isPaid() ? 'paid' : ($p ? bt_tbank_sbp_state($p) : 'dead'))]);
 }
 
 if ($action !== 'create') {

@@ -2401,3 +2401,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(reopen) open(true,true);
   msg&&setTimeout(()=>BT_toast(esc(msg)),300);
 });
+
+// оплата по СБП: ждём деньги — спрашиваем сайт раз в 3 с и сразу, когда покупатель вернулся из приложения банка
+document.addEventListener('DOMContentLoaded',()=>{
+  const s=document.querySelector('.sbp[data-id]'); if(!s) return;
+  const st=s.querySelector('.sbp__st'), t0=Date.now();
+  let tm=0, busy=false, done=false;
+  const show=(c,html)=>{ st.className='sbp__st '+c; st.innerHTML=html; };
+  const ask=()=>{
+    clearTimeout(tm); if(done||busy) return;
+    if(Date.now()-t0>20*60e3){ done=true; show('is-idle','Не видим оплату. Если вы уже заплатили, <a class="link" href="">обновите страницу</a>'); return; }
+    busy=true;
+    const fd=new FormData(); fd.append('action','sbp'); fd.append('id',s.dataset.id); fd.append('sessid',window.BT_SID||'');
+    fetch('/local/ajax/order.php',{method:'POST',body:fd}).then(r=>r.json()).then(r=>{
+      if(!r.ok){ done=true; show('is-idle','Не получается проверить оплату. <a class="link" href="">Обновите страницу</a>'); return; }
+      if(r.state==='paid'){ done=true; s.classList.add('is-paid'); show('is-ok','Оплата получена, открываем заказ'); setTimeout(()=>location.replace(s.dataset.done),1500); }
+      else if(r.state==='dead'){ done=true; s.classList.add('is-dead'); show('is-err','Этот QR-код больше не действует. <a class="link" href="">Получить новый</a>'); }
+    }).catch(()=>{}).finally(()=>{ busy=false; if(!done) tm=setTimeout(ask,document.hidden?15000:3000); });
+  };
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) ask(); });
+  tm=setTimeout(ask,3000);
+  const b=s.querySelector('.sbp__show'); b&&b.addEventListener('click',()=>{ s.classList.add('qr-open'); b.hidden=true; });
+});

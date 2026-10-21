@@ -1,5 +1,5 @@
 <?php
-// Оплата картой/СБП через модуль Т-Банка (tinkoff.payment): ссылка на оплату, сверка статуса с банком, агент сверки
+// Оплата картой и по СБП через модуль Т-Банка (tinkoff.payment): ссылка на оплату, QR для СБП, сверка статуса с банком, агент сверки
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
@@ -13,6 +13,66 @@ function bt_tbank_payment(Sale\Order $order): ?Sale\Payment
         }
     }
     return null;
+}
+
+// заказ того, кто оформил его в этой сессии, или его владельца
+function bt_tbank_order(int $id): ?Sale\Order
+{
+    global $USER;
+    $order = $id > 0 ? Sale\Order::load($id) : null;
+    return $order && (in_array($id, (array)($_SESSION['BT_ORDERS'] ?? []), true)
+        || (is_object($USER) && $USER->IsAuthorized() && (int)$order->getUserId() === (int)$USER->GetID())) ? $order : null;
+}
+
+// оплата по СБП — отдельная платёжная система того же терминала (XML_ID bt_sbp): вместо страницы банка свой экран с QR
+function bt_tbank_is_sbp(Sale\Payment $p): bool
+{
+    return (Sale\PaySystem\Manager::getById($p->getPaymentSystemId())['XML_ID'] ?? '') === 'bt_sbp';
+}
+
+// QR для СБП: ссылка в приложение банка и картинка. Платёж в банке тот же, что у страницы банка, — с неё можно заплатить и картой
+function bt_tbank_qr(Sale\Payment $p): array
+{
+    $orderId = (int)$p->getOrderId();
+    if (bt_tbank_url($p) === '') {
+        return [];
+    }
+    // повторная попытка могла заменить платёж новым — берём актуальный
+    $order = Sale\Order::load($orderId);
+    $p = $order ? bt_tbank_payment($order) : null;
+    $pid = $p ? (string)$p->getField('PS_INVOICE_ID') : '';
+    if ($pid === '') {
+        return [];
+    }
+    $link = (string)(bt_tbank_api($p, 'GetQr', ['PaymentId' => $pid, 'DataType' => 'PAYLOAD'])['Data'] ?? '');
+    $svg = (string)(bt_tbank_api($p, 'GetQr', ['PaymentId' => $pid, 'DataType' => 'IMAGE'])['Data'] ?? '');
+    return str_starts_with($link, 'https://') && str_starts_with($svg, '<svg') ? ['link' => $link, 'svg' => $svg, 'sum' => $p->getSum()] : [];
+}
+
+// экран СБП ждёт деньги: paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
+function bt_tbank_sbp_state(Sale\Payment $p): string
+{
+    $pid = (string)$p->getField('PS_INVOICE_ID');
+    if ($pid === '') {
+        return 'dead';
+    }
+    $st = (string)(bt_tbank_api($p, 'GetState', ['PaymentId' => $pid])['Status'] ?? '');
+    if ($st === 'CONFIRMED') {
+        return bt_tbank_sync($p) ? 'paid' : 'wait';
+    }
+    return in_array($st, ['CANCELED', 'REJECTED', 'DEADLINE_EXPIRED', 'AUTH_FAIL', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED'], true) ? 'dead' : 'wait';
+}
+
+// «Оплатить картой» с экрана СБП: платёж — на карточную систему; платёж в банке остаётся тем же, его страница принимает карты
+function bt_tbank_to_card(Sale\Payment $p): void
+{
+    foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff', '=ACTIVE' => 'Y'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'XML_ID']]) as $ps) {
+        if ($ps['XML_ID'] !== 'bt_sbp') {
+            $p->setFields(['PAY_SYSTEM_ID' => (int)$ps['ID'], 'PAY_SYSTEM_NAME' => $ps['NAME']]);
+            $p->getOrder()->save();
+            return;
+        }
+    }
 }
 
 // запрос к API банка с ключами терминала из настроек платёжной системы
