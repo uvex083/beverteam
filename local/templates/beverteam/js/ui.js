@@ -2090,7 +2090,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tags-more]
 
 // сертификат сервисного центра («О компании», «Ремонт кофемашин») по клику — на весь экран
 document.addEventListener('click',e=>{const a=e.target.closest('.cert__a'); if(!a) return; e.preventDefault();
-  BT_lightbox([{src:a.getAttribute('href'),cap:a.querySelector('img').alt}],0);});
+  BT_lightbox([{src:a.getAttribute('href'),cap:''}],0);});
 // «О компании»: отзывы и фотогалерея — слайдеры, клик по фото — просмотр на весь экран
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('[data-revs]').forEach(el=>BT_slider(el,{min:4,swiper:{breakpoints:{560:{slidesPerView:2,spaceBetween:14},900:{slidesPerView:3,spaceBetween:16},1200:{slidesPerView:4,spaceBetween:18}}}}));

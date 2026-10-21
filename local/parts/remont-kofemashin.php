@@ -129,8 +129,9 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <?php if (!empty($cert['pic'])): ?>
     <div class="certs">
       <a class="cert__a certs__img" href="<?= $e(bt_img($cert['pic_id'], 2400, 2400)) ?>" aria-label="Открыть сертификат крупно"><img src="<?= $e(bt_img($cert['pic_id'], 400, 400)) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy" width="160" height="113"></a>
-      <div><b><?= $e($cert['title'] ?? '') ?></b><p><?= $e($cert['subtitle'] ?? '') ?></p>
-        <?php if (!empty($cert['file'])): ?><a class="link" href="<?= $e($cert['file']) ?>" target="_blank" rel="noopener"><?= $e(($cert['btn_text'] ?? '') ?: 'Сертификат, PDF') ?></a><?php endif ?></div>
+      <b class="certs__t">Сертификат сервисного центра</b>
+      <p class="certs__p"><?= $e(bt_typo($cert['subtitle'] ?? '')) ?></p>
+      <?php if (!empty($cert['file'])): ?><a class="btn btn--line btn--sm certs__pdf" href="<?= $e($cert['file']) ?>" target="_blank" rel="noopener"><?= $e(($cert['btn_text'] ?? '') ?: 'Сертификат, PDF') ?></a><?php endif ?>
     </div>
     <?php endif ?>
   </section>

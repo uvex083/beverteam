@@ -191,6 +191,12 @@ function bt_product(string $id): ?array
     return $index[$id] ?? null;
 }
 
+// неразрывный пробел после коротких предлогов и союзов и в «ООО «…»»: строка не кончается на «в» или «и»
+function bt_typo(string $s): string
+{
+    return preg_replace('/(?<![\p{L}\d])(в|во|и|к|с|у|о|а|на|по|за|из|до|от|ООО) (?=\S)/iu', "$1\u{00A0}", $s);
+}
+
 function bt_fmt(float $n): string
 {
     return number_format($n, 0, '', "\u{00A0}") . "\u{00A0}₽";
