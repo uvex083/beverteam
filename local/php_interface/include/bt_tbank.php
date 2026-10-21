@@ -1,11 +1,14 @@
 <?php
-// Оплата картой и по СБП через модуль Т-Банка (tinkoff.payment): ссылка на оплату, QR для СБП, сверка статуса с банком, агент сверки
+// Оплата картой, по СБП и через SberPay модулем Т-Банка (tinkoff.payment): ссылка на оплату, QR для СБП, SberPay, сверка статуса с банком, агент сверки
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
 
 // статусы платежа в банке, по которым уже не заплатить
 const BT_TBANK_DEAD = ['CANCELED', 'REJECTED', 'DEADLINE_EXPIRED', 'AUTH_FAIL', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED'];
+
+// платёжные системы того же терминала со своим экраном оплаты вместо страницы банка: XML_ID => адрес экрана
+const BT_TBANK_SCREENS = ['bt_sbp' => '/personal/order/sbp/', 'bt_sberpay' => '/personal/order/sberpay/'];
 
 // неоплаченный платёж заказа через Т-Банк
 function bt_tbank_payment(Sale\Order $order): ?Sale\Payment
@@ -27,10 +30,87 @@ function bt_tbank_order(int $id): ?Sale\Order
         || (is_object($USER) && $USER->IsAuthorized() && (int)$order->getUserId() === (int)$USER->GetID())) ? $order : null;
 }
 
+// XML_ID платёжной системы платежа
+function bt_tbank_xml(Sale\Payment $p): string
+{
+    return (string)(Sale\PaySystem\Manager::getById($p->getPaymentSystemId())['XML_ID'] ?? '');
+}
+
 // оплата по СБП — отдельная платёжная система того же терминала (XML_ID bt_sbp): вместо страницы банка свой экран с QR
 function bt_tbank_is_sbp(Sale\Payment $p): bool
 {
-    return (Sale\PaySystem\Manager::getById($p->getPaymentSystemId())['XML_ID'] ?? '') === 'bt_sbp';
+    return bt_tbank_xml($p) === 'bt_sbp';
+}
+
+// свой экран оплаты (СБП, SberPay) или пусто — страница банка
+function bt_tbank_screen(Sale\Payment $p): string
+{
+    return BT_TBANK_SCREENS[bt_tbank_xml($p)] ?? '';
+}
+
+// устройство покупателя по User-Agent — для SberPay в DATA платежа: тип, ОС, встроенный браузер приложения, браузер
+function bt_tbank_device(): array
+{
+    $ua = (string)\Bitrix\Main\Context::getCurrent()->getRequest()->getUserAgent();
+    $os = match (true) {
+        (bool)preg_match('/iPhone|iPad|iPod/', $ua) => 'iOS',
+        str_contains($ua, 'Android') => 'Android',
+        str_contains($ua, 'Windows') => 'Windows',
+        str_contains($ua, 'Mac OS X') => 'macOS',
+        str_contains($ua, 'Linux') => 'Linux',
+        default => '',
+    };
+    $browser = match (true) {
+        str_contains($ua, 'YaBrowser') => 'Yandex',
+        str_contains($ua, 'Edg') => 'Edge',
+        (bool)preg_match('/OPR\/|Opera/', $ua) => 'Opera',
+        str_contains($ua, 'SamsungBrowser') => 'Samsung',
+        (bool)preg_match('/Firefox|FxiOS/', $ua) => 'Firefox',
+        (bool)preg_match('/Chrome|CriOS/', $ua) => 'Chrome',
+        str_contains($ua, 'Safari') => 'Safari',
+        default => 'Other',
+    };
+    // встроенный браузер приложения: Android помечает его «; wv)», на iOS в строке нет «Safari/»
+    $wv = str_contains($ua, '; wv)') || ($os === 'iOS' && !str_contains($ua, 'Safari/'));
+    return ['Device' => in_array($os, ['iOS', 'Android'], true) || str_contains($ua, 'Mobile') ? 'MobileWeb' : 'Desktop',
+        'DeviceOs' => $os, 'DeviceWebView' => $wv ? 'true' : 'false', 'DeviceBrowser' => $browser];
+}
+
+// SberPay: платёж в банке (тот же, что у страницы банка — с неё можно заплатить картой); на телефоне ещё и ссылка в СберБанк Онлайн
+function bt_tbank_sberpay(Sale\Payment $p, bool $mobile): array
+{
+    $orderId = (int)$p->getOrderId();
+    if (bt_tbank_url($p) === '') {
+        return [];
+    }
+    // повторная попытка могла заменить платёж новым — берём актуальный
+    $order = Sale\Order::load($orderId);
+    $p = $order ? bt_tbank_payment($order) : null;
+    $pid = $p ? (string)$p->getField('PS_INVOICE_ID') : '';
+    if ($pid === '') {
+        return [];
+    }
+    if (!$mobile) {
+        return ['pid' => $pid, 'sum' => $p->getSum(), 'link' => ''];
+    }
+    $app = fn($u) => preg_match('~^[a-z][a-z\d+.-]*://~i', $u) && !preg_match('~^(javascript|data|vbscript):~i', $u);
+    $http = new \Bitrix\Main\Web\HttpClient(['socketTimeout' => 5, 'streamTimeout' => 10]);
+    $r = (array)json_decode((string)$http->get('https://securepay.tinkoff.ru/v2/SberPay/transactions/' . rawurlencode($pid) . '/link'), true);
+    $link = (string)($r['Params']['RedirectUrl'] ?? '');
+    // по документации ссылку для телефона отдаёт и «Создать заказ» без номера — запасной путь
+    if (!$app($link)) {
+        $r = bt_tbank_api($p, 'SberPay/link/get', ['PaymentId' => $pid]);
+        $link = (string)($r['Params']['RedirectUrl'] ?? $r['RedirectUrl'] ?? '');
+    }
+    return $app($link) ? ['pid' => $pid, 'sum' => $p->getSum(), 'link' => $link] : [];
+}
+
+// SberPay с компьютера: банк отправляет запрос на оплату в СберБанк Онлайн на телефон покупателя
+function bt_tbank_sberpay_push(Sale\Payment $p, string $phone): bool
+{
+    $pid = (string)$p->getField('PS_INVOICE_ID');
+    $d = bt_phone_digits($phone);
+    return $pid !== '' && $d !== '' && !empty(bt_tbank_api($p, 'SberPay/link/get', ['PaymentId' => $pid, 'Phone' => '+' . $d])['Success']);
 }
 
 // QR для СБП: ссылка в приложение банка и картинка. Платёж в банке тот же, что у страницы банка, — с неё можно заплатить и картой
@@ -53,7 +133,7 @@ function bt_tbank_qr(Sale\Payment $p): array
         ? ['link' => $link, 'svg' => $svg, 'sum' => $p->getSum(), 'pid' => $pid] : [];
 }
 
-// экран СБП ждёт деньги: paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
+// экран СБП или SberPay ждёт деньги: paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
 function bt_tbank_sbp_state(Sale\Payment $p): string
 {
     $pid = (string)$p->getField('PS_INVOICE_ID');
@@ -67,11 +147,11 @@ function bt_tbank_sbp_state(Sale\Payment $p): string
     return in_array($st, BT_TBANK_DEAD, true) ? 'dead' : 'wait';
 }
 
-// «Оплатить картой» с экрана СБП: платёж — на карточную систему; платёж в банке остаётся тем же, его страница принимает карты
+// «Оплатить картой» с экрана СБП или SberPay: платёж — на карточную систему; платёж в банке остаётся тем же, его страница принимает карты
 function bt_tbank_to_card(Sale\Payment $p): void
 {
     foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff', '=ACTIVE' => 'Y'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'XML_ID']]) as $ps) {
-        if ($ps['XML_ID'] !== 'bt_sbp') {
+        if (!isset(BT_TBANK_SCREENS[(string)$ps['XML_ID']])) {
             $p->setFields(['PAY_SYSTEM_ID' => (int)$ps['ID'], 'PAY_SYSTEM_NAME' => $ps['NAME']]);
             $p->getOrder()->save();
             return;
@@ -79,14 +159,21 @@ function bt_tbank_to_card(Sale\Payment $p): void
     }
 }
 
-// логотипы способа онлайн-оплаты для плитки на оформлении: карты (МИР, Visa, Mastercard) или СБП
-function bt_tbank_logos(bool $sbp): string
+// знак SberPay: зелёный круг с галочкой; $on — цвет галочки
+function bt_tbank_sberpay_mark(string $bg = '#21A038', string $on = '#fff'): string
 {
-    $l = $sbp
+    return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="' . $bg . '"/><path d="M6.6 12.3l3.5 3.4 7.3-7.2" fill="none" stroke="' . $on . '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+// логотипы способа онлайн-оплаты для плитки на оформлении по XML_ID платёжной системы: карты (МИР, Visa, Mastercard), СБП или SberPay
+function bt_tbank_logos(string $xml = ''): string
+{
+    $sbp = $xml === 'bt_sbp';
+    $l = $xml === 'bt_sberpay' ? ['<span class="paylogo paylogo--sberpay">' . bt_tbank_sberpay_mark() . '<b>SberPay</b></span>'] : ($sbp
         ? ['<span class="paylogo paylogo--sbp"><svg viewBox="13 9 38 46" fill-rule="evenodd"><path fill="#575eaa" d="m14.091799,44.239796l5.36213,-9.45225l0,-5.77392l-5.37089,-9.47053l0.00876,24.6967z"/><path fill="#da195a" d="m39.729499,22.524216l-5.03061,3.04282l0,6.21422l15.32442,-9.26447l-10.29381,0.00743z"/><path fill="#fbb42d" d="m29.317269,10.020376l0,18.74245l5.38184,3.26189l-0.02817,-12.53628l-5.35367,-9.46806z"/><path fill="#f37632" d="m34.670879,19.488406l5.05878,3.03569l10.29381,-0.00744l-20.70626,-12.49631l5.35367,9.46806z"/><path fill="#5fba46" d="m29.318959,53.768056l5.37996,-9.47518l0,-6.08346l-5.38121,-3.20023l0.00125,18.75887z"/><path fill="#1289ca" d="m19.453859,29.013596l20.26331,12.26454l10.28567,-0.01209l-35.91986,-21.72298l5.37088,9.47053z"/><path fill="#0b8341" d="m39.717099,41.278166l-5.01808,3.01462l-5.37997,9.47518l20.68372,-12.50189l-10.28567,0.01209z"/><path fill="#90509f" d="m19.453859,34.787666l-5.36212,9.45226l15.26807,-9.23071l-5.13423,-3.10758l-4.77172,2.88603z"/></svg><b>СБП</b></span>']
         : ['<span class="paylogo"><svg viewBox="42 151 696 198"><defs><linearGradient id="btMir" x1="536" x2="738" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00A0E5"/><stop offset="1" stop-color="#0077C3"/></linearGradient></defs><path fill="#37A72E" d="M544.1,240.5v108h60v-64h68c28.6-0.2,52.9-18.5,62.1-44H544.1z"/><path fill="url(#btMir)" d="M536.1,151.5c3.5,44.1,45.3,79,96.3,79c0.2,0,104.3,0,104.3,0 c0.8-4,1.2-8.2,1.2-12.5c0-36.6-29.5-66.2-66-66.5L536.1,151.5z"/><path fill="#37A72E" d="M447.3,229.4l0-0.1L447.3,229.4c0.7-1.2,1.8-1.9,3.2-1.9c2,0,3.5,1.6,3.6,3.5l0,0 v116.5h60v-196h-60c-7.6,0.3-16.2,5.8-19.4,12.7L387,266.6c-0.1,0.4-0.3,0.8-0.5,1.2l0,0l0,0c-0.7,1-1.9,1.7-3.3,1.7 c-2.2,0-4-1.8-4-4v-114h-60v196h60v0c7.5-0.4,15.9-5.9,19.1-12.7l49-105.1C447.2,229.6,447.3,229.5,447.3,229.4L447.3,229.4z"/><path fill="#37A72E" d="M223.3,232.8l-35.1,114.7H145L110,232.7c-0.3-1.8-1.9-3.2-3.9-3.2 c-2.2,0-3.9,1.8-3.9,3.9c0,0,0,0,0,0l0,114h-60v-196h51.5H109c11,0,22.6,8.6,25.8,19.1l29.2,95.5c1.5,4.8,3.8,4.7,5.3,0 l29.2-95.5c3.2-10.6,14.8-19.1,25.8-19.1h15.3h51.5v196h-60v-114c0,0,0,0,0-0.1c0-2.2-1.8-3.9-3.9-3.9 C225.2,229.5,223.6,230.9,223.3,232.8L223.3,232.8z"/></svg></span>',
             '<span class="paylogo"><svg viewBox="60 143 660 214"><path fill="#1434CB" d="M489.823 143.111C442.988 143.111 401.134 167.393 401.134 212.256C401.134 263.706 475.364 267.259 475.364 293.106C475.364 303.989 462.895 313.731 441.6 313.731C411.377 313.731 388.789 300.119 388.789 300.119L379.123 345.391C379.123 345.391 405.145 356.889 439.692 356.889C490.898 356.889 531.19 331.415 531.19 285.784C531.19 231.419 456.652 227.971 456.652 203.981C456.652 195.455 466.887 186.114 488.122 186.114C512.081 186.114 531.628 196.014 531.628 196.014L541.087 152.289C541.087 152.289 519.818 143.111 489.823 143.111ZM61.3294 146.411L60.1953 153.011C60.1953 153.011 79.8988 156.618 97.645 163.814C120.495 172.064 122.122 176.868 125.971 191.786L167.905 353.486H224.118L310.719 146.411H254.635L198.989 287.202L176.282 167.861C174.199 154.203 163.651 146.411 150.74 146.411H61.3294ZM333.271 146.411L289.275 353.486H342.756L386.598 146.411H333.271ZM631.554 146.411C618.658 146.411 611.825 153.318 606.811 165.386L528.458 353.486H584.542L595.393 322.136H663.72L670.318 353.486H719.805L676.633 146.411H631.554ZM638.848 202.356L655.473 280.061H610.935L638.848 202.356Z"/></svg></span>',
-            '<span class="paylogo paylogo--mc"><svg viewBox="109 76 562 348"><path fill="#FF5A00" d="M465.738 113.525H313.812V386.475H465.738V113.525Z"/><path fill="#EB001B" d="M323.926 250C323.926 194.545 349.996 145.326 390 113.525C360.559 90.3769 323.42 76.3867 282.91 76.3867C186.945 76.3867 109.297 154.035 109.297 250C109.297 345.965 186.945 423.614 282.91 423.614C323.42 423.614 360.559 409.623 390 386.475C349.94 355.123 323.926 305.455 323.926 250Z"/><path fill="#F79E1B" d="M670.711 250C670.711 345.965 593.062 423.614 497.098 423.614C456.588 423.614 419.449 409.623 390.008 386.475C430.518 354.618 456.082 305.455 456.082 250C456.082 194.545 430.012 145.326 390.008 113.525C419.393 90.3769 456.532 76.3867 497.041 76.3867C593.062 76.3867 670.711 154.541 670.711 250Z"/></svg></span>'];
+            '<span class="paylogo paylogo--mc"><svg viewBox="109 76 562 348"><path fill="#FF5A00" d="M465.738 113.525H313.812V386.475H465.738V113.525Z"/><path fill="#EB001B" d="M323.926 250C323.926 194.545 349.996 145.326 390 113.525C360.559 90.3769 323.42 76.3867 282.91 76.3867C186.945 76.3867 109.297 154.035 109.297 250C109.297 345.965 186.945 423.614 282.91 423.614C323.42 423.614 360.559 409.623 390 386.475C349.94 355.123 323.926 305.455 323.926 250Z"/><path fill="#F79E1B" d="M670.711 250C670.711 345.965 593.062 423.614 497.098 423.614C456.588 423.614 419.449 409.623 390.008 386.475C430.518 354.618 456.082 305.455 456.082 250C456.082 194.545 430.012 145.326 390.008 113.525C419.393 90.3769 456.532 76.3867 497.041 76.3867C593.062 76.3867 670.711 154.541 670.711 250Z"/></svg></span>']);
     return '<span class="paylogos" aria-hidden="true">' . implode('', $l) . '</span>';
 }
 
@@ -169,6 +256,11 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
     $props = $order->getPropertyCollection();
     $host = 'https://' . \Bitrix\Main\Context::getCurrent()->getRequest()->getHttpHost();
     $back = $host . '/personal/order/success/?id=' . (int)$order->getId();
+    $data = array_filter(['Email' => (string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''), 'Phone' => (string)($props->getPhone() ? $props->getPhone()->getValue() : '')]);
+    // SberPay через своё API банк проводит, только зная устройство покупателя
+    if (bt_tbank_xml($p) === 'bt_sberpay') {
+        $data += ['SberPayWeb' => 'true'] + array_filter(bt_tbank_device(), fn($v) => $v !== '');
+    }
     $r = bt_tbank_api($p, 'Init', [
         'Amount' => $amount,
         'OrderId' => (string)$p->getField('ACCOUNT_NUMBER'),
@@ -176,7 +268,7 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
         'SuccessURL' => $back,
         'FailURL' => $back . '&pay=fail',
         'NotificationURL' => $host . '/personal/order/notification.php',
-        'DATA' => array_filter(['Email' => (string)($props->getUserEmail() ? $props->getUserEmail()->getValue() : ''), 'Phone' => (string)($props->getPhone() ? $props->getPhone()->getValue() : '')]),
+        'DATA' => $data,
     ] + ($receipt ? ['Receipt' => $receipt] : []));
     if (empty($r['Success']) || !str_starts_with((string)($r['PaymentURL'] ?? ''), 'https://')) {
         // номер уже занят прошлой попыткой (банк не даёт его повторить даже после отмены) — платим новым платежом заказа
@@ -296,35 +388,39 @@ function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
     $keep !== '' && $order->setField('COMMENTS', $keep . "\n" . $new);
 }
 
-// «По СБП» работает на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает коды, которые отличались
-function bt_tbank_sbp_sync(bool $apply = true): array
+// «По СБП» и «SberPay» работают на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает отличавшиеся коды: XML_ID => [коды]
+function bt_tbank_ps_sync(bool $apply = true): array
 {
-    $card = $sbp = 0;
+    $card = 0;
+    $copies = [];
     foreach (Loader::includeModule('sale') ? Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'order' => ['ID' => 'ASC'], 'select' => ['ID', 'XML_ID']])->fetchAll() : [] as $ps) {
-        if ($ps['XML_ID'] === 'bt_sbp') {
-            $sbp = $sbp ?: (int)$ps['ID'];
+        if (isset(BT_TBANK_SCREENS[(string)$ps['XML_ID']])) {
+            $copies[$ps['XML_ID']] ??= (int)$ps['ID'];
         } else {
             $card = $card ?: (int)$ps['ID'];
         }
     }
-    if (!$card || !$sbp) {
+    if (!$card || !$copies) {
         return [];
     }
     $pre = Sale\PaySystem\Service::PAY_SYSTEM_PREFIX;
     $key = fn($m) => $m['CODE_KEY'] . '|' . (int)$m['PERSON_TYPE_ID'];
-    $have = [];
-    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $sbp]])->fetchAll() as $m) {
-        $have[$key($m)] = $m;
-    }
+    $src = Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $card]])->fetchAll();
     $diff = [];
-    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $card]])->fetchAll() as $m) {
-        $h = $have[$key($m)] ?? null;
-        if ($h && $h['PROVIDER_KEY'] === $m['PROVIDER_KEY'] && $h['PROVIDER_VALUE'] === $m['PROVIDER_VALUE']) {
-            continue;
+    foreach ($copies as $xml => $to) {
+        $have = [];
+        foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $to]])->fetchAll() as $m) {
+            $have[$key($m)] = $m;
         }
-        $diff[] = $m['CODE_KEY'];
-        $apply && Sale\BusinessValue::setMapping($m['CODE_KEY'], $pre . $sbp, (int)$m['PERSON_TYPE_ID'] ?: null,
-            ['PROVIDER_KEY' => $m['PROVIDER_KEY'], 'PROVIDER_VALUE' => $m['PROVIDER_VALUE']]);
+        foreach ($src as $m) {
+            $h = $have[$key($m)] ?? null;
+            if ($h && $h['PROVIDER_KEY'] === $m['PROVIDER_KEY'] && $h['PROVIDER_VALUE'] === $m['PROVIDER_VALUE']) {
+                continue;
+            }
+            $diff[$xml][] = $m['CODE_KEY'];
+            $apply && Sale\BusinessValue::setMapping($m['CODE_KEY'], $pre . $to, (int)$m['PERSON_TYPE_ID'] ?: null,
+                ['PROVIDER_KEY' => $m['PROVIDER_KEY'], 'PROVIDER_VALUE' => $m['PROVIDER_VALUE']]);
+        }
     }
     return $diff;
 }
@@ -355,7 +451,7 @@ function bt_tbank_sync_user(int $userId = 0): void
 // агент: на случай, если уведомление банка не дошло
 function bt_tbank_agent(): string
 {
-    bt_tbank_sbp_sync();
+    bt_tbank_ps_sync();
     bt_tbank_sync_user();
     return 'bt_tbank_agent();';
 }

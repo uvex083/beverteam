@@ -2433,3 +2433,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   const b=s.querySelector('.sbp__show'), q=s.querySelector('.sbp__qr');
   b&&b.addEventListener('click',()=>{ s.classList.add('qr-open'); b.hidden=true; q.focus({preventScroll:true}); q.scrollIntoView({behavior:'smooth',block:'nearest'}); });
 });
+
+// SberPay: запрос на оплату в СберБанк Онлайн по номеру телефона (на компьютере сразу, на телефоне — «с другого телефона»); оплату ждёт блок СБП выше
+document.addEventListener('DOMContentLoaded',()=>{
+  const s=document.querySelector('.spay[data-id]'), f=s&&s.querySelector('.spay__form'); if(!f) return;
+  const inp=f.querySelector('input[name=phone]'), btn=f.querySelector('button[type=submit]'), sent=f.querySelector('.spay__sent'), o=s.querySelector('.spay__other');
+  let tm=0;
+  // повторный запрос — не раньше чем через 30 с: банк шлёт пуш на каждый
+  const lock=sec=>{ clearInterval(tm); let n=sec;
+    const tick=()=>{ btn.disabled=n>0; btn.textContent=n>0?'Отправить ещё раз через '+n+' с':'Отправить ещё раз'; if(--n<0) clearInterval(tm); };
+    tick(); tm=setInterval(tick,1000); };
+  o&&o.addEventListener('click',()=>{ f.hidden=false; o.hidden=true; f.scrollIntoView({behavior:'smooth',block:'nearest'}); });
+  f.addEventListener('submit',e=>{ e.preventDefault(); inp.dataset.touched='1';
+    if(btn.disabled||!BT_checkField(inp)) return;
+    btn.disabled=true;
+    const fd=new FormData(); fd.append('action','sberpay'); fd.append('id',s.dataset.id); fd.append('pid',s.dataset.pid); fd.append('phone',inp.value); fd.append('sessid',window.BT_SID||'');
+    fetch('/local/ajax/order.php',{method:'POST',body:fd}).then(r=>r.json()).then(r=>{
+      if(r.ok){ sent.hidden=false; lock(30); return; }
+      if(r.error==='wait'){ lock(r.left||30); return; }
+      btn.disabled=false;
+      BT_toast(r.error==='phone'?'Проверьте номер телефона':r.error==='dead'?'Платёж устарел — <a class="link" href="">обновите страницу</a>':'Банк не принял запрос. Проверьте номер или оплатите картой');
+    }).catch(()=>{ btn.disabled=false; BT_toast('Нет связи с сервером — попробуйте ещё раз'); });
+  });
+});

@@ -12,9 +12,9 @@ $back = '/personal/order/success/?id=' . $id;
 $order = $id ? Sale\Order::load($id) : null;
 $own = $order && (in_array($id, (array)($_SESSION['BT_ORDERS'] ?? []), true) || ($USER->IsAuthorized() && (int)$order->getUserId() === (int)$USER->GetID()));
 $p = $own && !$order->isCanceled() ? bt_tbank_payment($order) : null;
-// по СБП — свой экран с QR; оттуда «Оплатить картой» переводит платёж на карту и ведёт на страницу банка
-if ($p && bt_tbank_is_sbp($p) && !bt_tbank_sync($p)) {
-    ($_GET['card'] ?? '') === '1' ? bt_tbank_to_card($p) : LocalRedirect('/personal/order/sbp/?id=' . $id);
+// по СБП и через SberPay — свой экран; оттуда «Оплатить картой» переводит платёж на карту и ведёт на страницу банка
+if ($p && ($screen = bt_tbank_screen($p)) && !bt_tbank_sync($p)) {
+    ($_GET['card'] ?? '') === '1' ? bt_tbank_to_card($p) : LocalRedirect($screen . '?id=' . $id);
 }
 if ($p && !bt_tbank_sync($p) && ($url = bt_tbank_url($p))) {
     LocalRedirect($url, true);

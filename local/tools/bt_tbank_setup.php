@@ -1,6 +1,6 @@
 <?php
-// Оплата через Т-Банк (модуль tinkoff.payment): настройки платёжной системы без ключей, ограничение «только физлица», агент сверки оплат, оплата по СБП.
-// Терминал и пароль вписываются в админке: Магазин → Платёжные системы → «Картой онлайн»; в «По СБП» их копирует агент сверки (или apply). Чек включён: касса Т-Банка подключена к рабочему терминалу.
+// Оплата через Т-Банк (модуль tinkoff.payment): настройки платёжной системы без ключей, ограничение «только физлица», агент сверки оплат, оплата по СБП и через SberPay.
+// Терминал и пароль вписываются в админке: Магазин → Платёжные системы → «Картой онлайн»; в «По СБП» и «SberPay» их копирует агент сверки (или apply). Чек включён: касса Т-Банка подключена к рабочему терминалу.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_tbank_setup.php [show|apply]. Повторный запуск ничего не дублирует.
 
 if (PHP_SAPI !== 'cli') {
@@ -19,7 +19,7 @@ if (!IsModuleInstalled('tinkoff.payment') || !Loader::includeModule('sale')) {
     exit("модуль tinkoff.payment не установлен — поставить из Маркетплейса\n");
 }
 $all = Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'order' => ['ID' => 'ASC'], 'select' => ['ID', 'NAME', 'ACTIVE', 'XML_ID']])->fetchAll();
-$ps = current(array_filter($all, fn($x) => $x['XML_ID'] !== 'bt_sbp'));
+$ps = current(array_filter($all, fn($x) => !isset(BT_TBANK_SCREENS[(string)$x['XML_ID']])));
 if (!$ps) {
     exit("платёжная система модуля не найдена\n");
 }
@@ -53,30 +53,41 @@ foreach (Sale\Internals\PersonTypeTable::getList(['filter' => ['=ACTIVE' => 'Y']
         'CODE' => 'RECEIPT_URL', 'USER_PROPS' => 'N', 'IS_LOCATION' => 'N', 'PROPS_GROUP_ID' => $group, 'UTIL' => 'Y', 'ACTIVE' => 'Y',
         'DESCRIPTION' => 'Ссылка на чек онлайн-оплаты, приходит от Т-Банка']);
 }
-// оплата по СБП — вторая платёжная система того же терминала со своим экраном QR (/personal/order/sbp/);
+// оплата по СБП и через SberPay — платёжные системы того же терминала со своими экранами (/personal/order/sbp/, /personal/order/sberpay/);
 // настройки и ключи копируются с «Картой онлайн» (apply и агент сверки) — вписывать их только туда
-$sbpId = (int)(current(array_filter($all, fn($x) => $x['XML_ID'] === 'bt_sbp'))['ID'] ?? 0);
-if (!$sbpId) {
-    echo ($apply ? '' : '[show] ') . "платёжная система «По СБП» (настройки и ключи — копия «Картой онлайн»)\n";
+$extra = [
+    'bt_sbp' => ['NAME' => 'По СБП', 'SORT' => 55, 'DESCRIPTION' => 'QR-код или приложение вашего банка, без ввода карты'],
+    // создаётся выключенной: включать в админке, когда SberPay подключён на терминале
+    'bt_sberpay' => ['NAME' => 'SberPay', 'SORT' => 57, 'DESCRIPTION' => 'Оплата в приложении СберБанк Онлайн', 'ACTIVE' => 'N'],
+];
+$extraIds = [];
+foreach ($extra as $xml => $f) {
+    $extraIds[$xml] = (int)(current(array_filter($all, fn($x) => $x['XML_ID'] === $xml))['ID'] ?? 0);
+    if ($extraIds[$xml]) {
+        continue;
+    }
+    echo ($apply ? '' : '[show] ') . "платёжная система «{$f['NAME']}» (настройки и ключи — копия «Картой онлайн»)\n";
     if ($apply) {
         $src = Sale\Internals\PaySystemActionTable::getById($id)->fetch();
         unset($src['ID'], $src['PAY_SYSTEM_ID'], $src['LOGOTIP']);
-        $r = Sale\PaySystem\Manager::add(['NAME' => 'По СБП', 'PSA_NAME' => 'По СБП', 'XML_ID' => 'bt_sbp', 'SORT' => 55,
-            'DESCRIPTION' => 'QR-код или приложение вашего банка, без ввода карты'] + $src);
+        $r = Sale\PaySystem\Manager::add(['NAME' => $f['NAME'], 'PSA_NAME' => $f['NAME'], 'XML_ID' => $xml, 'SORT' => $f['SORT'], 'DESCRIPTION' => $f['DESCRIPTION']]
+            + array_intersect_key($f, ['ACTIVE' => 1]) + $src);
         if (!$r->isSuccess()) {
             exit(implode('; ', $r->getErrorMessages()) . "\n");
         }
-        $sbpId = (int)$r->getId();
-        Sale\PaySystem\Manager::update($sbpId, ['PAY_SYSTEM_ID' => $sbpId]);
+        $extraIds[$xml] = (int)$r->getId();
+        Sale\PaySystem\Manager::update($extraIds[$xml], ['PAY_SYSTEM_ID' => $extraIds[$xml]]);
     }
 }
-if ($sbpId) {
-    foreach (bt_tbank_sbp_sync($apply) as $code) {
-        echo ($apply ? '' : '[show] ') . "«По СБП»: $code — как у «Картой онлайн»\n";
+foreach (bt_tbank_ps_sync($apply) as $xml => $codes) {
+    foreach ($codes as $code) {
+        echo ($apply ? '' : '[show] ') . "«{$extra[$xml]['NAME']}»: $code — как у «Картой онлайн»\n";
     }
-    if (!Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $sbpId, '=SERVICE_TYPE' => 1]])->fetch()) {
-        echo ($apply ? '' : '[show] ') . "«По СБП»: только физлица\n";
-        $apply and Sale\Internals\ServiceRestrictionTable::add(['SERVICE_ID' => $sbpId, 'SERVICE_TYPE' => 1, 'SORT' => 100,
+}
+foreach (array_filter($extraIds) as $xml => $extraId) {
+    if (!Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $extraId, '=SERVICE_TYPE' => 1]])->fetch()) {
+        echo ($apply ? '' : '[show] ') . "«{$extra[$xml]['NAME']}»: только физлица\n";
+        $apply and Sale\Internals\ServiceRestrictionTable::add(['SERVICE_ID' => $extraId, 'SERVICE_TYPE' => 1, 'SORT' => 100,
             'CLASS_NAME' => '\Bitrix\Sale\Services\PaySystem\Restrictions\PersonType', 'PARAMS' => ['PERSON_TYPE_ID' => [1]]]);
     }
 }

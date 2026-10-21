@@ -37,9 +37,9 @@ $popular = array_values($popular);
 
 $pays = [];
 foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTIVE' => 'Y', '!=ACTION_FILE' => 'inner'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'DESCRIPTION', 'ACTION_FILE', 'XML_ID']]) as $ps) {
-    $sbp = $ps['XML_ID'] === 'bt_sbp';
-    $pays[] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE'], 'sbp' => $sbp,
-        'logo' => $ps['ACTION_FILE'] === 'tinkoff' ? bt_tbank_logos($sbp) : ''];
+    $xml = (string)$ps['XML_ID'];
+    $pays[] = ['id' => (int)$ps['ID'], 'name' => $ps['NAME'], 'desc' => (string)$ps['DESCRIPTION'], 'code' => $ps['ACTION_FILE'], 'sbp' => $xml === 'bt_sbp',
+        'sberpay' => $xml === 'bt_sberpay', 'logo' => $ps['ACTION_FILE'] === 'tinkoff' ? bt_tbank_logos($xml) : ''];
 }
 
 $u = ['name' => '', 'email' => '', 'phone' => ''];
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const pp=PAYS.find(x=>x.id===payId)||{}, online=pp.code==='tinkoff';
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
     if(!sending)submit.textContent=btnText();
-    sHint.textContent=online?(pp.sbp?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате по СБП.':'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.'):'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
+    sHint.textContent=online?(pp.sbp?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате по СБП.':pp.sberpay?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате через SberPay.':'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.'):'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
     if(calcShown()) sLeft.textContent='Считаем доставку…';
     submit.disabled=!!miss.length||sending||calcShown();
     return !miss.length;

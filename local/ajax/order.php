@@ -1,5 +1,5 @@
 <?php
-// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create | sbp (пришла ли оплата по СБП)
+// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create | sbp (пришла ли оплата по СБП или SberPay) | sberpay (запрос на оплату в СберБанк Онлайн)
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -236,7 +236,27 @@ if ($action === 'calc') {
         'cdekDown' => $cdekDown && !$own && !array_filter($deliveries, fn($d) => str_starts_with($d['code'], 'sdek_'))]);
 }
 
-// экран оплаты по СБП спрашивает, пришли ли деньги
+// SberPay с компьютера: запрос на оплату в СберБанк Онлайн по номеру телефона, не чаще раза в 30 секунд
+if ($action === 'sberpay') {
+    $order = bt_tbank_order((int)$in('id'));
+    $p = $order && !$order->isPaid() && !$order->isCanceled() ? bt_tbank_payment($order) : null;
+    $pid = $in('pid');
+    if (!$p || bt_tbank_xml($p) !== 'bt_sberpay' || (string)$p->getField('PS_INVOICE_ID') !== $pid) {
+        $out(['ok' => false, 'error' => 'dead']);
+    }
+    if (bt_phone_digits($in('phone')) === '') {
+        $out(['ok' => false, 'error' => 'phone']);
+    }
+    $last = (int)($_SESSION['BT_SBERPAY_PUSH'][$pid] ?? 0);
+    if ($last > time() - 30) {
+        $out(['ok' => false, 'error' => 'wait', 'left' => $last + 30 - time()]);
+    }
+    $ok = bt_tbank_sberpay_push($p, $in('phone'));
+    $ok && $_SESSION['BT_SBERPAY_PUSH'][$pid] = time();
+    $out(['ok' => $ok]);
+}
+
+// экран оплаты по СБП или SberPay спрашивает, пришли ли деньги
 if ($action === 'sbp') {
     $order = bt_tbank_order((int)$in('id'));
     $p = $order && !$order->isPaid() && !$order->isCanceled() ? bt_tbank_payment($order) : null;
