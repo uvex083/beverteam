@@ -366,6 +366,10 @@ foreach ($order->getPropertyCollection() as $prop) {
     }
 }
 $order->doFinalAction(true);
+// тариф СДЭК для выгрузки заказа модулем: штатно его пишет только sale.order.ajax
+if (str_starts_with($dCode, 'sdek_') && ($p = $order->getPropertyCollection()->getItemByOrderPropertyCode('IPOLSDEK_CNTDTARIF'))) {
+    $p->setValue((string)(\sdekShipmentCollection::getProfileTarif(substr($dCode, 5)) ?: ($_SESSION['IPOLSDEK_CHOSEN'][substr($dCode, 5)] ?? '')));
+}
 bt_order_payment($order)->setField('SUM', $order->getPrice());
 $r = $order->save();
 if (!$r->isSuccess()) {
