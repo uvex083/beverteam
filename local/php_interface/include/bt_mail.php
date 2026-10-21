@@ -17,8 +17,13 @@ function bt_mail_route(array &$fields, array &$message): void
     if ($to === '' || $to === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
         return;
     }
+    // скрытая копия уведомлений менеджеру (заявки, отзывы, копии заказов) — опция bt/notify_bcc
+    $bcc = \Bitrix\Main\Config\Option::get('bt', 'notify_bcc');
     if (($fields['BCC'] ?? '') === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
-        $fields['BCC'] = $to;
+        $fields['BCC'] = $bcc ? $to . ', ' . $bcc : $to;
+    }
+    if ($bcc && ($message['EVENT_NAME'] ?? '') === 'BT_FORM_REQUEST') {
+        $message['BCC'] = trim(trim((string)($message['BCC'] ?? '')) . ', ' . $bcc, ', ');
     }
     if (trim((string)($message['EMAIL_TO'] ?? '')) === '#DEFAULT_EMAIL_FROM#') {
         $message['EMAIL_TO'] = $to;
