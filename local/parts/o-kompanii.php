@@ -91,7 +91,7 @@ $revs = bt_reviews();
   <section class="sec sec--t0"><div class="cert">
     <div><div class="mono" style="color:var(--lime)"><?= $e($cert['caption'] ?? '') ?></div><h2 class="display h2" style="margin:14px 0"><?= $e($cert['title'] ?? '') ?></h2><p style="color:#A8A8A0;margin:0;max-width:40ch"><?= $e($cert['subtitle'] ?? '') ?></p>
       <?php if (!empty($cert['file'])): ?><a class="btn" style="margin-top:24px" href="<?= $e($cert['file']) ?>" target="_blank" rel="noopener"><?= $e(($cert['btn_text'] ?? '') ?: 'Сертификат, PDF') ?></a><?php endif ?></div>
-    <?php if (!empty($cert['pic'])): ?><a class="cert__a" href="<?= $e(CFile::GetPath($cert['pic_id'])) ?>" aria-label="Открыть сертификат крупно"><img class="cert__img" src="<?= $e($cert['pic']) ?>"<?= bt_img_wh($cert['pic']) ?> alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"></a><?php else: ?><div class="ph"><span>Скан сертификата авторизации<br><small>нужен файл от клиента</small></span></div><?php endif ?>
+    <?php if (!empty($cert['pic'])): ?><a class="cert__a" href="<?= $e(bt_img($cert['pic_id'], 2400, 2400)) ?>" aria-label="Открыть сертификат крупно"><img class="cert__img" src="<?= $e($cert['pic']) ?>"<?= bt_img_wh($cert['pic']) ?> alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy"></a><?php else: ?><div class="ph"><span>Скан сертификата авторизации<br><small>нужен файл от клиента</small></span></div><?php endif ?>
   </div></section>
   <?php endif ?>
 

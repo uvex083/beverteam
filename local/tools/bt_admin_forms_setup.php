@@ -21,7 +21,7 @@ $say = fn(string $s) => print(($apply || $mode === 'rollback' ? '' : '[show] ') 
 
 // код ИБ => [как выводит сайт: block — один элемент, list/blocks — список, поля в порядке страницы]
 $forms = [
-    'about_cert' => ['block', ['caption', 'title', 'subtitle', 'pic', 'btn_text', 'file']],
+    'about_cert' => ['block', ['caption', 'title', 'subtitle', 'btn_text', 'file', 'pic']],
     'about_faq' => ['list', ['name', 'text']],
     'about_form' => ['block', ['caption', 'title', 'subtitle', 'btn_text']],
     'about_history' => ['list', ['name', 'text', 'demo']],
