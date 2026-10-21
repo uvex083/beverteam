@@ -240,7 +240,9 @@ if ($action === 'calc') {
 if ($action === 'sbp') {
     $order = bt_tbank_order((int)$in('id'));
     $p = $order && !$order->isPaid() && !$order->isCanceled() ? bt_tbank_payment($order) : null;
-    $out(['ok' => (bool)$order, 'state' => !$order ? 'dead' : ($order->isPaid() ? 'paid' : ($p ? bt_tbank_sbp_state($p) : 'dead'))]);
+    // QR на экране от прошлого платежа (новый выпущен в другом окне) — по нему не ждём
+    $out(['ok' => (bool)$order, 'state' => !$order ? 'dead' : ($order->isPaid() ? 'paid'
+        : (!$p || (string)$p->getField('PS_INVOICE_ID') !== $in('pid') ? 'dead' : bt_tbank_sbp_state($p)))]);
 }
 
 if ($action !== 'create') {

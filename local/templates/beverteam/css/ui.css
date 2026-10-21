@@ -1595,8 +1595,9 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:700px){.okp .next{grid-auto-flow:row;grid-template-columns:1fr}.okp .dl{grid-template-columns:1fr;gap:4px}.okp .dl dd{margin-bottom:10px}}
 /* оплата по СБП: QR в тёмной рамке с уголками видоискателя; на телефоне главное — кнопка приложения банка, QR по запросу */
 .sbp__card{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,44px);align-items:center}
-.sbp__vf{position:relative;background:var(--ink);border-radius:var(--rad);padding:22px}
-.sbp__vf img{width:248px;height:248px;background:#fff;border-radius:var(--rad-xs);padding:10px;transition:opacity .25s}
+.sbp__qr{max-width:100%;outline:none}
+.sbp__vf{position:relative;max-width:100%;background:var(--ink);border-radius:var(--rad);padding:22px}
+.sbp__vf img{width:min(248px,100%);height:auto;aspect-ratio:1;background:#fff;border-radius:var(--rad-xs);padding:10px;transition:opacity .25s}
 .sbp__vf::before{content:"";position:absolute;inset:8px;pointer-events:none;transition:opacity .25s;background:
   linear-gradient(var(--lime) 0 0) top left/28px 3px no-repeat,linear-gradient(var(--lime) 0 0) top left/3px 28px no-repeat,
   linear-gradient(var(--lime) 0 0) top right/28px 3px no-repeat,linear-gradient(var(--lime) 0 0) top right/3px 28px no-repeat,
@@ -1606,18 +1607,20 @@ input,textarea{caret-color:var(--ink)}
 .sbp.is-paid .sbp__vf::after{opacity:1;transform:none}
 .sbp.is-paid .sbp__vf img,.sbp.is-dead .sbp__vf img{opacity:.12}
 .sbp.is-dead .sbp__vf::before{opacity:.3}
-.sbp.is-paid .sbp__app,.sbp.is-dead .sbp__app,.sbp.is-paid .sbp__show,.sbp.is-dead .sbp__show{display:none}
+.sbp.is-paid .sbp__app,.sbp.is-dead .sbp__app,.sbp.is-paid .sbp__show,.sbp.is-dead .sbp__show,.sbp.is-paid .sbp__steps,.sbp.is-dead .sbp__steps{display:none}
+.sbp.is-paid .sbp__alt{visibility:hidden}
 .sbp__sum{display:block;font-family:Unbounded,'BT Fallback',Manrope,sans-serif;font-weight:800;font-size:clamp(28px,3.2vw,38px);letter-spacing:-.02em;line-height:1.1}
 .sbp__note{display:block;margin-top:6px;font-size:14px;color:var(--gray)}
 .sbp__steps{list-style:none;counter-reset:sbp;margin:22px 0 0;padding:0;display:grid;gap:10px;font-size:14.5px;line-height:1.4}
 .sbp__steps li{counter-increment:sbp;display:flex;align-items:center;gap:12px}
 .sbp__steps li::before{content:counter(sbp);flex:none;width:26px;height:26px;border-radius:50%;background:var(--paper);display:grid;place-items:center;font:600 12px 'JetBrains Mono',monospace}
-.sbp__st{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;font-size:14px;color:var(--gray)}
-.sbp__st::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
-.sbp__st.is-ok{color:var(--ok);font-weight:600}.sbp__st.is-ok::before{background:var(--ok);animation:none}
+.sbp__st{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:baseline;gap:10px;font-size:14px;color:var(--gray)}
+.sbp__st>span{flex:1;min-width:0}
+.sbp__st::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite;transform:translateY(-1px)}
+.sbp__st.is-ok{color:var(--ok);font-weight:600}.sbp__st.is-ok::before{content:"✓";width:auto;height:auto;background:none;animation:none;transform:none}
 .sbp__st.is-err{color:var(--err)}.sbp__st.is-err::before{background:var(--err);animation:none}
 .sbp__st.is-idle::before{background:var(--gray-2);animation:none}
-.sbp__show{background:none;border:0;padding:0;margin-top:14px;font-size:14px;color:var(--gray);text-decoration:underline;text-underline-offset:3px}
+.sbp__show{background:none;border:0;padding:12px 0;margin-top:2px;font-size:14px;color:var(--gray);text-decoration:underline;text-underline-offset:3px}
 .sbp__app,.sbp__show,.sbp__m{display:none}
 .sbp__fail{grid-column:1/-1;display:grid;justify-items:start;gap:6px}
 .sbp__fail b{font-size:16px}.sbp__fail span{color:var(--gray);font-size:14px;margin-bottom:12px}
@@ -1627,7 +1630,7 @@ input,textarea{caret-color:var(--ink)}
   .sbp:not(.qr-open) .sbp__qr{display:none}
 }
 @media(max-width:720px){.sbp__card{grid-template-columns:minmax(0,1fr)}.sbp__qr{order:2;justify-self:center}}
-@media(prefers-reduced-motion:reduce){.sbp__st::before{animation:none}}
+@media(prefers-reduced-motion:reduce){.sbp__st::before{animation:none}.sbp__vf::before,.sbp__vf::after{transition:none}}
 
 /* ---------- главная (index.html) ---------- */
 .home .hero{padding:clamp(36px,5vw,64px) 0 var(--pad)}

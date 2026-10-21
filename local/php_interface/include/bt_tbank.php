@@ -4,6 +4,9 @@
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
 
+// статусы платежа в банке, по которым уже не заплатить
+const BT_TBANK_DEAD = ['CANCELED', 'REJECTED', 'DEADLINE_EXPIRED', 'AUTH_FAIL', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED'];
+
 // неоплаченный платёж заказа через Т-Банк
 function bt_tbank_payment(Sale\Order $order): ?Sale\Payment
 {
@@ -46,7 +49,8 @@ function bt_tbank_qr(Sale\Payment $p): array
     }
     $link = (string)(bt_tbank_api($p, 'GetQr', ['PaymentId' => $pid, 'DataType' => 'PAYLOAD'])['Data'] ?? '');
     $svg = (string)(bt_tbank_api($p, 'GetQr', ['PaymentId' => $pid, 'DataType' => 'IMAGE'])['Data'] ?? '');
-    return str_starts_with($link, 'https://') && str_starts_with($svg, '<svg') ? ['link' => $link, 'svg' => $svg, 'sum' => $p->getSum()] : [];
+    return str_starts_with($link, 'https://') && preg_match('/^\s*(<\?xml[^>]*>\s*)?<svg/i', $svg)
+        ? ['link' => $link, 'svg' => $svg, 'sum' => $p->getSum(), 'pid' => $pid] : [];
 }
 
 // экран СБП ждёт деньги: paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
@@ -60,7 +64,7 @@ function bt_tbank_sbp_state(Sale\Payment $p): string
     if ($st === 'CONFIRMED') {
         return bt_tbank_sync($p) ? 'paid' : 'wait';
     }
-    return in_array($st, ['CANCELED', 'REJECTED', 'DEADLINE_EXPIRED', 'AUTH_FAIL', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED'], true) ? 'dead' : 'wait';
+    return in_array($st, BT_TBANK_DEAD, true) ? 'dead' : 'wait';
 }
 
 // «Оплатить картой» с экрана СБП: платёж — на карточную систему; платёж в банке остаётся тем же, его страница принимает карты
@@ -144,7 +148,8 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
     $prevUrl = (string)$p->getField('PS_STATUS_DESCRIPTION');
     if ($prevId !== '' && str_starts_with($prevUrl, 'https://')) {
         $st = bt_tbank_api($p, 'GetState', ['PaymentId' => $prevId]);
-        if (in_array($st['Status'] ?? '', ['NEW', 'FORM_SHOWED'], true) && (int)($st['Amount'] ?? 0) === $amount) {
+        // платёж ещё проводится (покупатель подтверждает в приложении банка) — тоже не новый: новый отменил бы проводимый
+        if (($st['Status'] ?? '') !== '' && !in_array($st['Status'], BT_TBANK_DEAD, true) && (int)($st['Amount'] ?? 0) === $amount) {
             return $prevUrl;
         }
     }
@@ -243,9 +248,12 @@ function bt_tbank_receipt_save(array $req): void
 // заменить неоплаченный платёж новым (новый номер для банка); прошлые попытки в банке сначала отменяем, чтобы по старой ссылке не заплатили
 function bt_tbank_renew(Sale\Payment $p): ?Sale\Payment
 {
-    $final = ['CONFIRMED', 'CANCELED', 'REVERSED', 'REFUNDED', 'PARTIAL_REFUNDED', 'REJECTED', 'DEADLINE_EXPIRED'];
     foreach ((array)(bt_tbank_api($p, 'CheckOrder', ['OrderId' => (string)$p->getField('ACCOUNT_NUMBER')])['Payments'] ?? []) as $x) {
-        if (($x['Status'] ?? '') === 'CONFIRMED' || (!in_array($x['Status'] ?? '', $final, true) && empty(bt_tbank_api($p, 'Cancel', ['PaymentId' => (string)$x['PaymentId']])['Success']))) {
+        if (in_array($x['Status'] ?? '', BT_TBANK_DEAD, true)) {
+            continue;
+        }
+        // оплаченный или проводимый не трогаем; QR СБП банк отменить не даёт — тогда тоже без нового платежа
+        if (!in_array($x['Status'] ?? '', ['NEW', 'FORM_SHOWED'], true) || empty(bt_tbank_api($p, 'Cancel', ['PaymentId' => (string)$x['PaymentId']])['Success'])) {
             return null;
         }
     }
@@ -277,6 +285,39 @@ function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
     $keep !== '' && $order->setField('COMMENTS', $keep . "\n" . $new);
 }
 
+// «По СБП» работает на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает коды, которые отличались
+function bt_tbank_sbp_sync(bool $apply = true): array
+{
+    $card = $sbp = 0;
+    foreach (Loader::includeModule('sale') ? Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'order' => ['ID' => 'ASC'], 'select' => ['ID', 'XML_ID']])->fetchAll() : [] as $ps) {
+        if ($ps['XML_ID'] === 'bt_sbp') {
+            $sbp = $sbp ?: (int)$ps['ID'];
+        } else {
+            $card = $card ?: (int)$ps['ID'];
+        }
+    }
+    if (!$card || !$sbp) {
+        return [];
+    }
+    $pre = Sale\PaySystem\Service::PAY_SYSTEM_PREFIX;
+    $key = fn($m) => $m['CODE_KEY'] . '|' . (int)$m['PERSON_TYPE_ID'];
+    $have = [];
+    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $sbp]])->fetchAll() as $m) {
+        $have[$key($m)] = $m;
+    }
+    $diff = [];
+    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $pre . $card]])->fetchAll() as $m) {
+        $h = $have[$key($m)] ?? null;
+        if ($h && $h['PROVIDER_KEY'] === $m['PROVIDER_KEY'] && $h['PROVIDER_VALUE'] === $m['PROVIDER_VALUE']) {
+            continue;
+        }
+        $diff[] = $m['CODE_KEY'];
+        $apply && Sale\BusinessValue::setMapping($m['CODE_KEY'], $pre . $sbp, (int)$m['PERSON_TYPE_ID'] ?: null,
+            ['PROVIDER_KEY' => $m['PROVIDER_KEY'], 'PROVIDER_VALUE' => $m['PROVIDER_VALUE']]);
+    }
+    return $diff;
+}
+
 // платёжные системы модуля Т-Банка
 function bt_tbank_ps_ids(): array
 {
@@ -303,6 +344,7 @@ function bt_tbank_sync_user(int $userId = 0): void
 // агент: на случай, если уведомление банка не дошло
 function bt_tbank_agent(): string
 {
+    bt_tbank_sbp_sync();
     bt_tbank_sync_user();
     return 'bt_tbank_agent();';
 }

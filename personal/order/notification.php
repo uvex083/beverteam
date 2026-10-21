@@ -7,6 +7,10 @@ if (is_array($req) && isset($req['FiscalDocumentNumber']) && \Bitrix\Main\Loader
     bt_tbank_receipt_save($req);
     die('OK');
 }
+// отмена неоплаченной ссылки (повторная попытка отменяет прошлую) — не повод отменять заказ, а модуль отменил бы его целиком
+if (($req['Status'] ?? '') === 'CANCELED') {
+    die('OK');
+}
 // Платёж заменили новым (повторная оплата) — уведомления по старому номеру тоже не отдаём: на CANCELED модуль отменил бы весь заказ
 if (($acc = (string)($req['OrderId'] ?? '')) !== '' && \Bitrix\Main\Loader::includeModule('sale')) {
     $order = ($i = strrpos($acc, '/')) ? \Bitrix\Sale\Order::loadByAccountNumber(substr($acc, 0, $i)) : null;

@@ -1,6 +1,6 @@
 <?php
 // Оплата через Т-Банк (модуль tinkoff.payment): настройки платёжной системы без ключей, ограничение «только физлица», агент сверки оплат, оплата по СБП.
-// Терминал и пароль вписываются в админке: Магазин → Платёжные системы → «Картой онлайн», затем apply — копирует их в «По СБП». Чек включён: касса Т-Банка подключена к рабочему терминалу.
+// Терминал и пароль вписываются в админке: Магазин → Платёжные системы → «Картой онлайн»; в «По СБП» их копирует агент сверки (или apply). Чек включён: касса Т-Банка подключена к рабочему терминалу.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_tbank_setup.php [show|apply]. Повторный запуск ничего не дублирует.
 
 if (PHP_SAPI !== 'cli') {
@@ -54,7 +54,7 @@ foreach (Sale\Internals\PersonTypeTable::getList(['filter' => ['=ACTIVE' => 'Y']
         'DESCRIPTION' => 'Ссылка на чек онлайн-оплаты, приходит от Т-Банка']);
 }
 // оплата по СБП — вторая платёжная система того же терминала со своим экраном QR (/personal/order/sbp/);
-// настройки и ключи копируются с «Картой онлайн» при каждом apply — вписывать их только туда
+// настройки и ключи копируются с «Картой онлайн» (apply и агент сверки) — вписывать их только туда
 $sbpId = (int)(current(array_filter($all, fn($x) => $x['XML_ID'] === 'bt_sbp'))['ID'] ?? 0);
 if (!$sbpId) {
     echo ($apply ? '' : '[show] ') . "платёжная система «По СБП» (настройки и ключи — копия «Картой онлайн»)\n";
@@ -71,19 +71,8 @@ if (!$sbpId) {
     }
 }
 if ($sbpId) {
-    $key = fn($m) => $m['CODE_KEY'] . '|' . (int)$m['PERSON_TYPE_ID'];
-    $have = [];
-    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => Sale\PaySystem\Service::PAY_SYSTEM_PREFIX . $sbpId]])->fetchAll() as $m) {
-        $have[$key($m)] = $m;
-    }
-    foreach (Sale\Internals\BusinessValueTable::getList(['filter' => ['=CONSUMER_KEY' => $consumer]])->fetchAll() as $m) {
-        $h = $have[$key($m)] ?? null;
-        if ($h && $h['PROVIDER_KEY'] === $m['PROVIDER_KEY'] && $h['PROVIDER_VALUE'] === $m['PROVIDER_VALUE']) {
-            continue;
-        }
-        echo ($apply ? '' : '[show] ') . "«По СБП»: {$m['CODE_KEY']} — как у «Картой онлайн»\n";
-        $apply and Sale\BusinessValue::setMapping($m['CODE_KEY'], Sale\PaySystem\Service::PAY_SYSTEM_PREFIX . $sbpId, (int)$m['PERSON_TYPE_ID'] ?: null,
-            ['PROVIDER_KEY' => $m['PROVIDER_KEY'], 'PROVIDER_VALUE' => $m['PROVIDER_VALUE']]);
+    foreach (bt_tbank_sbp_sync($apply) as $code) {
+        echo ($apply ? '' : '[show] ') . "«По СБП»: $code — как у «Картой онлайн»\n";
     }
     if (!Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $sbpId, '=SERVICE_TYPE' => 1]])->fetch()) {
         echo ($apply ? '' : '[show] ') . "«По СБП»: только физлица\n";
