@@ -35,7 +35,7 @@ foreach ($vals as $code => $v) {
 }
 if ($ps['NAME'] !== 'Картой онлайн') {
     echo ($apply ? '' : '[show] ') . "название «Картой онлайн»\n";
-    $apply and Sale\PaySystem\Manager::update($id, ['NAME' => 'Картой онлайн', 'PSA_NAME' => 'Картой онлайн', 'DESCRIPTION' => 'На защищённой странице Т-Банка сразу после оформления', 'SORT' => 50]);
+    $apply and Sale\PaySystem\Manager::update($id, ['NAME' => 'Картой онлайн', 'PSA_NAME' => 'Картой онлайн', 'DESCRIPTION' => 'На защищённой странице Т‑Банка сразу после оформления', 'SORT' => 50]);
 }
 if (!Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $id, '=SERVICE_TYPE' => 1]])->fetch()) {
     echo ($apply ? '' : '[show] ') . "ограничение: только физлица\n";
