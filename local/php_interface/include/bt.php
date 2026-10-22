@@ -294,6 +294,12 @@ function bt_delivery_next(string $dCode): string
     };
 }
 
+// Отслеживание отправления: у СДЭК — страница трекинга по номеру, у своей доставки трек-номера нет
+function bt_track_url(string $dCode, string $num): string
+{
+    return $num !== '' && (str_starts_with($dCode, 'sdek_') || $dCode === 'bt_cdek') ? 'https://www.cdek.ru/ru/tracking?order_id=' . rawurlencode($num) : '';
+}
+
 // Фото пункта СДЭК: модуль хранит список сериализованным, элементы — строка-ссылка или ['url' => …]
 function bt_pvz_images(string $raw): array
 {

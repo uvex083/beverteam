@@ -45,7 +45,9 @@ $num = $order->getField('ACCOUNT_NUMBER');
 // Собираем — менеджер подтвердил или пришла оплата; у самовывоза третий шаг — статус «Готов к выдаче»
 $sid = (string)$o['STATUS_ID'];
 $pickup = $dCode === 'bt_pickup';
-$shipped = $pickup ? in_array($sid, ['R', 'F'], true) : (in_array($sid, ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped()));
+$track = $shipment ? trim((string)$shipment->getField('TRACKING_NUMBER')) : '';
+$trackUrl = bt_track_url($dCode, $track);
+$shipped = $pickup ? in_array($sid, ['R', 'F'], true) : (in_array($sid, ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped()) || $track !== '');
 // по счёту «Подтверждён» — ещё ждём оплату, собираем после неё
 $waitBill = $pCode === 'bill' && !$order->isPaid() && $sid === 'C';
 // дата «Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
@@ -68,6 +70,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <?php $tel = '<a class="link" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>' ?>
   <div class="alert alert--info"><span><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
     <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата. Вопросы по счёту — <?= $tel ?>.
+    <?php elseif ($track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>. Вопросы — <?= $tel ?>.
     <?php elseif ($pickup && $sid === 'R'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>. Вопросы — <?= $tel ?>.
     <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span></div>
   <?php endif ?>
@@ -100,6 +103,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Пункт выдачи</dt><dd><?= $e(($city ? $city . ', ' : '') . $pvzA) ?><?php if ($pvz && $pvz['w'] !== ''): ?><span class="muted" style="display:block;font-size:13px"><?= $e($pvz['w']) ?></span><?php endif ?>
       <?php if ($pvz): ?><button type="button" class="link pvzv__go" data-pvzv>На карте</button><?php endif ?></dd>
     <?php else: ?><dt>Адрес</dt><dd><?= $e(trim(($city ? $city . ', ' : '') . preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? ''), ', ') ?: '—') ?></dd><?php endif ?>
+    <?php if ($track !== ''): ?><dt>Трек-номер</dt><dd><?= $e($track) ?><?php if ($trackUrl): ?><span style="display:block;margin-top:4px"><a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">Отследить на сайте СДЭК</a></span><?php endif ?></dd><?php endif ?>
     <dt>Получатель</dt><dd><?= $e($name ?: ($phone ? '' : '—')) ?><?= $phone ? ($name ? ', ' : '') . '<span style="white-space:nowrap">' . $e($phone) . '</span>' : '' ?></dd>
     <?php if ($order->getField('USER_DESCRIPTION')): ?><dt>Комментарий</dt><dd><?= $e($order->getField('USER_DESCRIPTION')) ?></dd><?php endif ?>
   </dl></div>

@@ -173,6 +173,7 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
         'BT_TRACK' => bt_delivery_next($dCode),
+        'BT_TRACK_URL' => bt_track_url($dCode, $shipment ? (string)$shipment->getField('TRACKING_NUMBER') : ''),
         'BT_PICKUP_ADDR' => $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')),
         'BT_PICKUP_HOURS' => $e($co['hours'] ?? ''),
         // для «Собираем заказ»: оплачен ли, и платят ли при получении

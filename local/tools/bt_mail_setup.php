@@ -139,6 +139,7 @@ $messages = [
         m_head('Заказ в пути', 'Заказ № #ORDER_ID#')
         . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан в доставку. Отследить его можно на сайте службы доставки по трек-номеру:')
         . m_code('#ORDER_TRACKING_NUMBER#', 'Трек-номер')
+        . $ifText('BT_TRACK_URL', m_btn('#BT_TRACK_URL#', 'Отследить посылку'))
         . '#BT_ORDER#' . $orderBtn],
     'SALE_ORDER_SHIPMENT_STATUS_CHANGED' => ['Заказ № #ORDER_NO#: #STATUS_NAME#', $sale[0], $sale[1], '#BCC#',
         m_head('#HTML_STATUS_NAME#', 'Заказ № #ORDER_NO#')
