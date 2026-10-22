@@ -283,6 +283,17 @@ function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
     return $kg === 1 ? (float)$bi->getQuantity() . ' кг' : ($kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт');
 }
 
+// Что дальше по доставке — для кабинета, страницы заказа и писем: у самовывоза и своего курьера трек-номера нет
+function bt_delivery_next(string $dCode): string
+{
+    return match (true) {
+        $dCode === 'bt_pickup' => 'Менеджер позвонит, когда заказ будет готов к выдаче.',
+        $dCode === 'bt_courier' => 'Менеджер позвонит, чтобы согласовать время доставки.',
+        str_starts_with($dCode, 'sdek_') || $dCode === 'bt_cdek' => 'Трек-номер СДЭК пришлём на e‑mail, когда передадим заказ в доставку.',
+        default => 'Статус заказа сообщит менеджер.',
+    };
+}
+
 // Фото пункта СДЭК: модуль хранит список сериализованным, элементы — строка-ссылка или ['url' => …]
 function bt_pvz_images(string $raw): array
 {

@@ -155,7 +155,7 @@ function bt_mail_order(Sale\Order $order): array
             : ($pCode === 'tinkoff' ? 'Оплата онлайн. Если не успели оплатить, сделайте это на странице заказа в личном кабинете — там же появится кассовый чек.'
             : 'Оплата при получении заказа. Чек выдадим при получении, УПД — по запросу.'),
         'Изменить заказ можно до отправки — позвоните <a href="' . $e($co['phone1_href'] ?? '') . '" style="color:#0E0E0C;font-weight:700;white-space:nowrap">' . $e($co['phone1'] ?? '') . '</a>.',
-        'Статус и трек-номер сообщит менеджер, история заказов — в личном кабинете.',
+        bt_delivery_next($dCode) . ' История заказов — в личном кабинете.',
     ];
     $nextHtml = '';
     foreach ($next as $t) {
@@ -170,6 +170,7 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER_URL' => $host . '/personal/orders/' . (int)$order->getId() . '/',
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
+        'BT_TRACK' => bt_delivery_next($dCode),
         // для «Собираем заказ»: оплачен ли, и платят ли при получении
         'BT_PAID' => $order->isPaid() ? 'Y' : '',
         'BT_COD' => !$order->isPaid() && $pCode === 'cash' ? 'Y' : '',

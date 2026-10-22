@@ -120,7 +120,7 @@ if (!$order) {
       <button type="button" class="btn btn--dark" onclick="BT_auth(<?= $e(Json::encode($props['EMAIL'])) ?>)">Войти в кабинет</button></div>
     <?php endif ?>
     <div class="next">
-      <div><b>Отследить заказ</b><span>Статус и трек-номер сообщит менеджер, история заказов — в <a class="link" href="/personal/orders/<?= (int)$order->getId() ?>/">личном кабинете</a></span></div>
+      <div><b><?= str_starts_with($dCode, 'sdek_') ? 'Отследить заказ' : 'Что дальше' ?></b><span><?= $e(bt_delivery_next($dCode)) ?> История заказов — в <a class="link" href="/personal/orders/<?= (int)$order->getId() ?>/">личном кабинете</a></span></div>
       <div><b>Изменить заказ</b><span>Позвоните до отправки:<br><a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>" style="white-space:nowrap"><?= $e($co['phone1'] ?? '') ?></a></span></div>
       <?php // документы — только по счёту; при онлайн-оплате здесь будет ссылка на чек, когда она появится
       if ($pCode === 'bill'): ?><div><b>Нужен документ?</b><span>Счёт и УПД пришлём на e‑mail</span></div><?php endif ?>

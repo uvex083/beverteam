@@ -59,7 +59,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="alert alert--err"><span>Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
-  <div class="alert alert--info"><span>Сроки и трек-номер сообщит менеджер. Изменить заказ можно до отправки — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
+  <div class="alert alert--info"><span><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $dCode === 'bt_pickup' ? 'выдачи' : 'отправки' ?> — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php endif ?>
 </div>
 

@@ -118,7 +118,7 @@ $messages = [
         . '#BT_ORDER#' . m_h2('Что дальше') . '#BT_NEXT#' . $orderBtn],
     'SALE_ORDER_PAID' => ['Заказ № #ORDER_ID# оплачен', $sale[0], $sale[1], '#BCC#',
         m_head('Оплата получена', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Оплата по заказу № #ORDER_ID# поступила, спасибо. Статус и трек-номер сообщит менеджер.')
+        . m_p('#BT_HELLO# Оплата по заказу № #ORDER_ID# поступила, спасибо. #BT_TRACK#')
         . '#BT_ORDER#' . $orderBtn],
     'SALE_ORDER_CANCEL' => ['Заказ № #ORDER_ID# отменён', $sale[0], $sale[1], '#BCC#',
         m_head('Заказ отменён', 'Заказ № #ORDER_ID#')
@@ -128,7 +128,7 @@ $messages = [
         . '#BT_ORDER#' . $orderBtn],
     'SALE_ORDER_DELIVERY' => ['Заказ № #ORDER_ID# готовим к отправке', $sale[0], $sale[1], '#BCC#',
         m_head('Готовим к отправке', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Заказ № #ORDER_ID# подтверждён к отправке. Статус и трек-номер сообщит менеджер.')
+        . m_p('#BT_HELLO# Заказ № #ORDER_ID# подтверждён к отправке. #BT_TRACK#')
         . '#BT_ORDER#' . $orderBtn],
     'SALE_ORDER_REMIND_PAYMENT' => ['Напоминаем об оплате заказа № #ORDER_ID#', $sale[0], $sale[1], '#BCC#',
         m_head('Заказ ждёт оплаты', 'Заказ № #ORDER_ID#')
@@ -155,9 +155,9 @@ $messages = [
     // статус ставит и оплата, и менеджер (заказ «при получении» — перед отправкой в СДЭК): «оплачен» пишем, только если оплачен
     'SALE_STATUS_CHANGED_P' => ['Заказ № #ORDER_ID# собираем к отправке', $sale[0], $sale[1], '',
         m_head('Собираем заказ', 'Заказ № #ORDER_ID#')
-        . '<?if ($arParams["BT_PAID"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен и формируется к отправке. Статус и трек-номер сообщит менеджер.')
-        . '<?elseif ($arParams["BT_COD"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. Оплата — при получении, наличными или картой. Статус и трек-номер сообщит менеджер.')
-        . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. Статус и трек-номер сообщит менеджер.') . '<?endif?>'
+        . '<?if ($arParams["BT_PAID"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен и формируется к отправке. #BT_TRACK#')
+        . '<?elseif ($arParams["BT_COD"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. Оплата — при получении, наличными или картой. #BT_TRACK#')
+        . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. #BT_TRACK#') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     'SALE_STATUS_CHANGED_F' => ['Заказ № #ORDER_ID# выполнен', $sale[0], $sale[1], '',
