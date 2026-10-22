@@ -2108,7 +2108,9 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .oit img,.accp .oit .ph{width:64px;height:64px;object-fit:contain;background:var(--paper);border-radius:10px;padding:6px;mix-blend-mode:multiply}
 .accp .oit b{display:block;font-size:14.5px}.accp .oit .q{color:var(--gray);font-family:'JetBrains Mono';font-size:12.5px;white-space:nowrap}
 .accp .oit .p{font-family:Unbounded;font-weight:700;white-space:nowrap;text-align:right}
-.accp .odoc{display:inline-flex;align-items:center;gap:7px;margin-bottom:8px;color:var(--ink)}
+.accp .odoc{display:flex;width:fit-content;align-items:center;gap:7px;color:var(--ink)}
+.accp .dnote{display:block;font-weight:400;font-size:13.5px;line-height:1.5;color:var(--gray)}
+.accp .dreq{display:inline-block;margin-top:10px;font-size:13.5px}
 .accp .odoc svg{width:16px;height:16px;flex-shrink:0;color:var(--gray)}
 @media(hover:hover){.accp .odoc:hover .link{border-bottom-color:var(--ink)}}
 .accp .oit .p del{display:block;font-family:Manrope;font-weight:400;font-size:12.5px;color:var(--gray)}
