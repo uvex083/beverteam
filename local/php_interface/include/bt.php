@@ -1715,6 +1715,10 @@ function bt_order_status(array $o): array
         return ['Отменён', 'st-cancel'];
     }
     $st = $o['STATUS_ID'];
+    // «Оплачен, формируется к отправке» ставят и неоплаченному заказу при получении — в бейдже без слова «оплачен», оплата видна отдельно
+    if ($st === 'P') {
+        return ['Собираем', 'st-paid'];
+    }
     $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['R', 'DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
     return [$names[$st] ?? $st, $cls];
 }
