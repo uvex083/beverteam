@@ -75,6 +75,16 @@ switch ((string)$req->getPost('action')) {
             'inn' => !in_array(strlen($f['INN']), [10, 12], true) ? ($f['INN'] === '' ? 'Это поле нужно заполнить' : 'ИНН состоит из 10 цифр у компании и 12 у ИП') : (bt_inn_ok($f['INN']) ? '' : 'Проверьте ИНН — в номере ошибка'),
             'kpp' => $f['KPP'] !== '' && strlen($f['KPP']) !== 9 ? 'КПП состоит из 9 цифр' : '',
         ]);
+        // организация с таким ИНН уже сохранена — обновляем её, а не заводим вторую
+        foreach (bt_profiles($uid, 'UR') as $p) {
+            if (($p['v']['INN'] ?? '') === $f['INN'] && $p['id'] !== $id) {
+                if ($id) {
+                    $err['inn'] = 'Организация с этим ИНН уже сохранена';
+                } else {
+                    $id = $p['id'];
+                }
+            }
+        }
         $err and $out(['ok' => false, 'errors' => $err]);
         $out(['ok' => true, 'id' => $save($id, $ur, $f['COMPANY'], $f)]);
 

@@ -753,9 +753,6 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:640px){.quiz__opts{grid-template-columns:1fr}.quiz__res{grid-template-columns:1fr}}
 
 /* ================= B2B: повтор заказа, счета ================= */
-.b2b{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.b2b .card{padding:18px 20px}
-.b2b b{display:block;font-family:Unbounded;font-size:18px;margin:8px 0 4px}
 .reorder{background:var(--ink);color:#fff;border-radius:var(--rad);padding:24px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
 .reorder h2{font-family:Unbounded;font-weight:700;font-size:18px;margin-bottom:8px}
 .reorder p{color:#A8A8A0;margin:0;font-size:14px}
@@ -767,7 +764,7 @@ input,textarea{caret-color:var(--ink)}
 .docs tr:last-child td{border-bottom:0}
 .docs a{display:inline-flex;gap:6px;align-items:center;font-weight:600}
 .docs svg{width:15px;height:15px;stroke:currentColor;fill:none}
-@media(max-width:900px){.b2b{grid-template-columns:1fr}.reorder{grid-template-columns:1fr}}
+@media(max-width:900px){.reorder{grid-template-columns:1fr}}
 
 /* ================= Ремонт по брендам ================= */
 .brands{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
