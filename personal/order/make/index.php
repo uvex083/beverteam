@@ -148,7 +148,6 @@ $co = bt_contacts();
       <div class="blk">
         <h2><b>5</b>Комментарий</h2>
         <div class="field"><label for="coComment">Комментарий к заказу</label><textarea id="coComment" name="comment" rows="3" maxlength="2000" placeholder="Например: позвонить за час до доставки"></textarea></div>
-        <label class="check check--top"><input type="checkbox" name="agree" value="Y" id="coAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       </div>
     </div>
 
@@ -163,6 +162,7 @@ $co = bt_contacts();
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
+      <label class="check check--top"><input type="checkbox" name="agree" value="Y" id="coAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
       <button class="btn btn--block" type="submit" id="submit" disabled>Подтвердить заказ</button>
       <p class="err-form" id="sErr" role="alert"></p>
