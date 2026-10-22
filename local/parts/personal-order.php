@@ -101,7 +101,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
     if ($pCode !== 'tinkoff' || $check !== ''): ?>
     <dt>Документы</dt><dd><?php if ($check !== ''): ?><a class="link" href="<?= $e($check) ?>" target="_blank" rel="noopener">Кассовый чек</a></dd>
-    <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="btn btn--sm btn--dark" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?> Открыть счёт (PDF)</a><br>
+    <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="odoc" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?><span class="link">Счёт № <?= $e($num) ?>, PDF</span></a><br>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?>Счёт придёт на e‑mail после подтверждения заказа менеджером<br>
       <?php else: ?><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?><br><?php endif ?>
       <a class="link" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
