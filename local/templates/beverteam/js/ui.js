@@ -1132,6 +1132,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
       ld.querySelectorAll('.lead__ok [data-def]').forEach(x=>x.textContent=x.dataset.def);
       ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic;
+      /* по заказу из кабинета — свой текст подсказки и кнопки, без «модель, количество» */
+      const ord=/заказу? № /.test(topic), sb=f.querySelector('[type=submit]');
+      f.elements.message.placeholder=/^Отменить/.test(topic)?'Причина отмены, если хотите':ord?'Что хотите узнать или изменить':'Что нужно: модель, количество, адрес';
+      sb.dataset.def??=sb.textContent; sb.textContent=ord?'Отправить':sb.dataset.def;
       /* «Купить в один клик»: имя, телефон и товар без комментария; вошедшему покупателю — его имя и телефон */
       const prod=b.dataset.product||''; f.elements.product.value=prod;
       ld.querySelector('.lead__prod').hidden=!prod; ld.querySelector('.lead__msg').hidden=!!prod; if(prod) f.elements.message.value='';
