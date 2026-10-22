@@ -123,7 +123,7 @@ if (!$order) {
       <div><b>Что дальше</b><span><?= $e(bt_delivery_next($dCode)) ?> История заказов — в <a class="link" href="/personal/orders/<?= (int)$order->getId() ?>/">личном кабинете</a></span></div>
       <div><b>Изменить заказ</b><span>Позвоните до <?= $dCode === 'bt_pickup' ? 'выдачи' : 'отправки' ?>:<br><a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>" style="white-space:nowrap"><?= $e($co['phone1'] ?? '') ?></a></span></div>
       <?php // документы — только по счёту; при онлайн-оплате здесь будет ссылка на чек, когда она появится
-      if ($pCode === 'bill'): ?><div><b>Нужен документ?</b><span>Счёт и УПД пришлём на e‑mail</span></div><?php endif ?>
+      if ($pCode === 'bill'): ?><div><b>Счёт на оплату</b><span>Придёт на e‑mail и появится в личном кабинете, когда менеджер подтвердит заказ</span></div><?php endif ?>
     </div>
     <div class="row" style="justify-content:center;margin-top:28px;gap:12px"><a class="btn btn--line" href="/catalog/">Продолжить покупки</a></div>
   </div>

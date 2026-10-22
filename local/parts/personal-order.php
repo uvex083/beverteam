@@ -71,14 +71,14 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
   <?php $tel = '<a class="link" style="white-space:nowrap" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>';
   // при получении и по счёту с отсрочкой: сколько и как платить, пока не оплачено
-  $due = $order->isPaid() ? '' : ($pCode === 'cash' ? ' Оплата при получении — <b style="white-space:nowrap">' . bt_fmt((float)$order->getPrice()) . '</b>, наличными или картой.' : ($pCode === 'bill' ? ' Счёт ещё не оплачен — он в блоке «Оплата и документы».' : '')) ?>
-  <div class="alert alert--info" style="flex-wrap:wrap;align-items:center"><span style="flex:1 1 260px"><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
-    <?php elseif ($toPay): ?>Заказ ещё не оплачен — оплатите его, и мы начнём собирать.
+  $due = $order->isPaid() ? '' : ($pCode === 'cash' ? ' К оплате при получении <b style="white-space:nowrap">' . bt_fmt((float)$order->getPrice()) . '</b>, наличными или картой.' : ($pCode === 'bill' ? ' Счёт ещё не оплачен, он в блоке «Оплата и документы».' : '')) ?>
+  <div class="alert alert--info" style="flex-wrap:wrap;align-items:center"><span style="flex:1 1 260px"><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?>. Спасибо, что выбрали BEVERTEAM! Вопросы по заказу: <?= $tel ?>.
+    <?php elseif ($toPay): ?>Заказ ещё не оплачен. Оплатите его, и мы начнём собирать.
     <?php elseif ($waitBill): ?>Счёт выставлен и доступен в блоке «Оплата и документы». Если есть вопросы по счёту, позвоните: <?= $tel ?>.
-    <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>.<?= $due ?> Вопросы — <?= $tel ?>.
-    <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру — он позвонит перед приездом.' : 'Заказ передан в СДЭК — трек-номер появится здесь и придёт на e‑mail.' ?><?= $due ?> Вопросы — <?= $tel ?>.
-    <?php elseif ($stage === 'ship'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>.<?= $due ?> Вопросы — <?= $tel ?>.
-    <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span>
+    <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?>.<?php if ($trackUrl): ?> <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">Отследить на сайте СДЭК</a>.<?php endif ?><?= $due ?> Вопросы: <?= $tel ?>.
+    <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру, он позвонит перед приездом.' : 'Заказ передан в СДЭК. Трек-номер появится здесь и придёт на e‑mail.' ?><?= $due ?> Вопросы: <?= $tel ?>.
+    <?php elseif ($stage === 'ship'): ?>Заказ готов, забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e($co['hours'] ?? '') ?>.<?= $due ?> Вопросы: <?= $tel ?>.
+    <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?>, позвоните: <?= $tel ?>.<?php endif ?></span>
     <?php if ($toPay): ?><a class="btn btn--sm" style="margin-left:auto;flex-shrink:0" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить заказ</a><?php endif ?></div>
   <?php endif ?>
 </div>
@@ -124,9 +124,9 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
     if (!$order->isCanceled() && ($pCode !== 'tinkoff' || $order->isPaid())): ?>
     <dt>Документы</dt><dd><?php if ($pCode === 'tinkoff'): ?><?= $check !== '' ? '<a class="link" href="' . $e($check) . '" target="_blank" rel="noopener">Кассовый чек</a>' : '<span class="dnote">Кассовый чек придёт на e‑mail и появится здесь</span>' ?></dd>
-    <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="odoc" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?><span class="link">Счёт № <?= $e($num) ?>, PDF</span></a>
+    <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="odoc" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?><span class="link">Счёт № <?= $e($payment->getField('ACCOUNT_NUMBER') ?: $num) ?>, PDF</span></a>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?><span class="dnote">Счёт появится здесь и придёт на e‑mail, когда менеджер подтвердит заказ</span>
-      <?php else: ?><span class="dnote"><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?></span><?php endif ?>
+      <?php else: ?><span class="dnote"><?= $pCode === 'bill' ? 'Счёт пришлёт менеджер' : 'Чек выдадим при получении' ?></span><?php endif ?>
       <a class="link dreq" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
     <?php endif; endif ?>
   </dl></div>
@@ -149,7 +149,6 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
           <?php if ($pvz['w'] !== ''): ?><dt>Режим работы</dt><dd><?= $e($pvz['w']) ?></dd><?php endif ?>
           <?php if ($pvz['m'] !== ''): ?><dt>Метро</dt><dd><?= $e($pvz['m']) ?></dd><?php endif ?>
           <?php if ($pvz['n'] !== ''): ?><dt>Как найти</dt><dd><?= $e($pvz['n']) ?></dd><?php endif ?>
-          <?php if ($pvz['card'] || $pvz['cash']): ?><dt>Оплата в пункте</dt><dd class="pvzv__pay"><?= $pvz['card'] ? '<span>Карта</span>' : '' ?><?= $pvz['cash'] ? '<span>Наличные</span>' : '' ?></dd><?php endif ?>
         </dl>
         <?php if ($pvz['img']): ?><div class="pvzm__img"><?php foreach ($pvz['img'] as $u): ?><img src="<?= $e($u) ?>" alt="" loading="lazy"><?php endforeach ?></div><?php endif ?>
       </div>
