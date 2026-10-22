@@ -7,7 +7,7 @@ $aMenuLinks = [
     ['Чай', '/catalog/chay/', [], $sub, ''],
     ['Кофемашины', '/catalog/professionalnye-kofemashiny/', [], $sub, ''],
     ['Аксессуары', '/catalog/aksessuary/', [], $sub, ''],
-    ['Подбор кофе за минуту', '/podbor-kofe/', [], $sub, ''],
+    ['Подбор кофе', '/podbor-kofe/', [], ['DEPTH_LEVEL' => 1, 'dot' => true], ''],
     ['Услуги', '/servis/', [], ['DEPTH_LEVEL' => 1], ''],
     ['Аренда кофемашин', '/arenda-kofemashin/', [], $sub, ''],
     ['Ремонт кофемашин', '/servis/remont-kofemashin/', [], $sub, ''],

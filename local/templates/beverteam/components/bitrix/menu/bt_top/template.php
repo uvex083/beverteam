@@ -11,7 +11,7 @@ foreach ($arResult as $item) {
 }
 foreach ($tree as $n):
     $link = $n['LINK'] !== '#' ? $n['LINK'] : ''; ?>
-  <div class="nav-i<?= $n['SUB'] ? '' : ' nav-i--plain' ?>">
+  <div class="nav-i<?= $n['SUB'] ? '' : ' nav-i--plain' ?><?= !empty($n['PARAMS']['dot']) ? ' nav-i--dot' : '' ?>">
     <a href="<?= $link ?: '#' ?>"<?= $link ? '' : ' onclick="return false"' ?>><?= $n['TEXT'] ?></a>
     <?php if ($n['SUB']): ?><div class="nav-d"><?php foreach ($n['SUB'] as $s): ?><a href="<?= $s['LINK'] ?>"><?= $s['TEXT'] ?></a><?php endforeach ?></div><?php endif ?>
   </div>
