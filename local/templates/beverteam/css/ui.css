@@ -2130,6 +2130,8 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 /* документы */
 .accp .docs-w{overflow-x:auto;border-radius:var(--rad-s)}
 .accp .docs td{vertical-align:middle}
+.docs-acts{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.docs-acts svg{width:16px;height:16px;stroke:currentColor;fill:none}
 /* окно адреса: карта слева (только с ключом Яндекс Карт), поля справа */
 #addrModal .modal__p{width:min(640px,100%);padding:26px 28px 28px}
 #addrModal.has-map .modal__p{width:min(980px,100%)}
@@ -2256,18 +2258,20 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
   font:600 13.5px/1.2 Manrope,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 8px 24px rgba(14,14,12,.18);animation:fhint .2s ease-out}
 @media(hover:hover){.fhint:hover{background:var(--ink-3)}}
 @keyframes fhint{from{opacity:0;transform:translate(-6px,-50%)}}
-/* «Заказы по счёту» на телефоне — карточками: дата и сумма, номер и оплата, счёт отдельной строкой */
+/* «Заказы по счёту» на телефоне — карточками: номер и сумма, дата, организация, внизу оплата и ссылка на счёт */
 @media(max-width:640px){
   .docs,.docs tbody{display:block}.docs thead{display:none}
   .docs tr{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
   .docs tr:last-child{border-bottom:0}
   .docs td{padding:0;border:0}
-  .docs td:nth-child(1){grid-area:1/1;color:var(--gray);font-size:13px}
-  .docs td:nth-child(2){grid-area:2/1}
-  .docs td:nth-child(3){grid-area:1/2;text-align:right;font-weight:700}
-  .docs td:nth-child(4){grid-area:2/2;justify-self:end}
-  .docs td:nth-child(5){grid-area:3/1/4/3;text-align:left!important}
-  .docs td:nth-child(5):empty{display:none}
+  .docs tr{grid-template-areas:"num sum" "date date" "org org" "pay bill";gap:4px 12px}
+  .docs .d-num{grid-area:num;font-weight:700;font-size:15px}
+  .docs .d-sum{grid-area:sum;text-align:right;font-weight:700;font-size:15px}
+  .docs .d-date{grid-area:date;color:var(--gray);font-size:13px}
+  .docs .d-org{grid-area:org;font-size:13px}.docs .d-org .muted{display:inline!important;margin-left:4px}
+  .docs .d-pay{grid-area:pay;margin-top:8px;align-self:center}
+  .docs .d-bill{grid-area:bill;margin-top:8px;align-self:center}
+  .docs .d-bill a{min-height:44px}
 }
 /* обводка при наведении — серая и плавная, как у выпадающего списка */
 .pc__acts button,.subcats a,.soc a,.idp a,.jfilter a,.jtags--post a,.jside a,.quiz__opts button,.brands a,.srch__chips button,.srch__secs a,.sres a,

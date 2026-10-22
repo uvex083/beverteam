@@ -29,19 +29,22 @@ $one = !$orgCol && $org ? reset($org) : [];
 
 bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h1>', 'Счёт на оплату приходит на e‑mail, как только менеджер подтвердит заказ, и сразу доступен здесь.');
 ?>
+<div class="docs-acts">
+  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос акта сверки"><?= bt_icon('doc') ?> Запросить акт сверки</a>
+  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос закрывающих документов"><?= bt_icon('doc') ?> Запросить документы</a>
+</div>
 <?php if ($orders): ?>
-<div class="row between" style="margin:6px 0 14px;gap:6px 16px;flex-wrap:wrap"><h2 class="h3">Заказы по счёту</h2>
+<div class="row between" style="margin:0 0 14px;gap:6px 16px;flex-wrap:wrap"><h2 class="h3">Заказы по счёту</h2>
   <?php if (!empty($one['COMPANY'])): ?><span class="muted" style="font-size:14px"><?= $e($one['COMPANY']) ?><?= !empty($one['INN']) ? ', ИНН ' . $e($one['INN']) : '' ?></span><?php endif ?></div>
 <div class="docs-w"><table class="docs">
   <thead><tr><th>Дата</th><th>Заказ</th><?php if ($orgCol): ?><th>Организация</th><?php endif ?><th>Сумма</th><th>Оплата</th><th></th></tr></thead>
   <tbody><?php foreach ($orders as $o): ?>
-    <tr><td style="white-space:nowrap"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></td>
-      <td><a class="link" href="/personal/orders/<?= (int)$o['ID'] ?>/">№ <?= $e($o['ACCOUNT_NUMBER']) ?></a></td>
-      <?php if ($orgCol): $g = $org[(int)$o['ID']] ?? [] ?><td><?= $e($g['COMPANY'] ?? '') ?><?php if (!empty($g['INN'])): ?><span class="muted" style="display:block;font-size:12px">ИНН <?= $e($g['INN']) ?></span><?php endif ?></td><?php endif ?>
-      <td style="white-space:nowrap;font-variant-numeric:tabular-nums"><?= bt_fmt((float)$o['PRICE']) ?></td>
-      <td><?php if ($o['CANCELED'] === 'Y'): ?><span class="status st-cancel">Отменён</span><?php else: ?><?php if ($o['PAYED'] === 'Y'): ?><span class="status st-done">Оплачен</span><?php elseif ($o['STATUS_ID'] === 'N'): ?><span class="muted" style="font-size:13px">Счёт готовится</span><?php else: ?><span class="status st-new">Ждёт оплаты</span><?php endif ?><?php endif ?></td>
-      <td style="text-align:right;white-space:nowrap"><?php if ($o['CANCELED'] !== 'Y' && $o['STATUS_ID'] !== 'N'): ?><a href="/local/ajax/bill.php?id=<?= (int)$o['ID'] ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?> Счёт</a>
-        <?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="muted" style="font-size:13px">Счёт — после подтверждения</span><?php endif ?></td></tr>
+    <tr><td class="d-date" style="white-space:nowrap"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></td>
+      <td class="d-num"><a class="link" href="/personal/orders/<?= (int)$o['ID'] ?>/">№ <?= $e($o['ACCOUNT_NUMBER']) ?></a></td>
+      <?php if ($orgCol): $g = $org[(int)$o['ID']] ?? [] ?><td class="d-org"><?= $e($g['COMPANY'] ?? '') ?><?php if (!empty($g['INN'])): ?><span class="muted" style="display:block;font-size:12px">ИНН <?= $e($g['INN']) ?></span><?php endif ?></td><?php endif ?>
+      <td class="d-sum" style="white-space:nowrap;font-variant-numeric:tabular-nums"><?= bt_fmt((float)$o['PRICE']) ?></td>
+      <td class="d-pay"><?php if ($o['CANCELED'] === 'Y'): ?><span class="status st-cancel">Отменён</span><?php else: ?><?php if ($o['PAYED'] === 'Y'): ?><span class="status st-done">Оплачен</span><?php elseif ($o['STATUS_ID'] === 'N'): ?><span class="muted" style="font-size:13px">Счёт готовится</span><?php else: ?><span class="status st-new">Ждёт оплаты</span><?php endif ?><?php endif ?></td>
+      <td class="d-bill" style="text-align:right;white-space:nowrap"><?php if ($o['CANCELED'] !== 'Y' && $o['STATUS_ID'] !== 'N'): ?><a href="/local/ajax/bill.php?id=<?= (int)$o['ID'] ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?> Счёт</a><?php endif ?></td></tr>
   <?php endforeach ?></tbody>
 </table></div>
 <?php else: ?>
@@ -51,8 +54,4 @@ bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h
   <a class="btn" href="/catalog/">Перейти в каталог</a>
 </div>
 <?php endif ?>
-<div class="row" style="margin-top:18px;gap:10px">
-  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос акта сверки">Запросить акт сверки</a>
-  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос закрывающих документов">Запросить закрывающие документы</a>
-</div>
 <?php bt_acc_end();
