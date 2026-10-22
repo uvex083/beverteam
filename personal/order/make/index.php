@@ -22,9 +22,15 @@ $APPLICATION->SetPageProperty('title', 'Оформление заказа — BE
 $APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $nItems = 0;
+$lines = [];
 foreach ($basket as $bi) {
-    $nItems += ($pk = bt_basket_pack($bi)) ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
+    $m = bt_product((string)$bi->getProductId());
+    $q = ($pk = bt_basket_pack($bi)) ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
+    $nItems += $q;
+    $lines[] = ['n' => $bi->getField('NAME'), 'img' => $m['img'] ?? '', 'url' => $m['url'] ?? '', 'q' => $q, 'qty' => bt_basket_qty($bi),
+        'sum' => (float)$bi->getFinalPrice(), 'full' => (float)($m['old'] ?? $m['p'] ?? 0) * $q];
 }
+$nWord = $nItems . ' ' . (($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
 // популярные города из макета; названия и области — из местоположений Битрикса
 $popular = [];
@@ -144,11 +150,9 @@ $co = bt_contacts();
         </div>
         <input type="hidden" name="pvz" id="pvzIn" value="">
         <div class="coitems">
-          <div class="coitems__h"><span id="coItemsH"><?= $nItems ?> <?= ($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров') ?></span><a class="link" href="/personal/cart/">Изменить в корзине</a></div>
-          <ul class="coitems__l"><?php foreach ($basket as $bi):
-              $m = bt_product((string)$bi->getProductId()); $pk = bt_basket_pack($bi); $q = $pk ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
-              $tip = $bi->getField('NAME') . ' — ' . bt_basket_qty($bi) . ', ' . bt_fmt($bi->getFinalPrice()); ?>
-            <li title="<?= $e($tip) ?>"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="<?= $e($tip) ?>" loading="lazy" width="64" height="64"><?php else: ?><span class="coitems__n"><?= $e($bi->getField('NAME')) ?></span><?php endif ?><?php if ($q > 1): ?><b>×<?= $q ?></b><?php endif ?></li>
+          <div class="coitems__h"><span id="coItemsH"><?= $nWord ?></span><a class="link" href="/personal/cart/">Изменить в корзине</a></div>
+          <ul class="coitems__l"><?php foreach ($lines as $i => $l): ?>
+            <li><button type="button" class="coitems__i" data-items="<?= $i ?>" aria-label="<?= $e($l['n'] . ' — ' . $l['qty'] . ', ' . bt_fmt($l['sum'])) ?>"><?php if ($l['img'] !== ''): ?><img src="<?= $e($l['img']) ?>" alt="" loading="lazy" width="64" height="64"><?php else: ?><span class="coitems__n"><?= $e($l['n']) ?></span><?php endif ?><?php if ($l['q'] > 1): ?><b>×<?= $l['q'] ?></b><?php endif ?></button></li>
           <?php endforeach ?></ul>
         </div>
       </div>
@@ -178,6 +182,22 @@ $co = bt_contacts();
       <p class="muted cohint" id="sHint">Нажимая кнопку, вы соглашаетесь с <a href="/soglasie-na-obrabotku/" target="_blank">условиями обработки персональных данных</a> и <a href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a></p>
     </aside>
   </form>
+  <div class="modal modal--items" id="itemsModal" role="dialog" aria-modal="true" aria-labelledby="itemsT">
+    <div class="modal__bg" data-close></div>
+    <div class="modal__p">
+      <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+      <h2 class="itm__t" id="itemsT">Состав заказа</h2>
+      <p class="itm__s"><?= $nWord ?> на <?= bt_fmt($basket->getPrice()) ?></p>
+      <ul class="itm__l"><?php foreach ($lines as $i => $l): ?>
+        <li data-i="<?= $i ?>">
+          <a class="itm__ph" href="<?= $e($l['url']) ?>" target="_blank" tabindex="-1" aria-hidden="true"><?php if ($l['img'] !== ''): ?><img src="<?= $e($l['img']) ?>" alt="" loading="lazy" width="72" height="72"><?php endif ?></a>
+          <div class="itm__b"><a class="itm__n" href="<?= $e($l['url']) ?>" target="_blank"><?= $e($l['n']) ?></a><span class="itm__q"><?= $e($l['qty']) ?><?= $l['q'] > 1 ? ' · ' . bt_fmt($l['sum'] / $l['q']) . ' за шт.' : '' ?></span></div>
+          <div class="itm__p"><?php if ($l['full'] > $l['sum'] + 0.5): ?><del><?= bt_fmt($l['full']) ?></del><?php endif ?><b><?= bt_fmt($l['sum']) ?></b></div>
+        </li>
+      <?php endforeach ?></ul>
+      <a class="link itm__e" href="/personal/cart/">Изменить в корзине</a>
+    </div>
+  </div>
   <div class="modal modal--pvz" id="pvzModal" role="dialog" aria-modal="true" aria-labelledby="pvzT">
     <div class="modal__bg" data-close></div>
     <div class="modal__p">
@@ -497,6 +517,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     sync(); inp.addEventListener('input',sync);
     b.addEventListener('click',()=>{inp.value='';inp.focus();inp.dispatchEvent(new Event('input',{bubbles:true}));setErr(inp,'');});});
   const syncClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{b.hidden=!b.parentNode.querySelector('input:not([type=hidden])').value;});
+
+  // миниатюры состава — окно со всеми позициями, нажатая подсвечена
+  let itmFrom=null;
+  document.querySelector('.coitems__l').addEventListener('click',e=>{const b=e.target.closest('[data-items]');if(!b)return;
+    itmFrom=b; itemsModal.classList.add('open');
+    const li=itemsModal.querySelector(`[data-i="${b.dataset.items}"]`);
+    itemsModal.querySelectorAll('.itm__l li').forEach(x=>x.classList.toggle('on',x===li));
+    li.scrollIntoView({block:'nearest'}); if(fineP) itemsModal.querySelector('.modal__x').focus({preventScroll:true});});
+  itemsModal.addEventListener('click',e=>{if(e.target.closest('[data-close]'))itemsModal.classList.remove('open');});
+  new MutationObserver(()=>{if(!itemsModal.classList.contains('open')&&itmFrom&&fineP){itmFrom.focus({preventScroll:true});itmFrom=null;}})
+    .observe(itemsModal,{attributes:true,attributeFilter:['class']});
 
   /* ошибки под полем — та же разметка, что у BT_checkField */
   function setErr(el,msg){

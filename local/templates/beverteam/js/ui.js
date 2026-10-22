@@ -2074,9 +2074,12 @@ window.BT_mbar=(btn,sumEl,onTap,note)=>{
   new MutationObserver(sync).observe(sumEl,{childList:true,characterData:true,subtree:true});
   new MutationObserver(sync).observe(btn,{childList:true,attributes:true,attributeFilter:['disabled']});
   b.addEventListener('click',()=>onTap?onTap():btn.click());
-  let seen=true;const show=()=>{const on=!seen&&btn.offsetParent!==null;bar.hidden=!on;document.body.classList.toggle('has-mbar',on);
+  let seen=true,typing=false;const show=()=>{const on=!seen&&!typing&&btn.offsetParent!==null;bar.hidden=!on;document.body.classList.toggle('has-mbar',on);
     if(on)document.body.style.setProperty('--mbar-h',bar.offsetHeight+'px');};
   new IntersectionObserver(es=>{seen=es[0].isIntersecting;show();}).observe(btn);
+  const isTyping=el=>!!el&&el.matches('input:not([type=checkbox]):not([type=radio]):not([type=hidden]),textarea');
+  document.addEventListener('focusin',e=>{typing=isTyping(e.target);show();});
+  document.addEventListener('focusout',()=>setTimeout(()=>{typing=isTyping(document.activeElement);show();}));
   new MutationObserver(show).observe(btn.parentNode,{attributes:true,attributeFilter:['hidden']});
   sync();
 };
