@@ -161,7 +161,26 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER_URL' => $host . '/personal/orders/' . (int)$order->getId() . '/',
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
+        // для «Собираем заказ»: оплачен ли, и платят ли при получении
+        'BT_PAID' => $order->isPaid() ? 'Y' : '',
+        'BT_COD' => !$order->isPaid() && $pCode === 'cash' ? 'Y' : '',
     ];
+}
+
+// main:OnBeforeEventAdd — «Собираем заказ» сразу после онлайн-оплаты не шлём: статус магазин ставит сам, а письмо «Оплата получена» уже ушло
+function bt_mail_skip_p($event, $lid, $fields)
+{
+    $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
+    if ($event !== 'SALE_STATUS_CHANGED_P' || $id <= 0 || !Loader::includeModule('sale') || !($order = Sale\Order::load($id))) {
+        return true;
+    }
+    foreach ($order->getPaymentCollection() as $p) {
+        $d = $p->getField('DATE_PAID');
+        if ($p->isPaid() && !$p->isInner() && $d && $d->getTimestamp() > time() - 600) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // Строки «подпись — значение» для серых плашек письма (значения уже экранированы)

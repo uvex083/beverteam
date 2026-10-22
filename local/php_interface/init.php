@@ -15,6 +15,7 @@ require_once __DIR__ . '/include/bt_mail.php';
 // письма о заказе: состав и детали заказа полями #BT_*#
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_route');
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_before_send');
+AddEventHandler('main', 'OnBeforeEventAdd', 'bt_mail_skip_p');
 
 // счёт юрлицу: PDF в письме «Заказ подтверждён» и в кабинете; реквизиты продавца — из «Контактов»
 require_once __DIR__ . '/include/bt_bill.php';
