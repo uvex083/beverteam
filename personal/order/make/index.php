@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
   const dateOf=o=>{const x=BT_dates();
     if(o.d.period) return o.d.period;
-    if(o.tab==='pickup') return 'готов '+(x.relPack||BT_fmtDate(x.pack,true));
+    if(o.tab==='pickup') return 'обычно готов '+(x.relPack||BT_fmtDate(x.pack,true));
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
     return '';};
   const priceOf=o=>o.d.price>0?(o.d.from?'от ':'')+fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
     const nw=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']), dd=sel?dateOf(sel):'';
-    coItemsH.textContent=!sel?nw:sel.tab==='pickup'?(dd?'Заберёте '+dd.replace(/^готов /,''):'Самовывоз')+' · '+nw
+    coItemsH.textContent=!sel?nw:sel.tab==='pickup'?(dd?dd.charAt(0).toUpperCase()+dd.slice(1):'Самовывоз')+' · '+nw
       :sel.d.code==='bt_courier'&&dd?'Доставим '+dd+' · '+nw:sel.d.period?'Доставка '+sel.d.period+' · '+nw:nw;
     // ушли на другую вкладку — ошибка адреса, поставленная на уходе с поля, не должна ждать возвращения
     if(addr.hidden) addr.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,'')); else placeClr();
