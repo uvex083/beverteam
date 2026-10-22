@@ -1,4 +1,9 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
+if (!bt_clients_on() && !$GLOBALS['USER']->IsAdmin()) {
+    require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
+    return;
+}
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
 // title, description и H1 — вкладка SEO элемента «Первый экран» в ИБ «Наши клиенты»

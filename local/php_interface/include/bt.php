@@ -1926,6 +1926,12 @@ function bt_faq_ld(&$content): void
 }
 
 // Яндекс.Метрика — счётчик старого сайта, только на боевом домене: заходы с dev не портят статистику клиента
+// «Наши клиенты» скрыты: без ссылок и sitemap, посетителям 404, админу видна; включить — Option bt/clients_page = Y
+function bt_clients_on(): bool
+{
+    return \Bitrix\Main\Config\Option::get('bt', 'clients_page', 'N') === 'Y';
+}
+
 function bt_metrika(): string
 {
     if (!preg_match('/^(www\.)?beverteam\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
@@ -1948,6 +1954,7 @@ function bt_sitemap_build(): string
     $urls = ['/', '/catalog/', '/arenda-kofemashin/', '/kofe-v-ofis/', '/servis/', '/servis/remont-kofemashin/', '/podbor-kofe/', '/blog/',
         '/o-kompanii/', '/otzyvy-o-nas/', '/nashi-klienty/', '/kontakty/', '/oplata-i-dostavka/', '/vozvrat-i-obmen/', '/politika-konfidencialnosti/',
         '/polzovatelskoe-soglashenie/', '/soglasie-na-obrabotku/', '/sitemap/'];
+    bt_clients_on() || $urls = array_values(array_diff($urls, ['/nashi-klienty/']));
     $r = \CIBlockSection::GetList(['LEFT_MARGIN' => 'ASC'], ['IBLOCK_ID' => bt_iblock('catalog'), 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y'], false, ['ID', 'SECTION_PAGE_URL']);
     while ($s = $r->GetNext()) {
         $urls[] = $s['SECTION_PAGE_URL'];
@@ -2024,6 +2031,7 @@ function bt_search_pages(): array
         ['t' => 'Журнал', 'u' => '/blog/', 'd' => 'Статьи и новости', 'k' => 'журнал статьи новости блог'],
         ['t' => 'Контакты', 'u' => '/kontakty/', 'd' => 'Екатеринбург, ул. Колокольная, 31А', 'k' => 'контакты адрес телефон склад самовывоз'],
     ];
+    bt_clients_on() || $pages = array_values(array_filter($pages, fn($x) => $x['u'] !== '/nashi-klienty/'));
     $known = array_column($pages, 'u');
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $dirs, 'ACTIVE' => 'Y'], false, false, ['ID', 'NAME', 'PREVIEW_TEXT', 'PROPERTY_LINK']);
     while ($f = $r->Fetch()) {
