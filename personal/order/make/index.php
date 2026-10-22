@@ -312,10 +312,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(pvzOm){ if(pvzOpenId>=0&&pvzOpenId!==i) pvzOm.objects.setObjectOptions(pvzOpenId,PIN); pvzOm.objects.setObjectOptions(i,PIN_ON); }
     pvzOpenId=i;
     if(pvzMap) pvzMap.setCenter([p.lat,p.lon],Math.max(pvzMap.getZoom(),15),{duration:fromMap?200:300});
-    const pay=[p.card&&'картой',p.cash&&'наличными'].filter(Boolean).join(' или ');
     pvzCard.innerHTML=`<button type="button" class="pvzm__back" data-back>← Все пункты</button>
       <div class="pvzm__code">Пункт ${esc(p.c)}</div><h3 class="pvzm__a">${esc(p.a)}</h3>
-      <dl class="pvzm__dl">${p.w?`<dt>Время работы</dt><dd>${esc(p.w)}</dd>`:''}${p.m?`<dt>Метро</dt><dd>${esc(p.m)}</dd>`:''}${p.n?`<dt>Как найти</dt><dd>${esc(p.n)}</dd>`:''}${pay?`<dt>Оплата при получении</dt><dd>${pay}</dd>`:''}</dl>
+      <dl class="pvzm__dl">${p.w?`<dt>Время работы</dt><dd>${esc(p.w)}</dd>`:''}${p.m?`<dt>Метро</dt><dd>${esc(p.m)}</dd>`:''}${p.n?`<dt>Как найти</dt><dd>${esc(p.n)}</dd>`:''}</dl>
       ${p.img&&p.img.length?`<div class="pvzm__img">${p.img.slice(0,4).map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join('')}</div>`:''}
       <button type="button" class="btn btn--block pvzm__take" data-take="${i}">Заберу здесь</button>`;
     pvzListV.hidden=true; pvzCard.hidden=false; pvzCard.scrollTop=0;
@@ -349,7 +348,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function renderPay(){
     keepF();
     const list=PAYS.filter(p=>avail.some(a=>a.id===p.id));
-    pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?(sel.d.code==='sdek_pickup'?'В пункте выдачи СДЭК':'Курьеру СДЭК')+' — наличными или картой':p.desc;
+    pay.innerHTML=list.length?list.map(p=>{const desc=p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div>${p.logo||''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;
