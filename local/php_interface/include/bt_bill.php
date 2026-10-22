@@ -31,20 +31,38 @@ function bt_bill_file(Sale\Order $order): int
     if (!$payment) {
         return 0;
     }
+    // реквизиты продавца могли поменяться мимо события инфоблока (скриптом) — сверяем перед выпуском
+    $ver = bt_bill_ver();
+    Option::get('bt', 'bill_ver') === $ver or bt_bill_sync();
     $key = 'bill_' . $order->getId();
-    [$fid, $sum] = array_pad(explode(':', Option::get('bt', $key)), 2, '');
+    [$fid, $sum, $was] = array_pad(explode(':', Option::get('bt', $key)), 3, '');
     $cur = number_format((float)$order->getPrice(), 2, '.', '');
-    if ((int)$fid && $sum === $cur && CFile::GetFileArray((int)$fid)) {
+    if ((int)$fid && $sum === $cur && $was === $ver && CFile::GetFileArray((int)$fid)) {
         return (int)$fid;
     }
+    // в строках счёта служебные свойства позиций не нужны: фасовка уже в названии, «цена без скидки» — для сайта и писем.
+    // Правим копию заказа, сам заказ не меняется
+    $copy = $order->createClone();
+    foreach ($copy->getBasket() as $bi) {
+        $drop = array_filter(iterator_to_array($bi->getPropertyCollection()), fn($p) => in_array($p->getField('CODE'), ['PACK', 'FULL_PRICE'], true));
+        array_walk($drop, fn($p) => $p->delete());
+    }
+    $payment = bt_bill_payment($copy);
     $service = Sale\PaySystem\Manager::getObjectById($payment->getPaymentSystemId());
     $file = $service && $service->isAffordPdf() ? $service->getPdf($payment) : null;
     if (empty($file['ID'])) {
         return 0;
     }
     (int)$fid and CFile::Delete((int)$fid);
-    Option::set('bt', $key, $file['ID'] . ':' . $cur);
+    Option::set('bt', $key, $file['ID'] . ':' . $cur . ':' . $ver);
     return (int)$file['ID'];
+}
+
+// Отпечаток реквизитов продавца: поменялся — счёт синхронизируем и выпускаем заново
+function bt_bill_ver(): string
+{
+    $co = bt_contacts();
+    return substr(md5(implode('|', array_map(fn($k) => (string)($co[$k] ?? ''), ['legal', 'inn', 'legal_address', 'zip', 'city', 'street', 'phone1', 'bank', 'bik', 'rs', 'ks']))), 0, 8);
 }
 
 // Реквизиты продавца в счёте — из инфоблока «Контакты» (там их правит клиент)
@@ -72,6 +90,7 @@ function bt_bill_sync(): void
     foreach ($map as $code => $v) {
         Sale\BusinessValue::setMapping($code, Sale\PaySystem\Service::PAY_SYSTEM_PREFIX . $ps['ID'], null, ['PROVIDER_KEY' => 'VALUE', 'PROVIDER_VALUE' => (string)$v]);
     }
+    Option::set('bt', 'bill_ver', bt_bill_ver());
 }
 
 // iblock:OnAfterIBlockElementUpdate — правка контактов сразу попадает в счёт
