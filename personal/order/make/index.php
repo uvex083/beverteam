@@ -21,6 +21,10 @@ $APPLICATION->SetTitle('Оформление заказа');
 $APPLICATION->SetPageProperty('title', 'Оформление заказа — BEVERTEAM');
 $APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
+$nItems = 0;
+foreach ($basket as $bi) {
+    $nItems += ($pk = bt_basket_pack($bi)) ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
+}
 
 // популярные города из макета; названия и области — из местоположений Битрикса
 $popular = [];
@@ -137,6 +141,14 @@ $co = bt_contacts();
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <input type="hidden" name="pvz" id="pvzIn" value="">
+        <div class="coitems">
+          <div class="coitems__h"><span><?= $nItems ?> <?= ($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров') ?></span><a class="link" href="/personal/cart/">Изменить</a></div>
+          <ul class="coitems__l"><?php foreach ($basket as $bi):
+              $m = bt_product((string)$bi->getProductId()); $pk = bt_basket_pack($bi); $q = $pk ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
+              $tip = $bi->getField('NAME') . ' — ' . bt_basket_qty($bi) . ', ' . bt_fmt($bi->getFinalPrice()); ?>
+            <li title="<?= $e($tip) ?>"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="<?= $e($tip) ?>" loading="lazy" width="64" height="64"><?php else: ?><span class="coitems__n"><?= $e($bi->getField('NAME')) ?></span><?php endif ?><?php if ($q > 1): ?><b>×<?= $q ?></b><?php endif ?></li>
+          <?php endforeach ?></ul>
+        </div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
       </div>
 
@@ -152,21 +164,16 @@ $co = bt_contacts();
     </div>
 
     <aside class="sum">
-      <div id="sumItems"><?php foreach ($basket as $bi):
-          $m = bt_product((string)$bi->getProductId()); ?>
-        <div class="it"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif ?><span><?= $e($bi->getField('NAME')) ?><small><?= bt_basket_qty($bi) ?></small></span><b><?= bt_fmt($bi->getFinalPrice()) ?></b></div>
-      <?php endforeach ?></div>
-      <div class="l" style="margin-top:8px"><span>Товары</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <div class="l"><span>Товары, <?= $nItems ?> шт.</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <div class="l" id="sDiscRow" hidden><span>Скидка от суммы заказа</span><span id="sDisc" style="color:var(--ok)"></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
-      <label class="check check--top"><input type="checkbox" name="agree" value="Y" id="coAgree"> <span>Даю <a class="link" href="/soglasie-na-obrabotku/" target="_blank">согласие на обработку персональных данных</a> и принимаю <a class="link" href="/polzovatelskoe-soglashenie/" target="_blank">пользовательское соглашение</a></span></label>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
       <button class="btn btn--block" type="submit" id="submit" disabled>Подтвердить заказ</button>
       <p class="err-form" id="sErr" role="alert"></p>
-      <p class="muted" id="sHint" style="font-size:12px;margin:12px 0 0;text-align:center">Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.</p>
+      <p class="muted cohint" id="sHint">Нажимая кнопку, вы соглашаетесь с <a href="/soglasie-na-obrabotku/" target="_blank">условиями обработки персональных данных</a> и <a href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a></p>
     </aside>
   </form>
   <div class="modal modal--pvz" id="pvzModal" role="dialog" aria-modal="true" aria-labelledby="pvzT">
@@ -464,11 +471,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(/^(ул|пр-кт|пер|б-р|ш|пл|наб|проезд|туп|мкр|тракт|аллея)\s|,\s*д\s*$/i.test(val('street'))?'номер дома':'адрес доставки');
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
-    if(!coAgree.checked)miss.push('согласие с условиями');
     const pp=PAYS.find(x=>x.id===payId)||{}, online=pp.code==='tinkoff';
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
     if(!sending)submit.textContent=btnText();
-    sHint.textContent=online?(pp.sbp?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате по СБП.':pp.sberpay?'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате через SberPay.':'Нажимая кнопку, вы подтверждаете заказ и переходите к оплате на защищённой странице Т-Банка.'):'Нажимая кнопку, вы подтверждаете заказ. Менеджер свяжется для уточнения деталей.';
     if(calcShown()) sLeft.textContent='Считаем доставку…';
     submit.disabled=!!miss.length||sending||calcShown();
     return !miss.length;
@@ -480,7 +485,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||calcing||!ready()) return;
     sending=true; submit.disabled=true; submit.textContent='Оформляем…'; sErr.textContent='';
-    const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,dkey:sel.key,pay:payId,agree:coAgree.checked?'Y':''};
+    const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,dkey:sel.key,pay:payId,agree:'Y'};
     [...form.elements].forEach(el=>{if(el.name&&el.type!=='radio'&&el.type!=='checkbox'&&!(el.name in data))data[el.name]=el.value;});
     post(data).then(r=>{
       if(r.ok){
@@ -494,7 +499,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       Object.entries(r.errors||{}).forEach(([k,m])=>{const el=form.elements[k];
         if(el&&el.type!=='hidden'){setErr(el,m);first=first||el;} else sErr.textContent=m;});
       if(window.orgFields&&['company','inn','kpp','company_adr'].some(k=>r.errors&&r.errors[k]))orgFields.hidden=false;
-      if(r.errors&&r.errors.agree){setErr(coAgree,'x');first=first||coAgree;}
       if(first){first.focus({preventScroll:true});first.scrollIntoView({behavior:'smooth',block:'center'});BT_toast('Проверьте выделенные поля');}
       else if(!r.errors) sErr.textContent='Не получилось оформить заказ — обновите страницу и попробуйте ещё раз';
       ready();
