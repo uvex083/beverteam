@@ -1733,10 +1733,10 @@ function bt_order_status(array $o): array
     return [$names[$st] ?? $st, $cls];
 }
 
-// Заказ оплачивается по счёту
-function bt_order_by_bill(int $orderId): bool
+// Заказ оплачивается по счёту (или другим способом: cash — при получении)
+function bt_order_by_bill(int $orderId, string $action = 'bill'): bool
 {
-    $ps = array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill'], 'select' => ['ID']])->fetchAll(), 'ID');
+    $ps = array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => $action], 'select' => ['ID']])->fetchAll(), 'ID');
     return $ps && (bool)\Bitrix\Sale\Internals\PaymentTable::getList(['filter' => ['=ORDER_ID' => $orderId, '@PAY_SYSTEM_ID' => $ps], 'select' => ['ID'], 'limit' => 1])->fetch();
 }
 

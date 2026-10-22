@@ -18,17 +18,19 @@ bt_tbank_sync_user($uid);
 $orders = OrderTable::getList(['filter' => ['=USER_ID' => $uid, '=LID' => SITE_ID],
     'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'STATUS_ID', 'CANCELED', 'PRICE', 'PAYED'], 'order' => ['ID' => 'DESC']])->fetchAll();
 $ids = array_column($orders, 'ID');
-$items = $pays = $ships = $toPay = $billed = [];
+$items = $pays = $ships = $toPay = $billed = $cod = [];
 if ($ids) {
     foreach (BasketTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PRODUCT_ID', 'NAME', 'QUANTITY', 'MEASURE_NAME'], 'order' => ['ID' => 'ASC']])->fetchAll() as $b) {
         $items[$b['ORDER_ID']][] = $b;
     }
     $online = bt_tbank_ps_ids();
     $billPs = array_map('intval', array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill'], 'select' => ['ID']])->fetchAll(), 'ID'));
+    $cashPs = array_map('intval', array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'cash'], 'select' => ['ID']])->fetchAll(), 'ID'));
     foreach (PaymentTable::getList(['filter' => ['@ORDER_ID' => $ids], 'select' => ['ORDER_ID', 'PAY_SYSTEM_NAME', 'PAY_SYSTEM_ID', 'PAID']])->fetchAll() as $p) {
         $pays[$p['ORDER_ID']] = trim(explode(' — ', $p['PAY_SYSTEM_NAME'])[0]);
         $p['PAID'] !== 'Y' && in_array((int)$p['PAY_SYSTEM_ID'], $online, true) && $toPay[$p['ORDER_ID']] = true;
         in_array((int)$p['PAY_SYSTEM_ID'], $billPs, true) && $billed[$p['ORDER_ID']] = true;
+        in_array((int)$p['PAY_SYSTEM_ID'], $cashPs, true) && $cod[$p['ORDER_ID']] = true;
     }
     foreach (ShipmentTable::getList(['filter' => ['@ORDER_ID' => $ids, '=SYSTEM' => 'N'], 'select' => ['ORDER_ID', 'DELIVERY_NAME']])->fetchAll() as $s) {
         $ships[$s['ORDER_ID']] = $s['DELIVERY_NAME'];
@@ -67,7 +69,7 @@ if (!$orders): ?>
   <?php foreach ($orders as $o): [$st, $cls] = bt_order_status($o + ['BILL' => !empty($billed[$o['ID']])]); $list = $items[$o['ID']] ?? [] ?>
   <div class="ord" data-g="<?= $group($o) ?>">
     <a class="ord__lnk" href="/personal/orders/<?= (int)$o['ID'] ?>/" aria-label="Заказ № <?= $e($o['ACCOUNT_NUMBER']) ?>"></a>
-    <div><div class="hd"><span class="n">№ <?= $e($o['ACCOUNT_NUMBER']) ?></span><span class="dt"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></span><span class="ord__st"><span class="status <?= $cls ?>"><?= $e($st) ?></span><?php if ($o['PAYED'] === 'Y'): ?><span class="pay pay--ok">Оплачен</span><?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="pay">Не оплачен</span><?php endif ?></span></div>
+    <div><div class="hd"><span class="n">№ <?= $e($o['ACCOUNT_NUMBER']) ?></span><span class="dt"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></span><span class="ord__st"><span class="status <?= $cls ?>"><?= $e($st) ?></span><?php if ($o['PAYED'] === 'Y' || (!empty($cod[$o['ID']]) && $o['STATUS_ID'] === 'F')): ?><span class="pay pay--ok">Оплачен</span><?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="pay">Не оплачен</span><?php endif ?></span></div>
       <div class="items"><?php foreach (array_slice($list, 0, 4) as $b): $m = bt_product((string)$b['PRODUCT_ID']);
           if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="44" height="44"><?php endif; endforeach ?>
         <span><?= $word(count($list)) ?><?= !empty($ships[$o['ID']]) ? ' · ' . $e($ships[$o['ID']]) : '' ?></span></div></div>
