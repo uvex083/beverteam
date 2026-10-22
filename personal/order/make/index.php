@@ -177,7 +177,7 @@ $co = bt_contacts();
       <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
-      <button class="btn btn--block" type="submit" id="submit" disabled>Подтвердить заказ</button>
+      <button class="btn btn--block" type="submit" id="submit" disabled>Оформить заказ</button>
       <p class="err-form" id="sErr" role="alert"></p>
       <p class="muted cohint" id="sHint">Нажимая кнопку, вы соглашаетесь с <a href="/soglasie-na-obrabotku/" target="_blank">условиями обработки персональных данных</a> и <a href="/polzovatelskoe-soglashenie/" target="_blank">пользовательским соглашением</a></p>
     </aside>
@@ -553,14 +553,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     const pp=PAYS.find(x=>x.id===payId)||{}, online=pp.code==='tinkoff';
-    sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
+    sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно оформлять';
     if(!sending)submit.textContent=btnText();
     if(calcShown()) sLeft.textContent='Считаем доставку…';
     submit.disabled=sending||calcShown();
     return !miss.length;
   }
   // онлайн-оплата — кнопка ведёт в банк, поэтому и называется по-другому
-  const btnText=()=>(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff'?'Оплатить заказ':'Подтвердить заказ';
+  const btnText=()=>(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff'?'Оплатить заказ':'Оформить заказ';
   form.addEventListener('input',ready); form.addEventListener('change',ready);
   BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit),sHint.innerHTML);
 
