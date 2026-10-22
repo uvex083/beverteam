@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       dim(); return; }
     busyT=setTimeout(()=>{ cop.classList.add('is-calc'); dim();
       calcSt_.innerHTML='Считаем'+(cityIn.value.trim()?'<span class="calcst__c"> для города '+esc(cityIn.value.trim())+'</span>':'')+'…';
-      sDel.textContent=sTot.textContent='считаем…'; sEta.innerHTML='&nbsp;'; if(!dl.length){renderDeliv();renderPay();} ready(); },250);
+      sDel.textContent=sTot.textContent='считаем…'; sEta.innerHTML='&nbsp;'; coItemsH.textContent=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']); if(!dl.length){renderDeliv();renderPay();} ready(); },250);
   }
   const calcSt_=document.getElementById('calcSt');
   // расчёт не удался: варианты прежнего города остаются приглушёнными, если город уже другой
