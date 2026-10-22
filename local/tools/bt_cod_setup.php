@@ -26,14 +26,14 @@ if (!$cash || !$own) {
     die("нет оплаты «При получении» или своих служб доставки\n");
 }
 
-$have = Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $cash, '=SERVICE_TYPE' => ByDelivery::SERVICE_TYPE_PAYMENT, '=CLASS_NAME' => '\\' . ByDelivery::class], 'select' => ['ID']])->fetch();
+$have = Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID' => $cash, '=SERVICE_TYPE' => SaleServicesBaseRestrictionManager::SERVICE_TYPE_PAYMENT, '=CLASS_NAME' => '\\' . ByDelivery::class], 'select' => ['ID']])->fetch();
 $links = array_map('intval', Sale\Internals\DeliveryPaySystemTable::getLinks($cash, Sale\Internals\DeliveryPaySystemTable::ENTITY_TYPE_PAYSYSTEM));
 sort($links);
 sort($own);
 if (!$have || $links !== $own) {
     $say("«При получении» (ПС $cash) — только доставки " . implode(', ', $own) . ' (было: ' . ($links ? implode(', ', $links) : 'все') . ')');
     if ($apply) {
-        $r = ByDelivery::save(['SERVICE_ID' => $cash, 'SERVICE_TYPE' => ByDelivery::SERVICE_TYPE_PAYMENT, 'SORT' => 100, 'PARAMS' => ['DELIVERY' => $own]], (int)($have['ID'] ?? 0));
+        $r = ByDelivery::save(['SERVICE_ID' => $cash, 'SERVICE_TYPE' => SaleServicesBaseRestrictionManager::SERVICE_TYPE_PAYMENT, 'SORT' => 100, 'PARAMS' => ['DELIVERY' => $own]], (int)($have['ID'] ?? 0));
         $r->isSuccess() or die(implode('; ', $r->getErrorMessages()) . "\n");
     }
 }
