@@ -56,7 +56,7 @@ $statusAt = fn(array $ids) => \Bitrix\Sale\Internals\OrderChangeTable::getList([
 $shipAt = $shipped ? $statusAt(['R', 'S']) : null;
 $buildAt = in_array($stage, ['build', 'ship', 'done'], true) ? ($statusAt(['C', 'P']) ?? ($order->isPaid() ? $order->getField('DATE_PAYED') : null)) : null;
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
-    'build' => ['Собираем', in_array($stage, ['build', 'ship', 'done'], true), $buildAt ? $date($buildAt) : ''],
+    'build' => ['Собираем', in_array($stage, ['build', 'ship', 'done'], true), ($buildAt ?? $shipAt) ? $date($buildAt ?? $shipAt) : ''],
     'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $shipAt ? $date($shipAt) : ''],
     'done' => [$pickup ? 'Выдан' : 'Получен', $sid === 'F', $sid === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
