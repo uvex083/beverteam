@@ -17,5 +17,15 @@ if (!$file) {
     CHTTP::SetStatus('404 Not Found');
     die('Счёт не найден');
 }
-$file['ORIGINAL_NAME'] = 'Счёт № ' . $order->getField('ACCOUNT_NUMBER') . '.pdf';
-CFile::ViewByUser($file, ['force_download' => false, 'cache_time' => 0]);
+// CFile::ViewByUser открывает в браузере только картинки, PDF отдаём сами
+$path = \Bitrix\Main\Application::getDocumentRoot() . $file['SRC'];
+$num = (string)$order->getField('ACCOUNT_NUMBER');
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="schet-' . $num . '.pdf"; filename*=utf-8' . "''" . rawurlencode('Счёт № ' . $num . '.pdf'));
+header('Content-Length: ' . filesize($path));
+header('Cache-Control: private, no-store');
+readfile($path);
+die();
