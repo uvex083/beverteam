@@ -154,7 +154,7 @@ function bt_mail_order(Sale\Order $order): array
         $pCode === 'bill' ? 'Счёт пришлём на e‑mail после подтверждения заказа менеджером, УПД — тоже на e‑mail.'
             : ($pCode === 'tinkoff' ? 'Оплата онлайн. Если не успели оплатить, сделайте это на странице заказа в личном кабинете — там же появится кассовый чек.'
             : 'Оплата при получении заказа. Чек выдадим при получении, УПД — по запросу.'),
-        'Изменить заказ можно до отправки — позвоните <a href="' . $e($co['phone1_href'] ?? '') . '" style="color:#0E0E0C;font-weight:700;white-space:nowrap">' . $e($co['phone1'] ?? '') . '</a>.',
+        'Изменить заказ можно до ' . ($dCode === 'bt_pickup' ? 'выдачи' : 'отправки') . ' — позвоните <a href="' . $e($co['phone1_href'] ?? '') . '" style="color:#0E0E0C;font-weight:700;white-space:nowrap">' . $e($co['phone1'] ?? '') . '</a>.',
         bt_delivery_next($dCode) . ' История заказов — в личном кабинете.',
     ];
     $nextHtml = '';
