@@ -168,16 +168,16 @@ $messages = [
         m_head('Заказ в пути', 'Заказ № #ORDER_ID#')
         . '<?if ($arParams["BT_DCODE"] === "bt_courier"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан курьеру, он позвонит перед приездом.')
         . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан в СДЭК. Трек-номер для отслеживания пришлём отдельным письмом, как только СДЭК его присвоит.') . '<?endif?>'
-        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('Оплата при получении — наличными или картой: <b style="white-space:nowrap">#BT_TOTAL#</b>.') . '<?endif?>'
+        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('К оплате при получении <b style="white-space:nowrap">#BT_TOTAL#</b>, наличными или картой.') . '<?endif?>'
         . '<?if ($arParams["BT_BILL_DUE"] === "Y"):?>' . m_p('Счёт на <b style="white-space:nowrap">#BT_TOTAL#</b> ещё не оплачен — он в личном кабинете, в разделе «Счета и документы».') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     // самовывоз: менеджер собрал заказ
     'SALE_STATUS_CHANGED_R' => ['Заказ № #ORDER_ID# готов к выдаче', $sale[0], $sale[1], '',
         m_head('Заказ готов к выдаче', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Заказ № #ORDER_ID# собран и ждёт вас на складе: <b>#BT_PICKUP_ADDR#</b>, #BT_PICKUP_HOURS#.')
-        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('Оплата при получении — наличными или картой: <b style="white-space:nowrap">#BT_TOTAL#</b>.') . '<?endif?>'
-        . m_p('На складе назовите номер заказа. Если заберёт другой человек — сообщите менеджеру его имя.')
+        . m_p('#BT_HELLO# Заказ № #ORDER_ID# собран и ждёт вас на складе: <b>#BT_PICKUP_ADDR#</b>, <span style="white-space:nowrap">#BT_PICKUP_HOURS#</span>.')
+        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('К оплате при получении <b style="white-space:nowrap">#BT_TOTAL#</b>, наличными или картой.') . '<?endif?>'
+        . m_p('На складе назовите номер заказа. Если заберёт другой человек, сообщите менеджеру его имя.')
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     'SALE_STATUS_CHANGED_F' => ['Заказ № #ORDER_ID# выполнен', $sale[0], $sale[1], '',
