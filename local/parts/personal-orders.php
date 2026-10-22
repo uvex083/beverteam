@@ -40,7 +40,6 @@ $info = bt_order_ship_info($ids ?? []);
 $group = fn(array $o) => $o['CANCELED'] === 'Y' ? 'cancel' : ($o['STATUS_ID'] === 'F' ? 'done' : 'active');
 $cnt = array_count_values(array_map($group, $orders));
 // повторить предлагаем только завершённый заказ: активный ещё не доехал — повтор дал бы случайный дубль
-$repeat = current(array_filter($orders, fn($o) => $group($o) === 'done' && !empty($items[$o['ID']])));
 $word = fn(int $n) => $n . ' ' . (($n % 10 === 1 && $n % 100 !== 11) ? 'товар' : (in_array($n % 10, [2, 3, 4]) && !in_array($n % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
 bt_acc_start('orders', '<h1 class="display h1">Мои заказы</h1>');
@@ -51,14 +50,6 @@ if (!$orders): ?>
     <a class="btn" href="/catalog/">Перейти в каталог</a>
   </div>
 <?php else: ?>
-  <?php if ($repeat): ?>
-  <?php $rl = $items[$repeat['ID']]; $more = count($rl) - 2 ?>
-  <div class="reorder">
-    <div class="reorder__t"><b>Прошлый заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?></b>
-      <span><?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?> · <?= $e(implode(', ', array_column(array_slice($rl, 0, 2), 'NAME'))) ?><?= $more > 0 ? ' и ещё ' . $more : '' ?></span></div>
-    <button class="btn btn--ghost btn--sm" type="button" data-reorder="<?= (int)$repeat['ID'] ?>" aria-label="Повторить заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?>"><?= bt_icon('repeat') ?> Повторить</button>
-  </div>
-  <?php endif ?>
   <div class="ftabs" data-ftabs>
     <button type="button" aria-pressed="true" data-f="">Все · <?= count($orders) ?></button>
     <?php foreach (['active' => 'Активные', 'done' => 'Выполненные', 'cancel' => 'Отменённые'] as $k => $t): if (!empty($cnt[$k])): ?>

@@ -753,11 +753,6 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:640px){.quiz__opts{grid-template-columns:1fr}.quiz__res{grid-template-columns:1fr}}
 
 /* ================= B2B: повтор заказа, счета ================= */
-.reorder{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:14px 16px 14px 20px;margin-bottom:18px;display:flex;gap:14px;align-items:center}
-.reorder__t{flex:1;min-width:0}
-.reorder__t b{display:block;font-size:15px}
-.reorder__t span{display:block;margin-top:2px;color:var(--gray);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.reorder .btn{flex:none;min-height:44px}
 .docs{width:100%;border-collapse:collapse;font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
 .docs th,.docs td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
 .docs thead th{background:var(--paper);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
