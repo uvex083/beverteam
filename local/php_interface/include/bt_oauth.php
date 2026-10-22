@@ -191,7 +191,8 @@ abstract class BtOAuthBank extends CSocServAuth
         } elseif ($nonce === '' || !CSocServAuthManager::CheckUniqueKey()) {
             $_SESSION['BT_OAUTH_ERR'] = ['msg' => 'Сессия входа устарела. Начните вход заново.'];
         } elseif (($token = $this->token($code)) && $this->idTokenOk($token, $nonce) && ($f = $this->user($token))) {
-            $res = $this->AuthorizeUser($f);
+            // true — запомнить вход, как при входе по коду: иначе выкидывает через 24 минуты бездействия
+            $res = $this->AuthorizeUser($f, true);
         }
         LocalRedirect($this->getRedirectUriAfterAuthorize($res, static::ID));
     }
