@@ -172,7 +172,9 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER_URL' => $host . '/personal/orders/' . (int)$order->getId() . '/',
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
-        'BT_TRACK' => bt_delivery_next($dCode),
+        // «что дальше» — пока заказ не отправлен
+        'BT_TRACK' => in_array(bt_order_stage(['STATUS_ID' => $order->getField('STATUS_ID'), 'CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'PAYED' => $order->isPaid() ? 'Y' : 'N']
+            + (bt_order_ship_info([$order->getId()])[$order->getId()] ?? [])), ['ship', 'done', 'cancel'], true) ? '' : bt_delivery_next($dCode),
         'BT_TRACK_URL' => bt_track_url($dCode, $shipment ? (string)$shipment->getField('TRACKING_NUMBER') : ''),
         'BT_PICKUP_ADDR' => $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')),
         'BT_PICKUP_HOURS' => $e($co['hours'] ?? ''),
@@ -199,12 +201,16 @@ function bt_mail_skip_p($event, $lid, $fields)
     return true;
 }
 
-// «Передан в доставку» у СДЭК с трек-номером: покупатель уже получил письмо «Трек-номер заказа» — второе не шлём
-function bt_mail_skip_s($event, $lid, $fields)
+// Лишние письма: «Передан в доставку» у СДЭК с трек-номером (уже ушло «Трек-номер заказа»);
+// «Оплата получена» у заказа «при получении» — покупатель сам отдал деньги курьеру или на складе
+function bt_mail_skip_extra($event, $lid, $fields)
 {
     $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
-    if ($event !== 'SALE_STATUS_CHANGED_S' || $id <= 0) {
+    if (!in_array($event, ['SALE_STATUS_CHANGED_S', 'SALE_ORDER_PAID'], true) || $id <= 0 || !Loader::includeModule('sale')) {
         return true;
+    }
+    if ($event === 'SALE_ORDER_PAID') {
+        return !bt_order_by_bill($id, 'cash');
     }
     $i = bt_order_ship_info([$id])[$id] ?? [];
     return !(str_starts_with($i['DCODE'] ?? '', 'sdek_') && ($i['TRACK'] ?? '') !== '');

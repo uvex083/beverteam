@@ -48,6 +48,12 @@ foreach ($hints as $id => $d) {
     }
 }
 
+// «оплачен → Оплачен, формируется к отправке» ставит bt_order_ship_guard и только неотправленному заказу; штатная настройка откатила бы отправленный назад
+if (\Bitrix\Main\Config\Option::get('sale', 'status_on_paid', '') !== '') {
+    $say('sale.status_on_paid: выключить (было ' . \Bitrix\Main\Config\Option::get('sale', 'status_on_paid', '') . ')');
+    $apply and \Bitrix\Main\Config\Option::set('sale', 'status_on_paid', '');
+}
+
 // письмо при смене статуса (текст и оформление задаёт bt_mail_setup.php)
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);

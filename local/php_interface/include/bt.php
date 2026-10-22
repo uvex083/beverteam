@@ -1736,19 +1736,17 @@ function bt_order_status(array $o): array
     };
 }
 
-// sale:OnSaleOrderBeforeSaved. Статус идёт только вперёд: оплата после «Передан в доставку» / «Готов к выдаче» не возвращает заказ
-// в «Оплачен, формируется к отправке» (письмо «Собираем заказ», повторная выгрузка в СДЭК). Трек-номер СДЭК сам переводит заказ в «Передан в доставку»
+// sale:OnSaleOrderBeforeSaved. Оплата переводит в «Оплачен, формируется к отправке» только ещё не отправленный заказ (вместо штатной
+// настройки sale.status_on_paid, которая откатила бы «Передан в доставку» / «Готов к выдаче» назад). Трек-номер СДЭК — «Передан в доставку»
 function bt_order_ship_guard(\Bitrix\Main\Event $e): void
 {
     $order = $e->getParameter('ENTITY');
     if (!$order instanceof \Bitrix\Sale\Order || $order->isNew() || $order->isCanceled()) {
         return;
     }
-    $was = (string)($order->getFields()->getOriginalValues()['STATUS_ID'] ?? '');
     $st = (string)$order->getField('STATUS_ID');
-    if ($st === 'P' && in_array($was, ['S', 'R'], true)) {
-        $order->setField('STATUS_ID', $was);
-        return;
+    if (($order->getFields()->getOriginalValues()['PAYED'] ?? '') === 'N' && $order->isPaid() && in_array($st, ['N', 'C'], true)) {
+        $order->setField('STATUS_ID', $st = 'P');
     }
     if (!in_array($st, ['N', 'C', 'P'], true)) {
         return;
