@@ -176,6 +176,7 @@ function bt_mail_order(Sale\Order $order): array
         'BT_TRACK_URL' => bt_track_url($dCode, $shipment ? (string)$shipment->getField('TRACKING_NUMBER') : ''),
         'BT_PICKUP_ADDR' => $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')),
         'BT_PICKUP_HOURS' => $e($co['hours'] ?? ''),
+        'BT_DCODE' => $dCode,
         // для «Собираем заказ»: оплачен ли, и платят ли при получении
         'BT_PAID' => $order->isPaid() ? 'Y' : '',
         'BT_COD' => !$order->isPaid() && $pCode === 'cash' ? 'Y' : '',
@@ -196,6 +197,17 @@ function bt_mail_skip_p($event, $lid, $fields)
         }
     }
     return true;
+}
+
+// «Передан в доставку» у СДЭК с трек-номером: покупатель уже получил письмо «Трек-номер заказа» — второе не шлём
+function bt_mail_skip_s($event, $lid, $fields)
+{
+    $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
+    if ($event !== 'SALE_STATUS_CHANGED_S' || $id <= 0) {
+        return true;
+    }
+    $i = bt_order_ship_info([$id])[$id] ?? [];
+    return !(str_starts_with($i['DCODE'] ?? '', 'sdek_') && ($i['TRACK'] ?? '') !== '');
 }
 
 // Строки «подпись — значение» для серых плашек письма (значения уже экранированы)

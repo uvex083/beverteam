@@ -27,8 +27,10 @@ $toPay = !$order->isCanceled() && bt_tbank_payment($order);
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
 // в заказе «При получении» без контекста непонятно, о чём речь
 $pCode === 'cash' and $payName = 'Оплата при получении';
-$o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID'), 'PAYED' => $order->isPaid() ? 'Y' : 'N', 'BILL' => $pCode === 'bill'];
+$o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID'), 'PAYED' => $order->isPaid() ? 'Y' : 'N', 'BILL' => $pCode === 'bill']
+    + (bt_order_ship_info([$order->getId()])[$order->getId()] ?? []);
 [$st, $cls] = bt_order_status($o);
+$stage = bt_order_stage($o);
 $date = fn($d) => $d ? FormatDate('j M, H:i', $d->getTimestamp()) : '';
 $city = bt_loc($props['LOCATION'] ?? '')['n'];
 $name = $props['FIO'] ?? $props['CONTACT_PERSON'] ?? '';
@@ -41,21 +43,19 @@ foreach ($basket as $bi) {
 }
 $disc = $full - (float)$basket->getPrice();
 $num = $order->getField('ACCOUNT_NUMBER');
-// ход заказа — одна шкала для всех способов, как у маркетплейсов: оплата не шаг, она в блоке «Оплата и документы».
-// Собираем — менеджер подтвердил или пришла оплата; у самовывоза третий шаг — статус «Готов к выдаче»
+// ход заказа — одна шкала для всех способов, как у маркетплейсов: оплата не шаг, она в блоке «Оплата и документы». Этап — bt_order_stage(), как у бейджа
 $sid = (string)$o['STATUS_ID'];
 $pickup = $dCode === 'bt_pickup';
-$track = $shipment ? trim((string)$shipment->getField('TRACKING_NUMBER')) : '';
+$track = (string)($o['TRACK'] ?? '');
 $trackUrl = bt_track_url($dCode, $track);
-$shipped = $pickup ? in_array($sid, ['R', 'F'], true) : (in_array($sid, ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped()) || $track !== '');
-// по счёту «Подтверждён» — ещё ждём оплату, собираем после неё
-$waitBill = $pCode === 'bill' && !$order->isPaid() && $sid === 'C';
-// дата «Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
-$readyAt = $pickup && $shipped ? \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED', '%DATA' => 's:9:"STATUS_ID";s:1:"R"'],
-    'select' => ['DATE_CREATE'], 'order' => ['ID' => 'DESC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null : null;
+$shipped = in_array($stage, ['ship', 'done'], true);
+$waitBill = $stage === 'wait';
+// дата шага «Передан в доставку / Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
+$shipAt = $shipped ? \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED',
+    ['LOGIC' => 'OR', ['%DATA' => 's:9:"STATUS_ID";s:1:"R"'], ['%DATA' => 's:9:"STATUS_ID";s:1:"S"']]], 'select' => ['DATE_CREATE'], 'order' => ['ID' => 'ASC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null : null;
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
-    'build' => ['Собираем', $shipped || $order->isPaid() || $sid === 'P' || ($sid === 'C' && !$waitBill), ''],
-    'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $readyAt ? $date($readyAt) : ''],
+    'build' => ['Собираем', in_array($stage, ['build', 'ship', 'done'], true), ''],
+    'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $shipAt ? $date($shipAt) : ''],
     'done' => [$pickup ? 'Выдан' : 'Получен', $sid === 'F', $sid === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
 
@@ -70,8 +70,9 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <?php $tel = '<a class="link" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>' ?>
   <div class="alert alert--info"><span><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
     <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата. Вопросы по счёту — <?= $tel ?>.
-    <?php elseif ($track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>. Вопросы — <?= $tel ?>.
-    <?php elseif ($pickup && $sid === 'R'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>. Вопросы — <?= $tel ?>.
+    <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>. Вопросы — <?= $tel ?>.
+    <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру — он позвонит перед приездом.' : 'Заказ передан в СДЭК — трек-номер появится здесь и придёт на e‑mail.' ?> Вопросы — <?= $tel ?>.
+    <?php elseif ($stage === 'ship'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>. Вопросы — <?= $tel ?>.
     <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span></div>
   <?php endif ?>
 </div>

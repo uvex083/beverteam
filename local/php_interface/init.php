@@ -16,6 +16,9 @@ require_once __DIR__ . '/include/bt_mail.php';
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_route');
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_before_send');
 AddEventHandler('main', 'OnBeforeEventAdd', 'bt_mail_skip_p');
+AddEventHandler('main', 'OnBeforeEventAdd', 'bt_mail_skip_s');
+// статус заказа только вперёд; трек-номер СДЭК — «Передан в доставку»
+\Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderBeforeSaved', 'bt_order_ship_guard');
 
 // счёт юрлицу: PDF в письме «Заказ подтверждён» и в кабинете; реквизиты продавца — из «Контактов»
 require_once __DIR__ . '/include/bt_bill.php';

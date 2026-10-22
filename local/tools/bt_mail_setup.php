@@ -162,6 +162,14 @@ $messages = [
         . '<?else:?>' . m_p('#BT_HELLO# Собираем заказ № #ORDER_ID#. #BT_TRACK#') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
+    // курьер BEVERTEAM или СДЭК: заказ отправлен. У СДЭК с трек-номером письмо не уходит — его заменяет «Трек-номер заказа»
+    'SALE_STATUS_CHANGED_S' => ['Заказ № #ORDER_ID# передан в доставку', $sale[0], $sale[1], '',
+        m_head('Заказ в пути', 'Заказ № #ORDER_ID#')
+        . '<?if ($arParams["BT_DCODE"] === "bt_courier"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан курьеру — он позвонит перед приездом.')
+        . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан в СДЭК. Трек-номер для отслеживания пришлём отдельным письмом, как только СДЭК его присвоит.') . '<?endif?>'
+        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('Оплата при получении — наличными или картой: <b style="white-space:nowrap">#BT_TOTAL#</b>.') . '<?endif?>'
+        . $ifText('TEXT', m_p('#HTML_TEXT#'))
+        . '#BT_ORDER#' . $orderBtn],
     // самовывоз: менеджер собрал заказ
     'SALE_STATUS_CHANGED_R' => ['Заказ № #ORDER_ID# готов к выдаче', $sale[0], $sale[1], '',
         m_head('Заказ готов к выдаче', 'Заказ № #ORDER_ID#')

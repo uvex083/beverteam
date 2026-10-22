@@ -1707,30 +1707,79 @@ function bt_cdek_formation(array &$f, $orderId, $descr): void
     }
 }
 
-// Статус заказа для кабинета: [текст, css-класс]; текст — название статуса из настроек магазина до запятой
+// Этап заказа — один на бейдж, шкалу, список заказов и профиль. $o: STATUS_ID, CANCELED, PAYED; BILL — по счёту; PICKUP, SHIPPED — из bt_order_ship_info()
+function bt_order_stage(array $o): string
+{
+    $st = (string)($o['STATUS_ID'] ?? '');
+    return match (true) {
+        ($o['CANCELED'] ?? 'N') === 'Y' => 'cancel',
+        $st === 'F' => 'done',
+        // «Готов к выдаче» и «Передан в доставку» — один шаг: у самовывоза он называется по-своему
+        in_array($st, ['R', 'S'], true) || !empty($o['SHIPPED']) => 'ship',
+        // по счёту «Подтверждён» без оплаты — ждём деньги
+        $st === 'C' && !empty($o['BILL']) && ($o['PAYED'] ?? 'N') !== 'Y' => 'wait',
+        in_array($st, ['C', 'P'], true) || ($o['PAYED'] ?? 'N') === 'Y' => 'build',
+        default => 'acc',
+    };
+}
+
+// Статус заказа для кабинета: [текст, css-класс]
 function bt_order_status(array $o): array
 {
-    static $names = null;
-    if ($names === null) {
-        $names = [];
-        foreach (\Bitrix\Sale\Internals\StatusLangTable::getList(['filter' => ['=LID' => LANGUAGE_ID]])->fetchAll() as $s) {
-            $names[$s['STATUS_ID']] = trim(explode(',', $s['NAME'])[0]);
+    return match (bt_order_stage($o)) {
+        'cancel' => ['Отменён', 'st-cancel'],
+        'done' => ['Выполнен', 'st-done'],
+        'ship' => [!empty($o['PICKUP']) ? 'Готов к выдаче' : 'Передан в доставку', 'st-ship'],
+        'wait' => ['Ждёт оплаты', 'st-new'],
+        'build' => ['Собираем', 'st-paid'],
+        default => ['Принят', 'st-new'],
+    };
+}
+
+// sale:OnSaleOrderBeforeSaved. Статус идёт только вперёд: оплата после «Передан в доставку» / «Готов к выдаче» не возвращает заказ
+// в «Оплачен, формируется к отправке» (письмо «Собираем заказ», повторная выгрузка в СДЭК). Трек-номер СДЭК сам переводит заказ в «Передан в доставку»
+function bt_order_ship_guard(\Bitrix\Main\Event $e): void
+{
+    $order = $e->getParameter('ENTITY');
+    if (!$order instanceof \Bitrix\Sale\Order || $order->isNew() || $order->isCanceled()) {
+        return;
+    }
+    $was = (string)($order->getFields()->getOriginalValues()['STATUS_ID'] ?? '');
+    $st = (string)$order->getField('STATUS_ID');
+    if ($st === 'P' && in_array($was, ['S', 'R'], true)) {
+        $order->setField('STATUS_ID', $was);
+        return;
+    }
+    if (!in_array($st, ['N', 'C', 'P'], true)) {
+        return;
+    }
+    foreach ($order->getShipmentCollection() as $s) {
+        $code = $s->isSystem() ? '' : (string)(\Bitrix\Sale\Delivery\Services\Table::getById($s->getDeliveryId())->fetch()['XML_ID'] ?? '');
+        if (str_starts_with($code, 'sdek_') && trim((string)$s->getField('TRACKING_NUMBER')) !== '') {
+            $order->setField('STATUS_ID', 'S');
+            return;
         }
     }
-    if ($o['CANCELED'] === 'Y') {
-        return ['Отменён', 'st-cancel'];
+}
+
+// Доставка заказов для кабинета: [ID => [DCODE, PICKUP, TRACK, SHIPPED]]. Отправлен — отметка «Отгружен» или статус отгрузки в админке, у СДЭК — трек-номер
+function bt_order_ship_info(array $ids): array
+{
+    $ids = array_filter(array_map('intval', $ids));
+    if (!$ids) {
+        return [];
     }
-    $st = $o['STATUS_ID'];
-    // «Оплачен, формируется к отправке» ставят и неоплаченному заказу при получении — в бейдже без слова «оплачен», оплата видна отдельно
-    if ($st === 'P') {
-        return ['Собираем', 'st-paid'];
+    \Bitrix\Main\Loader::includeModule('sale');
+    $codes = array_column(\Bitrix\Sale\Delivery\Services\Table::getList(['select' => ['ID', 'XML_ID']])->fetchAll(), 'XML_ID', 'ID');
+    $out = [];
+    $r = \Bitrix\Sale\Internals\ShipmentTable::getList(['filter' => ['@ORDER_ID' => $ids, '=SYSTEM' => 'N'], 'select' => ['ORDER_ID', 'DELIVERY_ID', 'TRACKING_NUMBER', 'STATUS_ID', 'DEDUCTED']]);
+    while ($s = $r->fetch()) {
+        $code = (string)($codes[$s['DELIVERY_ID']] ?? '');
+        $track = trim((string)$s['TRACKING_NUMBER']);
+        $out[(int)$s['ORDER_ID']] = ['DCODE' => $code, 'PICKUP' => $code === 'bt_pickup', 'TRACK' => $track,
+            'SHIPPED' => $s['DEDUCTED'] === 'Y' || in_array($s['STATUS_ID'], ['DS', 'DF'], true) || ($track !== '' && $code !== 'bt_pickup')];
     }
-    // «Подтверждён»: по неоплаченному счёту ждём оплату, остальное уже собираем — как на шкале заказа
-    if ($st === 'C') {
-        return !empty($o['BILL']) && ($o['PAYED'] ?? 'N') !== 'Y' ? ['Ждёт оплаты', 'st-new'] : ['Собираем', 'st-paid'];
-    }
-    $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['R', 'DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
-    return [$names[$st] ?? $st, $cls];
+    return $out;
 }
 
 // Заказ оплачивается по счёту (или другим способом: cash — при получении)

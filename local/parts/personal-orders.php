@@ -36,6 +36,7 @@ if ($ids) {
         $ships[$s['ORDER_ID']] = $s['DELIVERY_NAME'];
     }
 }
+$info = bt_order_ship_info($ids ?? []);
 $group = fn(array $o) => $o['CANCELED'] === 'Y' ? 'cancel' : ($o['STATUS_ID'] === 'F' ? 'done' : 'active');
 $cnt = array_count_values(array_map($group, $orders));
 // повторить предлагаем только завершённый заказ: активный ещё не доехал — повтор дал бы случайный дубль
@@ -66,7 +67,7 @@ if (!$orders): ?>
     <button type="button" aria-pressed="false" data-f="<?= $k ?>"><?= $t ?> · <?= $cnt[$k] ?></button>
     <?php endif; endforeach ?>
   </div>
-  <?php foreach ($orders as $o): [$st, $cls] = bt_order_status($o + ['BILL' => !empty($billed[$o['ID']])]); $list = $items[$o['ID']] ?? [] ?>
+  <?php foreach ($orders as $o): [$st, $cls] = bt_order_status($o + ['BILL' => !empty($billed[$o['ID']])] + ($info[$o['ID']] ?? [])); $list = $items[$o['ID']] ?? [] ?>
   <div class="ord" data-g="<?= $group($o) ?>">
     <a class="ord__lnk" href="/personal/orders/<?= (int)$o['ID'] ?>/" aria-label="Заказ № <?= $e($o['ACCOUNT_NUMBER']) ?>"></a>
     <div><div class="hd"><span class="n">№ <?= $e($o['ACCOUNT_NUMBER']) ?></span><span class="dt"><?= $e(FormatDate('j F Y', $o['DATE_INSERT']->getTimestamp())) ?></span><span class="ord__st"><span class="status <?= $cls ?>"><?= $e($st) ?></span><?php if ($o['PAYED'] === 'Y' || (!empty($cod[$o['ID']]) && $o['STATUS_ID'] === 'F')): ?><span class="pay pay--ok">Оплачен</span><?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="pay">Не оплачен</span><?php endif ?></span></div>
