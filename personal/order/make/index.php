@@ -27,7 +27,7 @@ foreach ($basket as $bi) {
     $m = bt_product((string)$bi->getProductId());
     $q = ($pk = bt_basket_pack($bi)) ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
     $nItems += $q;
-    $lines[] = ['n' => $bi->getField('NAME'), 'img' => $m['img'] ?? '', 'url' => $m['url'] ?? '', 'q' => $q, 'qty' => bt_basket_qty($bi),
+    $lines[] = ['n' => $bi->getField('NAME'), 'img' => $m['img'] ?? '', 'url' => $m['url'] ?? '', 'q' => $q, 'qty' => bt_basket_qty($bi), 'u' => $pk === 1 ? 'кг' : ($pk ? 'уп.' : 'шт.'),
         'sum' => (float)$bi->getFinalPrice(), 'full' => (float)($m['old'] ?? $m['p'] ?? 0) * $q];
 }
 $nWord = $nItems . ' ' . (($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
@@ -191,7 +191,7 @@ $co = bt_contacts();
       <ul class="itm__l"><?php foreach ($lines as $i => $l): ?>
         <li data-i="<?= $i ?>">
           <a class="itm__ph" href="<?= $e($l['url']) ?>" target="_blank" tabindex="-1" aria-hidden="true"><?php if ($l['img'] !== ''): ?><img src="<?= $e($l['img']) ?>" alt="" loading="lazy" width="72" height="72"><?php endif ?></a>
-          <div class="itm__b"><a class="itm__n" href="<?= $e($l['url']) ?>" target="_blank"><?= $e($l['n']) ?></a><span class="itm__q"><?= $e($l['qty']) ?><?= $l['q'] > 1 ? ' · ' . bt_fmt($l['sum'] / $l['q']) . ' за шт.' : '' ?></span></div>
+          <div class="itm__b"><a class="itm__n" href="<?= $e($l['url']) ?>" target="_blank"><?= $e($l['n']) ?></a><span class="itm__q"><?= $e($l['qty']) ?><?= $l['q'] > 1 ? ' · ' . bt_fmt($l['sum'] / $l['q']) . ' за ' . $l['u'] : '' ?></span></div>
           <div class="itm__p"><?php if ($l['full'] > $l['sum'] + 0.5): ?><del><?= bt_fmt($l['full']) ?></del><?php endif ?><b><?= bt_fmt($l['sum']) ?></b></div>
         </li>
       <?php endforeach ?></ul>
@@ -519,6 +519,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const syncClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{b.hidden=!b.parentNode.querySelector('input:not([type=hidden])').value;});
 
   // миниатюры состава — окно со всеми позициями, нажатая подсвечена
+  // окно — прямо в body: внутри страницы шапка и нижняя плашка остаются поверх затемнения
+  document.body.appendChild(itemsModal);
   let itmFrom=null;
   document.querySelector('.coitems__l').addEventListener('click',e=>{const b=e.target.closest('[data-items]');if(!b)return;
     itmFrom=b; itemsModal.classList.add('open');
