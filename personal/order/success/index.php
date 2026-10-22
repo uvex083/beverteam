@@ -95,12 +95,14 @@ if (!$order) {
         <<?= $tag ?> class="oit"<?= $tag === 'a' ? ' href="' . $e($m['url']) . '"' : '' ?>>
           <span class="oit__img"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="56" height="56"><?php endif ?></span>
           <span class="oit__n"><?= $e($bi->getField('NAME')) ?><small><?= bt_basket_qty($bi) ?> · <?= bt_fmt($bi->getPrice()) ?><?= bt_basket_pack($bi) ? ' за кг' : '' ?></small></span>
-          <b><?= bt_fmt($bi->getFinalPrice()) ?></b>
+          <b><?php if (bt_basket_full($bi) > $bi->getFinalPrice() + 0.5): ?><del><?= bt_fmt(bt_basket_full($bi)) ?></del><?php endif ?><?= bt_fmt($bi->getFinalPrice()) ?></b>
         </<?= $tag ?>>
         <?php endforeach ?>
       </div>
       <div class="otot">
-        <div><span>Товары</span><span><?= bt_fmt($order->getBasket()->getPrice()) ?></span></div>
+        <?php $full = 0.0; foreach ($order->getBasket() as $bi) { $full += bt_basket_full($bi); } $disc = $full - (float)$order->getBasket()->getPrice(); ?>
+        <div><span>Товары</span><span><?= bt_fmt($full) ?></span></div>
+        <?php if ($disc > 0.5): ?><div><span>Скидка</span><span style="color:var(--ok)">−<?= bt_fmt($disc) ?></span></div><?php endif ?>
         <div><span>Доставка</span><span><?= $dCode === 'bt_cdek' ? 'сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно') ?></span></div>
         <div class="t"><span>Итого</span><span><?= bt_fmt($order->getPrice()) ?></span></div>
       </div>
