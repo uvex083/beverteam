@@ -433,7 +433,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const autoStreet=()=>{const v=stIn.value.trim();if(v.length<2)return;const n=++stN;clearTimeout(stT);
     post({action:'street',q:v,city:locIn.value?cityIn.value.trim():''}).then(r=>{if(n!==stN||stIn.value.trim()!==v)return;
       const s=(r.list||[])[0], num=v.match(/\d.*$/);
-      if(!s||!letters(s.v).includes(letters(v.replace(/\d.*$/,'').replace(/(^|[\s.,])(ул|улица|д|дом)(?=[\s.,]|$)/gi,' '))))return;
+      // подставляем, только если набрано название целиком: «лен» — это ещё не «пр-кт Ленина»
+      const words=t=>String(t||'').toLowerCase().replace(/ё/g,'е').split(/[^a-zа-я0-9]+/).filter(Boolean);
+      const typed=words(v.replace(/\d.*$/,'').replace(/(^|[\s.,])(ул|улица|д|дом)(?=[\s.,]|$)/gi,' ')), sw=words(s&&s.s);
+      if(!s||!typed.length||!typed.every(x=>sw.includes(x)))return;
       stIn.value=s.house&&num&&s.v.replace(/\D/g,'')===num[0].replace(/\D/g,'')?s.v:(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
       showStreets([]);ready();if(num)setErr(stIn,'');reStreet();});};
   stIn.addEventListener('blur',()=>{showStreets([]);autoStreet();});

@@ -45,7 +45,8 @@ if ($action === 'street') {
         $d = $s['data'] ?? [];
         $street = $full ? (string)($s['value'] ?? '')
             : trim(($d['street_with_type'] ?? '') . ($d['house'] ? ', ' . ($d['house_type'] ?? 'д') . ' ' . $d['house'] : '') . ($d['block'] ? ' ' . ($d['block_type'] ?? '') . ' ' . $d['block'] : ''));
-        if ($street !== '') {
+        if ($street !== '' && !in_array($street . '|' . ($d['city_district_with_type'] ?? ''), $seen ?? [], true)) {
+            $seen[] = $street . '|' . ($d['city_district_with_type'] ?? '');
             $list[] = ['v' => $street, 's' => $d['street_with_type'] ?? '', 'house' => (bool)$d['house'], 'r' => $full ? '' : trim(($d['city_district_with_type'] ?? '') ?: ($d['area_with_type'] ?? ''))];
         }
     }
