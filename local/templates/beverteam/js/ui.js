@@ -922,12 +922,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     $a('#aAv').textContent=((USER.name||USER.email||'?').trim()[0]||'?').toUpperCase();
     $a('#aUName').textContent=USER.name||'Без имени';
     $a('#aUId').textContent=USER.email||''; }
-  /* вошли: страницы кабинета и оформления перерисовывает сервер под покупателя */
+  /* вошли: окно закрываем, имя уже в шапке; страницы кабинета и оформления перерисовывает сервер под покупателя */
   function done(r,msg){
     if(r.sessid) window.BT_SID=r.sessid;
     BT_login(r.user); clearInterval(timer);
     if(location.pathname.startsWith('/personal/')){ location.reload(); return; }
-    fillDone(); step('done'); BT_toast(msg);
+    au.classList.remove('open'); BT_toast(msg);
   }
   const loginErr = msg => fieldErr($a('#aLogin'),msg);
   const note = msg => { const n=$a('#aNote'); n.hidden=!msg; n.textContent=msg||''; };
