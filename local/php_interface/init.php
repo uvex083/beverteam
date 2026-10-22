@@ -52,6 +52,7 @@ AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'Bt\\Attr\\onLeadAdd');
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, array_fill_keys(['BtOAuth', 'BtOAuthBank', 'BtOAuthTbank', 'BtOAuthSber', 'BtOAuthAlfa'], '/local/php_interface/include/bt_oauth.php'));
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);
 AddEventHandler('socialservices', 'OnFindSocialservicesUser', ['BtOAuth', 'findUser']);
+AddEventHandler('socialservices', 'OnUserLoginSocserv', ['BtOAuth', 'remember']);
 
 // обработчики доставки: СДЭК (расчёт по весу через калькулятор; заказы в СДЭК не создаём) и курьер по расстоянию от склада
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, ['Bt\\Cdek\\Api' => '/local/php_interface/include/cdek.php', 'Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php',

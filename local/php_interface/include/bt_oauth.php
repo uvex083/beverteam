@@ -75,6 +75,15 @@ class BtOAuth
         return (int)$u['ID'];
     }
 
+    // OnUserLoginSocserv: штатные Яндекс и VK входят без «запомнить» — переавторизуем с ним, как при входе по коду (наши банки уже с ним)
+    public static function remember(array $f): void
+    {
+        global $USER;
+        if (in_array($f['EXTERNAL_AUTH_ID'] ?? '', ['YandexOAuth', 'VKontakte'], true) && $USER->IsAuthorized()) {
+            $USER->Authorize((int)$USER->GetID(), true);
+        }
+    }
+
     // Вход по коду подтвердил почту — привязываем сервис, с которым покупатель пришёл в этой сессии
     public static function link(int $userId): void
     {
