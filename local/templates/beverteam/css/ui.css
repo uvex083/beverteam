@@ -1544,7 +1544,7 @@ input,textarea{caret-color:var(--ink)}
 .pvzm__img{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
 .pvzm__img img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--paper)}
 /* пункт выдачи на странице заказа: адрес, режим, как найти, карта */
-.pvzv__go{background:none;border:0;padding:0;margin-top:4px;font:inherit;font-size:13.5px;cursor:pointer}
+.pvzv__go{display:inline-block;background:none;border:0;border-bottom:1px solid var(--lime);padding:0 0 1px;margin-top:6px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .modal--pvzv .modal__p{width:min(980px,100%);padding:26px 28px 28px}
 .pvzv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px}
 .pvzv__map{min-height:400px;border-radius:var(--rad);overflow:hidden;background:var(--paper);border:1px solid var(--line)}
