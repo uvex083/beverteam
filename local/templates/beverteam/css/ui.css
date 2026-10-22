@@ -1543,6 +1543,14 @@ input,textarea{caret-color:var(--ink)}
 .pvzm__dl dd{margin:2px 0 0;font-size:14px;line-height:1.45}
 .pvzm__img{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
 .pvzm__img img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--paper)}
+/* пункт выдачи на странице заказа: адрес, режим, как найти, карта */
+.pvzv__go{background:none;border:0;padding:0;margin-top:4px;font:inherit;font-size:13.5px;cursor:pointer}
+.modal--pvzv .modal__p{width:min(980px,100%);padding:26px 28px 28px}
+.pvzv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px}
+.pvzv__map{min-height:400px;border-radius:var(--rad);overflow:hidden;background:var(--paper);border:1px solid var(--line)}
+.pvzv__map [class*="ground-pane"]{filter:grayscale(1) contrast(.92) brightness(1.04)}
+.pvzv__pay span{display:inline-block;margin:0 6px 4px 0;padding:3px 10px;border-radius:999px;background:var(--paper);font-size:12.5px}
+@media(max-width:760px){.pvzv{grid-template-columns:1fr;gap:16px}.pvzv__map{min-height:240px;order:-1}.modal--pvzv{padding:12px}.modal--pvzv .modal__p{padding:22px 18px 18px}}
 .pvzm__take{margin-top:auto;position:sticky;bottom:0}
 @media(max-width:860px){
   .modal--pvz{padding:0}

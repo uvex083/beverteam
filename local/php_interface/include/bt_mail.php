@@ -123,7 +123,7 @@ function bt_mail_order(Sale\Order $order): array
         . '<td colspan="2" align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . bt_fmt($order->getPrice()) . '</td></tr></table>';
 
     // детали: доставка, адрес, оплата, покупатель, получатель
-    $where = preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
+    $where = preg_replace(['/\s*#S\S+$/u', '/^Пункт выдачи СДЭК:\s*/u'], '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
     $det = [];
     if ($shipment) {
         $det['Доставка'] = $e($shipment->getDeliveryName() . ($city ? ', ' . $city : ''));
@@ -131,6 +131,9 @@ function bt_mail_order(Sale\Order $order): array
     if ($where !== '') {
         $label = $dCode === 'bt_pickup' ? 'Самовывоз' : (($props['PVZ'] ?? '') !== '' ? 'Пункт выдачи' : 'Адрес');
         $det[$label] = $e(($city && $dCode !== 'bt_pickup' ? $city . ', ' : '') . $where);
+        if (($props['PVZ'] ?? '') !== '' && ($pvp = bt_pvz_point($props['PVZ'])) && $pvp['w'] !== '') {
+            $det['Режим работы'] = $e($pvp['w']);
+        }
     }
     if ($payment) {
         $det['Оплата'] = $e($payment->getPaymentSystemName());

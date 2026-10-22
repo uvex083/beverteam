@@ -85,7 +85,10 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Доставка</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($shipment ? $shipment->getDeliveryName() : '—') ?></dd>
     <?php if ($dCode === 'bt_pickup'): ?><dt>Адрес склада</dt><dd><?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?></dd>
-    <?php elseif (($props['PVZ'] ?? '') !== ''): ?><dt>Пункт выдачи</dt><dd><?= $e(($city ? $city . ', ' : '') . $props['PVZ']) ?></dd>
+    <?php elseif (($props['PVZ'] ?? '') !== ''): $pvz = bt_pvz_point($props['PVZ']);
+      $pvzA = preg_replace(['/\s*#S\S+$/u', '/^Пункт выдачи СДЭК:\s*/u'], '', $props['ADDRESS'] ?? '') ?: ($pvz['a'] ?? ''); ?>
+    <dt>Пункт выдачи</dt><dd><?= $e(($city ? $city . ', ' : '') . $pvzA) ?><?php if ($pvz && $pvz['w'] !== ''): ?><span class="muted" style="display:block;font-size:13px"><?= $e($pvz['w']) ?></span><?php endif ?>
+      <?php if ($pvz): ?><button type="button" class="link pvzv__go" data-pvzv>На карте</button><?php endif ?></dd>
     <?php else: ?><dt>Адрес</dt><dd><?= $e(trim(($city ? $city . ', ' : '') . preg_replace('/\s*#S\S+$/u', '', $props['ADDRESS'] ?? ''), ', ') ?: '—') ?></dd><?php endif ?>
     <dt>Получатель</dt><dd><?= $e($name ?: ($phone ? '' : '—')) ?><?= $phone ? ($name ? ', ' : '') . '<span style="white-space:nowrap">' . $e($phone) . '</span>' : '' ?></dd>
     <?php if ($order->getField('USER_DESCRIPTION')): ?><dt>Комментарий</dt><dd><?= $e($order->getField('USER_DESCRIPTION')) ?></dd><?php endif ?>
@@ -112,4 +115,43 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <a class="btn btn--ghost" href="/kontakty/#form" data-lead="Вопрос по заказу № <?= $e($num) ?>">Вопрос по заказу</a>
   <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>">Отменить заказ</a><?php endif ?>
 </div>
+<?php if (!empty($pvz)): ?>
+<div class="modal modal--pvzv" id="pvzView" role="dialog" aria-modal="true" aria-labelledby="pvzVT">
+  <div class="modal__bg" data-close></div>
+  <div class="modal__p">
+    <button class="modal__x" type="button" data-close aria-label="Закрыть">×</button>
+    <div class="pvzv">
+      <div>
+        <h2 class="pvzm__t" id="pvzVT">Пункт выдачи СДЭК</h2>
+        <p class="pvzm__a"><?= $e(($city ? $city . ', ' : '') . $pvzA) ?></p>
+        <dl class="pvzm__dl">
+          <?php if ($pvz['w'] !== ''): ?><dt>Режим работы</dt><dd><?= $e($pvz['w']) ?></dd><?php endif ?>
+          <?php if ($pvz['m'] !== ''): ?><dt>Метро</dt><dd><?= $e($pvz['m']) ?></dd><?php endif ?>
+          <?php if ($pvz['n'] !== ''): ?><dt>Как найти</dt><dd><?= $e($pvz['n']) ?></dd><?php endif ?>
+          <?php if ($pvz['card'] || $pvz['cash']): ?><dt>Оплата в пункте</dt><dd class="pvzv__pay"><?= $pvz['card'] ? '<span>Карта</span>' : '' ?><?= $pvz['cash'] ? '<span>Наличные</span>' : '' ?></dd><?php endif ?>
+        </dl>
+        <?php if ($pvz['img']): ?><div class="pvzm__img"><?php foreach ($pvz['img'] as $u): ?><img src="<?= $e($u) ?>" alt="" loading="lazy"><?php endforeach ?></div><?php endif ?>
+      </div>
+      <?php if ($pvz['lat'] && $pvz['lon']): ?><div class="pvzv__map" id="pvzVMap" data-lat="<?= $pvz['lat'] ?>" data-lon="<?= $pvz['lon'] ?>"></div><?php endif ?>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const m=document.getElementById('pvzView'); if(!m) return;
+  document.body.appendChild(m);
+  let map=null;
+  document.addEventListener('click',e=>{
+    if(e.target.closest('[data-pvzv]')){ m.classList.add('open');
+      const box=document.getElementById('pvzVMap'); if(!box) return;
+      if(map){ map.container.fitToViewport(); return; }
+      const c=[+box.dataset.lat,+box.dataset.lon];
+      BT_ymaps().then(y=>{ map=new y.Map(box,{center:c,zoom:16,controls:['zoomControl']},{suppressMapOpenBlock:true,yandexMapDisablePoiInteractivity:true});
+        map.geoObjects.add(new y.Placemark(c,{},BT_mapPin(true))); }).catch(()=>{ box.textContent='Карта не загрузилась'; });
+    }
+    if(e.target.closest('#pvzView [data-close]')) m.classList.remove('open');
+  });
+});
+</script>
+<?php endif ?>
 <?php bt_acc_end();

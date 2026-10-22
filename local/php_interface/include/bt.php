@@ -283,6 +283,37 @@ function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
     return $kg === 1 ? (float)$bi->getQuantity() . ' кг' : ($kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт');
 }
 
+// Фото пункта СДЭК: модуль хранит список сериализованным, элементы — строка-ссылка или ['url' => …]
+function bt_pvz_images(string $raw): array
+{
+    $list = $raw === '' ? [] : @unserialize($raw, ['allowed_classes' => false]);
+    $urls = [];
+    foreach (is_array($list) ? $list : [] as $i) {
+        $u = is_array($i) ? (string)($i['url'] ?? $i['URL'] ?? '') : (string)$i;
+        str_starts_with($u, 'https://') and $urls[] = $u;
+    }
+    return array_slice($urls, 0, 4);
+}
+
+// Строка таблицы пунктов модуля ipol.sdek → данные пункта для оформления и кабинета
+function bt_pvz_row(array $p): array
+{
+    return ['c' => $p['CODE'], 'a' => $p['ADDRESS'], 'w' => (string)$p['WORK_TIME'], 'm' => (string)$p['NEAREST_METRO_STATION'],
+        'n' => (string)$p['ADDRESS_COMMENT'], 'lat' => (float)$p['LAT'], 'lon' => (float)$p['LON'], 'kg' => (float)$p['WEIGHT_MAX'],
+        'cash' => $p['HAVE_CASH'] === 'Y', 'card' => $p['HAVE_CASHLESS'] === 'Y', 'img' => bt_pvz_images((string)$p['OFFICE_IMAGE_LIST'])];
+}
+
+// Пункт выдачи СДЭК по коду — для страницы заказа и писем; закрытый пункт тоже: заказ мог уйти до его закрытия
+function bt_pvz_point(string $code): ?array
+{
+    if ($code === '' || !Loader::includeModule('ipol.sdek')) {
+        return null;
+    }
+    $db = \Bitrix\Main\Application::getConnection();
+    $p = $db->query("SELECT * FROM ipol_sdek_points WHERE CODE = '" . $db->getSqlHelper()->forSql($code) . "'")->fetch();
+    return $p ? bt_pvz_row($p) : null;
+}
+
 // Цена без скидки за единицу количества (шт или кг) — в свойство позиции при оформлении: по нему кабинет и письма показывают скидку.
 // setProperty заменяет весь набор свойств, поэтому «Фасовку» передаём вместе с новым
 function bt_basket_full_save(\Bitrix\Sale\BasketItemBase $bi): void
