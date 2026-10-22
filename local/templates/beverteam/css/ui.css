@@ -753,18 +753,18 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:640px){.quiz__opts{grid-template-columns:1fr}.quiz__res{grid-template-columns:1fr}}
 
 /* ================= B2B: повтор заказа, счета ================= */
-.reorder{background:var(--ink);color:#fff;border-radius:var(--rad);padding:24px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
-.reorder h2{font-family:Unbounded;font-weight:700;font-size:18px;margin-bottom:8px}
-.reorder p{color:#A8A8A0;margin:0;font-size:14px}
-.reorder .it{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-.reorder .it span{background:#26261F;border-radius:999px;padding:6px 13px;font-size:12.5px}
+.reorder{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:14px 16px 14px 20px;margin-bottom:18px;display:flex;gap:14px;align-items:center}
+.reorder__t{flex:1;min-width:0}
+.reorder__t b{display:block;font-size:15px}
+.reorder__t span{display:block;margin-top:2px;color:var(--gray);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reorder .btn{flex:none;min-height:44px}
 .docs{width:100%;border-collapse:collapse;font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
 .docs th,.docs td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
 .docs thead th{background:var(--paper);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
 .docs tr:last-child td{border-bottom:0}
 .docs a{display:inline-flex;gap:6px;align-items:center;font-weight:600}
 .docs svg{width:15px;height:15px;stroke:currentColor;fill:none}
-@media(max-width:900px){.reorder{grid-template-columns:1fr}}
+
 
 /* ================= Ремонт по брендам ================= */
 .brands{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -2104,7 +2104,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .ord .items span{font-size:13px;color:var(--gray)}
 .accp .ord .r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .accp .ord .sum{font-family:Unbounded;font-weight:700;font-size:17px;white-space:nowrap}
-.accp .reorder .it span{color:#fff}
+
 /* детальная заказа */
 .accp .pagehead .row{gap:16px}
 .accp .track{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 20px}

@@ -52,13 +52,11 @@ if (!$orders): ?>
   </div>
 <?php else: ?>
   <?php if ($repeat): ?>
+  <?php $rl = $items[$repeat['ID']]; $more = count($rl) - 2 ?>
   <div class="reorder">
-    <div><span class="mono" style="color:var(--lime)">Прошлый заказ · <?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?></span>
-      <h2>Повторить заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?></h2>
-      <p>Положим тот же состав в корзину. Доставку и оплату выберете при оформлении.</p>
-      <div class="it"><?php foreach (array_slice($items[$repeat['ID']], 0, 6) as $b): ?><span><?= $e($b['NAME']) ?> · <?= (float)$b['QUANTITY'] ?> <?= $e($b['MEASURE_NAME'] ?: 'шт') ?></span><?php endforeach ?></div></div>
-    <div style="display:grid;gap:10px"><button class="btn" type="button" data-reorder="<?= (int)$repeat['ID'] ?>"><?= bt_icon('repeat') ?> Повторить заказ</button>
-      <?php if (!empty($billed[$repeat['ID']])): ?><a class="btn btn--line" style="color:#fff;border-color:#fff" href="/personal/docs/">Счета и документы</a><?php endif ?></div>
+    <div class="reorder__t"><b>Повторить прошлый заказ</b>
+      <span>№ <?= $e($repeat['ACCOUNT_NUMBER']) ?> от <?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?> · <?= $e(implode(', ', array_column(array_slice($rl, 0, 2), 'NAME'))) ?><?= $more > 0 ? ' и ещё ' . $more : '' ?></span></div>
+    <button class="btn btn--ghost btn--sm" type="button" data-reorder="<?= (int)$repeat['ID'] ?>" aria-label="Повторить заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?>"><?= bt_icon('repeat') ?> Повторить</button>
   </div>
   <?php endif ?>
   <div class="ftabs" data-ftabs>
