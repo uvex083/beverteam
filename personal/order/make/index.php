@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const val=n=>(form.elements[n]?.value||'').trim(), dig=n=>val(n).replace(/\D/g,'');
   function ready(){
     const miss=[];
-    if(pt==='UR'){ if(!val('company'))miss.push('название организации'); if(!BT_innOk(dig('inn')))miss.push('ИНН'); }
+    if(pt==='UR'){ if(!val('company'))miss.push('название организации'); if(!BT_innOk(dig('inn')))miss.push(dig('inn')?'верный ИНН':'ИНН'); }
     if(val('name').length<2)miss.push(pt==='UR'?'контактное лицо':'имя');
     if(dig('phone').length!==11)miss.push('телефон');
     if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(val('email')))miss.push('e‑mail');
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const to=(el,msg)=>{el.scrollIntoView({behavior:'smooth',block:'center'}); if(msg) BT_toast(msg);};
     // реквизиты сохранённой организации скрыты — неполные (нет ИНН) раскрываем и подсвечиваем
     const orgBad=pt==='UR'&&(!val('company')?coCompany:!BT_innOk(dig('inn'))?coInn:null);
-    if(orgBad){ if(window.orgFields) orgFields.hidden=false; setErr(orgBad,orgBad===coInn?'Укажите ИНН: 10 цифр у компании, 12 у ИП':'Укажите название организации'); to(orgBad,'Заполните реквизиты организации'); if(fineP) orgBad.focus({preventScroll:true}); }
+    if(orgBad){ if(window.orgFields) orgFields.hidden=false; setErr(orgBad,orgBad!==coInn?'Укажите название организации':[10,12].includes(dig('inn').length)?'Проверьте ИНН — в номере ошибка':'Укажите ИНН: 10 цифр у компании, 12 у ИП'); to(orgBad,'Заполните реквизиты организации'); if(fineP) orgBad.focus({preventScroll:true}); }
     else if(!locIn.value){ setErr(cityIn,'Выберите город из списка'); to(cityIn); if(fineP) cityIn.focus({preventScroll:true}); }
     else if(!sel||!last||last.loc!==locIn.value) to(blkD,'Выберите способ доставки');
     else if(sel.tab==='pvz'&&!pvzIn.value) to(blkD,'Выберите пункт выдачи на карте');
