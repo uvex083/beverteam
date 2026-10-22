@@ -277,7 +277,7 @@ foreach ($chips as [$name, $value, $params]) {
     $url = $reset . (($q = http_build_query(($rest ? $rest + ['set_filter' => 'Y'] : []) + $keep)) !== '' ? '?' . $q : '');
     $html .= '<a class="chip" href="' . $e($url) . '" data-names="' . $e(implode(',', $params)) . '" title="Убрать условие">' . $e($name) . ': ' . $e($value) . '<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
 }
-if ($chips) {
+if (count($chips) > 1) {
     $html .= '<a class="chip chip--reset" href="' . $e($reset) . '" data-freset>Сбросить все<i><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></i></a>';
 }
 $APPLICATION->AddViewContent('bt_cat_chips', $html . '</div>');
