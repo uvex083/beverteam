@@ -37,7 +37,7 @@ bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h
       <td><a class="link" href="/personal/orders/<?= (int)$o['ID'] ?>/">№ <?= $e($o['ACCOUNT_NUMBER']) ?></a></td>
       <td style="white-space:nowrap;font-variant-numeric:tabular-nums"><?= bt_fmt((float)$o['PRICE']) ?></td>
       <td><?php if ($o['CANCELED'] === 'Y'): ?><span class="status st-cancel">Отменён</span><?php else: ?><span class="status <?= $o['PAYED'] === 'Y' ? 'st-paid' : 'st-new' ?>"><?= $o['PAYED'] === 'Y' ? 'Оплачен' : 'Ждёт оплаты' ?></span><?php endif ?></td>
-      <td style="text-align:right;white-space:nowrap"><?php if ($o['CANCELED'] !== 'Y' && $o['STATUS_ID'] !== 'N'): ?><a href="/local/ajax/bill.php?id=<?= (int)$o['ID'] ?>"><?= bt_icon('doc') ?> Счёт PDF</a>
+      <td style="text-align:right;white-space:nowrap"><?php if ($o['CANCELED'] !== 'Y' && $o['STATUS_ID'] !== 'N'): ?><a href="/local/ajax/bill.php?id=<?= (int)$o['ID'] ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?> Счёт PDF</a>
         <?php elseif ($o['CANCELED'] !== 'Y'): ?><span class="muted" style="font-size:13px">Счёт — после подтверждения</span><?php endif ?></td></tr>
   <?php endforeach ?></tbody>
 </table></div>

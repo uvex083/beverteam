@@ -1,5 +1,5 @@
 <?php
-// Скачать счёт по заказу (PDF): только владельцу заказа или в браузере, где заказ оформлен
+// Счёт по заказу (PDF) — открывается в браузере, сохранить покупатель решает сам: только владельцу заказа или в браузере, где заказ оформлен
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -18,4 +18,4 @@ if (!$file) {
     die('Счёт не найден');
 }
 $file['ORIGINAL_NAME'] = 'Счёт № ' . $order->getField('ACCOUNT_NUMBER') . '.pdf';
-CFile::ViewByUser($file, ['force_download' => true, 'cache_time' => 0]);
+CFile::ViewByUser($file, ['force_download' => false, 'cache_time' => 0]);
