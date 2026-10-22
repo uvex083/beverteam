@@ -27,7 +27,7 @@ $toPay = !$order->isCanceled() && bt_tbank_payment($order);
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
 // в заказе «При получении» без контекста непонятно, о чём речь
 $pCode === 'cash' and $payName = 'Оплата при получении';
-$o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID')];
+$o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID'), 'PAYED' => $order->isPaid() ? 'Y' : 'N', 'BILL' => $pCode === 'bill'];
 [$st, $cls] = bt_order_status($o);
 $date = fn($d) => $d ? FormatDate('j M, H:i', $d->getTimestamp()) : '';
 $city = bt_loc($props['LOCATION'] ?? '')['n'];
@@ -46,9 +46,14 @@ $num = $order->getField('ACCOUNT_NUMBER');
 $sid = (string)$o['STATUS_ID'];
 $pickup = $dCode === 'bt_pickup';
 $shipped = $pickup ? in_array($sid, ['R', 'F'], true) : (in_array($sid, ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped()));
+// по счёту «Подтверждён» — ещё ждём оплату, собираем после неё
+$waitBill = $pCode === 'bill' && !$order->isPaid() && $sid === 'C';
+// дата «Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
+$readyAt = $pickup && $shipped ? \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED', '%DATA' => 's:9:"STATUS_ID";s:1:"R"'],
+    'select' => ['DATE_CREATE'], 'order' => ['ID' => 'DESC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null : null;
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
-    'build' => ['Собираем', $shipped || $order->isPaid() || in_array($sid, ['C', 'P'], true), ''],
-    'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $pickup && $sid === 'R' ? $date($order->getField('DATE_STATUS')) : ''],
+    'build' => ['Собираем', $shipped || $order->isPaid() || $sid === 'P' || ($sid === 'C' && !$waitBill), ''],
+    'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $readyAt ? $date($readyAt) : ''],
     'done' => [$pickup ? 'Выдан' : 'Получен', $sid === 'F', $sid === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
 
@@ -60,7 +65,11 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="alert alert--err"><span>Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
-  <div class="alert alert--info"><span><?= $pickup && $sid === 'R' ? 'Заказ готов — забирайте: ' . $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) . ', ' . $e(mb_strtolower($co['hours'] ?? '')) . '.' : $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $dCode === 'bt_pickup' ? 'выдачи' : 'отправки' ?> — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
+  <?php $tel = '<a class="link" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>' ?>
+  <div class="alert alert--info"><span><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
+    <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата. Вопросы по счёту — <?= $tel ?>.
+    <?php elseif ($pickup && $sid === 'R'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>. Вопросы — <?= $tel ?>.
+    <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span></div>
   <?php endif ?>
 </div>
 
@@ -96,7 +105,8 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
-    <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if (!$order->isPaid() && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
+    <dt>Статус</dt><dd><?php $paidOnGet = !$order->isPaid() && $pCode === 'cash' && $sid === 'F'; // при получении: деньги взяли при выдаче, отметку в заказе менеджер мог не поставить ?>
+    <span class="pay<?= $order->isPaid() || $paidOnGet ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : ($paidOnGet ? 'Оплачен при получении' : 'Не оплачен') ?></span><?php if (!$order->isPaid() && !$paidOnGet && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
     <?php // онлайн-оплата: только ссылка на чек из уведомления банка, пока её нет — строку не показываем
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';

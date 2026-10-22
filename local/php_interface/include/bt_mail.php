@@ -149,14 +149,16 @@ function bt_mail_order(Sale\Order $order): array
         . '<tr><td style="padding:18px 20px 8px">' . bt_mail_rows($det) . '</td></tr></table>';
 
     // что дальше — как на странице «Заказ принят»
+    $track = bt_delivery_next($dCode);
     $next = [
-        'Менеджер позвонит в рабочее время' . (($co['hours'] ?? '') !== '' ? ' (' . $e($co['hours']) . ')' : '') . ', если потребуется уточнить детали.',
+        str_starts_with($track, 'Менеджер позвонит') ? '' : 'Менеджер позвонит в рабочее время' . (($co['hours'] ?? '') !== '' ? ' (' . $e($co['hours']) . ')' : '') . ', если потребуется уточнить детали.',
         $pCode === 'bill' ? 'Счёт пришлём на e‑mail после подтверждения заказа менеджером, УПД — тоже на e‑mail.'
             : ($pCode === 'tinkoff' ? 'Оплата онлайн. Если не успели оплатить, сделайте это на странице заказа в личном кабинете — там же появится кассовый чек.'
             : 'Оплата при получении заказа. Чек выдадим при получении, УПД — по запросу.'),
         'Изменить заказ можно до ' . ($dCode === 'bt_pickup' ? 'выдачи' : 'отправки') . ' — позвоните <a href="' . $e($co['phone1_href'] ?? '') . '" style="color:#0E0E0C;font-weight:700;white-space:nowrap">' . $e($co['phone1'] ?? '') . '</a>.',
-        bt_delivery_next($dCode) . ' История заказов — в личном кабинете.',
+        $track . ' История заказов — в личном кабинете.',
     ];
+    $next = array_filter($next);
     $nextHtml = '';
     foreach ($next as $t) {
         $nextHtml .= '<tr><td width="22" valign="top" style="padding:8px 0 10px"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="9" height="9" bgcolor="#C7DA43" style="width:9px;height:9px;background-color:#C7DA43;border-radius:5px;font-size:0;line-height:0">&nbsp;</td></tr></table></td>'

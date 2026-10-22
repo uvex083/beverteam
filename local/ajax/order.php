@@ -375,7 +375,11 @@ foreach ($order->getPropertyCollection() as $prop) {
 $order->doFinalAction(true);
 // тариф СДЭК для выгрузки заказа модулем: штатно его пишет только sale.order.ajax
 if (str_starts_with($dCode, 'sdek_') && ($p = $order->getPropertyCollection()->getItemByOrderPropertyCode('IPOLSDEK_CNTDTARIF'))) {
-    $p->setValue((string)(\sdekShipmentCollection::getProfileTarif(substr($dCode, 5)) ?: ($_SESSION['IPOLSDEK_CHOSEN'][substr($dCode, 5)] ?? '')));
+    // при сбое расчёта профиля модуль отдаёт не номер, а строку вида [["250",false]] — берём только число, иначе тариф по профилю
+    $prof = substr($dCode, 5);
+    $tarif = array_values(array_filter([\sdekShipmentCollection::getProfileTarif($prof), $_SESSION['IPOLSDEK_CHOSEN'][$prof] ?? ''], fn($t) => ctype_digit((string)$t)))[0]
+        ?? ['pickup' => 136, 'courier' => 137][$prof] ?? '';
+    $p->setValue((string)$tarif);
 }
 foreach ($order->getBasket() as $bi) {
     bt_basket_full_save($bi);

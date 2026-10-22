@@ -1719,8 +1719,19 @@ function bt_order_status(array $o): array
     if ($st === 'P') {
         return ['Собираем', 'st-paid'];
     }
+    // «Подтверждён»: по неоплаченному счёту ждём оплату, остальное уже собираем — как на шкале заказа
+    if ($st === 'C') {
+        return !empty($o['BILL']) && ($o['PAYED'] ?? 'N') !== 'Y' ? ['Ждёт оплаты', 'st-new'] : ['Собираем', 'st-paid'];
+    }
     $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['R', 'DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
     return [$names[$st] ?? $st, $cls];
+}
+
+// Заказ оплачивается по счёту
+function bt_order_by_bill(int $orderId): bool
+{
+    $ps = array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill'], 'select' => ['ID']])->fetchAll(), 'ID');
+    return $ps && (bool)\Bitrix\Sale\Internals\PaymentTable::getList(['filter' => ['=ORDER_ID' => $orderId, '@PAY_SYSTEM_ID' => $ps], 'select' => ['ID'], 'limit' => 1])->fetch();
 }
 
 // Кабинет: гостю — приглашение войти (окно входа откроется само); true — можно выводить страницу

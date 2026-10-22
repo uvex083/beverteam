@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function renderPay(){
     keepF();
     const list=PAYS.filter(p=>avail.some(a=>a.id===p.id));
-    pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
+    pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?(sel.d.code==='sdek_pickup'?'В пункте выдачи СДЭК':'Курьеру СДЭК')+' — наличными или картой':p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div>${p.logo||''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;

@@ -26,7 +26,7 @@ $co = bt_contacts();
 bt_acc_start('profile', '<h1 class="display h1">Личный кабинет</h1>');
 ?>
 <div class="grid g3" style="margin-bottom:16px">
-  <?php if ($last): [$st, $cls] = bt_order_status($last) ?>
+  <?php if ($last): [$st, $cls] = bt_order_status($last + ['BILL' => bt_order_by_bill((int)$last['ID'])]) ?>
   <a class="card" href="/personal/orders/<?= (int)$last['ID'] ?>/"><span class="mono muted">Последний заказ</span><b class="kpi">№ <?= $e($last['ACCOUNT_NUMBER']) ?></b><span class="ord__st"><span class="status <?= $cls ?>"><?= $e($st) ?></span><?php if ($last['PAYED'] === 'Y'): ?><span class="pay pay--ok">Оплачен</span><?php elseif ($last['CANCELED'] !== 'Y'): ?><span class="pay">Не оплачен</span><?php endif ?></span></a>
   <?php else: ?>
   <a class="card" href="/catalog/"><span class="mono muted">Заказы</span><b class="kpi">Пока нет</b><span class="link" style="font-size:13.5px">Перейти в каталог</span></a>

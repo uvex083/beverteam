@@ -148,16 +148,17 @@ $messages = [
         . m_note('История заказов — в <a href="https://#SERVER_NAME#/personal/orders/" style="color:#6C6C64">личном кабинете</a>.')],
     'SALE_STATUS_CHANGED_C' => ['Заказ № #ORDER_ID# подтверждён', $sale[0], $sale[1], '',
         m_head('Заказ подтверждён', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Менеджер проверил заказ № #ORDER_ID#: всё в наличии, сумма и доставка уточнены.')
+        . m_p('#BT_HELLO# Менеджер проверил заказ № #ORDER_ID# — всё в наличии.')
+        . '<?if (trim((string)$arParams["BT_BILL"]) === ""):?>' . m_p('Собираем заказ. #BT_TRACK#') . '<?endif?>'
         . $ifText('BT_BILL', m_box(m_p('<b>Счёт на оплату — во вложении.</b> Его же можно скачать в личном кабинете. После оплаты соберём заказ и пришлём УПД.')))
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     // статус ставит и оплата, и менеджер (заказ «при получении» — перед отправкой в СДЭК): «оплачен» пишем, только если оплачен
-    'SALE_STATUS_CHANGED_P' => ['Заказ № #ORDER_ID# собираем к отправке', $sale[0], $sale[1], '',
+    'SALE_STATUS_CHANGED_P' => ['Собираем заказ № #ORDER_ID#', $sale[0], $sale[1], '',
         m_head('Собираем заказ', 'Заказ № #ORDER_ID#')
-        . '<?if ($arParams["BT_PAID"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен и формируется к отправке. #BT_TRACK#')
-        . '<?elseif ($arParams["BT_COD"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. Оплата — при получении, наличными или картой. #BT_TRACK#')
-        . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. #BT_TRACK#') . '<?endif?>'
+        . '<?if ($arParams["BT_PAID"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен — собираем его. #BT_TRACK#')
+        . '<?elseif ($arParams["BT_COD"] === "Y"):?>' . m_p('#BT_HELLO# Собираем заказ № #ORDER_ID#. Оплата — при получении, наличными или картой. #BT_TRACK#')
+        . '<?else:?>' . m_p('#BT_HELLO# Собираем заказ № #ORDER_ID#. #BT_TRACK#') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     // самовывоз: менеджер собрал заказ
