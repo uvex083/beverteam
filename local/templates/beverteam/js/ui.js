@@ -650,7 +650,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     el.addEventListener('pointerdown',()=>{el.dataset.touched='1';});
     el.addEventListener('keyup',e=>{ if(e.key==='Tab') el.dataset.touched='1'; });
     el.addEventListener('blur',()=>{ if(el.dataset.touched) BT_checkField(el); });
-    el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(el.closest('.field')?.classList.contains('is-err')) BT_checkField(el); });
+    /* стёр поле целиком — оно снова чистое, ошибку покажем только на следующем уходе с поля */
+    el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(!el.closest('.field')?.classList.contains('is-err')) return;
+      const empty=!el.value.trim()||(kindOf(el)==='tel'&&el.value.replace(/\D/g,'').length<=1);
+      empty?fieldErr(el,''):BT_checkField(el); });
   });
   document.addEventListener('reset',e=>e.target.querySelectorAll('[data-touched]').forEach(x=>delete x.dataset.touched),true);
   /* согласие с политикой — обязательный чекбокс */

@@ -219,6 +219,8 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте — точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
+    // ушли на другую вкладку — ошибка адреса, поставленная на уходе с поля, не должна ждать возвращения
+    if(addr.hidden) addr.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,''));
   }
 
   /* пункты выдачи СДЭК: карточка доставки показывает выбранный пункт, выбор — в окне с картой.
