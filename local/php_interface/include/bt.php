@@ -1827,10 +1827,13 @@ function bt_acc_start(string $cur, string $head, string $sub = ''): void
         echo '<a href="' . $href . '"' . ($code === $cur ? ' class="cur" aria-current="page"' : '') . '>' . $text . ' ' . $extra . '</a>';
     }
     echo '<button class="out" type="button" data-logout>Выйти</button></aside><div class="acc-c">';
+    $GLOBALS['bt_acc_cur'] = $cur;
 }
 
 function bt_acc_end(): void
 {
+    // на телефоне «Выйти» не во вкладках, а внизу профиля
+    echo ($GLOBALS['bt_acc_cur'] ?? '') === 'profile' ? '<button class="btn btn--ghost btn--block acc-out-m" type="button" data-logout>Выйти из кабинета</button>' : '';
     echo '</div></div></div>';
 }
 

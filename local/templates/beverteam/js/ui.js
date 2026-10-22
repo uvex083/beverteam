@@ -1582,6 +1582,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('[data-ftabs]').forEach(t=>t.addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return;
     t.querySelectorAll('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));
     document.querySelectorAll('.ord[data-g]').forEach(o=>o.hidden=!!b.dataset.f&&o.dataset.g!==b.dataset.f); }));
+  /* кабинет на телефоне: вкладки листаются — текущая сразу в зоне видимости, край гаснет, пока есть что листать */
+  const accNav=document.querySelector('.accp .acc-nav');
+  if(accNav){
+    const edge=()=>{ const s=accNav.scrollWidth>accNav.clientWidth+2;
+      accNav.classList.toggle('is-more-l',s&&accNav.scrollLeft>4); accNav.classList.toggle('is-more-r',s&&accNav.scrollLeft+accNav.clientWidth<accNav.scrollWidth-4); };
+    const cur=accNav.querySelector('.cur');
+    if(cur&&accNav.scrollWidth>accNav.clientWidth) accNav.scrollLeft=cur.offsetLeft-(accNav.clientWidth-cur.offsetWidth)/2;
+    edge(); accNav.addEventListener('scroll',edge,{passive:true}); addEventListener('resize',edge);
+  }
   document.addEventListener('click',e=>{ const b=e.target.closest('[data-reorder]'); if(!b||b.disabled) return; b.disabled=true;
     accPost({action:'reorder',id:b.dataset.reorder}).then(r=>{
       if(!r.ok){ BT_toast(r.message||'Не получилось повторить заказ'); return; }

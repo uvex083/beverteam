@@ -2054,6 +2054,21 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .acc-nav .out{display:flex;width:100%;padding:14px 12px 10px;margin-top:6px;border:0;border-top:1px solid var(--line);background:none;
   font:inherit;font-weight:600;font-size:14px;color:var(--err);text-align:left;cursor:pointer}
 @media(hover:hover){.accp .acc-nav .out:hover{background:var(--paper)}}
+/* телефон и планшет: меню кабинета — строка вкладок, листается пальцем; край гаснет, пока есть что листать; «Выйти» — внизу профиля */
+.acc-out-m{display:none}
+@media(max-width:1050px){
+  .accp .acc-l{gap:18px}
+  .accp .acc-nav{position:relative;display:flex;gap:8px;margin:0 calc(-1*clamp(16px,4vw,40px));padding:2px clamp(16px,4vw,40px);background:none;border:0;border-radius:0;
+    overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:clamp(16px,4vw,40px);scrollbar-width:none}
+  .accp .acc-nav::-webkit-scrollbar{display:none}
+  .accp .acc-nav .u,.accp .acc-nav .out{display:none}
+  .accp .acc-nav a{flex:none;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--white);white-space:nowrap;scroll-snap-align:start}
+  .accp .acc-nav a.cur{border-color:var(--ink)}
+  .accp .acc-nav.is-more-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}
+  .accp .acc-nav.is-more-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 48px);mask-image:linear-gradient(90deg,transparent,#000 48px)}
+  .accp .acc-nav.is-more-l.is-more-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 48px,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,transparent,#000 48px,#000 calc(100% - 48px),transparent)}
+  .acc-out-m{display:flex;margin-top:18px}
+}
 .accp .acc-guest{margin:30px 0 0}
 .accp .grid.g3 .card{padding:18px 20px}
 .accp .kpi{display:block;font-family:Unbounded;font-size:18px;margin:8px 0 6px}
