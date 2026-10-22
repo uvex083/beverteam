@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /bitrix/
+Disallow: /local/
+Disallow: /personal/
+Disallow: /search/
+Disallow: /seo-otchet/
+Disallow: /*?*set_filter=
+Disallow: /*?*sort=
+Allow: /bitrix/components/
+Allow: /bitrix/cache/
+Allow: /bitrix/js/
+Allow: /local/templates/
+Allow: /upload/
+
+Sitemap: https://beverteam.ru/sitemap.xml
