@@ -649,11 +649,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* ошибку — только когда человек сам побывал в поле и ушёл; фокус, который ставит скрипт (открытие окна), ошибок не даёт */
     el.addEventListener('pointerdown',()=>{el.dataset.touched='1';});
     el.addEventListener('keyup',e=>{ if(e.key==='Tab') el.dataset.touched='1'; });
-    el.addEventListener('blur',()=>{ if(el.dataset.touched) BT_checkField(el); });
-    /* стёр поле целиком — оно снова чистое, ошибку покажем только на следующем уходе с поля */
-    el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(!el.closest('.field')?.classList.contains('is-err')) return;
-      const empty=!el.value.trim()||(kindOf(el)==='tel'&&el.value.replace(/\D/g,'').length<=1);
-      empty?fieldErr(el,''):BT_checkField(el); });
+    /* пустое поле на уходе не ругаем: «нужно заполнить» — только при отправке; стёртое поле снова чистое */
+    const empty=()=>!el.value.trim()||(kindOf(el)==='tel'&&el.value.replace(/\D/g,'').length<=1);
+    el.addEventListener('blur',()=>{ if(el.dataset.touched) empty()?fieldErr(el,''):BT_checkField(el); });
+    el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(el.closest('.field')?.classList.contains('is-err')) empty()?fieldErr(el,''):BT_checkField(el); });
   });
   document.addEventListener('reset',e=>e.target.querySelectorAll('[data-touched]').forEach(x=>delete x.dataset.touched),true);
   /* согласие с политикой — обязательный чекбокс */

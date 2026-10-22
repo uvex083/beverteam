@@ -350,12 +350,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     }).catch(()=>n===calcN?calcFailed():false);
   }
   dTabs.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
-    tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();}});
+    tab=b.dataset.tab; const o=opts().find(x=>x.tab===tab); if(o){const same=sel&&sel.d.id===o.d.id; sel=o; if(same){renderDeliv();renderPay();renderSum(last);ready();}else{renderDeliv();calc();}}});
   deliv.addEventListener('change',e=>{const o=opts().find(x=>x.key===e.target.value);if(!o)return;const same=sel&&sel.d.id===o.d.id;sel=o;
-    if(same){renderDeliv();renderPay();renderSum(last);ready();}else calc();});
+    if(same){renderDeliv();renderPay();renderSum(last);ready();}else{renderDeliv();calc();}});
   pay.addEventListener('change',e=>{payId=wantPay=+e.target.value;renderPay();renderSum(last);ready();});
   ptypeTabs.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b||b.dataset.t===pt)return;
     [...ptypeTabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));pt=b.dataset.t;urFields.hidden=pt!=='UR';
+    if(urFields.hidden) urFields.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,''));
     coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';calc();ready();});
   coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';
 
@@ -457,7 +458,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(val('email')))miss.push('e‑mail');
     if(!locIn.value)miss.push('город');
     else if(!sel||!last||last.loc!==locIn.value)miss.push('способ доставки');
-    else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(val('street')?'номер дома':'адрес доставки');
+    else if(sel.tab==='addr'&&!/[а-яёa-z]{2,}.*\d/i.test(val('street')))miss.push(/^(ул|пр-кт|пер|б-р|ш|пл|наб|проезд|туп|мкр|тракт|аллея)\s|,\s*д\s*$/i.test(val('street'))?'номер дома':'адрес доставки');
     else if(sel.tab==='pvz'&&!pvzIn.value)miss.push('пункт выдачи');
     if(locIn.value&&!payId)miss.push('способ оплаты');
     if(!coAgree.checked)miss.push('согласие с условиями');
