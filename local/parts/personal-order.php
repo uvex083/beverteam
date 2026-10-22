@@ -74,7 +74,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   $due = $order->isPaid() ? '' : ($pCode === 'cash' ? ' Оплата при получении — <b style="white-space:nowrap">' . bt_fmt((float)$order->getPrice()) . '</b>, наличными или картой.' : ($pCode === 'bill' ? ' Счёт ещё не оплачен — он в блоке «Оплата и документы».' : '')) ?>
   <div class="alert alert--info" style="flex-wrap:wrap;align-items:center"><span style="flex:1 1 260px"><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
     <?php elseif ($toPay): ?>Заказ ещё не оплачен — оплатите его, и мы начнём собирать.
-    <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата. Вопросы по счёту — <?= $tel ?>.
+    <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата (при отсрочке платежа — сразу). Вопросы по счёту — <?= $tel ?>.
     <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>.<?= $due ?> Вопросы — <?= $tel ?>.
     <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру — он позвонит перед приездом.' : 'Заказ передан в СДЭК — трек-номер появится здесь и придёт на e‑mail.' ?><?= $due ?> Вопросы — <?= $tel ?>.
     <?php elseif ($stage === 'ship'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>.<?= $due ?> Вопросы — <?= $tel ?>.
