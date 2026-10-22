@@ -33,7 +33,11 @@ $name = $props['FIO'] ?? $props['CONTACT_PERSON'] ?? '';
 $phone = $props['PHONE'] ?? '' ? bt_phone_fmt($props['PHONE']) : '';
 $dPrice = (float)$order->getDeliveryPrice();
 $basket = $order->getBasket();
-$disc = (float)$basket->getBasePrice() - (float)$basket->getPrice();
+$full = 0.0;
+foreach ($basket as $bi) {
+    $full += bt_basket_full($bi);
+}
+$disc = $full - (float)$basket->getPrice();
 $num = $order->getField('ACCOUNT_NUMBER');
 $shipped = in_array($o['STATUS_ID'], ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped());
 
@@ -66,11 +70,11 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="" loading="lazy" width="64" height="64"><?php else: ?><span class="ph"></span><?php endif ?>
     <div><?php if ($m): ?><a href="<?= $e($m['url'] ?? '') ?>"><b><?= $e($bi->getField('NAME')) ?></b></a><?php else: ?><b><?= $e($bi->getField('NAME')) ?></b><?php endif ?><?php if (!empty($m['par'])): ?><span class="muted" style="font-size:12.5px"><?= $e($m['par']) ?></span><?php endif ?></div>
     <span class="q"><?= bt_basket_qty($bi) ?> · <?= bt_fmt($bi->getPrice()) ?><?= bt_basket_pack($bi) ? ' за кг' : '' ?></span>
-    <span class="p"><?= bt_fmt($bi->getFinalPrice()) ?></span>
+    <span class="p"><?php if (bt_basket_full($bi) > $bi->getFinalPrice() + 0.5): ?><del><?= bt_fmt(bt_basket_full($bi)) ?></del><?php endif ?><?= bt_fmt($bi->getFinalPrice()) ?></span>
   </div>
   <?php endforeach ?>
   <div class="tot">
-    <div><span class="muted">Товары</span><span><?= bt_fmt((float)$basket->getBasePrice()) ?></span></div>
+    <div><span class="muted">Товары</span><span><?= bt_fmt($full) ?></span></div>
     <?php if ($disc > 0.5): ?><div><span class="muted">Скидка</span><span style="color:var(--ok)">−<?= bt_fmt($disc) ?></span></div><?php endif ?>
     <div><span class="muted">Доставка</span><span><?= $dCode === 'bt_cdek' && $dPrice == 0 ? 'сообщит менеджер' : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно') ?></span></div>
     <div class="t"><span>Итого</span><span><?= bt_fmt($order->getPrice()) ?></span></div>

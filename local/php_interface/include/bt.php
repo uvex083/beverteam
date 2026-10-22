@@ -283,6 +283,27 @@ function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
     return $kg === 1 ? (float)$bi->getQuantity() . ' кг' : ($kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт');
 }
 
+// Цена без скидки за единицу количества (шт или кг) — в свойство позиции при оформлении: по нему кабинет и письма показывают скидку.
+// setProperty заменяет весь набор свойств, поэтому «Фасовку» передаём вместе с новым
+function bt_basket_full_save(\Bitrix\Sale\BasketItemBase $bi): void
+{
+    $m = bt_product((string)$bi->getProductId());
+    $unit = (float)($m['old'] ?? $m['p'] ?? 0);
+    if ($unit <= (float)$bi->getPrice() + 0.009) {
+        return;
+    }
+    $props = array_values(array_filter($bi->getPropertyCollection()->getPropertyValues(), fn($p) => ($p['CODE'] ?? '') !== 'FULL_PRICE'));
+    $props[] = ['NAME' => 'Цена без скидки', 'CODE' => 'FULL_PRICE', 'VALUE' => (string)round($unit, 2), 'SORT' => 200];
+    $bi->getPropertyCollection()->setProperty($props);
+}
+
+// Сумма строки без скидки: по цене без скидки из свойства, без него — по базовой цене Битрикса
+function bt_basket_full(\Bitrix\Sale\BasketItemBase $bi): float
+{
+    $u = (float)($bi->getPropertyCollection()->getPropertyValues()['FULL_PRICE']['VALUE'] ?? 0);
+    return max($u * (float)$bi->getQuantity(), (float)$bi->getBasePrice() * (float)$bi->getQuantity(), (float)$bi->getFinalPrice());
+}
+
 // Положить в корзину: $kg — фасовка кофе на развес (каждая фасовка — своя строка, количество в Битриксе — в кг), $q — штук.
 // $add — прибавить к тому, что уже лежит (повтор заказа). Возвращает текст ошибки или ''
 function bt_basket_put(\Bitrix\Sale\BasketBase $basket, int $id, int $kg, float $q, bool $add = false): string

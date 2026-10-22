@@ -391,6 +391,9 @@ $order->doFinalAction(true);
 if (str_starts_with($dCode, 'sdek_') && ($p = $order->getPropertyCollection()->getItemByOrderPropertyCode('IPOLSDEK_CNTDTARIF'))) {
     $p->setValue((string)(\sdekShipmentCollection::getProfileTarif(substr($dCode, 5)) ?: ($_SESSION['IPOLSDEK_CHOSEN'][substr($dCode, 5)] ?? '')));
 }
+foreach ($order->getBasket() as $bi) {
+    bt_basket_full_save($bi);
+}
 bt_order_payment($order)->setField('SUM', $order->getPrice());
 $r = $order->save();
 if (!$r->isSuccess()) {

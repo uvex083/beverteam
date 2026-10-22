@@ -92,6 +92,7 @@ function bt_mail_order(Sale\Order $order): array
     $cell = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#0E0E0C;border-bottom:1px solid #DCDCD4;vertical-align:top';
     $head = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6C6C64;padding:0 0 8px;border-bottom:1px solid #0E0E0C';
     $rows = '';
+    $full = 0.0;
     foreach ($order->getBasket() as $bi) {
         $title = $e($bi->getField('NAME'));
         $url = (string)$bi->getField('DETAIL_PAGE_URL');
@@ -101,8 +102,12 @@ function bt_mail_order(Sale\Order $order): array
         $qty = str_replace(' ', "\u{00A0}", bt_basket_qty($bi));
         $rows .= '<tr><td style="' . $cell . ';padding:12px 12px 12px 0">' . $title . '</td>'
             . '<td width="56" align="center" style="' . $cell . ';padding:12px 6px;white-space:nowrap">' . $qty . '</td>'
-            . '<td align="right" style="' . $cell . ';padding:12px 0 12px 8px;white-space:nowrap;font-weight:700">' . bt_fmt($bi->getFinalPrice()) . '</td></tr>';
+            . '<td align="right" style="' . $cell . ';padding:12px 0 12px 8px;white-space:nowrap;font-weight:700">'
+            . (($lf = bt_basket_full($bi)) > $bi->getFinalPrice() + 0.5 ? '<del style="display:block;font-size:12px;font-weight:400;color:#6C6C64">' . bt_fmt($lf) . '</del>' : '')
+            . bt_fmt($bi->getFinalPrice()) . '</td></tr>';
+        $full += bt_basket_full($bi);
     }
+    $disc = $full - (float)$order->getBasket()->getPrice();
     $dPrice = (float)$order->getDeliveryPrice();
     $dText = $dCode === 'bt_cdek' ? 'стоимость сообщит менеджер'
         : ($dPrice > 0 ? bt_fmt($dPrice) : 'бесплатно');
@@ -111,7 +116,8 @@ function bt_mail_order(Sale\Order $order): array
     $right = fn(string $v, string $css = '') => '<td colspan="2" align="right" style="' . $sum . $css . '">' . $v . '</td>';
     $items = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px">'
         . '<tr><td style="' . $head . '">Товар</td><td align="center" style="' . $head . '">Кол-во</td><td align="right" style="' . $head . '">Сумма</td></tr>' . $rows
-        . '<tr><td style="' . $sum . '">Товары</td>' . $right(bt_fmt($order->getBasket()->getPrice()), ';white-space:nowrap') . '</tr>'
+        . '<tr><td style="' . $sum . '">Товары</td>' . $right(bt_fmt($full), ';white-space:nowrap') . '</tr>'
+        . ($disc > 0.5 ? '<tr><td style="' . $sum . '">Скидка</td>' . $right('−' . bt_fmt($disc), ';white-space:nowrap;color:#2F7D4A') . '</tr>' : '')
         . ($shipment ? '<tr><td style="' . $sum . '">Доставка</td>' . $right($dText) . '</tr>' : '')
         . '<tr><td valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0E0E0C;padding:14px 0 0">' . ($dCode === 'bt_cdek' ? 'Итого без доставки' : 'Итого') . '</td>'
         . '<td colspan="2" align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . bt_fmt($order->getPrice()) . '</td></tr></table>';

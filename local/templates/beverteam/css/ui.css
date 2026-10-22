@@ -2098,7 +2098,8 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .oit{display:grid;grid-template-columns:64px 1fr auto auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
 .accp .oit img,.accp .oit .ph{width:64px;height:64px;object-fit:contain;background:var(--paper);border-radius:10px;padding:6px;mix-blend-mode:multiply}
 .accp .oit b{display:block;font-size:14.5px}.accp .oit .q{color:var(--gray);font-family:'JetBrains Mono';font-size:12.5px;white-space:nowrap}
-.accp .oit .p{font-family:Unbounded;font-weight:700;white-space:nowrap}
+.accp .oit .p{font-family:Unbounded;font-weight:700;white-space:nowrap;text-align:right}
+.accp .oit .p del{display:block;font-family:Manrope;font-weight:400;font-size:12.5px;color:var(--gray)}
 .accp .tot{display:grid;gap:6px;max-width:320px;margin-left:auto;margin-top:14px;font-size:14px}
 .accp .tot div{display:flex;justify-content:space-between;gap:16px}
 .accp .tot .t{border-top:1px solid var(--line);padding-top:10px;margin-top:4px;font-family:Unbounded;font-weight:700;font-size:17px}
