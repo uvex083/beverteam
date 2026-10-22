@@ -171,6 +171,8 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
         'BT_TRACK' => bt_delivery_next($dCode),
+        'BT_PICKUP_ADDR' => $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')),
+        'BT_PICKUP_HOURS' => $e($co['hours'] ?? ''),
         // для «Собираем заказ»: оплачен ли, и платят ли при получении
         'BT_PAID' => $order->isPaid() ? 'Y' : '',
         'BT_COD' => !$order->isPaid() && $pCode === 'cash' ? 'Y' : '',

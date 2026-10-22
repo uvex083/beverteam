@@ -160,9 +160,18 @@ $messages = [
         . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# формируется к отправке. #BT_TRACK#') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
+    // самовывоз: менеджер собрал заказ
+    'SALE_STATUS_CHANGED_R' => ['Заказ № #ORDER_ID# готов к выдаче', $sale[0], $sale[1], '',
+        m_head('Заказ готов к выдаче', 'Заказ № #ORDER_ID#')
+        . m_p('#BT_HELLO# Заказ № #ORDER_ID# собран и ждёт вас на складе.')
+        . $rows(['Адрес' => '#BT_PICKUP_ADDR#', 'Часы работы' => '#BT_PICKUP_HOURS#'])
+        . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('Оплата при получении — наличными или картой: <b style="white-space:nowrap">#BT_TOTAL#</b>.') . '<?endif?>'
+        . m_p('На складе назовите номер заказа. Если заберёт другой человек — сообщите менеджеру его имя.')
+        . $ifText('TEXT', m_p('#HTML_TEXT#'))
+        . '#BT_ORDER#' . $orderBtn],
     'SALE_STATUS_CHANGED_F' => ['Заказ № #ORDER_ID# выполнен', $sale[0], $sale[1], '',
         m_head('Заказ выполнен', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Заказ № #ORDER_ID# доставлен и оплачен. Спасибо, что выбрали BEVERTEAM!')
+        . m_p('#BT_HELLO# Заказ № #ORDER_ID# выполнен. Спасибо, что выбрали BEVERTEAM!')
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . m_p('Повторить заказ можно в личном кабинете.')
         . '#BT_ORDER#' . $orderBtn],

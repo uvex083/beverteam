@@ -39,16 +39,15 @@ foreach ($basket as $bi) {
 }
 $disc = $full - (float)$basket->getPrice();
 $num = $order->getField('ACCOUNT_NUMBER');
-$shipped = in_array($o['STATUS_ID'], ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped());
-
-// ход заказа: по счёту и онлайн сначала оплата, при получении — сначала доставка
+// ход заказа — одна шкала для всех способов, как у маркетплейсов: оплата не шаг, она в блоке «Оплата и документы».
+// Собираем — менеджер подтвердил или пришла оплата; у самовывоза третий шаг — статус «Готов к выдаче»
+$sid = (string)$o['STATUS_ID'];
+$pickup = $dCode === 'bt_pickup';
+$shipped = $pickup ? in_array($sid, ['R', 'F'], true) : (in_array($sid, ['DS', 'DT', 'DF', 'F'], true) || ($shipment && $shipment->isShipped()));
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
-    'pay' => ['Оплачен', $order->isPaid(), $order->isPaid() ? $date($order->getField('DATE_PAYED')) : ''],
-    'ship' => [$dCode === 'bt_pickup' ? 'Готов к выдаче' : 'Передан в доставку', $shipped, ''],
-    'done' => ['Выполнен', $o['STATUS_ID'] === 'F', $o['STATUS_ID'] === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
-if (!in_array($pCode, ['bill', 'tinkoff'], true)) {
-    $steps = ['acc' => $steps['acc'], 'ship' => $steps['ship'], 'pay' => $steps['pay'], 'done' => $steps['done']];
-}
+    'build' => ['Собираем', $shipped || $order->isPaid() || in_array($sid, ['C', 'P'], true), ''],
+    'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $pickup && $sid === 'R' ? $date($order->getField('DATE_STATUS')) : ''],
+    'done' => [$pickup ? 'Выдан' : 'Получен', $sid === 'F', $sid === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
 
 bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № ' . $e($num) . '</h1><span class="status ' . $cls . '">' . $e($st) . '</span></div>',
@@ -59,7 +58,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="alert alert--err"><span>Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
-  <div class="alert alert--info"><span><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $dCode === 'bt_pickup' ? 'выдачи' : 'отправки' ?> — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
+  <div class="alert alert--info"><span><?= $pickup && $sid === 'R' ? 'Заказ готов — забирайте: ' . $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) . ', ' . $e(mb_strtolower($co['hours'] ?? '')) . '.' : $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $dCode === 'bt_pickup' ? 'выдачи' : 'отправки' ?> — позвоните <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php endif ?>
 </div>
 
@@ -95,7 +94,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
-    <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
+    <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if (!$order->isPaid() && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Оплата при получении — наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
     <?php // онлайн-оплата: только ссылка на чек из уведомления банка, пока её нет — строку не показываем
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';

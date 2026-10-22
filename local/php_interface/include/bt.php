@@ -1715,7 +1715,7 @@ function bt_order_status(array $o): array
         return ['Отменён', 'st-cancel'];
     }
     $st = $o['STATUS_ID'];
-    $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
+    $cls = $st === 'F' ? 'st-done' : ($st === 'P' ? 'st-paid' : (in_array($st, ['R', 'DS', 'DT', 'DF'], true) ? 'st-ship' : 'st-new'));
     return [$names[$st] ?? $st, $cls];
 }
 
