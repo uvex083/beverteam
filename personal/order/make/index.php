@@ -568,10 +568,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   function goMissing(){
     if(!BT_validate(form)) return;
     const to=(el,msg)=>{el.scrollIntoView({behavior:'smooth',block:'center'}); if(msg) BT_toast(msg);};
-    if(!locIn.value){ setErr(cityIn,'Выберите город из списка'); to(cityIn); if(fineP) cityIn.focus({preventScroll:true}); }
+    // реквизиты сохранённой организации скрыты — неполные (нет ИНН) раскрываем и подсвечиваем
+    const orgBad=pt==='UR'&&(!val('company')?coCompany:!BT_innOk(dig('inn'))?coInn:null);
+    if(orgBad){ if(window.orgFields) orgFields.hidden=false; setErr(orgBad,orgBad===coInn?'Укажите ИНН: 10 цифр у компании, 12 у ИП':'Укажите название организации'); to(orgBad,'Заполните реквизиты организации'); if(fineP) orgBad.focus({preventScroll:true}); }
+    else if(!locIn.value){ setErr(cityIn,'Выберите город из списка'); to(cityIn); if(fineP) cityIn.focus({preventScroll:true}); }
     else if(!sel||!last||last.loc!==locIn.value) to(blkD,'Выберите способ доставки');
     else if(sel.tab==='pvz'&&!pvzIn.value) to(blkD,'Выберите пункт выдачи на карте');
     else if(!payId) to(blkP,'Выберите способ оплаты');
+    // на непредусмотренный случай кнопка не молчит: ведём к списку того, что осталось
+    else to(sLeft,sLeft.textContent);
   }
   form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||calcing) return;
     if(!ready()){ goMissing(); return; }
