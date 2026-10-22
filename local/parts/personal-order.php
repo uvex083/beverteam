@@ -51,10 +51,12 @@ $trackUrl = bt_track_url($dCode, $track);
 $shipped = in_array($stage, ['ship', 'done'], true);
 $waitBill = $stage === 'wait';
 // дата шага «Передан в доставку / Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
-$shipAt = $shipped ? \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED',
-    ['LOGIC' => 'OR', ['%DATA' => 's:9:"STATUS_ID";s:1:"R"'], ['%DATA' => 's:9:"STATUS_ID";s:1:"S"']]], 'select' => ['DATE_CREATE'], 'order' => ['ID' => 'ASC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null : null;
+$statusAt = fn(array $ids) => \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED',
+    array_merge(['LOGIC' => 'OR'], array_map(fn($s) => ['%DATA' => 's:9:"STATUS_ID";s:1:"' . $s . '"'], $ids))], 'select' => ['DATE_CREATE'], 'order' => ['ID' => 'ASC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null;
+$shipAt = $shipped ? $statusAt(['R', 'S']) : null;
+$buildAt = in_array($stage, ['build', 'ship', 'done'], true) ? ($statusAt(['C', 'P']) ?? ($order->isPaid() ? $order->getField('DATE_PAYED') : null)) : null;
 $steps = ['acc' => ['Принят', true, $date($order->getDateInsert())],
-    'build' => ['Собираем', in_array($stage, ['build', 'ship', 'done'], true), ''],
+    'build' => ['Собираем', in_array($stage, ['build', 'ship', 'done'], true), $buildAt ? $date($buildAt) : ''],
     'ship' => [$pickup ? 'Готов к выдаче' : 'Передан в доставку', $shipped, $shipAt ? $date($shipAt) : ''],
     'done' => [$pickup ? 'Выдан' : 'Получен', $sid === 'F', $sid === 'F' ? $date($order->getField('DATE_STATUS')) : '']];
 $lastDone = array_key_last(array_filter($steps, fn($s) => $s[1]));
@@ -67,13 +69,17 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <div class="alert alert--err"><span>Заказ отменён<?= $order->getField('REASON_CANCELED') ? ': ' . $e($order->getField('REASON_CANCELED')) : '' ?>. Вопросы — по телефону <a class="link" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>.</span></div>
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
-  <?php $tel = '<a class="link" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>' ?>
-  <div class="alert alert--info"><span><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
+  <?php $tel = '<a class="link" style="white-space:nowrap" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>';
+  // при получении и по счёту с отсрочкой: сколько и как платить, пока не оплачено
+  $due = $order->isPaid() ? '' : ($pCode === 'cash' ? ' Оплата при получении — <b style="white-space:nowrap">' . bt_fmt((float)$order->getPrice()) . '</b>, наличными или картой.' : ($pCode === 'bill' ? ' Счёт ещё не оплачен — он в блоке «Оплата и документы».' : '')) ?>
+  <div class="alert alert--info" style="flex-wrap:wrap;align-items:center"><span style="flex:1 1 260px"><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?> — спасибо, что выбрали BEVERTEAM! Вопросы по заказу — <?= $tel ?>.
+    <?php elseif ($toPay): ?>Заказ ещё не оплачен — оплатите его, и мы начнём собирать.
     <?php elseif ($waitBill): ?>Счёт выставлен — соберём заказ, как только придёт оплата. Вопросы по счёту — <?= $tel ?>.
-    <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>. Вопросы — <?= $tel ?>.
-    <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру — он позвонит перед приездом.' : 'Заказ передан в СДЭК — трек-номер появится здесь и придёт на e‑mail.' ?> Вопросы — <?= $tel ?>.
-    <?php elseif ($stage === 'ship'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>. Вопросы — <?= $tel ?>.
-    <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span></div>
+    <?php elseif ($stage === 'ship' && $track !== '' && !$pickup): ?>Заказ передан в доставку, трек-номер <?= $e($track) ?><?php if ($trackUrl): ?> — <a class="link" href="<?= $e($trackUrl) ?>" target="_blank" rel="noopener">отследить на сайте СДЭК</a><?php endif ?>.<?= $due ?> Вопросы — <?= $tel ?>.
+    <?php elseif ($stage === 'ship' && !$pickup): ?><?= $dCode === 'bt_courier' ? 'Заказ передан курьеру — он позвонит перед приездом.' : 'Заказ передан в СДЭК — трек-номер появится здесь и придёт на e‑mail.' ?><?= $due ?> Вопросы — <?= $tel ?>.
+    <?php elseif ($stage === 'ship'): ?>Заказ готов — забирайте: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>, <?= $e(mb_strtolower($co['hours'] ?? '')) ?>.<?= $due ?> Вопросы — <?= $tel ?>.
+    <?php else: ?><?= $e(bt_delivery_next($dCode)) ?> Изменить заказ можно до <?= $pickup ? 'выдачи' : 'отправки' ?> — позвоните <?= $tel ?>.<?php endif ?></span>
+    <?php if ($toPay): ?><a class="btn btn--sm" style="margin-left:auto;flex-shrink:0" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить заказ</a><?php endif ?></div>
   <?php endif ?>
 </div>
 
@@ -114,10 +120,10 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Статус</dt><dd><?php $paidOnGet = !$order->isPaid() && $pCode === 'cash' && $sid === 'F'; // при получении: деньги взяли при выдаче, отметку в заказе менеджер мог не поставить ?>
     <span class="pay<?= $order->isPaid() || $paidOnGet ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : ($paidOnGet ? 'Оплачен при получении' : 'Не оплачен') ?></span><?php if (!$order->isPaid() && !$paidOnGet && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
-    <?php // онлайн-оплата: только ссылка на чек из уведомления банка, пока её нет — строку не показываем
+    <?php // онлайн-оплата: ссылка на чек из уведомления банка; у отменённого заказа документов нет
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
-    if ($pCode !== 'tinkoff' || $check !== ''): ?>
-    <dt>Документы</dt><dd><?php if ($check !== ''): ?><a class="link" href="<?= $e($check) ?>" target="_blank" rel="noopener">Кассовый чек</a></dd>
+    if (!$order->isCanceled() && ($pCode !== 'tinkoff' || $order->isPaid())): ?>
+    <dt>Документы</dt><dd><?php if ($pCode === 'tinkoff'): ?><?= $check !== '' ? '<a class="link" href="' . $e($check) . '" target="_blank" rel="noopener">Кассовый чек</a>' : '<span class="dnote">Кассовый чек придёт на e‑mail и появится здесь</span>' ?></dd>
     <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="odoc" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?><span class="link">Счёт № <?= $e($num) ?>, PDF</span></a>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?><span class="dnote">Счёт появится здесь и придёт на e‑mail, когда менеджер подтвердит заказ</span>
       <?php else: ?><span class="dnote"><?= $pCode === 'bill' ? 'Счёт и УПД пришлёт менеджер' : 'Чек — при получении, УПД — по запросу' ?></span><?php endif ?>
@@ -127,7 +133,6 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 </div>
 
 <div class="row" style="margin-top:20px;gap:10px">
-  <?php if ($toPay): ?><a class="btn" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить заказ</a><?php endif ?>
   <a class="btn btn--ghost" href="/kontakty/#form" data-lead="Вопрос по заказу № <?= $e($num) ?>">Вопрос по заказу</a>
   <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>">Отменить заказ</a><?php endif ?>
 </div>

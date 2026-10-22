@@ -53,7 +53,7 @@ if (!$orders): ?>
 <?php else: ?>
   <?php if ($repeat): ?>
   <div class="reorder">
-    <div><span class="mono" style="color:var(--lime)">Последний заказ · <?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?></span>
+    <div><span class="mono" style="color:var(--lime)">Прошлый заказ · <?= $e(FormatDate('j F', $repeat['DATE_INSERT']->getTimestamp())) ?></span>
       <h2>Повторить заказ № <?= $e($repeat['ACCOUNT_NUMBER']) ?></h2>
       <p>Положим тот же состав в корзину. Доставку и оплату выберете при оформлении.</p>
       <div class="it"><?php foreach (array_slice($items[$repeat['ID']], 0, 6) as $b): ?><span><?= $e($b['NAME']) ?> · <?= (float)$b['QUANTITY'] ?> <?= $e($b['MEASURE_NAME'] ?: 'шт') ?></span><?php endforeach ?></div></div>

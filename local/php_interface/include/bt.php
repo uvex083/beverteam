@@ -1736,8 +1736,10 @@ function bt_order_status(array $o): array
     };
 }
 
-// sale:OnSaleOrderBeforeSaved. Оплата переводит в «Оплачен, формируется к отправке» только ещё не отправленный заказ (вместо штатной
-// настройки sale.status_on_paid, которая откатила бы «Передан в доставку» / «Готов к выдаче» назад). Трек-номер СДЭК — «Передан в доставку»
+// sale:OnSaleOrderBeforeSaved — статус заказа в админке всегда совпадает с тем, что видит покупатель:
+// оплата переводит в «Оплачен, формируется к отправке» только неотправленный заказ (штатный sale.status_on_paid откатил бы отправленный назад);
+// трек-номер СДЭК, статус отгрузки «Передан в службу доставки» / «Отгружен» или галочка «Отгружено» — «Передан в доставку»;
+// «Готов к выдаче» бывает только у самовывоза, «Передан в доставку» — только у доставки: перепутанный статус исправляем
 function bt_order_ship_guard(\Bitrix\Main\Event $e): void
 {
     $order = $e->getParameter('ENTITY');
@@ -1748,16 +1750,21 @@ function bt_order_ship_guard(\Bitrix\Main\Event $e): void
     if (($order->getFields()->getOriginalValues()['PAYED'] ?? '') === 'N' && $order->isPaid() && in_array($st, ['N', 'C'], true)) {
         $order->setField('STATUS_ID', $st = 'P');
     }
-    if (!in_array($st, ['N', 'C', 'P'], true)) {
-        return;
-    }
+    $pickup = $sent = false;
     foreach ($order->getShipmentCollection() as $s) {
-        $code = $s->isSystem() ? '' : (string)(\Bitrix\Sale\Delivery\Services\Table::getById($s->getDeliveryId())->fetch()['XML_ID'] ?? '');
-        if (str_starts_with($code, 'sdek_') && trim((string)$s->getField('TRACKING_NUMBER')) !== '') {
-            $order->setField('STATUS_ID', 'S');
-            return;
+        if ($s->isSystem()) {
+            continue;
         }
+        $pickup = (\Bitrix\Sale\Delivery\Services\Table::getById($s->getDeliveryId())->fetch()['XML_ID'] ?? '') === 'bt_pickup';
+        $sent = trim((string)$s->getField('TRACKING_NUMBER')) !== '' || $s->getField('DEDUCTED') === 'Y' || in_array($s->getField('STATUS_ID'), ['DS', 'DF'], true);
     }
+    $to = match (true) {
+        $st === 'R' && !$pickup => 'S',
+        $st === 'S' && $pickup => 'R',
+        in_array($st, ['N', 'C', 'P'], true) && $sent && !$pickup => 'S',
+        default => $st,
+    };
+    $to !== $st && $order->setField('STATUS_ID', $to);
 }
 
 // Доставка заказов для кабинета: [ID => [DCODE, PICKUP, TRACK, SHIPPED]]. Отправлен — отметка «Отгружен» или статус отгрузки в админке, у СДЭК — трек-номер
@@ -1775,7 +1782,7 @@ function bt_order_ship_info(array $ids): array
         $code = (string)($codes[$s['DELIVERY_ID']] ?? '');
         $track = trim((string)$s['TRACKING_NUMBER']);
         $out[(int)$s['ORDER_ID']] = ['DCODE' => $code, 'PICKUP' => $code === 'bt_pickup', 'TRACK' => $track,
-            'SHIPPED' => $s['DEDUCTED'] === 'Y' || in_array($s['STATUS_ID'], ['DS', 'DF'], true) || ($track !== '' && $code !== 'bt_pickup')];
+            'SHIPPED' => $code !== 'bt_pickup' && ($s['DEDUCTED'] === 'Y' || in_array($s['STATUS_ID'], ['DS', 'DF'], true) || $track !== '')];
     }
     return $out;
 }

@@ -115,6 +115,7 @@ $messages = [
     'SALE_NEW_ORDER' => ['Заказ № #ORDER_ID# принят', $sale[0], $sale[1], '#BCC#',
         m_head('Заказ принят', 'Заказ № #ORDER_ID# · #BT_DATE#')
         . m_p('#BT_HELLO# Спасибо за заказ — ниже его состав и детали.')
+        . $ifText('BT_PAY_URL', m_btn('#BT_PAY_URL#', 'Оплатить заказ'))
         . '#BT_ORDER#' . m_h2('Что дальше') . '#BT_NEXT#' . $orderBtn],
     'SALE_ORDER_PAID' => ['Заказ № #ORDER_ID# оплачен', $sale[0], $sale[1], '#BCC#',
         m_head('Оплата получена', 'Заказ № #ORDER_ID#')
@@ -139,7 +140,7 @@ $messages = [
         m_head('Заказ в пути', 'Заказ № #ORDER_ID#')
         . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан в доставку. Отследить его можно на сайте службы доставки по трек-номеру:')
         . m_code('#ORDER_TRACKING_NUMBER#', 'Трек-номер')
-        . $ifText('BT_TRACK_URL', m_btn('#BT_TRACK_URL#', 'Отследить посылку'))
+        . $ifText('BT_TRACK_URL', m_btn('#BT_TRACK_URL#', 'Отследить посылку') . '<div style="height:18px;line-height:18px;font-size:1px">&nbsp;</div>')
         . '#BT_ORDER#' . $orderBtn],
     'SALE_ORDER_SHIPMENT_STATUS_CHANGED' => ['Заказ № #ORDER_NO#: #STATUS_NAME#', $sale[0], $sale[1], '#BCC#',
         m_head('#HTML_STATUS_NAME#', 'Заказ № #ORDER_NO#')
@@ -168,6 +169,7 @@ $messages = [
         . '<?if ($arParams["BT_DCODE"] === "bt_courier"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан курьеру — он позвонит перед приездом.')
         . '<?else:?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан в СДЭК. Трек-номер для отслеживания пришлём отдельным письмом, как только СДЭК его присвоит.') . '<?endif?>'
         . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('Оплата при получении — наличными или картой: <b style="white-space:nowrap">#BT_TOTAL#</b>.') . '<?endif?>'
+        . '<?if ($arParams["BT_BILL_DUE"] === "Y"):?>' . m_p('Счёт на <b style="white-space:nowrap">#BT_TOTAL#</b> ещё не оплачен — он в личном кабинете, в разделе «Счета и документы».') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
     // самовывоз: менеджер собрал заказ
