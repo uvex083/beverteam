@@ -116,7 +116,7 @@ $co = bt_contacts();
         </div>
         <div class="f2" style="margin-top:18px">
           <div class="field"><label for="coName" id="coNameL">Имя *</label><input id="coName" name="name" autocomplete="name" value="<?= $e($u['name']) ?>"></div>
-          <div class="field"><label for="coPhone">Телефон *</label><input id="coPhone" name="phone" type="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__" value="<?= $e($u['phone'] ? bt_phone_fmt($u['phone']) : '') ?>"></div>
+          <div class="field"><label for="coPhone">Телефон *</label><input id="coPhone" name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" value="<?= $e($u['phone'] ? bt_phone_fmt($u['phone']) : '') ?>"></div>
           <?php if ($USER->IsAuthorized()): ?><div class="field" style="grid-column:1/-1"><label for="coEmail">E‑mail *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Сюда придёт подтверждение заказа" value="<?= $e($u['email']) ?>"></div><?php endif ?>
         </div>
       </div>
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   let pvzCur=<?= Json::encode(($ship['pvz'] ?? '') !== '' && ($ship['pvza'] ?? '') !== '' ? ['c' => $ship['pvz'], 'a' => $ship['pvza'], 'loc' => $ship['loc'] ?? ''] : null) ?>;
   if(pvzCur&&pvzCur.loc===locIn.value) pvzIn.value=pvzCur.c; else pvzCur=null;
   const pvzCache={}; let pvzAll=[], pvzLoc='', pvzMap=null, pvzOm=null, pvzOpenId=-1;
-  const pvzPick=()=>pvzCur?`<span class="pvzpick"><span class="pvzpick__a">${esc(pvzCur.a)}</span><button type="button" class="btn btn--dark btn--sm" data-pvz>Изменить</button></span>`
+  const pvzPick=()=>pvzCur?`<span class="pvzpick"><span class="pvzpick__a">${esc(pvzCur.a)}</span><button type="button" class="btn btn--dark btn--sm" data-pvz aria-label="Изменить пункт выдачи">Изменить</button></span>`
     :`<span class="pvzpick"><button type="button" class="btn btn--sm" data-pvz>Выбрать пункт на карте</button></span>`;
   const PIN={...BT_mapPin(false),zIndex:0}, PIN_ON={...BT_mapPin(true),zIndex:1000}, ymapsLoad=BT_ymaps;
   const plural=(n,f)=>f[n%10===1&&n%100!==11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2];
@@ -335,10 +335,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;
     backF();
   }
+  // «Товары» и «Скидка» — как в корзине: по обычной цене, скидка ступеней и старой цены отдельной строкой
+  function subRows(base){ const full=Math.max(base,BT_cartItems().reduce((a,c)=>a+(c.old||c.p)*c.q,0)), itd=Math.round((full-base)*100)/100;
+    sSub.textContent=fmt(full); sItDiscRow.hidden=!(itd>0); sItDisc.textContent='−'+fmt(itd); }
   function renderSum(r){ if(!r) return;
-    // «Товары» и «Скидка» — как в корзине: по обычной цене, скидка ступеней и старой цены отдельной строкой
-    const base=r.base??r.sum, full=Math.max(base,BT_cartItems().reduce((a,c)=>a+(c.old||c.p)*c.q,0)), itd=Math.round((full-base)*100)/100;
-    sSub.textContent=fmt(full); sItDiscRow.hidden=!(itd>0); sItDisc.textContent='−'+fmt(itd);
+    subRows(r.base??r.sum);
     sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
     const cdekUnknown=sel&&isCdek(sel.d)&&!(r.deliveryPrice>0);
     sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':(sel.d.from?'от ':'')+fmt(r.deliveryPrice);
@@ -361,7 +362,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       dim(); return; }
     busyT=setTimeout(()=>{ cop.classList.add('is-calc'); dim();
       calcSt_.innerHTML='Считаем'+(cityIn.value.trim()?'<span class="calcst__c"> для города '+esc(cityIn.value.trim())+'</span>':'')+'…';
-      sDel.textContent=sTot.textContent='считаем…'; sEta.innerHTML='&nbsp;'; coItemsH.textContent=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']); if(!dl.length){renderDeliv();renderPay();} ready(); },250);
+      sDel.textContent=sTot.textContent='считаем…'; sEta.innerHTML='&nbsp;'; if(!last||last.loc!==locIn.value) coItemsH.textContent=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']); if(!dl.length){renderDeliv();renderPay();} ready(); },250);
   }
   const calcSt_=document.getElementById('calcSt');
   // расчёт не удался: варианты прежнего города остаются приглушёнными, если город уже другой
@@ -429,7 +430,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pickLi=ul=>ul.classList.contains('open')&&(ul.querySelector('li.act')||ul.querySelector('li'));
   navList(cityIn,cityList);
   let cityT=0, cityN=0;
-  cityIn.addEventListener('input',()=>{locIn.value='';calcN++;busy(false);cop.classList.toggle('is-stale',dl.length>0);dim();sDel.textContent='—';if(last)sTot.textContent=fmt(last.sum);ready();
+  cityIn.addEventListener('input',()=>{locIn.value='';calcN++;busy(false);cop.classList.toggle('is-stale',dl.length>0);dim();sDel.textContent='—';sEta.innerHTML='&nbsp;';coItemsH.textContent=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']);if(last)sTot.textContent=fmt(last.sum);ready();
     const v=cityIn.value.trim(); clearTimeout(cityT);
     if(v.length<2){showCities(POP.filter(c=>c.n.toLowerCase().startsWith(v.toLowerCase())));return;}
     const n=++cityN; cityT=setTimeout(()=>post({action:'city',q:v}).then(r=>{if(n===cityN&&document.activeElement===cityIn)showCities(r.list||[]);}),200);});
@@ -561,6 +562,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       ready();
     }).catch(()=>{sending=false;submit.textContent=btnText();sErr.textContent='Нет связи с сервером — попробуйте ещё раз';ready();});
   });
+  subRows(<?= (float)$basket->getPrice() ?>);
   calcing=!!locIn.value; renderDeliv(); renderPay(); ready(); calc();
 });
 </script>

@@ -379,6 +379,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 @media(hover:hover){.radio-card:hover{border-color:#B9B9AF}}
 .radio-card input{margin-top:3px;accent-color:var(--ink);width:17px;height:17px;flex-shrink:0}
 .radio-card.on{border-color:var(--ink);background:var(--white);box-shadow:inset 0 0 0 1px var(--ink)}
+.radio-card:has(input:focus-visible){box-shadow:0 0 0 3px rgba(215,232,92,.7)}.radio-card.on:has(input:focus-visible){box-shadow:inset 0 0 0 1px var(--ink),0 0 0 3px rgba(215,232,92,.7)}
 .orgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:18px}
 .radio-card.off{opacity:.45;pointer-events:none}
 .radio-card .t{font-weight:700;display:flex;justify-content:space-between;gap:10px}
@@ -1556,7 +1557,7 @@ input,textarea{caret-color:var(--ink)}
 .field.city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:#55554E;transition:color .15s}
 @media(hover:hover){.field.city li:hover{color:var(--ink)}}
 .field.city li small{color:var(--gray);margin-left:6px}
-.field.city li.act{background:var(--paper);color:var(--ink)}
+.field.city li.act{background:var(--lime-soft);color:var(--ink)}
 .field.city input{padding-right:46px}
 .fclr{position:absolute;right:4px;top:0;width:40px;height:40px;display:grid;place-items:center;padding:0;border-radius:50%;color:var(--gray);background:none;border:0}
 .fclr[hidden]{display:none}
