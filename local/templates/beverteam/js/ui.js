@@ -2064,17 +2064,18 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // мобильная панель «сумма + кнопка» внизу экрана, пока основная кнопка не видна
-window.BT_mbar=(btn,sumEl,onTap)=>{
+window.BT_mbar=(btn,sumEl,onTap,note)=>{
   if(!btn||!('IntersectionObserver' in window))return;
   const bar=document.createElement('div');bar.className='mbar';bar.hidden=true;
-  bar.innerHTML=`<button type="button" class="btn"><span></span><b></b></button>`;
+  bar.innerHTML=`<button type="button" class="btn"><span></span><b></b></button>`+(note?`<p class="mbar__note">${note}</p>`:'');
   document.body.appendChild(bar);
   const b=bar.querySelector('button'),s=bar.querySelector('b'),t=bar.querySelector('span');
   const sync=()=>{s.textContent=sumEl.textContent;t.textContent=btn.textContent;b.classList.toggle('is-off',!!btn.disabled);};
   new MutationObserver(sync).observe(sumEl,{childList:true,characterData:true,subtree:true});
   new MutationObserver(sync).observe(btn,{childList:true,attributes:true,attributeFilter:['disabled']});
   b.addEventListener('click',()=>onTap?onTap():btn.click());
-  let seen=true;const show=()=>{const on=!seen&&btn.offsetParent!==null;bar.hidden=!on;document.body.classList.toggle('has-mbar',on);};
+  let seen=true;const show=()=>{const on=!seen&&btn.offsetParent!==null;bar.hidden=!on;document.body.classList.toggle('has-mbar',on);
+    if(on)document.body.style.setProperty('--mbar-h',bar.offsetHeight+'px');};
   new IntersectionObserver(es=>{seen=es[0].isIntersecting;show();}).observe(btn);
   new MutationObserver(show).observe(btn.parentNode,{attributes:true,attributeFilter:['hidden']});
   sync();

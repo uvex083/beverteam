@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pack=c=>{const p=BT_perKg(c,c.kg,c.q),b=(c.old||c.p)/c.kg;
     return `Пачки по 1 кг · ${b>p?`<del>${fmt(b)}</del> `:''}<b>${fmt(p)}</b> за кг`;};
   const totals=()=>{const cart=BT_cartItems(),t=BT_cartTotal(),full=cart.reduce((a,c)=>a+(c.old||c.p)*c.q,0);
-    cnt.textContent=cart.length+' '+plural(cart.length,['позиция','позиции','позиций']);
+    cnt.textContent=t.n+' шт.';
     const sd=BT_sumDisc(t.sum), hint=BT_sumDiscHint(t.sum);
     sub.textContent=fmt(full); discRow.hidden=!(full>t.sum); disc.textContent='−'+fmt(full-t.sum); tot.textContent=fmt(t.sum-sd.cut);
     sdRow.hidden=!sd.cut; sdName.textContent=`Скидка ${sd.pct}% от суммы заказа`; sdCut.textContent='−'+fmt(sd.cut);

@@ -352,7 +352,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 /* forms */
 .field{display:grid;gap:7px;margin-bottom:16px;position:relative;padding-bottom:20px;align-content:start}
 .field--flat{padding-bottom:0}
-.field label{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)}
+.field label{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
 .field input,.field select,.field textarea{width:100%;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:12px 14px;font-size:15px}
 /* место под сообщение зарезервировано, сам текст абсолютом — ничего не прыгает */
 .field .err{position:absolute;left:0;right:0;top:100%;margin-top:-18px;color:var(--err);font-size:12.5px;
@@ -1556,6 +1556,11 @@ input,textarea{caret-color:var(--ink)}
 .field.city li{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:#55554E;transition:color .15s}
 @media(hover:hover){.field.city li:hover{color:var(--ink)}}
 .field.city li small{color:var(--gray);margin-left:6px}
+.field.city li.act{background:var(--paper);color:var(--ink)}
+.field.city input{padding-right:46px}
+.fclr{position:absolute;right:4px;bottom:23px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;font-size:22px;line-height:1;color:var(--gray);background:none;border:0}
+.fclr[hidden]{display:none}
+@media(hover:hover){.fclr:hover{color:var(--ink)}}
 .cop .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
 .cop .sum .it{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .cop .sum .it img{width:44px;height:44px;object-fit:contain;background:var(--paper);border-radius:8px;padding:4px;mix-blend-mode:multiply}
@@ -2309,8 +2314,11 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   .mbar .btn{flex:1;justify-content:space-between;gap:12px;padding-left:24px;padding-right:24px}.mbar .btn.is-off{opacity:.5}
   .mbar .btn b{font-family:Unbounded;font-weight:800;white-space:nowrap}
   .mbar .btn:has(b:empty){justify-content:center}.mbar .btn b:empty{display:none}
-  body.has-mbar{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-  body.has-mbar .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+  .mbar:not([hidden]):has(.mbar__note){flex-wrap:wrap;row-gap:8px}
+  .mbar__note{flex-basis:100%;margin:0;font-size:11px;line-height:1.4;color:var(--gray);text-align:center}
+  .mbar__note a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--lime-d);text-underline-offset:2px}
+  body.has-mbar{padding-bottom:var(--mbar-h,calc(76px + env(safe-area-inset-bottom)))}
+  body.has-mbar .toast{bottom:calc(var(--mbar-h,76px) + 8px)}
 }
 @keyframes mbarIn{from{transform:translateY(100%)}}
 /* короткий футер на оформлении заказа: контакты и условия, без меню */

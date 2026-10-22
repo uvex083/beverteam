@@ -125,6 +125,7 @@ $co = bt_contacts();
         <h2><b>2</b>Город доставки</h2>
         <div class="field city"><label for="cityIn">Населённый пункт *</label>
           <input id="cityIn" name="city" value="<?= $e($popular[0]['n'] ?? '') ?>" autocomplete="new-password" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-controls="cityList" aria-expanded="false">
+          <button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden>×</button>
           <input type="hidden" name="loc" id="locIn" value="<?= $e($popular[0]['code'] ?? '') ?>">
           <ul id="cityList" role="listbox" tabindex="-1"></ul>
         </div>
@@ -136,20 +137,20 @@ $co = bt_contacts();
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button></div>
         <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна — сбой на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
         <div class="opts" id="deliv"></div>
+        <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
         <div id="addr" hidden style="margin-top:18px">
-          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><ul id="streetList" role="listbox" tabindex="-1"></ul></div>
+          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden>×</button><ul id="streetList" role="listbox" tabindex="-1"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <input type="hidden" name="pvz" id="pvzIn" value="">
         <div class="coitems">
-          <div class="coitems__h"><span><?= $nItems ?> <?= ($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров') ?></span><a class="link" href="/personal/cart/">Изменить</a></div>
+          <div class="coitems__h"><span id="coItemsH"><?= $nItems ?> <?= ($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров') ?></span><a class="link" href="/personal/cart/">Изменить в корзине</a></div>
           <ul class="coitems__l"><?php foreach ($basket as $bi):
               $m = bt_product((string)$bi->getProductId()); $pk = bt_basket_pack($bi); $q = $pk ? (int)round($bi->getQuantity() / $pk) : (int)$bi->getQuantity();
               $tip = $bi->getField('NAME') . ' — ' . bt_basket_qty($bi) . ', ' . bt_fmt($bi->getFinalPrice()); ?>
             <li title="<?= $e($tip) ?>"><?php if (!empty($m['img'])): ?><img src="<?= $e($m['img']) ?>" alt="<?= $e($tip) ?>" loading="lazy" width="64" height="64"><?php else: ?><span class="coitems__n"><?= $e($bi->getField('NAME')) ?></span><?php endif ?><?php if ($q > 1): ?><b>×<?= $q ?></b><?php endif ?></li>
           <?php endforeach ?></ul>
         </div>
-        <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
       </div>
 
       <div class="blk" id="blkP">
@@ -165,6 +166,7 @@ $co = bt_contacts();
 
     <aside class="sum">
       <div class="l"><span>Товары, <?= $nItems ?> шт.</span><span id="sSub"><?= bt_fmt($basket->getPrice()) ?></span></div>
+      <div class="l" id="sItDiscRow" hidden><span>Скидка</span><span id="sItDisc" style="color:var(--ok)"></span></div>
       <div class="l" id="sDiscRow" hidden><span>Скидка от суммы заказа</span><span id="sDisc" style="color:var(--ok)"></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
@@ -202,6 +204,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const post=(data)=>{const fd=new FormData();Object.entries(data).forEach(([k,v])=>fd.append(k,v));fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/order.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json());};
+  const N_ITEMS=<?= $nItems ?>;
   let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'addr') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, wantPay=<?= (int)($ship['pay'] ?? 0) ?>, payId=0, calcN=0, sending=false;
 
   /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
@@ -213,7 +216,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(o.d.code==='bt_courier') return (x.relDeliver?x.relDeliver+', ':'')+BT_fmtDate(x.deliver,true);
     return '';};
   const priceOf=o=>o.d.price>0?(o.d.from?'от ':'')+fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';
+  // фокус в доставке или оплате: перерисовка и приглушение на время расчёта не должны выбрасывать его на body
+  let reF=null;
+  const keepF=()=>{const a=document.activeElement, c=[deliv,pay,dTabs].find(x=>x.contains(a)); if(c) reF={c,a};};
+  const backF=()=>{if(!reF||deliv.inert)return; const {c,a}=reF; reF=null;
+    if(document.activeElement&&document.activeElement!==document.body)return;
+    (a.isConnected?a:c.querySelector('input:checked,[aria-selected="true"]'))?.focus({preventScroll:true});};
   function renderDeliv(){
+    keepF();
     const all=opts();
     let nOn=0;
     [...dTabs.children].forEach(b=>{const on=all.some(o=>o.tab===b.dataset.tab); nOn+=on;
@@ -226,8 +236,12 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте — точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
+    const nw=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']), dd=sel?dateOf(sel):'';
+    coItemsH.textContent=!sel?nw:sel.tab==='pickup'?(dd?'Заберёте '+dd.replace(/^готов /,''):'Самовывоз')+' · '+nw
+      :sel.d.code==='bt_courier'&&dd?'Доставим '+dd+' · '+nw:sel.d.period?'Доставка '+sel.d.period+' · '+nw:nw;
     // ушли на другую вкладку — ошибка адреса, поставленная на уходе с поля, не должна ждать возвращения
     if(addr.hidden) addr.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,''));
+    backF();
   }
 
   /* пункты выдачи СДЭК: карточка доставки показывает выбранный пункт, выбор — в окне с картой.
@@ -285,6 +299,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       ${p.img&&p.img.length?`<div class="pvzm__img">${p.img.slice(0,4).map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join('')}</div>`:''}
       <button type="button" class="btn btn--block pvzm__take" data-take="${i}">Заберу здесь</button>`;
     pvzListV.hidden=true; pvzCard.hidden=false; pvzCard.scrollTop=0;
+    if(fineP&&pvzModal.contains(document.activeElement)) pvzCard.querySelector('[data-take]').focus({preventScroll:true});
   }
   function takePvz(i){ const p=pvzAll[i]; if(!p) return;
     pvzCur={c:p.c,a:p.a,loc:pvzLoc}; pvzIn.value=p.c; pvzModal.classList.remove('open'); renderDeliv(); ready(); }
@@ -294,6 +309,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   pvzCard.addEventListener('click',e=>{ if(e.target.closest('[data-back]')){pvzCard.hidden=true;pvzListV.hidden=false;renderPvzList();return;}
     const t=e.target.closest('[data-take]'); if(t) takePvz(+t.dataset.take); });
   pvzModal.addEventListener('click',e=>{if(e.target.closest('[data-close]'))pvzModal.classList.remove('open');});
+  // с клавиатуры и мышью: на телефоне фокус в поле поиска выдвинул бы клавиатуру поверх карты
+  const fineP=matchMedia('(pointer:fine)').matches;
+  new MutationObserver(()=>{ const o=pvzModal.classList.contains('open');
+    if(o&&fineP) setTimeout(()=>(pvzListV.hidden?pvzCard.querySelector('button'):pvzQ).focus({preventScroll:true}),50);
+    if(!o&&(pvzModal.contains(document.activeElement)||document.activeElement===document.body)) deliv.querySelector('[data-pvz]')?.focus({preventScroll:true});
+  }).observe(pvzModal,{attributes:true,attributeFilter:['class']});
+  pvzModal.addEventListener('keydown',e=>{ if(e.key!=='Tab')return;
+    const f=[...pvzModal.querySelectorAll('button,input,[tabindex="0"]')].filter(x=>!x.closest('[hidden]')&&x.offsetParent!==null);
+    if(!f.length)return; const i=f.indexOf(document.activeElement);
+    if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();} else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();} });
   /* кнопка в карточке или клик по карточке, пока пункт не выбран, — открывают окно */
   deliv.addEventListener('click',e=>{const card=e.target.closest('.radio-card'); const r=card&&card.querySelector('input[value="sdek_pickup"]'); if(!r) return;
     const btn=e.target.closest('[data-pvz]'); if(btn) e.preventDefault();
@@ -302,14 +327,19 @@ document.addEventListener('DOMContentLoaded',()=>{
     openPvz();});
   const pvzMapBox=document.getElementById('pvzMap');
   function renderPay(){
+    keepF();
     const list=PAYS.filter(p=>avail.some(a=>a.id===p.id));
     pay.innerHTML=list.length?list.map(p=>{const desc=p.code==='cash'&&sel&&isCdek(sel.d)?'Наложенным платежом при получении в СДЭК':p.desc;
       return `<label class="radio-card ${payId===p.id?'on':''}"><input type="radio" name="pay" value="${p.id}" ${payId===p.id?'checked':''}>
         <div><div class="t">${esc(p.name)}</div><div class="d">${esc(desc)}</div>${p.logo||''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div><div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${locIn.value?'Сначала выберите способ доставки.':'Выберите город из списка, чтобы увидеть способы оплаты.'}</p>`;
+    backF();
   }
   function renderSum(r){ if(!r) return;
-    sSub.textContent=fmt(r.base??r.sum); sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
+    // «Товары» и «Скидка» — как в корзине: по обычной цене, скидка ступеней и старой цены отдельной строкой
+    const base=r.base??r.sum, full=Math.max(base,BT_cartItems().reduce((a,c)=>a+(c.old||c.p)*c.q,0)), itd=Math.round((full-base)*100)/100;
+    sSub.textContent=fmt(full); sItDiscRow.hidden=!(itd>0); sItDisc.textContent='−'+fmt(itd);
+    sDiscRow.hidden=!(r.disc>0); sDisc.textContent='−'+fmt(r.disc||0);
     const cdekUnknown=sel&&isCdek(sel.d)&&!(r.deliveryPrice>0);
     sDel.textContent=!sel?'—':cdekUnknown?'сообщит менеджер':r.deliveryPrice===0?'бесплатно':(sel.d.from?'от ':'')+fmt(r.deliveryPrice);
     sTot.textContent=fmt(r.total); sTotNote.hidden=!cdekUnknown;
@@ -323,7 +353,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function calcShown(){ return document.querySelector('.cop').classList.contains('is-calc'); }
   function waiting(){ return calcShown()||(!!locIn.value&&!last&&calcing); }
   // приглушённые варианты недоступны ни мышью, ни с клавиатуры
-  function dim(){ const off=cop.classList.contains('is-calc')||cop.classList.contains('is-stale'); [deliv,pay,dTabs].forEach(x=>x.inert=off); }
+  function dim(){ const off=cop.classList.contains('is-calc')||cop.classList.contains('is-stale'); if(off)keepF(); [deliv,pay,dTabs].forEach(x=>x.inert=off); if(!off)backF(); }
   function busy(on){
     clearTimeout(busyT); calcing=on;
     if(!on){ cop.classList.remove('is-calc'); calcSt_.textContent='';
@@ -390,7 +420,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* город: популярные из макета + поиск по местоположениям Битрикса */
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;
-  const showCities=list=>{cityList.innerHTML=list.map(cityRow).join('');const o=list.length>0;cityList.classList.toggle('open',o);cityIn.setAttribute('aria-expanded',o);};
+  const showCities=list=>{cityList.innerHTML=list.map(cityRow).join('');const o=list.length>0;cityList.classList.toggle('open',o);cityIn.setAttribute('aria-expanded',o);cityIn.removeAttribute('aria-activedescendant');};
+  // ↑/↓ двигают подсветку по подсказкам, Enter берёт подсвеченную (без подсветки — первую)
+  const navList=(inp,ul)=>inp.addEventListener('keydown',e=>{ if(!ul.classList.contains('open')||(e.key!=='ArrowDown'&&e.key!=='ArrowUp'))return; e.preventDefault();
+    const li=[...ul.querySelectorAll('li')], i=li.findIndex(x=>x.classList.contains('act')), j=e.key==='ArrowDown'?Math.min(i+1,li.length-1):Math.max(i-1,0);
+    li.forEach((x,k)=>{x.id=x.id||ul.id+'-'+k; x.classList.toggle('act',k===j); x.setAttribute('aria-selected',k===j);});
+    inp.setAttribute('aria-activedescendant',li[j].id); li[j].scrollIntoView({block:'nearest'}); });
+  const pickLi=ul=>ul.classList.contains('open')&&(ul.querySelector('li.act')||ul.querySelector('li'));
+  navList(cityIn,cityList);
   let cityT=0, cityN=0;
   cityIn.addEventListener('input',()=>{locIn.value='';calcN++;busy(false);cop.classList.toggle('is-stale',dl.length>0);dim();sDel.textContent='—';if(last)sTot.textContent=fmt(last.sum);ready();
     const v=cityIn.value.trim(); clearTimeout(cityT);
@@ -400,7 +437,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   cityList.addEventListener('mousedown',e=>e.preventDefault());
   // сменили город — улица, дом и квартира прежнего города не подходят: сохранённый адрес этого города или пустые поля
   let curLoc=locIn.value;
-  const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');
+  const pickCity=c=>{cityIn.value=c.n;locIn.value=c.code;showCities([]);setErr(cityIn,'');setTimeout(syncClr);
     let msg='';
     if(c.code!==curLoc){
       const a=(BT_CO_DATA.addrs||[]).find(x=>x.loc?x.loc===c.code:x.city===c.n), st=document.getElementById('coStreet'),
@@ -419,13 +456,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       const m=(r.list||[]).filter(c=>letters(c.n).startsWith(letters(v))), c=m.find(c=>letters(c.n)===letters(v))||(m.length===1?m[0]:null);
       c?pickCity(c):setErr(cityIn,'Выберите город из списка');});};
   cityIn.addEventListener('blur',()=>{showCities([]);autoCity();});
-  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(locIn.value){showCities([]);return;}const li=cityList.classList.contains('open')&&cityList.querySelector('li');li?li.click():autoCity();}
+  cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(locIn.value){showCities([]);return;}const li=pickLi(cityList);li?li.click():autoCity();}
     if(e.key==='Escape')showCities([]);});
 
   /* улица и дом: подсказки DaData в пределах выбранного города; без дома — дописываем номер дальше */
   const stIn=document.getElementById('coStreet'), stList=document.getElementById('streetList');
   const showStreets=list=>{stList.innerHTML=list.map(s=>`<li role="option" data-v="${esc(s.v)}" data-h="${s.house?1:0}">${esc(s.v)}${s.r?`<small>${esc(s.r)}</small>`:''}</li>`).join('');
-    const o=list.length>0;stList.classList.toggle('open',o);stIn.setAttribute('aria-expanded',o);};
+    const o=list.length>0;stList.classList.toggle('open',o);stIn.setAttribute('aria-expanded',o);stIn.removeAttribute('aria-activedescendant');};
+  navList(stIn,stList);
   let stT=0, stN=0, stCalcT=0;
   /* адрес с домом изменился — пересчитать цену курьера (она зависит от расстояния) */
   const reStreet=()=>{const v=stIn.value.trim();if(v!==calcSt&&/\d/.test(v))calc();};
@@ -434,7 +472,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const n=++stN; stT=setTimeout(()=>post({action:'street',q:v,city:locIn.value?cityIn.value.trim():''}).then(r=>{if(n===stN&&document.activeElement===stIn)showStreets(r.list||[]);}),250);});
   stList.addEventListener('mousedown',e=>e.preventDefault());
   stList.addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;
-    stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);setErr(stIn,'');stIn.focus();ready();reStreet();
+    stIn.value=li.dataset.v+(li.dataset.h==='1'?'':', д ');showStreets([]);syncClr();setErr(stIn,'');stIn.focus();ready();reStreet();
     if(li.dataset.h!=='1') stIn.dispatchEvent(new Event('input'));});
   // ввели руками и ушли — улицу берём из справочника, дом оставляем свой, если справочник его не знает
   const autoStreet=()=>{const v=stIn.value.trim();if(v.length<2)return;const n=++stN;clearTimeout(stT);
@@ -447,8 +485,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       stIn.value=s.house&&num&&s.v.replace(/\D/g,'')===num[0].replace(/\D/g,'')?s.v:(s.s||v.replace(/[\s,]*\d.*$/,''))+(num?', д '+num[0].replace(/^(д|дом)[\s.]*/i,''):'');
       showStreets([]);ready();if(num)setErr(stIn,'');reStreet();});};
   stIn.addEventListener('blur',()=>{showStreets([]);autoStreet();});
-  stIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();stList.classList.contains('open')&&stList.querySelector('li')?stList.querySelector('li').click():autoStreet();}
+  stIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=pickLi(stList);li?li.click():autoStreet();}
     if(e.key==='Escape'){e.preventDefault();showStreets([]);}});
+
+  // × в поле города и улицы: виден, пока в поле что-то есть
+  document.querySelectorAll('.cop [data-clr]').forEach(b=>{const inp=b.parentNode.querySelector('input:not([type=hidden])'), sync=()=>{b.hidden=!inp.value;};
+    sync(); inp.addEventListener('input',sync);
+    b.addEventListener('click',()=>{inp.value='';inp.focus();inp.dispatchEvent(new Event('input',{bubbles:true}));setErr(inp,'');});});
+  const syncClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{b.hidden=!b.parentNode.querySelector('input:not([type=hidden])').value;});
 
   /* ошибки под полем — та же разметка, что у BT_checkField */
   function setErr(el,msg){
@@ -475,15 +519,25 @@ document.addEventListener('DOMContentLoaded',()=>{
     sLeft.textContent=miss.length?'Осталось указать: '+miss.join(', '):online?'Всё заполнено — можно оплачивать':'Всё заполнено — можно подтверждать';
     if(!sending)submit.textContent=btnText();
     if(calcShown()) sLeft.textContent='Считаем доставку…';
-    submit.disabled=!!miss.length||sending||calcShown();
+    submit.disabled=sending||calcShown();
     return !miss.length;
   }
   // онлайн-оплата — кнопка ведёт в банк, поэтому и называется по-другому
   const btnText=()=>(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff'?'Оплатить заказ':'Подтвердить заказ';
   form.addEventListener('input',ready); form.addEventListener('change',ready);
-  BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit));
+  BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit),sHint.innerHTML);
 
-  form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||calcing||!ready()) return;
+  // не всё заполнено: поля подсвечивает BT_validate, остальное — прокручиваем к своему блоку
+  function goMissing(){
+    if(!BT_validate(form)) return;
+    const to=(el,msg)=>{el.scrollIntoView({behavior:'smooth',block:'center'}); if(msg) BT_toast(msg);};
+    if(!locIn.value){ setErr(cityIn,'Выберите город из списка'); to(cityIn); if(fineP) cityIn.focus({preventScroll:true}); }
+    else if(!sel||!last||last.loc!==locIn.value) to(blkD,'Выберите способ доставки');
+    else if(sel.tab==='pvz'&&!pvzIn.value) to(blkD,'Выберите пункт выдачи на карте');
+    else if(!payId) to(blkP,'Выберите способ оплаты');
+  }
+  form.addEventListener('submit',e=>{const bad=e.defaultPrevented; e.preventDefault(); if(bad||sending||calcing) return;
+    if(!ready()){ goMissing(); return; }
     sending=true; submit.disabled=true; submit.textContent='Оформляем…'; sErr.textContent='';
     const data={action:'create',ptype:pt,delivery:sel.d.id,mode:sel.tab,dkey:sel.key,pay:payId,agree:'Y'};
     [...form.elements].forEach(el=>{if(el.name&&el.type!=='radio'&&el.type!=='checkbox'&&!(el.name in data))data[el.name]=el.value;});
