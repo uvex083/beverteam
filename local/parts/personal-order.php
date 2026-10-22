@@ -25,6 +25,8 @@ $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymen
 $pCode === 'tinkoff' && !$payment->isPaid() && !$order->isCanceled() && bt_tbank_sync($payment);
 $toPay = !$order->isCanceled() && bt_tbank_payment($order);
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
+// в заказе «При получении» без контекста непонятно, о чём речь
+$pCode === 'cash' and $payName = 'Оплата при получении';
 $o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID')];
 [$st, $cls] = bt_order_status($o);
 $date = fn($d) => $d ? FormatDate('j M, H:i', $d->getTimestamp()) : '';
@@ -94,7 +96,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
-    <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if (!$order->isPaid() && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Оплата при получении — наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
+    <dt>Статус</dt><dd><span class="pay<?= $order->isPaid() ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : 'Не оплачен' ?></span><?php if (!$order->isPaid() && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
     <?php // онлайн-оплата: только ссылка на чек из уведомления банка, пока её нет — строку не показываем
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
