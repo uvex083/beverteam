@@ -20,7 +20,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
         <div><dt>Телефоны</dt><dd><a href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a><br><a href="<?= $e($co['phone2_href'] ?? '') ?>"><?= $e($co['phone2'] ?? '') ?></a></dd></div>
         <div><dt>Почта</dt><dd><a href="mailto:<?= $e($co['email'] ?? '') ?>"><?= $e($co['email'] ?? '') ?></a></dd></div>
         <div><dt>Адрес склада и самовывоза</dt><dd><?= $e($co['zip'] ?? '') ?>, <?= $e($co['city'] ?? '') ?>,<br><?= $e($co['street'] ?? '') ?></dd></div>
-        <div><dt>Время работы офиса</dt><dd><?= $e($co['hours'] ?? '') ?><br><span class="muted" style="font-weight:400;font-size:13px">Сб–Вс — выходные, самовывоз по договорённости с менеджером</span></dd></div>
+        <div><dt>Время работы офиса</dt><dd><?= $e($co['hours'] ?? '') ?><br><span class="muted" style="font-weight:400;font-size:13px">Сб–Вс — выходные. Самовывоз — в часы работы офиса</span></dd></div>
         <?php if (!empty($co['hours_service'])): ?><div><dt>Выезд технического специалиста</dt><dd><?= $e($co['hours_service']) ?><br><span class="muted" style="font-weight:400;font-size:13px">по Екатеринбургу, по заявке</span></dd></div><?php endif ?>
         <div><dt>Мессенджеры</dt><dd><div class="msgr msgr--lg"><?= $msgr ?></div></dd></div>
       </dl>
