@@ -125,7 +125,7 @@ $co = bt_contacts();
         <h2><b>2</b>Город доставки</h2>
         <div class="field city"><label for="cityIn">Населённый пункт *</label>
           <input id="cityIn" name="city" value="<?= $e($popular[0]['n'] ?? '') ?>" autocomplete="new-password" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-controls="cityList" aria-expanded="false">
-          <button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden>×</button>
+          <button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
           <input type="hidden" name="loc" id="locIn" value="<?= $e($popular[0]['code'] ?? '') ?>">
           <ul id="cityList" role="listbox" tabindex="-1"></ul>
         </div>
@@ -139,7 +139,7 @@ $co = bt_contacts();
         <div class="opts" id="deliv"></div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
         <div id="addr" hidden style="margin-top:18px">
-          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden>×</button><ul id="streetList" role="listbox" tabindex="-1"></ul></div>
+          <div class="f2"><div class="field city street" style="grid-column:1/-1"><label for="coStreet">Улица, дом *</label><input id="coStreet" name="street" data-v="addr" placeholder="Начните вводить улицу" autocomplete="new-password" spellcheck="false" enterkeyhint="next" role="combobox" aria-autocomplete="list" aria-controls="streetList" aria-expanded="false" value="<?= $e($u['street'] ?? '') ?>"><button type="button" class="fclr" data-clr aria-label="Очистить поле" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><ul id="streetList" role="listbox" tabindex="-1"></ul></div>
             <div class="field"><label for="coFlat">Квартира / офис</label><input id="coFlat" name="flat" value="<?= $e($u['flat'] ?? '') ?>"></div><div class="field"><label for="coEntr">Подъезд, этаж, домофон</label><input id="coEntr" name="entrance" value="<?= $e($u['entrance'] ?? '') ?>"></div></div>
         </div>
         <input type="hidden" name="pvz" id="pvzIn" value="">
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     coItemsH.textContent=!sel?nw:sel.tab==='pickup'?(dd?'Заберёте '+dd.replace(/^готов /,''):'Самовывоз')+' · '+nw
       :sel.d.code==='bt_courier'&&dd?'Доставим '+dd+' · '+nw:sel.d.period?'Доставка '+sel.d.period+' · '+nw:nw;
     // ушли на другую вкладку — ошибка адреса, поставленная на уходе с поля, не должна ждать возвращения
-    if(addr.hidden) addr.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,''));
+    if(addr.hidden) addr.querySelectorAll('.field.is-err input').forEach(x=>setErr(x,'')); else placeClr();
     backF();
   }
 
@@ -489,6 +489,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(e.key==='Escape'){e.preventDefault();showStreets([]);}});
 
   // × в поле города и улицы: виден, пока в поле что-то есть
+  // по центру поля по вертикали: высота подписи над полем разная на телефоне и компьютере
+  const placeClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{const i=b.parentNode.querySelector('input:not([type=hidden])');if(i.offsetHeight)b.style.top=(i.offsetTop+(i.offsetHeight-40)/2)+'px';});
+  placeClr(); addEventListener('resize',placeClr);
   document.querySelectorAll('.cop [data-clr]').forEach(b=>{const inp=b.parentNode.querySelector('input:not([type=hidden])'), sync=()=>{b.hidden=!inp.value;};
     sync(); inp.addEventListener('input',sync);
     b.addEventListener('click',()=>{inp.value='';inp.focus();inp.dispatchEvent(new Event('input',{bubbles:true}));setErr(inp,'');});});

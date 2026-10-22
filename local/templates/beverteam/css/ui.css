@@ -1558,7 +1558,7 @@ input,textarea{caret-color:var(--ink)}
 .field.city li small{color:var(--gray);margin-left:6px}
 .field.city li.act{background:var(--paper);color:var(--ink)}
 .field.city input{padding-right:46px}
-.fclr{position:absolute;right:4px;bottom:23px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;font-size:22px;line-height:1;color:var(--gray);background:none;border:0}
+.fclr{position:absolute;right:4px;top:0;width:40px;height:40px;display:grid;place-items:center;padding:0;border-radius:50%;color:var(--gray);background:none;border:0}
 .fclr[hidden]{display:none}
 @media(hover:hover){.fclr:hover{color:var(--ink)}}
 .cop .sum{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px;position:sticky;top:130px}
