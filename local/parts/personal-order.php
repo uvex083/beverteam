@@ -77,7 +77,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 </div>
 
 <div class="card" style="margin-top:16px">
-  <div class="row between" style="margin-bottom:8px;gap:10px;flex-wrap:wrap"><h2 class="h3">Состав заказа</h2>
+  <div class="row between" style="margin-bottom:8px;gap:10px;flex-wrap:wrap;align-items:center"><h2 class="h3" style="margin:0">Состав заказа</h2>
     <?php if (!$toPay && ($order->isCanceled() || $order->getField('STATUS_ID') === 'F')): ?><button class="btn btn--ghost btn--sm" type="button" data-reorder="<?= (int)$order->getId() ?>"><?= bt_icon('repeat') ?> Повторить заказ</button><?php endif ?></div>
   <?php foreach ($basket as $bi): $m = bt_product((string)$bi->getProductId()) ?>
   <div class="oit">
