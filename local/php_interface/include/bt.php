@@ -1508,7 +1508,12 @@ function bt_journal_digest_html(array $posts, string $host): string
     foreach ($posts as $p) {
         $url = $e($host . $p['url']);
         $lead = mb_strlen($p['lead']) > 180 ? rtrim(mb_substr($p['lead'], 0, 180), ' ,.;:') . '…' : $p['lead'];
-        $img = $p['img'] === '' ? '' : (str_starts_with($p['img'], 'http') ? $p['img'] : $host . $p['img']);
+        // в письме JPG, а не WebP: почтовые клиенты WebP показывают не все
+        $img = $p['img'];
+        if (preg_match('~^/upload/resize_cache/(.+\.(?:jpe?g|png))\.webp$~i', $img, $m)) {
+            $img = is_file($_SERVER['DOCUMENT_ROOT'] . '/upload/resize_cache/' . $m[1]) ? '/upload/resize_cache/' . $m[1] : '/upload/' . $m[1];
+        }
+        $img = $img === '' ? '' : (str_starts_with($img, 'http') ? $img : $host . $img);
         $out .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px"><tr><td>'
             . ($img !== '' ? '<a href="' . $url . '" style="display:block;margin:0 0 12px"><img src="' . $e($img) . '" width="520" alt="" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:12px"></a>' : '')
             . '<div style="' . $font . 'font-size:12px;font-weight:700;color:#6C6C64;margin:0 0 6px">' . $e($p['cat']) . '</div>'
