@@ -123,7 +123,7 @@ $courier = bt_delivery(['XML_ID' => 'bt_courier', '_OLD_NAME' => 'Доставк
     'DESCRIPTION' => 'По Екатеринбургу в течение 2 рабочих дней: 350 ₽ до 7 км пути от склада, дальше 50 ₽ за км. Бесплатно от 3 000 ₽.',
     'CONFIG' => ['MAIN' => ['MIN' => '350', 'PER_KM' => '50', 'K' => '1.3']]], $apply, $say, $check);
 $pickup = bt_delivery(['XML_ID' => 'bt_pickup', '_OLD_NAME' => 'Самовывоз', 'NAME' => 'Самовывоз со склада', 'ACTIVE' => 'Y', 'SORT' => 20,
-    'DESCRIPTION' => 'ул. Колокольная, 31А, Пн–Пт 10:00–17:00. Пришлём письмо, когда заказ будет готов. Перед приездом позвоните, чтобы мы подготовили его к выдаче.', 'CONFIG' => $cfg(0, 0, 0)], $apply, $say, $check);
+    'DESCRIPTION' => 'ул. Колокольная, 31А, Пн–Пт 10:00–17:00. Перед приездом позвоните, чтобы мы подготовили заказ к выдаче.', 'CONFIG' => $cfg(0, 0, 0)], $apply, $say, $check);
 // СДЭК — службы модуля ipol.sdek; своя служба bt_cdek выключена, скрипт её не трогает
 bt_delivery_only_city($courier, $ekb, $apply, $say);
 bt_delivery_only_city($pickup, $ekb, $apply, $say);
