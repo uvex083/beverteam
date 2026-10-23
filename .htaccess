@@ -13,6 +13,14 @@ ErrorDocument 404 /404.php
   RewriteRule (^|/)\.git - [F,L]
   RewriteRule ^upload/sale/.+\.pdf$ - [F,L]
 
+  # дубли адресов: /…/index.php и двойной слеш → основной адрес
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s/([^?\s]*/)?index\.php[?\s]
+  RewriteRule ^(.*/)?index\.php$ https://%{HTTP_HOST}/$1 [R=301,L]
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{THE_REQUEST} \s(/[^?\s]*?)//+([^?\s]*)
+  RewriteRule ^ https://%{HTTP_HOST}%1/%2 [R=301,L]
+
   # адреса старого сайта (конструктор) → новые, чтобы не потерять позиции в поиске
   RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/catalog/aksessuary/$1/ [R=301,L]
   RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/catalog/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
@@ -41,6 +49,10 @@ ErrorDocument 404 /404.php
   RewriteRule ^magazin/product/jetinno-jl30/?$ https://%{HTTP_HOST}/catalog/professionalnye-kofemashiny/ [R=301,L]
   RewriteRule ^chaj/?$ https://%{HTTP_HOST}/catalog/chay/ [R=301,L]
   RewriteRule ^(folder/)?kofe/?$ https://%{HTTP_HOST}/catalog/kofe/ [R=301,L]
+  RewriteRule ^magazin/product/glintvejn/?$ https://%{HTTP_HOST}/catalog/chay/ [R=301,L]
+  RewriteRule ^podpiska/?$ https://%{HTTP_HOST}/kofe-v-ofis/ [R=301,L]
+  # разделы старого магазина, которых нет в карте выше, — в каталог, а не на несуществующий /catalog/folder/…
+  RewriteRule ^magazin/folder/.+$ https://%{HTTP_HOST}/catalog/ [R=301,L]
   # магазин переехал на /catalog/ — все старые адреса /magazin/ одним прыжком
   RewriteRule ^magazin/?$ https://%{HTTP_HOST}/catalog/ [R=301,L]
   RewriteRule ^magazin/(.+?)/?$ https://%{HTTP_HOST}/catalog/$1/ [R=301,L]
