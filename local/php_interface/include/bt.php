@@ -1852,6 +1852,16 @@ function bt_acc_end(): void
 }
 
 // Open Graph и canonical: считаются после выполнения страницы (AddBufferContent); тип и картинку страница задаёт свойствами og_type / og_image
+// main:OnEpilog — SEO-описание из инфоблока приходит уже экранированным, ShowHead экранирует ещё раз: в сниппете было бы «&quot;»
+function bt_desc_unescape(): void
+{
+    global $APPLICATION;
+    $d = (string)$APPLICATION->GetPageProperty('description');
+    if (str_contains($d, '&')) {
+        $APPLICATION->SetPageProperty('description', htmlspecialchars_decode($d, ENT_QUOTES));
+    }
+}
+
 function bt_og(): string
 {
     global $APPLICATION;

@@ -34,6 +34,7 @@ AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_sale_badge_sync');
 // посадочные страницы для SEO: свои title, description, H1 и SEO-текст по адресу
 require_once __DIR__ . '/include/bt_seo.php';
 AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
+AddEventHandler('main', 'OnEpilog', 'bt_desc_unescape');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
 // FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы (после SEO-текста посадочной)
 AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
