@@ -278,8 +278,8 @@ window.BT_cartSync = (key,q,was) => { const id=BT_kid(key);
     if(!d.ok) throw new Error(d.error||'cart');
     window.BT_BASKET={items:d.items,sum:d.sum};
     /* Метрика: добавили или убрали упаковки — цена упаковки по ступени, как в корзине */
-    const m=BT_find(id), n=q-was, kg=BT_kkg(key);
-    if(m&&n&&window.BT_ec) BT_ec(n>0?'add':'remove',{products:[BT_ecItem(m,Object.assign({price:BT_piece(m,kg,Math.max(q,was)),quantity:Math.abs(n)},kg?{variant:kg+' кг'}:{}))]});
+    try{ const m=BT_find(id), n=q-was, kg=BT_kkg(key);
+      if(m&&n&&window.BT_ec) BT_ec(n>0?'add':'remove',{products:[BT_ecItem(m,Object.assign({price:BT_piece(m,kg,Math.max(q,was)),quantity:Math.abs(n)},kg?{variant:kg+' кг'}:{}))]}); }catch(e){}
   }).catch(()=>{
     if(was>0) CART[key]=was; else delete CART[key]; cartSave(); BT_cartUpdate(false);
     document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,key,q:was}}));
@@ -1172,8 +1172,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const d=await r.json().catch(()=>({}));
       if(d.ok){
         const topic=String(fd.get('topic')||''), g=f.dataset.goal||goalOf(f.dataset.form,topic);
-        goal(g,{topic,page:location.pathname});
-        if(/^bt_lead/.test(g)) goal('bt_lead');
+        if(d.goal!==false){ goal(g,{topic,page:location.pathname}); if(/^bt_lead/.test(g)) goal('bt_lead'); }
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
         else if(ld) BT_formOk(f);
         else { f.reset(); BT_toast('Заявка отправлена'); }
@@ -2493,7 +2492,7 @@ window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||
   const seen=[];
   /* видимые карточки, которые ещё не попали в показы: при загрузке, после «Показать ещё», фильтра, переключения вкладок */
   const shown=()=>{const add=[];
-    document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc, m=BT_find(id); if(!m||m.rent||!pc.offsetParent||seen.includes(id)) return;
+    document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc; if(seen.includes(id)||!pc.offsetParent) return; const m=BT_find(id); if(!m||m.rent) return;
       seen.push(id); add.push(BT_ecItem(m,{list:list(pc),position:seen.length}));});
     for(let i=0;i<add.length;i+=20) BT_ec('impressions',add.slice(i,i+20));
   };

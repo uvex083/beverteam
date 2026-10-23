@@ -55,7 +55,7 @@ if ($model = $v('model', 150)) {
 // ловушка для ботов: поле скрыто от людей — делаем вид, что всё хорошо
 if ((string)$req->getPost('website') !== '') {
     bt_ip_hit('BT_HONEYPOT', 'form:' . mb_substr($form, 0, 40));
-    $out(200, ['ok' => true]);
+    $out(200, ['ok' => true, 'goal' => false]);
 }
 
 $errors = [];

@@ -587,12 +587,17 @@ document.addEventListener('DOMContentLoaded',()=>{
         Object.keys(BT_CART).forEach(k=>delete BT_CART[k]);
         try{localStorage.setItem('bt_cart','{}');}catch(x){}
         window.BT_BASKET={items:{},sum:0}; BT_cartUpdate(false);
-        /* Метрика: покупка (электронная коммерция, частями по 15 товаров — лимит 8 КБ) и цель «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк они теряются */
+        /* Метрика: покупка (электронная коммерция) и цель «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк они теряются; переход на оплату от Метрики не зависит */
         let gone=false; const go=()=>{if(!gone){gone=true;location.href=r.redirect;}};
-        const num=String(r.accountNumber||r.orderId), items=(r.items||[]).map(x=>{const m=BT_find(x.id); return m&&m.cat?Object.assign({category:m.cat},x):x;});
-        for(let i=0;i<items.length;i+=15) BT_ec('purchase',{actionField:{id:items.length>15?num+'-'+(i/15+1):num},products:items.slice(i,i+15)});
-        try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal','bt_order',{order_id:num,order_price:r.price,currency:'RUB'},go);}catch(x){}
-        setTimeout(go,1200); return;
+        setTimeout(go,1200);
+        try{
+          const num=String(r.accountNumber||r.orderId), items=(Array.isArray(r.items)?r.items:[]).map(x=>{const m=BT_find(String(x.id)); return m&&m.cat?Object.assign({category:m.cat},x):x;});
+          /* лимит Метрики — 8 КБ на запись: большой заказ частями «N-1», «N-2» */
+          const parts=[[]]; items.forEach(x=>{const p=parts[parts.length-1]; if(p.length&&JSON.stringify(p.concat(x)).length>6000) parts.push([x]); else p.push(x);});
+          if(items.length) parts.forEach((p,i)=>BT_ec('purchase',{actionField:{id:parts.length>1?num+'-'+(i+1):num},products:p}));
+          if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal','bt_order',{order_id:num,order_price:r.price,currency:'RUB'},go);
+        }catch(x){}
+        return;
       }
       sending=false; submit.textContent=btnText();
       let first=null;
