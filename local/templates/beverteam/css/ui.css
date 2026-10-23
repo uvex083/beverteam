@@ -1199,12 +1199,13 @@ input,textarea{caret-color:var(--ink)}
 [data-rv="scale"]{transform:scale(.97)}
 [data-rv].rv-done{will-change:auto}
 /* первый экран: заголовок проявляется построчно, подсветка «прорисовывается» */
-.hero h1:not(.hero__title){opacity:0;transform:translateY(16px);animation:rv-up .7s cubic-bezier(.22,1,.36,1) .05s forwards}
+.hero h1:not(.hero__title){animation:rv-slide .7s cubic-bezier(.22,1,.36,1) .05s both}
 .hero h1:not(.hero__title) em{background-size:0% 100%;animation:rv-mark .7s cubic-bezier(.22,1,.36,1) .5s forwards}
 .hero__lead,.hero .row,.hero .link,.hero__right{opacity:0;animation:rv-up .7s cubic-bezier(.22,1,.36,1) forwards}
 .hero__lead{animation-delay:.16s}.hero .row{animation-delay:.24s}.hero .link{animation-delay:.3s}
 .hero__right{animation-delay:.2s}
 @keyframes rv-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes rv-slide{from{transform:translateY(16px)}to{transform:none}}
 @keyframes rv-mark{to{background-size:100% 100%}}
 @media(prefers-reduced-motion:reduce){
   [data-rv]{opacity:1!important;transform:none!important;transition:none}
