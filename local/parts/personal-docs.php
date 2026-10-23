@@ -29,10 +29,6 @@ $one = !$orgCol && $org ? reset($org) : [];
 
 bt_acc_start('docs', '<h1 class="display h1">Счета и документы</h1>', 'Счёт на оплату приходит на e‑mail, как только менеджер подтвердит заказ, и сразу доступен здесь.');
 ?>
-<div class="docs-acts">
-  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос акта сверки"><?= bt_icon('doc') ?> Запросить акт сверки</a>
-  <a class="btn btn--ghost btn--sm" href="/kontakty/#form" data-lead="Запрос закрывающих документов"><?= bt_icon('doc') ?> Запросить документы</a>
-</div>
 <?php if ($orders): ?>
 <div class="row between" style="margin:0 0 14px;gap:6px 16px;flex-wrap:wrap"><h2 class="h3">Заказы по счёту</h2>
   <?php if (!empty($one['COMPANY'])): ?><span class="muted" style="font-size:14px"><?= $e($one['COMPANY']) ?><?= !empty($one['INN']) ? ', ИНН ' . $e($one['INN']) : '' ?></span><?php endif ?></div>

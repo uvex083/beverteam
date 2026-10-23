@@ -126,8 +126,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
     <dt>Документы</dt><dd><?php if ($pCode === 'tinkoff'): ?><?= $check !== '' ? '<a class="link" href="' . $e($check) . '" target="_blank" rel="noopener">Кассовый чек</a>' : '<span class="dnote">Кассовый чек придёт на e‑mail и появится здесь</span>' ?></dd>
     <?php else: if ($pCode === 'bill' && bt_bill_ready($order)): ?><a class="odoc" href="/local/ajax/bill.php?id=<?= (int)$order->getId() ?>" target="_blank" rel="noopener"><?= bt_icon('doc') ?><span class="link">Счёт № <?= $e($payment->getField('ACCOUNT_NUMBER') ?: $num) ?>, PDF</span></a>
       <?php elseif ($pCode === 'bill' && !$order->isCanceled()): ?><span class="dnote">Счёт появится здесь и придёт на e‑mail, когда менеджер подтвердит заказ</span>
-      <?php else: ?><span class="dnote"><?= $pCode === 'bill' ? 'Счёт пришлёт менеджер' : 'Чек выдадим при получении' ?></span><?php endif ?>
-      <a class="link dreq" href="/kontakty/#form" data-lead="Документы по заказу № <?= $e($num) ?>">Запросить документы</a></dd>
+      <?php else: ?><span class="dnote"><?= $pCode === 'bill' ? 'Счёт пришлёт менеджер' : 'Чек выдадим при получении' ?></span><?php endif ?></dd>
     <?php endif; endif ?>
   </dl></div>
 </div>
