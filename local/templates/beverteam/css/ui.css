@@ -1701,7 +1701,7 @@ input,textarea{caret-color:var(--ink)}
 .home .hero__grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,64px);align-items:start}
 .home .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--gray);margin-bottom:22px}
 .home .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--lime);display:block}
-.home .hero__title{font-size:clamp(32px,4.8vw,58px);margin:0;opacity:0;transform:translateY(16px);animation:rv-up .7s cubic-bezier(.22,1,.36,1) .05s forwards}
+.home .hero__title{font-size:clamp(32px,4.8vw,58px);margin:0;animation:rv-slide .7s cubic-bezier(.22,1,.36,1) .05s both}
 .home .hero__title em{font-style:normal;background:var(--lime);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 @media(prefers-reduced-motion:reduce){.home .hero__title{animation:none;opacity:1;transform:none}}
 .home .wr h1,.home .wr .wr__t{font-size:clamp(24px,2.6vw,34px)}
