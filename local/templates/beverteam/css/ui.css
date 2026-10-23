@@ -1755,8 +1755,9 @@ input,textarea{caret-color:var(--ink)}
 .home .tile img{max-height:118px;max-width:calc(100% - 28px);width:auto;height:auto;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s cubic-bezier(.22,1,.36,1)}
 .home .tile b{padding:14px 16px 4px;font-size:14.5px}
 .home .tile small{padding:0 16px 14px;color:var(--gray);font-size:12px}
-.home .svc{background:var(--ink);color:#fff;border-radius:var(--rad);overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr}
-.home .svc__l{padding:clamp(32px,4vw,56px)}
+/* фон карточки белый, тёмный — у левой колонки: иначе по краям белой половины просвечивает тёмная кайма сглаживания */
+.home .svc{background:#fff;color:#fff;border-radius:var(--rad);overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr}
+.home .svc__l{background:var(--ink);padding:clamp(32px,4vw,56px)}
 .home .svc__l h2 span,.home .svc__l .svc__t span{color:var(--lime)}
 .home .svc__l>p{color:#A8A8A0;margin:0 0 30px;max-width:40ch}
 .home .svc__list{list-style:none;margin:0 0 34px;padding:0;border-top:1px solid #2C2C27}
