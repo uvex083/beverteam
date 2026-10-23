@@ -36,6 +36,8 @@ class Table extends \Bitrix\Main\ORM\Data\DataManager
             new Fields\StringField('BRAND_MANUAL', ['size' => 1, 'nullable' => true]),
             new Fields\FloatField('AMOUNT', ['nullable' => true]),
             new Fields\StringField('YM_UID', ['size' => 40]),
+            new Fields\StringField('PHRASE', ['size' => 255, 'nullable' => true]),      // запрос из Метрики: null — ещё не нашли визит, '' — запрос не передан
+            new Fields\DatetimeField('PHRASE_AT', ['nullable' => true]),
         ];
     }
 }
@@ -224,6 +226,10 @@ function report(string $type, array $f): array
     }
     $rows = [];
     foreach (Table::getList(['filter' => $flt, 'order' => ['CREATED' => 'DESC', 'ID' => 'DESC']])->fetchAll() as $r) {
+        // запрос известен из Метрики — бренд по запросу, иначе по странице входа
+        if ((string)$r['PHRASE'] !== '') {
+            $r['BRAND_AUTO'] = isBrandPhrase($r['PHRASE']) ? 'Y' : 'N';
+        }
         $r['BRAND'] = $r['BRAND_MANUAL'] ?: $r['BRAND_AUTO'];
         if ($f['brand'] === 'nonbrand' && $r['BRAND'] === 'Y' || $f['brand'] === 'brand' && $r['BRAND'] !== 'Y') {
             continue;
@@ -286,4 +292,59 @@ function totals(array $rows): array
 {
     $c = array_filter($rows, fn($r) => $r['COUNTED']);
     return ['all' => count($rows), 'n' => count($c), 'base' => array_sum(array_column($c, 'BASE')), 'fee' => array_sum(array_column($c, 'FEE'))];
+}
+
+// брендовый запрос: название компании в любом написании («бэвертим», «бевертим», «beverteam»); корни — опция bt/seo_brand_re
+function isBrandPhrase(string $phrase): bool
+{
+    $re = Option::get('bt', 'seo_brand_re', 'бэвер|бевер|бивер|bever|beaver');
+    return (bool)@preg_match('/' . str_replace('/', '\/', $re) . '/iu', $phrase);
+}
+
+// поисковый запрос последнего значимого входа перед заказом или заявкой — из Метрики по номеру посетителя (_ym_uid).
+// null — визита в Метрике нет (ещё не обработан, блокировщик рекламы); '' — визит есть, запрос поисковик не передал
+function metrikaPhrase(string $uid, DateTime $at): ?string
+{
+    $file = Option::get('bt', 'metrika_token_file', '');
+    $token = $file !== '' && is_readable($file) ? trim((string)file_get_contents($file)) : '';
+    if ($token === '' || !ctype_digit($uid)) {
+        throw new \RuntimeException('нет токена Метрики');
+    }
+    $http = new \Bitrix\Main\Web\HttpClient(['socketTimeout' => 10, 'streamTimeout' => 15]);
+    $http->setHeader('Authorization', 'OAuth ' . $token);
+    $ts = $at->getTimestamp();
+    $json = $http->get('https://api-metrika.yandex.net/stat/v1/data?' . http_build_query([
+        'ids' => (int)Option::get('bt', 'metrika_counter', '110309111'), 'accuracy' => 'full', 'limit' => 1, 'sort' => '-ym:s:dateTime',
+        'date1' => date('Y-m-d', max($ts - DAYS * 86400, strtotime('2026-09-24'))), 'date2' => date('Y-m-d', $ts),
+        'metrics' => 'ym:s:visits', 'dimensions' => 'ym:s:dateTime,ym:s:lastSignTrafficSource,ym:s:lastSignSearchPhrase',
+        'filters' => "ym:s:clientID=='$uid' AND ym:s:dateTime<='" . date('Y-m-d H:i:s', $ts) . "'",
+    ]));
+    if ($http->getStatus() !== 200 || !is_array($d = json_decode((string)$json, true))) {
+        throw new \RuntimeException('Метрика ответила ' . $http->getStatus() . ': ' . mb_substr((string)$json, 0, 200));
+    }
+    $row = $d['data'][0]['dimensions'] ?? null;
+    if (!$row) {
+        return null;
+    }
+    return ($row[1]['id'] ?? '') === 'organic' ? mb_substr((string)($row[2]['name'] ?? ''), 0, 255) : '';
+}
+
+// агент: запросы для новых заказов и заявок. Визит появляется в Метрике не сразу — не нашли, повторяем раз в час двое суток
+function phraseAgent(): string
+{
+    $now = time();
+    $rows = Table::getList(['select' => ['ID', 'YM_UID', 'CREATED', 'PHRASE_AT'], 'order' => ['ID' => 'ASC'], 'limit' => 20, 'filter' => [
+        '@TYPE' => ['order', 'lead'], '!=YM_UID' => '', '=PHRASE' => null, '<=CREATED' => DateTime::createFromTimestamp($now - 1200),
+        ['LOGIC' => 'OR', '=PHRASE_AT' => null, ['<=PHRASE_AT' => DateTime::createFromTimestamp($now - 3600), '>=CREATED' => DateTime::createFromTimestamp($now - 2 * 86400)]],
+    ]])->fetchAll();
+    foreach ($rows as $r) {
+        try {
+            $p = metrikaPhrase((string)$r['YM_UID'], $r['CREATED']);
+        } catch (\Throwable $e) {
+            \CEventLog::Add(['SEVERITY' => 'WARNING', 'AUDIT_TYPE_ID' => 'BT_ATTR_METRIKA', 'MODULE_ID' => 'main', 'ITEM_ID' => (string)$r['ID'], 'DESCRIPTION' => $e->getMessage()]);
+            break;
+        }
+        Table::update($r['ID'], ['PHRASE' => $p, 'PHRASE_AT' => new DateTime()]);
+    }
+    return '\Bt\Attr\phraseAgent();';
 }

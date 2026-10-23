@@ -48,13 +48,13 @@ if (($_GET['format'] ?? '') === 'csv') {
     $num = fn($v) => str_replace('.', ',', (string)round((float)$v, 2));
     // текст, начинающийся с = + - @, Excel принял бы за формулу (телефон «+7…» тоже)
     $txt = fn($v) => preg_match('/^[=+\-@\t\r]/', (string)$v) ? "'" . $v : (string)$v;
-    $head = ['Дата', 'Источник', 'Поисковик', 'Страница входа', 'Вход', 'Запрос'];
+    $head = ['Дата', 'Источник', 'Поисковик', 'Страница входа', 'Вход', 'Запрос', 'Поисковый запрос'];
     $head = array_merge($head, $tab === 'order' ? ['Заказ', 'Покупатель', 'Сумма заказа', 'Доставка', 'Статус', 'База', 'Вознаграждение', 'Не засчитан']
         : ($tab === 'lead' ? ['Заявка', 'Имя', 'Телефон', 'Сумма сделки', 'Вознаграждение', 'Не засчитана'] : []));
     fputcsv($out, $head, ';');
     foreach ($rows as $r) {
         $line = [(string)$r['CREATED'], Attr\SOURCES[$r['SOURCE']] ?? $r['SOURCE'], $txt(Attr\ENGINES[$r['ENGINE']] ?? $r['ENGINE']), $txt($r['LANDING']),
-            (string)$r['ENTRY_AT'], $r['BRAND'] === 'Y' ? 'брендовый' : 'не брендовый'];
+            (string)$r['ENTRY_AT'], $r['BRAND'] === 'Y' ? 'брендовый' : 'не брендовый', $txt((string)$r['PHRASE'])];
         if ($tab === 'order') {
             $o = $r['ORDER'];
             $line = array_merge($line, [$o['num'] ?? $r['ENTITY_ID'], $txt($o['buyer'] ?? ''), $num($o['price'] ?? 0), $num($o['delivery'] ?? 0), $o['status'] ?? '',

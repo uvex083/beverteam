@@ -20,6 +20,25 @@ if (!$conn->isTableExists($t)) {
     }
 } else {
     echo "таблица $t есть, строк: " . \Bt\Attr\Table::getCount() . "\n";
+    // запрос из Метрики (добавлено после запуска)
+    foreach (['PHRASE' => 'varchar(255) NULL', 'PHRASE_AT' => 'datetime NULL'] as $col => $type) {
+        if (!$conn->getTableField($t, $col)) {
+            echo ($apply ? '' : '[show] ') . "колонка $col\n";
+            $apply and $conn->queryExecute("ALTER TABLE `$t` ADD COLUMN `$col` $type");
+        }
+    }
+}
+// токен Метрики (только чтение) — файл вне сайта, в гит и базу не попадает
+$file = dirname($_SERVER['DOCUMENT_ROOT'], 2) . '/secrets/metrika.token';
+if (\Bitrix\Main\Config\Option::get('bt', 'metrika_token_file', '') !== $file) {
+    echo ($apply ? '' : '[show] ') . "опция bt/metrika_token_file = $file\n";
+    $apply and \Bitrix\Main\Config\Option::set('bt', 'metrika_token_file', $file);
+}
+echo 'токен Метрики: ' . (is_readable($file) ? 'есть' : 'НЕТ — запросы из Метрики не подтянутся') . "\n";
+$agent = '\Bt\Attr\phraseAgent();';
+if (!CAgent::GetList([], ['NAME' => $agent])->Fetch()) {
+    echo ($apply ? '' : '[show] ') . "агент $agent раз в 20 минут\n";
+    $apply and CAgent::AddAgent($agent, 'main', 'N', 1200);
 }
 // отчёт закрыт от посетителей — и из поиска по сайту тоже
 $mask = COption::GetOptionString('search', 'exclude_mask');

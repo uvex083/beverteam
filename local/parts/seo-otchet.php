@@ -30,6 +30,10 @@ $brand = function (array $r) use ($e) {
         $on = (string)$r['BRAND_MANUAL'] === $v;
         $h .= '<button type="submit" name="v" value="' . $v . '" class="chipx"' . ($on ? ' aria-pressed="true"' : '') . '>' . $e($t) . '</button>';
     }
+    // запрос из Метрики; авто-пометка по нему, а не по странице входа
+    if ($r['TYPE'] !== 'visit' && $r['SOURCE'] === 'organic') {
+        $h .= '<span class="muted seor__q">' . ($r['PHRASE'] === null ? 'Запрос: ищем в Метрике' : ((string)$r['PHRASE'] === '' ? 'Запрос поисковик не передал' : 'Запрос: «' . $e($r['PHRASE']) . '»')) . '</span>';
+    }
     return $h . '</form>';
 };
 ?>
