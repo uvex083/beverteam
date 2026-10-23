@@ -424,5 +424,5 @@ if ($USER->IsAuthorized() || !empty($fresh)) {
         }
     }
 }
-$out(['ok' => true, 'orderId' => (int)$order->getId(), 'accountNumber' => $order->getField('ACCOUNT_NUMBER'),
+$out(['ok' => true, 'orderId' => (int)$order->getId(), 'accountNumber' => $order->getField('ACCOUNT_NUMBER'), 'price' => (float)$order->getPrice(),
     'redirect' => (bt_tbank_payment($order) ? '/personal/order/pay/' : '/personal/order/success/') . '?id=' . (int)$order->getId()]);
