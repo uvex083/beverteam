@@ -1152,6 +1152,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     ld.querySelector('form').hidden=true; ok.hidden=false; ld.classList.add('open');
     setTimeout(()=>ok.querySelector('.btn').focus({preventScroll:true}),40);
   };
+  /* цель Метрики — только по сохранённой заявке; коды целей заведены в Метрике как «JavaScript-событие» */
+  const goalOf=(form,topic)=>form==='subscribe'?'bt_journal_sub':form==='contact'?'bt_lead_contact':form==='write'?'bt_lead_write':/заказу? № /.test(topic)?'bt_order_question':
+    'bt_lead_'+([[/^Аренда/,'arenda'],[/дегустац/i,'degustaciya'],[/один клик/i,'one_click'],[/^Подбор кофе/,'podbor'],[/персональн/i,'predlozhenie'],[/Кофе в офис|поставк/i,'ofis'],[/инженер|ремонт/i,'servis'],[/О компании/,'about']].find(([re])=>re.test(topic))?.[1]||'other');
+  const goal=(g,p)=>{try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal',g,p);}catch(e){}};
   document.addEventListener('submit',async e=>{
     const f=e.target.closest('form[data-form]'); if(!f) return;
     /* невалидную форму уже остановил общий обработчик submit выше */
@@ -1164,6 +1168,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       const r=await fetch('/local/ajax/form.php',{method:'POST',body:fd,credentials:'same-origin'});
       const d=await r.json().catch(()=>({}));
       if(d.ok){
+        const topic=String(fd.get('topic')||''), g=goalOf(f.dataset.form,topic);
+        goal(g,{topic,page:location.pathname});
+        if(g!=='bt_journal_sub'&&g!=='bt_order_question') goal('bt_lead');
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
         else if(ld) BT_formOk(f);
         else { f.reset(); BT_toast('Заявка отправлена'); }
