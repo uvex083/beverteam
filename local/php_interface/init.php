@@ -39,6 +39,7 @@ AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_tokens_buffer');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_nbsp_buffer');
+AddEventHandler('main', 'OnEndBufferContent', 'bt_defer_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
 

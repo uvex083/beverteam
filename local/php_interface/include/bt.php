@@ -1199,6 +1199,14 @@ function bt_tokens_buffer(&$content): void
     $content = strtr($content, bt_rent_tokens());
 }
 
+// main:OnEndBufferContent — общий скрипт шаблона с defer: страница рисуется до выполнения JS. Встроенные скрипты страниц ждут DOMContentLoaded
+function bt_defer_buffer(&$content): void
+{
+    if (!defined('ADMIN_SECTION')) {
+        $content = preg_replace('#<script\s+src="(/bitrix/cache/js/' . SITE_ID . '/beverteam/template_[^"]+)"></script>#', '<script defer src="$1"></script>', $content, 1);
+    }
+}
+
 // main:OnEndBufferContent — неразрывные пробелы в числах, суммах и датах: «8 000 ₽», «до 17:00», «20 октября 2026» не рвутся по строкам.
 // Меняется только текст между тегами HTML-страницы: скрипты, стили, атрибуты и ответы не-HTML не трогаем
 function bt_nbsp_buffer(&$content): void
