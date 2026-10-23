@@ -587,7 +587,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         Object.keys(BT_CART).forEach(k=>delete BT_CART[k]);
         try{localStorage.setItem('bt_cart','{}');}catch(x){}
         window.BT_BASKET={items:{},sum:0}; BT_cartUpdate(false);
-        location.href=r.redirect; return;
+        /* цель Метрики «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк она теряется */
+        let gone=false; const go=()=>{if(!gone){gone=true;location.href=r.redirect;}};
+        try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal','bt_order',{order_id:String(r.accountNumber||r.orderId),order_price:r.price,currency:'RUB'},go);}catch(x){}
+        setTimeout(go,800); return;
       }
       sending=false; submit.textContent=btnText();
       let first=null;
