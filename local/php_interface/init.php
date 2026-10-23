@@ -11,6 +11,7 @@ foreach (['OnAfterIBlockSectionAdd', 'OnAfterIBlockSectionUpdate', 'OnAfterIBloc
     AddEventHandler('iblock', $ev, 'bt_menu_cache_reset');
 }
 require_once __DIR__ . '/include/bt_mail.php';
+require_once __DIR__ . '/include/bt_dkim.php';
 
 // письма о заказе: состав и детали заказа полями #BT_*#
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_route');
