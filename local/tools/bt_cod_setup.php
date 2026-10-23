@@ -46,7 +46,7 @@ if ($cur !== $noCod) {
 }
 // описание самовывоза на оформлении — как на странице «Оплата и доставка»
 $pickup = Sale\Delivery\Services\Table::getList(['filter' => ['=XML_ID' => 'bt_pickup'], 'select' => ['ID', 'DESCRIPTION']])->fetch();
-$desc = 'ул. Колокольная, 31А, Пн–Пт 10:00–17:00, по предварительному согласованию. Пришлём письмо, когда заказ будет готов.';
+$desc = 'ул. Колокольная, 31А, Пн–Пт 10:00–17:00. Обычно заказ готов в день оформления, пришлём письмо. Перед приездом позвоните, чтобы мы подготовили его к выдаче.';
 if ($pickup && $pickup['DESCRIPTION'] !== $desc) {
     $say("самовывоз: «{$desc}»");
     $apply and Sale\Delivery\Services\Manager::update((int)$pickup['ID'], ['DESCRIPTION' => $desc]);

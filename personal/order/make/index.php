@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
   const dateOf=o=>{const x=BT_dates();
     if(o.d.period) return o.d.period;
-    if(o.tab==='pickup') return '';
+    if(o.tab==='pickup') return 'обычно в день заказа';
     if(o.d.code==='bt_courier') return 'до '+BT_fmtDate(x.deliver,true);
     return '';};
   const priceOf=o=>o.d.price>0?(o.d.from?'от ':'')+fmt(o.d.price):isCdek(o.d)?'сообщит менеджер':'бесплатно';

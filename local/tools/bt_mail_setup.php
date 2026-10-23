@@ -175,8 +175,8 @@ $messages = [
     // самовывоз: менеджер собрал заказ
     'SALE_STATUS_CHANGED_R' => ['Заказ № #ORDER_ID# готов к выдаче', $sale[0], $sale[1], '',
         m_head('Заказ готов к выдаче', 'Заказ № #ORDER_ID#')
-        . m_p('#BT_HELLO# Заказ № #ORDER_ID# собран. Забрать его можно на складе: <b>#BT_PICKUP_ADDR#</b>, <span style="white-space:nowrap">#BT_PICKUP_HOURS#</span>, по предварительному согласованию.')
-        . m_p('Перед приездом позвоните менеджеру и договоритесь о времени.')
+        . m_p('#BT_HELLO# Заказ № #ORDER_ID# собран и ждёт вас на складе: <b>#BT_PICKUP_ADDR#</b>, <span style="white-space:nowrap">#BT_PICKUP_HOURS#</span>.')
+        . m_p('Перед приездом позвоните, пожалуйста, чтобы мы подготовили заказ к выдаче.')
         . '<?if ($arParams["BT_COD"] === "Y"):?>' . m_p('К оплате при получении <b style="white-space:nowrap">#BT_TOTAL#</b>, наличными или картой.') . '<?endif?>'
         . m_p('На складе назовите номер заказа. Если заберёт другой человек, сообщите менеджеру его имя.')
         . $ifText('TEXT', m_p('#HTML_TEXT#'))

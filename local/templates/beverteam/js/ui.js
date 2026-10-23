@@ -303,7 +303,7 @@ window.BT_dates = (days) => {
 window.BT_timeline = () => `<div class="tl3">
     <div>${I.truck}<span><small>Курьер по Екатеринбургу</small><b>до ${BT_fmtDate(BT_dates().deliver)}</b></span></div>
     <div>${I.box}<span><small>СДЭК по России</small><b>2–7 дней</b></span></div>
-    <div>${I.home}<span><small>Самовывоз</small><b>по согласованию</b></span></div>
+    <div>${I.home}<span><small>Самовывоз</small><b>обычно в день заказа</b></span></div>
   </div>`;
 /* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
