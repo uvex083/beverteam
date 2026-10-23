@@ -32,7 +32,7 @@ a{color:#0E0E0C}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
     <td align="left" valign="middle">
       <a href="<?= $host ?>/" style="text-decoration:none"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td><img src="<?= $host ?>/local/templates/beverteam/brand/logo-mail-white.png" width="162" height="34" alt="Бэвертим" style="display:block;border:0;width:162px;height:34px"></td>
+        <td><img src="<?= $host ?>/local/templates/beverteam/brand/logo-mail-white.png?v=2" width="162" height="34" alt="Бэвертим" style="display:block;border:0;width:162px;height:34px"></td>
       </tr></table></a>
     </td>
     <td align="right" valign="middle" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:13px;color:#C9C9C2;white-space:nowrap"><a href="<?= $host ?>/catalog/" style="color:#D7E85C;text-decoration:none;font-weight:700">Каталог</a></td>
