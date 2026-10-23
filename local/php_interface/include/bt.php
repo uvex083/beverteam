@@ -1984,6 +1984,13 @@ function bt_sitemap_build(): string
     foreach (bt_rent_models() as $m) {
         $urls[] = bt_rent_url($m);
     }
+    // посадочные страницы SEO: ссылок на них может не быть, робот находит их по карте
+    if ($lid = bt_iblock('seo_landings')) {
+        $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => $lid, 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'PROPERTY_URL']);
+        while ($l = $r->Fetch()) {
+            ($u = (string)parse_url(trim((string)$l['PROPERTY_URL_VALUE']), PHP_URL_PATH)) !== '' and $urls[] = $u;
+        }
+    }
     foreach (['catalog', 'journal'] as $code) {
         $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => bt_iblock($code), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'], false, false, ['ID', 'IBLOCK_ID', 'DETAIL_PAGE_URL', 'TIMESTAMP_X']);
         while ($e = $r->GetNext()) {
