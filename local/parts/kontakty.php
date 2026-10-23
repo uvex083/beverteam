@@ -58,7 +58,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
   </section>
 
   <section class="sec sec--t0" id="form"><form class="card form" data-form="write" novalidate>
-    <div><div class="mono muted">Заявка</div><h2 class="display h2" style="margin:14px 0 10px">Напишите нам</h2><p class="muted" style="margin:0;max-width:40ch">Менеджер перезвонит или напишет в течение 5 минут в рабочее время. Подберём кофе, машину или запишем на ремонт.</p></div>
+    <div><div class="mono muted">Заявка</div><h2 class="display h2" style="margin:14px 0 10px">Напишите нам</h2><p class="muted" style="margin:0;max-width:40ch">Менеджер перезвонит или напишет в рабочее время. Подберём кофе, машину или запишем на ремонт.</p></div>
     <div>
       <div class="f2"><div class="field"><label>Имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div><div class="field"><label>Телефон *</label><input name="phone" placeholder="+7 ___ ___-__-__"></div></div>
       <div class="field"><label>E-mail</label><input name="email" type="email" placeholder="mail@company.ru" maxlength="100"></div>
