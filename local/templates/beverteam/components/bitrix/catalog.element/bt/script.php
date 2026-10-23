@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('bt:cart',e=>{ if(e.detail&&String(e.detail.id).split(':')[0]===String(PID)) sync(); });
   sync();
 
-  const dd=BT_dates(); dship.innerHTML=`${BT_ICONS.truck}<span>Екатеринбург — <b>${dd.relDeliver?dd.relDeliver+', ':''}${BT_fmtDate(dd.deliver)}</b><br><small class="muted">По России — СДЭК, 2–7 дней</small></span>`;
+  const dd=BT_dates(); dship.innerHTML=`${BT_ICONS.truck}<span>Екатеринбург — <b>до ${BT_fmtDate(dd.deliver)}</b><br><small class="muted">По России — СДЭК, 2–7 дней</small></span>`;
   ptabs.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;[...ptabs.children].forEach(x=>x.setAttribute('aria-selected',x===b));
     document.querySelectorAll('.pane').forEach(p=>p.hidden=p.dataset.pane!==b.dataset.p);});
   const rec=document.getElementById('rec');

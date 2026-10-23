@@ -290,7 +290,7 @@ window.BT_cartUpdate = pulse => {
   if(pulse){a.classList.remove('is-pulse');void a.offsetWidth;a.classList.add('is-pulse');}
 };
 
-/* ---------- даты: сборка сегодня (до 17:00 в будни), курьер по Екатеринбургу — за 2 рабочих дня ---------- */
+/* ---------- даты: сборка сегодня (до 17:00 в будни), курьер по Екатеринбургу — в течение 2 рабочих дней со дня заказа ---------- */
 const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const isWork = d => d.getDay()!==0 && d.getDay()!==6;
 const nextWork = (d,n) => { const x=new Date(d); while(n>0){ x.setDate(x.getDate()+1); if(isWork(x)) n--; } return x; };
@@ -299,7 +299,7 @@ window.BT_fmtDate = (d,short) => d.getDate()+'\u00a0'+(short?MONTHS_S:MONTHS)[d.
 window.BT_dates = (days) => {
   const now=new Date(); let pack=new Date(now);
   if(!isWork(now)||now.getHours()>=17) pack=nextWork(now,1);           /* после 17:00 и в выходные — первый рабочий день */
-  const deliver=nextWork(pack,days||2), ship=deliver;
+  const deliver=nextWork(now,days||2), ship=deliver;
   const rel = d => { const t=new Date();t.setHours(0,0,0,0); const x=new Date(d);x.setHours(0,0,0,0); const k=Math.round((x-t)/864e5); return k===0?'сегодня':k===1?'завтра':''; };
   return {pack,ship,deliver,relPack:rel(pack),relShip:rel(ship),relDeliver:rel(deliver)};
 };
@@ -307,7 +307,7 @@ window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT
   return `<div class="tl3">
     <div>${I.box}<span><small>Соберём</small><b>${f(d.relPack,d.pack)}</b></span></div>
     <div>${I.truck}<span><small>Передадим курьеру</small><b>${f(d.relShip,d.ship)}</b></span></div>
-    <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>от ${BT_fmtDate(d.deliver)}</b></span></div>
+    <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>до ${BT_fmtDate(d.deliver)}</b></span></div>
   </div>`; };
 /* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
