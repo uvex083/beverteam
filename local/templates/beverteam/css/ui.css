@@ -543,6 +543,7 @@ input,textarea{caret-color:var(--ink)}
   .hero-in>*:nth-child(2){animation-delay:.07s}.hero-in>*:nth-child(3){animation-delay:.14s}
   .hero-in>*:nth-child(4){animation-delay:.21s}.hero-in>*:nth-child(5){animation-delay:.28s}.hero-in>*:nth-child(6){animation-delay:.35s}
   @keyframes bt-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .hero-in>h1{animation-name:bt-slide}@keyframes bt-slide{from{transform:translateY(10px)}to{transform:none}}
 }
 /* маркер-подсветка в заголовке: полоса за x-высотой, а не заливка всей строки */
 .hero h1:not(.hero__title) em{background-image:linear-gradient(180deg,transparent 34%,var(--lime) 34%,var(--lime) 94%,transparent 94%);
