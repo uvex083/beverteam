@@ -1127,7 +1127,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const topic=b.dataset.lead||'Оставить заявку', f=ld.querySelector('form');
       f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
       ld.querySelectorAll('.lead__ok [data-def]').forEach(x=>x.textContent=x.dataset.def);
-      ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic; f.dataset.src=b.closest('[data-cfg]')?'cfg':'';
+      ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic; f.dataset.goal=b.dataset.goal||(b.closest('[data-cfg]')?'bt_lead_cfg':'');
       /* по заказу из кабинета — свой текст подсказки и кнопки, без «модель, количество» */
       const ord=/заказу? № /.test(topic), sb=f.querySelector('[type=submit]');
       f.elements.message.placeholder=/^Отменить/.test(topic)?'Причина отмены, если хотите':ord?'Что хотите узнать или изменить':'Что нужно: модель, количество, адрес';
@@ -1168,9 +1168,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       const r=await fetch('/local/ajax/form.php',{method:'POST',body:fd,credentials:'same-origin'});
       const d=await r.json().catch(()=>({}));
       if(d.ok){
-        const topic=String(fd.get('topic')||''), g=f.dataset.src==='cfg'?'bt_lead_cfg':goalOf(f.dataset.form,topic);
+        const topic=String(fd.get('topic')||''), g=f.dataset.goal||goalOf(f.dataset.form,topic);
         goal(g,{topic,page:location.pathname});
-        if(g!=='bt_journal_sub'&&g!=='bt_order_question') goal('bt_lead');
+        if(/^bt_lead/.test(g)) goal('bt_lead');
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
         else if(ld) BT_formOk(f);
         else { f.reset(); BT_toast('Заявка отправлена'); }

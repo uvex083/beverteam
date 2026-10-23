@@ -133,7 +133,7 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
 
 <div class="row" style="margin-top:20px;gap:10px">
   <a class="btn btn--ghost" href="/kontakty/#form" data-lead="Вопрос по заказу № <?= $e($num) ?>">Вопрос по заказу</a>
-  <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>">Отменить заказ</a><?php endif ?>
+  <?php if (!$order->isCanceled() && !$shipped && !$order->isPaid()): ?><a class="btn btn--ghost" href="/kontakty/#form" data-lead="Отменить заказ № <?= $e($num) ?>" data-goal="bt_order_cancel">Отменить заказ</a><?php endif ?>
 </div>
 <?php if (!empty($pvz)): ?>
 <div class="modal modal--pvzv" id="pvzView" role="dialog" aria-modal="true" aria-labelledby="pvzVT">

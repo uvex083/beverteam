@@ -74,7 +74,7 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
       <div class="msgr msgr--lg"><?= $msgr ?></div>
       <a class="dn__tel" href="<?= $e($co['phone1_href'] ?? '') ?>"><?= $e($co['phone1'] ?? '') ?></a>
       <span class="dn__addr"><?= $e($co['city'] ?? '') ?>, <?= $e($co['street'] ?? '') ?><br><?= $e($co['hours'] ?? '') ?></span>
-      <a class="btn btn--block" href="/kontakty/#form" data-lead="Оставить заявку">Оставить заявку</a>
+      <a class="btn btn--block" href="/kontakty/#form" data-lead="Оставить заявку" data-goal="bt_lead_menu">Оставить заявку</a>
     </div>
   </section>
   <?= implode('', $panels) ?>
