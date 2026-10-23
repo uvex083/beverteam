@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     deliv.innerHTML=list.length?list.map(o=>{const free=o.d.price===0&&o.d.base>0;
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
         <div style="flex:1"><div class="t"><span>${esc(o.t)}${free?' <span class="badge badge--ok">Бесплатно</span>':''}</span><span class="p">${free?`<s class="muted">${fmt(o.d.base)}</s>`:priceOf(o)}${dateOf(o)?`<span class="dd">${dateOf(o)}</span>`:''}</span></div>
-        <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте. Точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
+        ${o.desc?`<div class="d">${esc(o.desc)}</div>`:''}${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте. Точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
     const nw=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']), dd=sel?dateOf(sel):'';

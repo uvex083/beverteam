@@ -44,9 +44,9 @@ if ($cur !== $noCod) {
     $say('СДЭК, безналичные оплаты: ' . implode(', ', $noCod) . ' (было: ' . implode(', ', $cur) . ')');
     $apply and \COption::SetOptionString('ipol.sdek', 'paysystems', serialize($noCod));
 }
-// описание самовывоза на оформлении — как на странице «Оплата и доставка»
+// у самовывоза на оформлении описания нет: адрес и часы — в плашке под выбором доставки
 $pickup = Sale\Delivery\Services\Table::getList(['filter' => ['=XML_ID' => 'bt_pickup'], 'select' => ['ID', 'DESCRIPTION']])->fetch();
-$desc = 'ул. Колокольная, 31А, Пн–Пт 10:00–17:00. Перед приездом позвоните, чтобы мы подготовили заказ к выдаче.';
+$desc = '';
 if ($pickup && $pickup['DESCRIPTION'] !== $desc) {
     $say("самовывоз: «{$desc}»");
     $apply and Sale\Delivery\Services\Manager::update((int)$pickup['ID'], ['DESCRIPTION' => $desc]);
