@@ -87,11 +87,4 @@ ErrorDocument 404 /404.php
   <FilesMatch "\.(css|js|woff2)$">
     Header append Cache-Control "immutable"
   </FilesMatch>
-  # заголовки безопасности; встраивать сайт во фрейм можно только себе и Метрике (карты кликов, Вебвизор)
-  Header always set X-Content-Type-Options "nosniff"
-  Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  Header always set Strict-Transport-Security "max-age=31536000"
-  Header always set Content-Security-Policy "frame-ancestors 'self' https://metrika.yandex.ru https://metrika.yandex.by https://metrica.yandex.com https://*.webvisor.com https://webvisor.com"
-  Header unset X-Powered-CMS
-  Header always unset X-Powered-CMS
 </IfModule>
