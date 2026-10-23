@@ -306,7 +306,7 @@ window.BT_dates = (days) => {
 window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT_fmtDate(x);
   return `<div class="tl3">
     <div>${I.box}<span><small>Соберём</small><b>${f(d.relPack,d.pack)}</b></span></div>
-    <div>${I.truck}<span><small>Передадим курьеру</small><b>${f(d.relShip,d.ship)}</b></span></div>
+    <div>${I.truck}<span><small>Передадим курьеру</small><b>до ${BT_fmtDate(d.ship)}</b></span></div>
     <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>до ${BT_fmtDate(d.deliver)}</b></span></div>
   </div>`; };
 /* блок «до бесплатной доставки» с прогрессом */
