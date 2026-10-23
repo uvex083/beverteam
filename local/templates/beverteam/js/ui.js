@@ -277,6 +277,9 @@ window.BT_cartSync = (key,q,was) => { const id=BT_kid(key);
   return fetch('/local/ajax/cart.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
     if(!d.ok) throw new Error(d.error||'cart');
     window.BT_BASKET={items:d.items,sum:d.sum};
+    /* Метрика: добавили или убрали упаковки — цена упаковки по ступени, как в корзине */
+    const m=BT_find(id), n=q-was, kg=BT_kkg(key);
+    if(m&&n&&window.BT_ec) BT_ec(n>0?'add':'remove',{products:[BT_ecItem(m,Object.assign({price:BT_piece(m,kg,Math.max(q,was)),quantity:Math.abs(n)},kg?{variant:kg+' кг'}:{}))]});
   }).catch(()=>{
     if(was>0) CART[key]=was; else delete CART[key]; cartSave(); BT_cartUpdate(false);
     document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,key,q:was}}));
@@ -2478,3 +2481,28 @@ document.addEventListener('DOMContentLoaded',()=>{
     }).catch(()=>{ btn.disabled=false; BT_toast('Нет связи с сервером — попробуйте ещё раз'); });
   });
 });
+
+/* ---------- электронная коммерция Метрики (dataLayer): списки, карточка товара, корзина; покупка — на оформлении заказа ---------- */
+window.dataLayer=window.dataLayer||[];
+window.BT_ec=(type,data)=>{try{dataLayer.push({ecommerce:{currencyCode:'RUB',[type]:data}});}catch(e){}};
+window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||0},m.cat?{category:m.cat}:{},extra||{});
+(()=>{
+  const list=()=>(document.querySelector('h1')?.textContent||document.title).trim().slice(0,100);
+  const seen=[];
+  /* карточки, которые ещё не попали в показы: при загрузке и после «Показать ещё», фильтра, подгрузки */
+  const shown=()=>{const add=[];
+    document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc, m=BT_find(id); if(!m||m.rent||seen.includes(id)) return;
+      seen.push(id); add.push(BT_ecItem(m,{list:list(),position:seen.length}));});
+    for(let i=0;i<add.length;i+=20) BT_ec('impressions',add.slice(i,i+20));
+  };
+  document.addEventListener('DOMContentLoaded',()=>{
+    const p=window.BT_PAGE, m=p&&p.id&&BT_find(String(p.id));
+    if(m&&!m.rent) BT_ec('detail',{products:[BT_ecItem(m)]});
+    shown();
+    let t; new MutationObserver(()=>{clearTimeout(t); t=setTimeout(shown,300);}).observe(document.body,{childList:true,subtree:true});
+  });
+  document.addEventListener('click',e=>{const a=e.target.closest('.pc[data-pc] a[href]'); if(!a) return;
+    const id=a.closest('.pc').dataset.pc, m=BT_find(id); if(!m||m.rent) return;
+    BT_ec('click',{products:[BT_ecItem(m,{list:list(),position:seen.indexOf(id)+1||undefined})]});
+  });
+})();

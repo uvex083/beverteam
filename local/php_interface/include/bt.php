@@ -503,16 +503,21 @@ function bt_catalog_data(): array
 
     // корневой раздел каждого раздела
     $root = [];
-    $r = \CIBlockSection::GetList([], ['IBLOCK_ID' => $catId], false, ['ID', 'CODE', 'IBLOCK_SECTION_ID', 'DEPTH_LEVEL']);
+    $r = \CIBlockSection::GetList([], ['IBLOCK_ID' => $catId], false, ['ID', 'CODE', 'NAME', 'IBLOCK_SECTION_ID', 'DEPTH_LEVEL']);
     $sec = [];
     while ($s = $r->Fetch()) {
         $sec[$s['ID']] = $s;
     }
+    // категория для электронной коммерции Метрики: «Кофе/Для эспрессо»
+    $path = [];
     foreach ($sec as $id => $s) {
+        $names = [$s['NAME']];
         while ($s['IBLOCK_SECTION_ID']) {
             $s = $sec[$s['IBLOCK_SECTION_ID']];
+            array_unshift($names, $s['NAME']);
         }
         $root[$id] = $s['CODE'];
+        $path[$id] = implode('/', array_slice($names, 0, 5));
     }
 
     // цены: базовая и оптовая сетка по количеству
@@ -534,6 +539,7 @@ function bt_catalog_data(): array
         $m = [
             'id' => (string)$f['ID'], 'code' => $f['CODE'], 'url' => $f['~DETAIL_PAGE_URL'], 'img' => $img($f['PREVIEW_PICTURE']),
             'n' => $f['~NAME'], 'p' => $pl[0]['p'], 'par' => (string)$pr['SHORT_DESC']['~VALUE'], 'stock' => 1,
+            'cat' => $path[$f['IBLOCK_SECTION_ID']] ?? '',
         ];
         if ($pr['OLD_PRICE']['VALUE']) {
             $m['old'] = (float)$pr['OLD_PRICE']['VALUE'];
@@ -2053,7 +2059,7 @@ function bt_metrika(): string
 <script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();
 for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
 k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
-ym(110309111,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,ecommerce:"dataLayer"});window.BT_YM=110309111;</script>
+window.dataLayer=window.dataLayer||[];ym(110309111,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,ecommerce:"dataLayer"});window.BT_YM=110309111;</script>
 <noscript><div><img src="https://mc.yandex.ru/watch/110309111" style="position:absolute;left:-9999px" alt=""></div></noscript>
 HTML;
 }

@@ -424,5 +424,12 @@ if ($USER->IsAuthorized() || !empty($fresh)) {
         }
     }
 }
-$out(['ok' => true, 'orderId' => (int)$order->getId(), 'accountNumber' => $order->getField('ACCOUNT_NUMBER'), 'price' => (float)$order->getPrice(),
+// состав заказа для покупки в электронной коммерции Метрики: кофе на развес — в упаковках, как в корзине на сайте
+$items = [];
+foreach ($order->getBasket() as $bi) {
+    $kg = (float)preg_replace('/[^\d.]/', '', (string)($bi->getPropertyCollection()->getPropertyValues()['PACK']['VALUE'] ?? ''));
+    $items[] = ['id' => (string)$bi->getProductId(), 'name' => $bi->getField('NAME'), 'price' => round($bi->getPrice() * ($kg ?: 1), 2),
+        'quantity' => $kg ? $bi->getQuantity() / $kg : $bi->getQuantity()] + ($kg ? ['variant' => $kg . ' кг'] : []);
+}
+$out(['ok' => true, 'orderId' => (int)$order->getId(), 'accountNumber' => $order->getField('ACCOUNT_NUMBER'), 'price' => (float)$order->getPrice(), 'items' => $items,
     'redirect' => (bt_tbank_payment($order) ? '/personal/order/pay/' : '/personal/order/success/') . '?id=' . (int)$order->getId()]);

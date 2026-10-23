@@ -587,10 +587,12 @@ document.addEventListener('DOMContentLoaded',()=>{
         Object.keys(BT_CART).forEach(k=>delete BT_CART[k]);
         try{localStorage.setItem('bt_cart','{}');}catch(x){}
         window.BT_BASKET={items:{},sum:0}; BT_cartUpdate(false);
-        /* цель Метрики «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк она теряется */
+        /* Метрика: покупка (электронная коммерция, частями по 15 товаров — лимит 8 КБ) и цель «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк они теряются */
         let gone=false; const go=()=>{if(!gone){gone=true;location.href=r.redirect;}};
-        try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal','bt_order',{order_id:String(r.accountNumber||r.orderId),order_price:r.price,currency:'RUB'},go);}catch(x){}
-        setTimeout(go,800); return;
+        const num=String(r.accountNumber||r.orderId), items=(r.items||[]).map(x=>{const m=BT_find(x.id); return m&&m.cat?Object.assign({category:m.cat},x):x;});
+        for(let i=0;i<items.length;i+=15) BT_ec('purchase',{actionField:{id:items.length>15?num+'-'+(i/15+1):num},products:items.slice(i,i+15)});
+        try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal','bt_order',{order_id:num,order_price:r.price,currency:'RUB'},go);}catch(x){}
+        setTimeout(go,1200); return;
       }
       sending=false; submit.textContent=btnText();
       let first=null;
