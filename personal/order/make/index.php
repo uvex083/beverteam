@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);
   const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
   const dateOf=o=>{const x=BT_dates();
-    if(o.d.period) return o.d.period;
+    if(o.d.period) return o.d.period.replace(/(\d)\s*-\s*(\d)/g,'$1–$2');
     if(o.tab==='pickup') return 'обычно в день заказа';
     if(o.d.code==='bt_courier') return 'до '+BT_fmtDate(x.deliver,true);
     return '';};

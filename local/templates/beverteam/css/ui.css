@@ -579,7 +579,9 @@ input,textarea{caret-color:var(--ink)}
 .radio-card .t .p{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:flex-end;gap:2px 0}
 .radio-card .dd{color:var(--ink);white-space:nowrap}
 .radio-card .dd::before{content:", "}
-@media(max-width:600px){#deliv .radio-card .t{flex-direction:column;gap:4px}#deliv .radio-card .t .p{flex-direction:column;align-items:flex-start}#deliv .radio-card .dd::before{content:none}}
+/* узкая карточка (телефон и планшет с колонкой итога): цена и срок столбиком под названием */
+#deliv{container-type:inline-size}
+@container (max-width:520px){#deliv .radio-card .t{flex-direction:column;gap:4px}#deliv .radio-card .t .p{flex-direction:column;align-items:flex-start}#deliv .radio-card .dd::before{content:none}#deliv .radio-card .t>span:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}#deliv .radio-card .badge{margin-left:0}}
 .radio-card .badge{margin-left:8px;vertical-align:middle}
 /* — карточка товара: строка «доставим» — */
 .dship{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:14px}
