@@ -64,7 +64,6 @@ AddEventHandler('ipol.sdek', 'onFormation', 'bt_cdek_formation');
 
 // заголовки безопасности отдаём из PHP: mod_headers у хостинга не действует. Фреймом встраивать сайт можно только себе и Метрике (карта кликов, Вебвизор)
 if (!headers_sent() && PHP_SAPI !== 'cli') {
-    header_remove('X-Powered-CMS');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Strict-Transport-Security: max-age=31536000');
