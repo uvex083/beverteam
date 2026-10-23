@@ -576,8 +576,10 @@ input,textarea{caret-color:var(--ink)}
 .free i{display:block;height:5px;border-radius:3px;background:rgba(14,14,12,.12);margin-top:8px;position:relative;overflow:hidden}
 .free i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p,0%);background:var(--ink);border-radius:3px;transition:width .4s cubic-bezier(.16,1,.3,1)}
 /* — способы доставки: дата и бейджи — */
-.radio-card .t .p{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.radio-card .dd{font-size:12.5px;color:var(--ink);font-weight:600;white-space:nowrap}
+.radio-card .t .p{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:flex-end;gap:2px 0}
+.radio-card .dd{color:var(--ink);white-space:nowrap}
+.radio-card .dd::before{content:", "}
+@media(max-width:600px){.radio-card .t{flex-direction:column;gap:4px}.radio-card .t .p{justify-content:flex-start}}
 .radio-card .badge{margin-left:8px;vertical-align:middle}
 /* — карточка товара: строка «доставим» — */
 .dship{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:14px}
