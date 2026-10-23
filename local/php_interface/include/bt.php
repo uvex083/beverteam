@@ -1613,10 +1613,11 @@ function bt_user_js(): ?array
     if (!is_object($USER) || !$USER->IsAuthorized()) {
         return null;
     }
-    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN', 'PERSONAL_PHONE', 'PERSONAL_MOBILE']])->fetch();
+    $u = \Bitrix\Main\UserTable::getList(['filter' => ['=ID' => (int)$USER->GetID()], 'select' => ['NAME', 'LAST_NAME', 'EMAIL', 'LOGIN', 'PERSONAL_PHONE', 'PERSONAL_MOBILE', 'PERSONAL_PHOTO']])->fetch();
     $phone = (string)($u['PERSONAL_PHONE'] ?: $u['PERSONAL_MOBILE']);
     return $u ? ['name' => trim($u['NAME'] . ' ' . $u['LAST_NAME']), 'email' => (string)($u['EMAIL'] ?: $u['LOGIN']),
-        'phone' => $phone !== '' ? bt_phone_fmt($phone) : '', 'priceEdit' => bt_price_editor()] : null;
+        'phone' => $phone !== '' ? bt_phone_fmt($phone) : '', 'priceEdit' => bt_price_editor(),
+        'photo' => $u['PERSONAL_PHOTO'] ? (string)(CFile::ResizeImageGet($u['PERSONAL_PHOTO'], ['width' => 96, 'height' => 96], BX_RESIZE_IMAGE_EXACT)['src'] ?? '') : ''] : null;
 }
 
 // Кнопки входа через сервисы для ui.js: только включённые в модуле «Социальные сервисы» и с заполненными ключами
@@ -1835,7 +1836,7 @@ function bt_acc_start(string $cur, string $head, string $sub = ''): void
     echo '<div class="wrap accp">';
     bt_crumbs();
     echo '<div class="pagehead">' . $head . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . '</div><div class="acc-l"><aside class="acc-nav">'
-        . '<div class="u"><i>' . $e(mb_strtoupper(mb_substr($u['name'] ?: $u['email'], 0, 1))) . '</i><div><b>' . $e(explode(' ', $u['name'])[0] ?: 'Покупатель') . '</b><small>' . $e($u['email']) . '</small></div></div>';
+        . '<div class="u"><i>' . (!empty($u['photo']) ? '<img src="' . $e($u['photo']) . '" alt="">' : $e(mb_strtoupper(mb_substr($u['name'] ?: $u['email'], 0, 1)))) . '</i><div><b>' . $e(explode(' ', $u['name'])[0] ?: 'Покупатель') . '</b><small>' . $e($u['email']) . '</small></div></div>';
     foreach ($nav as [$code, $href, $text, $extra]) {
         echo '<a href="' . $href . '"' . ($code === $cur ? ' class="cur" aria-current="page"' : '') . '>' . $text . ' ' . $extra . '</a>';
     }

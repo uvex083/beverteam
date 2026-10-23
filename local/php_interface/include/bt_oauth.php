@@ -81,6 +81,13 @@ class BtOAuth
         global $USER;
         if (in_array($f['EXTERNAL_AUTH_ID'] ?? '', ['YandexOAuth', 'VKontakte'], true) && $USER->IsAuthorized()) {
             $USER->Authorize((int)$USER->GetID(), true);
+            // ядро сохраняет фото сервиса только новому аккаунту; уже существующему — подставляем, если своего нет
+            $pic = $f['PERSONAL_PHOTO'] ?? null;
+            $id = (int)$USER->GetID();
+            if (is_array($pic) && !empty($pic['tmp_name']) && CFile::CheckImageFile($pic) == ''
+                && !(int)(\Bitrix\Main\UserTable::getList(['filter' => ['=ID' => $id], 'select' => ['PERSONAL_PHOTO']])->fetch()['PERSONAL_PHOTO'] ?? 0)) {
+                (new CUser())->Update($id, ['PERSONAL_PHOTO' => $pic + ['MODULE_ID' => 'main']]);
+            }
         }
     }
 

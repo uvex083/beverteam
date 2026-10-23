@@ -771,7 +771,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const dnFill=()=>{
     const q=s=>dn.querySelector(s), u=window.BT_USER;
     if(u){ q('[data-dme-name]').textContent=u.name||u.email; q('[data-dme-sub]').textContent='Личный кабинет';
-      q('[data-dme-i]').textContent=(u.name||u.email||'?').trim().charAt(0).toUpperCase(); }
+      const i=q('[data-dme-i]'); if(u.photo){ i.innerHTML=''; const im=new Image(); im.src=u.photo; im.alt=''; i.append(im); } else i.textContent=(u.name||u.email||'?').trim().charAt(0).toUpperCase(); }
   };
   new MutationObserver(()=>{ const o=dr.classList.contains('open');
     burger.setAttribute('aria-expanded',o); burger.setAttribute('aria-label',o?'Закрыть меню':'Меню');
