@@ -579,7 +579,7 @@ input,textarea{caret-color:var(--ink)}
 .radio-card .t .p{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:flex-end;gap:2px 0}
 .radio-card .dd{color:var(--ink);white-space:nowrap}
 .radio-card .dd::before{content:", "}
-@media(max-width:600px){.radio-card .t{flex-direction:column;gap:4px}.radio-card .t .p{justify-content:flex-start}}
+@media(max-width:600px){#deliv .radio-card .t{flex-direction:column;gap:4px}#deliv .radio-card .t .p{flex-direction:column;align-items:flex-start}#deliv .radio-card .dd::before{content:none}}
 .radio-card .badge{margin-left:8px;vertical-align:middle}
 /* — карточка товара: строка «доставим» — */
 .dship{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:14px}
