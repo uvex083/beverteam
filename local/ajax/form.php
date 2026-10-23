@@ -27,7 +27,7 @@ Loader::includeModule('iblock');
 $rules = [
     'lead' => ['name', 'phone'],
     'contact' => ['name', 'phone'],
-    'write' => ['name', 'phone', 'email'],
+    'write' => ['name', 'phone'],
     'subscribe' => ['email'],
 ];
 $form = (string)$req->getPost('form');
