@@ -290,28 +290,24 @@ window.BT_cartUpdate = pulse => {
   if(pulse){a.classList.remove('is-pulse');void a.offsetWidth;a.classList.add('is-pulse');}
 };
 
-/* ---------- даты: сборка сегодня (до 17:00 в будни), курьер по Екатеринбургу — в течение 2 рабочих дней со дня заказа ---------- */
+/* ---------- даты: курьер по Екатеринбургу привозит в течение 2 рабочих дней со дня заказа, день считаем по Екатеринбургу ---------- */
 const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const isWork = d => d.getDay()!==0 && d.getDay()!==6;
 const nextWork = (d,n) => { const x=new Date(d); while(n>0){ x.setDate(x.getDate()+1); if(isWork(x)) n--; } return x; };
 const MONTHS_S=['янв.','февр.','марта','апр.','мая','июня','июля','авг.','сент.','окт.','нояб.','дек.'];
 window.BT_fmtDate = (d,short) => d.getDate()+'\u00a0'+(short?MONTHS_S:MONTHS)[d.getMonth()];
 window.BT_dates = (days) => {
-  const now=new Date(); let pack=new Date(now);
-  if(!isWork(now)||now.getHours()>=17) pack=nextWork(now,1);           /* после 17:00 и в выходные — первый рабочий день */
-  const deliver=nextWork(now,days||2), ship=deliver;
-  const rel = d => { const t=new Date();t.setHours(0,0,0,0); const x=new Date(d);x.setHours(0,0,0,0); const k=Math.round((x-t)/864e5); return k===0?'сегодня':k===1?'завтра':''; };
-  return {pack,ship,deliver,relPack:rel(pack),relShip:rel(ship),relDeliver:rel(deliver)};
+  let now=new Date(); try{ now=new Date(now.toLocaleString('en-US',{timeZone:'Asia/Yekaterinburg'})); }catch(e){}
+  return {deliver:nextWork(now,days||2)};
 };
-window.BT_timeline = () => { const d=BT_dates(); const f=(r,x)=>(r?r+', ':'')+BT_fmtDate(x);
-  return `<div class="tl3">
-    <div>${I.box}<span><small>Соберём</small><b>${f(d.relPack,d.pack)}</b></span></div>
-    <div>${I.truck}<span><small>Передадим курьеру</small><b>до ${BT_fmtDate(d.ship)}</b></span></div>
-    <div>${I.home}<span><small>Екатеринбург / СДЭК по России</small><b>до ${BT_fmtDate(d.deliver)}</b></span></div>
-  </div>`; };
+window.BT_timeline = () => `<div class="tl3">
+    <div>${I.truck}<span><small>Курьер по Екатеринбургу</small><b>до ${BT_fmtDate(BT_dates().deliver)}</b></span></div>
+    <div>${I.box}<span><small>СДЭК по России</small><b>2–7 дней</b></span></div>
+    <div>${I.home}<span><small>Самовывоз</small><b>по согласованию</b></span></div>
+  </div>`;
 /* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
-  return sum>=T ? `Доставка по Екатеринбургу — бесплатно, по России — СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
+  return sum>=T ? `Доставка по Екатеринбургу бесплатно, по России через СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
 
 /* скидка от суммы заказа — по правилам корзины Битрикса (window.BT_SUMDISC: [{from,pct}]): сколько срежет и сколько до следующей ступени */
 window.BT_sumDisc = sum => { const L=window.BT_SUMDISC||[]; let cur=null, next=null;

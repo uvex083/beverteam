@@ -141,7 +141,7 @@ $co = bt_contacts();
       <div class="blk" id="blkD">
         <h2><b>3</b>Доставка<span class="calcst" id="calcSt" aria-live="polite"></span></h2>
         <div class="pill-tabs dtabs" id="dTabs" role="tablist"><button type="button" role="tab" data-tab="addr">Курьером</button><button type="button" role="tab" data-tab="pickup">Самовывоз</button><button type="button" role="tab" data-tab="pvz">Пункт выдачи</button></div>
-        <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна — сбой на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
+        <div class="alert cdekdown" id="cdekDown" hidden>Доставка СДЭК сейчас недоступна из-за сбоя на стороне СДЭК. Обновите страницу через пару минут или выберите другой способ.</div>
         <div class="opts" id="deliv"></div>
         <div id="pickupNote" class="alert alert--info" hidden style="margin-top:14px">Самовывоз: <?= $e(($co['city'] ?? '') . ', ' . ($co['street'] ?? '')) ?>. Заберите <?= $e(mb_strtolower($co['hours'] ?? '')) ?> после звонка менеджера о готовности заказа.</div>
         <div id="addr" hidden style="margin-top:18px">
@@ -174,7 +174,7 @@ $co = bt_contacts();
       <div class="l" id="sDiscRow" hidden><span>Скидка от суммы заказа</span><span id="sDisc" style="color:var(--ok)"></span></div>
       <div class="l"><span>Доставка</span><span id="sDel">—</span></div>
       <div class="l t"><span>К оплате</span><span id="sTot"><?= bt_fmt($basket->getPrice()) ?></span></div>
-      <p class="totnote" id="sTotNote" hidden>Без учёта доставки — стоимость сообщит менеджер</p>
+      <p class="totnote" id="sTotNote" hidden>Без учёта доставки, её стоимость сообщит менеджер</p>
       <div class="eta" id="sEta">&nbsp;</div>
       <p class="left" id="sLeft" aria-live="polite">&nbsp;</p>
       <button class="btn btn--block" type="submit" id="submit" disabled>Оформить заказ</button>
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     deliv.innerHTML=list.length?list.map(o=>{const free=o.d.price===0&&o.d.base>0;
       return `<label class="radio-card ${sel&&sel.key===o.key?'on':''}"><input type="radio" name="dopt" value="${o.key}" ${sel&&sel.key===o.key?'checked':''}>
         <div style="flex:1"><div class="t"><span>${esc(o.t)}${free?' <span class="badge badge--ok">Бесплатно</span>':''}</span><span class="p">${free?`<s class="muted">${fmt(o.d.base)}</s>`:priceOf(o)}${dateOf(o)?`<span class="dd">${dateOf(o)}</span>`:''}</span></div>
-        <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте — точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
+        <div class="d">${esc(o.desc)}</div>${o.d.from&&/\d/.test(calcSt)?'<div class="d">Не нашли этот адрес на карте. Точную стоимость доставки сообщит менеджер.</div>':''}${o.d.code==='sdek_pickup'?pvzPick():''}</div></label>`;}).join('')
       :waiting()?'<div class="radio-card skel" aria-hidden="true"></div>':`<p class="muted" style="margin:0;font-size:14px">${!locIn.value?'Выберите город из списка, чтобы увидеть способы доставки.':dl.length?'Для выбранного города этот способ недоступен — выберите другой.':'В этот город сейчас не можем рассчитать доставку — позвоните нам, подберём вариант.'}</p>`;
     addr.hidden=!sel||sel.tab!=='addr'; pickupNote.hidden=!sel||sel.tab!=='pickup';
     const nw=N_ITEMS+' '+plural(N_ITEMS,['товар','товара','товаров']), dd=sel?dateOf(sel):'';
@@ -281,11 +281,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     const pts=pvzCache[loc]?Promise.resolve(pvzCache[loc]):post({action:'pvz',loc}).then(r=>pvzCache[loc]=r.list||[]);
     Promise.all([pts,ymapsLoad().catch(()=>null)]).then(([list,y])=>{ if(loc!==pvzLoc) return;
       pvzAll=list; pvzOpenId=-1; renderPvzList();
-      if(!list.length){pvzLoad.textContent='В этом городе нет пунктов выдачи СДЭК — выберите доставку курьером';return;}
-      if(!y){pvzLoad.textContent='Карта не загрузилась — выберите пункт из списка';return;}
+      if(!list.length){pvzLoad.textContent='В этом городе нет пунктов выдачи СДЭК. Выберите доставку курьером';return;}
+      if(!y){pvzLoad.textContent='Карта не загрузилась. Выберите пункт из списка';return;}
       pvzLoad.hidden=true; drawPvzMap(y);
       const c=pvzAll.findIndex(p=>p.c===pvzIn.value); if(c>=0) showPvz(c);
-    }).catch(()=>{pvzLoc='';pvzLoad.textContent='Не получилось загрузить пункты — попробуйте ещё раз';});
+    }).catch(()=>{pvzLoc='';pvzLoad.textContent='Не получилось загрузить пункты. Попробуйте ещё раз';});
   }
   function drawPvzMap(y){
     if(!pvzMap) pvzMap=new y.Map(pvzMapBox,{center:[pvzAll[0].lat,pvzAll[0].lon],zoom:11,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true,yandexMapDisablePoiInteractivity:true});
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const list=pvzAll.map((p,i)=>[p,i]).filter(([p])=>!q||(p.a+' '+p.m+' '+p.c).toLowerCase().replace(/ё/g,'е').includes(q));
     pvzN.textContent=pvzAll.length?(q?`Найдено: ${list.length}`:`${pvzAll.length} ${plural(pvzAll.length,['пункт','пункта','пунктов'])} в городе`):'';
     pvzList.innerHTML=list.slice(0,150).map(([p,i])=>`<button type="button" class="pvzm__it${p.c===pvzIn.value?' on':''}" data-i="${i}"><b>${esc(p.a)}</b><span>${esc([p.m&&'м. '+p.m,p.w].filter(Boolean).join(' · '))}</span></button>`).join('')
-      +(list.length>150?'<p class="pvzm__n">Уточните поиск, чтобы увидеть остальные</p>':'')+(q&&!list.length?'<p class="pvzm__n">Ничего не нашли — попробуйте другую улицу</p>':'');
+      +(list.length>150?'<p class="pvzm__n">Уточните поиск, чтобы увидеть остальные</p>':'')+(q&&!list.length?'<p class="pvzm__n">Ничего не нашли. Попробуйте другую улицу</p>':'');
   }
   function showPvz(i,fromMap){
     const p=pvzAll[i]; if(!p) return;
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // расчёт не удался: варианты прежнего города остаются приглушёнными, если город уже другой
   function calcFailed(){ busy(false); cop.classList.toggle('is-stale',!!last&&last.loc!==locIn.value); dim();
     renderDeliv(); renderPay(); if(last&&last.loc===locIn.value) renderSum(last); ready();
-    BT_toast('Не получилось пересчитать доставку — обновите страницу'); return false; }
+    BT_toast('Не получилось пересчитать доставку. Обновите страницу'); return false; }
   function calc(again){
     const n=++calcN; busy(true);
     const st=document.getElementById('coStreet').value.trim(); calcSt=st;
