@@ -22,7 +22,7 @@ $APPLICATION->SetPageProperty('robots', 'noindex, follow');
       <div class="l"><span>Доставка</span><span class="muted">рассчитаем при оформлении</span></div>
       <div class="l t"><span>Итого</span><span id="tot"></span></div>
       <a class="btn btn--block" id="goOrder" href="/personal/order/make/" style="margin-top:14px">Оформить заказ</a>
-      <p class="muted" style="font-size:12.5px;margin:12px 0 0;text-align:center">Юрлицам — оплата по счёту, закрывающие документы</p>
+      <p class="muted" style="font-size:12.5px;margin:12px 0 0;text-align:center">Юрлица и ИП могут оплатить заказ по счёту</p>
     </aside>
   </div>
 
