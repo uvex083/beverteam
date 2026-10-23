@@ -3,6 +3,6 @@
 /upload/
 # IDE
 /.idea/
-# на dev — запрет индексации, боевой robots.txt появится при запуске
+# robots.txt правят сеошник и админка (SEO → robots.txt) прямо на сервере
 /robots.txt
 /sitemap.xml
