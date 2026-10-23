@@ -1143,7 +1143,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
   /* форма на странице отправлена: очищаем её и показываем окно «Заявка отправлена» — посетитель остаётся на том же месте */
-  const okMsg={subscribe:['Вы подписаны','Будем присылать подборку новых статей журнала на этот адрес. Отписаться можно в любой момент.']};
+  const okMsg={subscribe:['Проверьте почту','Мы отправили письмо со ссылкой. Подписка заработает, когда вы по ней перейдёте.']};
   window.BT_formOk=f=>{
     f.reset(); f.querySelectorAll('.is-err').forEach(x=>x.classList.remove('is-err')); f.querySelectorAll('.err').forEach(x=>x.textContent=''); f.querySelectorAll('[aria-invalid]').forEach(x=>x.removeAttribute('aria-invalid'));
     const ok=ld.querySelector('.lead__ok'), t=ok.querySelector('.display'), m=ok.querySelector('.muted');

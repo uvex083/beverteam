@@ -110,6 +110,17 @@ $messages = [
         . m_p('#DATE# изменились цены в прайс-листе. Актуальный прайс всегда открывается по одной и той же ссылке — там же его можно скачать в Excel или PDF.')
         . m_btn('https://#SERVER_NAME#/price/', 'Открыть прайс-лист')
         . m_note('Письмо пришло, потому что вы подписались на изменения прайса на сайте #SERVER_NAME#. <a href="https://#SERVER_NAME#/local/ajax/price.php?unsub=#TOKEN#" style="color:#6C6C64">Отписаться</a>')],
+    'BT_JOURNAL_CONFIRM' => ['Подтвердите подписку на журнал BEVERTEAM', '#EMAIL_TO#', '#DEFAULT_EMAIL_FROM#', '',
+        m_head('Подтвердите подписку', 'Журнал')
+        . m_p('Вы подписались на подборки новых статей журнала BEVERTEAM о кофе и кофемашинах. Чтобы получать их, подтвердите адрес.')
+        . m_btn('https://#SERVER_NAME#/local/ajax/journal.php?confirm=#TOKEN#', 'Подтвердить подписку')
+        . m_note('Если вы не подписывались, просто не обращайте внимания на это письмо: без подтверждения писем не будет.')],
+    'BT_JOURNAL_DIGEST' => ['Новое в журнале BEVERTEAM', '#EMAIL_TO#', '#DEFAULT_EMAIL_FROM#', '',
+        m_head('Новое в журнале', 'Журнал')
+        . m_p('Собрали статьи, которые вышли с прошлой подборки.')
+        . '<div style="height:8px;line-height:8px;font-size:1px">&nbsp;</div>#POSTS#'
+        . m_btn('https://#SERVER_NAME#/blog/', 'Все статьи журнала')
+        . m_note('Письмо пришло, потому что вы подписались на журнал на сайте #SERVER_NAME#. <a href="https://#SERVER_NAME#/local/ajax/journal.php?unsub=#TOKEN#" style="color:#6C6C64">Отписаться</a>')],
 
     // магазин
     'SALE_NEW_ORDER' => ['Заказ № #ORDER_ID# принят', $sale[0], $sale[1], '#BCC#',

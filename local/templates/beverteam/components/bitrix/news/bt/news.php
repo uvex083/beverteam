@@ -63,14 +63,14 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   ], $component) ?>
 
   <section class="sec sec--t0" style="padding-top:var(--pad)">
-    <div class="jsub">
+    <div class="jsub" id="jsub">
       <div class="jsub__t">
         <div class="mono">Журнал · рассылка</div>
         <h2 class="display h2">Не пропускайте<br><span>новые статьи</span></h2>
-        <p>Раз в месяц — подборка новых статей журнала. Без спама, отписаться можно в любой момент.</p>
+        <p>Пришлём подборку, когда выйдет несколько новых статей. Отписаться можно по ссылке в письме.</p>
+        <?php $js = (string)($_GET['sub'] ?? ''); if ($js === 'ok' || $js === 'bad' || !empty($_GET['unsub'])): ?><p class="jsub__ok" role="status"><?= $js === 'ok' ? 'Подписка подтверждена. Первая подборка придёт, когда выйдет несколько новых статей.' : ($js === 'bad' ? 'Ссылка устарела. Подпишитесь ещё раз, и мы пришлём новое письмо.' : 'Вы отписались, подборок журнала больше не будет.') ?></p><?php endif ?>
       </div>
       <form class="jsub__f" data-form="subscribe" novalidate>
-        <input type="hidden" name="topic" value="Подписка на новые материалы журнала">
         <input type="hidden" name="sessid" value="<?= bitrix_sessid() ?>">
         <div class="hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
         <div class="jsub__row">

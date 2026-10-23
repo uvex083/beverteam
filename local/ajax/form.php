@@ -81,6 +81,17 @@ if ($errors) {
     $out(200, ['ok' => false, 'errors' => $errors]);
 }
 
+// подписка на журнал не заявка: свой список подписчиков, адрес подтверждается письмом
+if ($form === 'subscribe') {
+    if (time() - (int)($_SESSION['BT_FORM_LAST'] ?? 0) < 15 || bt_ip_flood('BT_JOURNAL_SUB', 5, 600)) {
+        $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Слишком много подписок подряд. Попробуйте через 10 минут.']);
+    }
+    bt_journal_subscribe($d['email']) or $out(500, ['ok' => false, 'error' => 'save']);
+    $_SESSION['BT_FORM_LAST'] = time();
+    bt_ip_hit('BT_JOURNAL_SUB');
+    $out(200, ['ok' => true]);
+}
+
 // защита от спама: не чаще раза в 15 секунд из сессии и не больше 5 заявок за 10 минут с одного IP; администраторам не мешает проверять формы
 $ip = (string)$req->getRemoteAddress();
 $ibId = bt_iblock('form_requests');

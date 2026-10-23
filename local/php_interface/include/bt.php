@@ -1431,6 +1431,94 @@ function bt_price_notify_send(int $ts): int
     return $n;
 }
 
+// Подписка на журнал: адрес попадает в ИБ journal_subs выключенным и включается по ссылке из письма BT_JOURNAL_CONFIRM
+function bt_journal_subscribe(string $email): bool
+{
+    if (!($ib = bt_iblock('journal_subs'))) {
+        return false;
+    }
+    $email = mb_strtolower($email);
+    $el = \CIBlockElement::GetList([], ['IBLOCK_ID' => $ib, '=NAME' => $email], false, false, ['ID', 'ACTIVE', 'PROPERTY_TOKEN'])->Fetch();
+    if ($el && $el['ACTIVE'] === 'Y') {
+        return true;
+    }
+    $token = (string)($el['PROPERTY_TOKEN_VALUE'] ?? '');
+    if (!$el) {
+        $token = md5(random_bytes(16));
+        if (!(new \CIBlockElement())->Add(['IBLOCK_ID' => $ib, 'NAME' => $email, 'ACTIVE' => 'N', 'PROPERTY_VALUES' => ['TOKEN' => $token]])) {
+            return false;
+        }
+    } elseif ($token === '') {
+        $token = md5(random_bytes(16));
+        \CIBlockElement::SetPropertyValuesEx($el['ID'], $ib, ['TOKEN' => $token]);
+    }
+    \CEvent::Send('BT_JOURNAL_CONFIRM', 's1', ['EMAIL_TO' => $email, 'TOKEN' => $token]);
+    return true;
+}
+
+// Агент раз в сутки: 1-го числа подборка журнала, если с прошлой вышло не меньше bt/journal_digest_min материалов (иначе ждём следующего месяца)
+function bt_journal_digest_agent(): string
+{
+    if ((int)date('j') === 1 && \Bitrix\Main\Config\Option::get('bt', 'journal_digest_month') !== date('Y-m')) {
+        \Bitrix\Main\Config\Option::set('bt', 'journal_digest_month', date('Y-m'));
+        bt_journal_digest_send();
+    }
+    return 'bt_journal_digest_agent();';
+}
+
+// Подборка новых материалов журнала подписчикам; $to — проверка: только этому подписчику, без порога и без сдвига отметки «прошлая подборка»
+function bt_journal_digest_send(string $to = ''): int
+{
+    $opt = fn(string $k, string $d = '') => \Bitrix\Main\Config\Option::get('bt', $k, $d);
+    $posts = [];
+    $r = \CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC'], ['IBLOCK_ID' => bt_iblock('journal'), 'ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y',
+        '>DATE_ACTIVE_FROM' => ConvertTimeStamp((int)$opt('journal_digest_last', '0'), 'FULL')], false, false,
+        ['ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'NAME', 'CODE', 'TAGS', 'ACTIVE_FROM', 'DATE_CREATE', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_PAGE_URL', 'PROPERTY_KIND', 'PROPERTY_RUBRIC', 'PROPERTY_READ_TIME']);
+    while ($f = $r->GetNext()) {
+        $posts[] = bt_post_data($f);
+    }
+    if ($to !== '' && !$posts) {
+        $posts = array_slice(bt_posts(), 0, 5);
+    }
+    if (!$posts || ($to === '' && count($posts) < max(1, (int)$opt('journal_digest_min', '5')))) {
+        return 0;
+    }
+    $html = bt_journal_digest_html(array_slice($posts, 0, 10), bt_mail_host('s1'));
+    $n = 0;
+    $r = \CIBlockElement::GetList([], ['IBLOCK_ID' => bt_iblock('journal_subs'), 'ACTIVE' => 'Y'] + ($to !== '' ? ['=NAME' => mb_strtolower($to)] : []),
+        false, false, ['ID', 'NAME', 'PROPERTY_TOKEN']);
+    while ($s = $r->Fetch()) {
+        if (check_email($s['NAME'], true) && $s['PROPERTY_TOKEN_VALUE']) {
+            \CEvent::Send('BT_JOURNAL_DIGEST', 's1', ['EMAIL_TO' => $s['NAME'], 'TOKEN' => $s['PROPERTY_TOKEN_VALUE'], 'POSTS' => $html]);
+            $n++;
+        }
+    }
+    if ($to === '') {
+        \Bitrix\Main\Config\Option::set('bt', 'journal_digest_last', (string)time());
+    }
+    return $n;
+}
+
+// Карточки материалов для письма: обложка, рубрика, заголовок, анонс
+function bt_journal_digest_html(array $posts, string $host): string
+{
+    $e = fn($s) => htmlspecialcharsbx($s);
+    $font = 'font-family:Manrope,Arial,Helvetica,sans-serif;';
+    $out = '';
+    foreach ($posts as $p) {
+        $url = $e($host . $p['url']);
+        $lead = mb_strlen($p['lead']) > 180 ? rtrim(mb_substr($p['lead'], 0, 180), ' ,.;:') . '…' : $p['lead'];
+        $img = $p['img'] === '' ? '' : (str_starts_with($p['img'], 'http') ? $p['img'] : $host . $p['img']);
+        $out .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px"><tr><td>'
+            . ($img !== '' ? '<a href="' . $url . '" style="display:block;margin:0 0 12px"><img src="' . $e($img) . '" width="520" alt="" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:12px"></a>' : '')
+            . '<div style="' . $font . 'font-size:12px;font-weight:700;color:#6C6C64;margin:0 0 6px">' . $e($p['cat']) . '</div>'
+            . '<a href="' . $url . '" style="' . $font . 'font-size:18px;line-height:1.3;font-weight:800;color:#0E0E0C;text-decoration:none">' . $e($p['t']) . '</a>'
+            . ($lead !== '' ? '<p style="margin:8px 0 0;' . $font . 'font-size:14px;line-height:1.55;color:#3A3A35">' . $e($lead) . '</p>' : '')
+            . '</td></tr></table>';
+    }
+    return $out;
+}
+
 // Может ли текущий пользователь править цены прямо на странице прайса (право каталога «Изменение цен»; у администраторов есть всегда)
 function bt_price_editor(): bool
 {
