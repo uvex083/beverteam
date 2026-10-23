@@ -15,7 +15,11 @@ $lnk = 'color:#D7E85C;text-decoration:none;font-weight:700';
       <?php if (!empty($co['email'])): ?><a href="mailto:<?= $e($co['email']) ?>" style="<?= $lnk ?>"><?= $e($co['email']) ?></a><?php endif ?>
     </td>
     <td class="bt-col" width="50%" valign="top">
-      <?= $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')) ?><br>
+      <?php // своя ссылка на адрес: иначе Gmail и iOS сами делают из него синюю ссылку на свои карты
+      $addr = trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ');
+      [$lat, $lon] = array_pad(explode(',', str_replace(' ', '', (string)($co['map'] ?? ''))), 2, '');
+      $map = $lat !== '' && $lon !== '' ? 'https://yandex.ru/maps/?pt=' . $lon . ',' . $lat . '&z=17' : 'https://yandex.ru/maps/?text=' . rawurlencode($addr); ?>
+      <?php if ($addr !== ''): ?><a href="<?= $e($map) ?>" style="color:#C9C9C2;text-decoration:none"><?= $e($addr) ?></a><br><?php endif ?>
       <?php if (!empty($co['hours'])): ?><?= $e($co['hours']) ?><br><?php endif ?>
       <a href="<?= $host ?>/personal/" style="<?= $lnk ?>">Личный кабинет</a> &nbsp;·&nbsp; <a href="<?= $host ?>/kontakty/" style="<?= $lnk ?>">Контакты</a>
     </td>
