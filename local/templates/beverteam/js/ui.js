@@ -2491,9 +2491,9 @@ window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||
   const list=pc=>{const s=pc.closest('section'), h=s&&s.querySelector('h1,h2');
     return ((h||document.querySelector('h1'))?.textContent||document.title).replace(/\s+/g,' ').trim().slice(0,100);};
   const seen=[];
-  /* карточки, которые ещё не попали в показы: при загрузке и после «Показать ещё», фильтра, подгрузки */
+  /* видимые карточки, которые ещё не попали в показы: при загрузке, после «Показать ещё», фильтра, переключения вкладок */
   const shown=()=>{const add=[];
-    document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc, m=BT_find(id); if(!m||m.rent||seen.includes(id)) return;
+    document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc, m=BT_find(id); if(!m||m.rent||!pc.offsetParent||seen.includes(id)) return;
       seen.push(id); add.push(BT_ecItem(m,{list:list(pc),position:seen.length}));});
     for(let i=0;i<add.length;i+=20) BT_ec('impressions',add.slice(i,i+20));
   };
@@ -2501,7 +2501,7 @@ window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||
     const p=window.BT_PAGE, m=p&&p.id&&BT_find(String(p.id));
     if(m&&!m.rent) BT_ec('detail',{products:[BT_ecItem(m)]});
     shown();
-    let t; new MutationObserver(()=>{clearTimeout(t); t=setTimeout(shown,300);}).observe(document.body,{childList:true,subtree:true});
+    let t; new MutationObserver(()=>{clearTimeout(t); t=setTimeout(shown,300);}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
   });
   document.addEventListener('click',e=>{const a=e.target.closest('.pc[data-pc] a[href]'); if(!a) return;
     const pc=a.closest('.pc'), id=pc.dataset.pc, m=BT_find(id); if(!m||m.rent) return;
