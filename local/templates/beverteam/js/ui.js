@@ -1165,13 +1165,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(e.defaultPrevented||f.dataset.busy){e.preventDefault();return;}
     e.preventDefault();
     const btn=f.querySelector('button[type=submit]'), fd=new FormData(f);
-    fd.append('form',f.dataset.form); fd.append('page',location.pathname);
+    /* код формы: им заявка ложится в свою папку в админке и им же засчитывается цель Метрики */
+    const topic=String(fd.get('topic')||''), g=f.dataset.goal||goalOf(f.dataset.form,topic);
+    fd.append('form',f.dataset.form); fd.append('page',location.pathname); fd.append('goal',g);
     f.dataset.busy='1'; if(btn) btn.disabled=true;
     try{
       const r=await fetch('/local/ajax/form.php',{method:'POST',body:fd,credentials:'same-origin'});
       const d=await r.json().catch(()=>({}));
       if(d.ok){
-        const topic=String(fd.get('topic')||''), g=f.dataset.goal||goalOf(f.dataset.form,topic);
         if(d.goal!==false){ goal(g,{topic,page:location.pathname}); if(/^bt_lead/.test(g)) goal('bt_lead'); }
         if(f.closest('#lead')){ f.reset(); f.hidden=true; ld.querySelector('.lead__ok').hidden=false; ld.querySelector('.lead__ok .btn').focus(); }
         else if(ld) BT_formOk(f);

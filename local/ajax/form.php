@@ -108,12 +108,22 @@ if (!$isAdmin && $recent >= 5) {
 if ($d['phone'] !== '') {
     $d['phone'] = '+7 ' . substr($digits, 1, 3) . ' ' . substr($digits, 4, 3) . '-' . substr($digits, 7, 2) . '-' . substr($digits, 9, 2);
 }
+// папка — по форме, с которой пришла заявка (код папки = код цели Метрики), неизвестная форма — в «Другие кнопки»
+$folder = static function (string $code) use ($ibId): int {
+    $s = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'], false, ['ID'])->Fetch();
+    return (int)($s['ID'] ?? 0);
+};
+$goal = (string)$req->getPost('goal');
+$sectionId = preg_match('/^bt_[a-z_]{2,40}$/', $goal) ? $folder($goal) : 0;
+$sectionId = $sectionId ?: $folder('bt_lead_other');
+$status = CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'STATUS', 'XML_ID' => 'new'])->Fetch();
 $el = new CIBlockElement();
 $id = (int)$el->Add([
-    'IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_FROM' => ConvertTimeStamp(time(), 'FULL'),
+    'IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y', 'ACTIVE_FROM' => ConvertTimeStamp(time(), 'FULL'), 'IBLOCK_SECTION_ID' => $sectionId ?: false,
     'NAME' => $d['topic'] . ' — ' . ($d['name'] ?: $d['email']),
     'PROPERTY_VALUES' => ['CLIENT_NAME' => $d['name'], 'PHONE' => $d['phone'], 'EMAIL' => $d['email'], 'TOPIC' => $d['topic'],
-        'MESSAGE' => $d['message'], 'PAGE' => $d['page'], 'IP' => $ip, 'USER_ID' => $USER->IsAuthorized() ? (int)$USER->GetID() : ''],
+        'MESSAGE' => $d['message'], 'PAGE' => $d['page'], 'IP' => $ip, 'USER_ID' => $USER->IsAuthorized() ? (int)$USER->GetID() : '',
+        'STATUS' => $status ? (int)$status['ID'] : false],
 ]);
 if (!$id) {
     $out(500, ['ok' => false, 'error' => 'save']);
