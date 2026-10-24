@@ -184,7 +184,7 @@ if ($bp):
 <?php if ($revs = $onMain(bt_reviews(), 'reviews')): ?>
 <section class="sec sec--t0"><div class="wrap">
   <?= $head($revB, bt_btn($revB['btn_text'] ?? '', $revB['btn_link'] ?? '', 'link'), 'div') ?>
-  <div class="grid g3 revs" data-rv>
+  <div class="grid g3 revs" id="revs" data-rv>
     <?php foreach ($revs as $r) echo bt_rev_card($r) ?>
   </div>
 </div></section>

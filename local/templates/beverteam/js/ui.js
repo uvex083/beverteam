@@ -1220,6 +1220,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('[data-ymap]').forEach(el=>BT_mapWidget(el));
   /* плитка разделов главной — слайдер, как в макете */
   BT_slider(document.getElementById('tiles'),{min:5,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3},1200:{slidesPerView:5,spaceBetween:14}}}});
+  /* отзывы и журнал на главной: на телефоне листаются, на компьютере три в ряд */
+  ['revs','news'].forEach(id=>BT_slider(document.getElementById(id),{min:2,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3,spaceBetween:20}}}}));
   /* 404: поиск открывает общий поиск по сайту с введённым запросом */
   const escq=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
