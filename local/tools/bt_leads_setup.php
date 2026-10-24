@@ -38,9 +38,10 @@ $r = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, 'CHECK_PERMISSIONS' => '
 while ($s = $r->Fetch()) {
     $have[$s['CODE']] = $s;
 }
-$sort = 0;
-foreach ($folders as $code => $name) {
-    $sort += 10;
+// список заявок в админке — «новые сверху» (по ID), этот порядок действует и на папки: создаём с конца, чтобы первая папка получила больший ID
+$sorts = array_combine(array_keys($folders), range(10, 10 * count($folders), 10));
+foreach (array_reverse($folders, true) as $code => $name) {
+    $sort = $sorts[$code];
     $s = $have[$code] ?? null;
     if (!$s) {
         $say("папка «{$name}»");
