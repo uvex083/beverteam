@@ -1024,7 +1024,7 @@ input,textarea{caret-color:var(--ink)}
 @media(hover:hover){.msgr--lg a:hover{background:var(--lime);color:var(--ink)}}
 
 /* — адрес и город в шапке (доверие + LocalBusiness) — */
-.hdr__msgr{flex:1;display:flex;justify-content:center;min-width:0}
+.hdr__msgr{flex:1;display:flex;justify-content:flex-end;min-width:0;margin-right:calc(14px - clamp(12px,2vw,28px))}
 
 /* — выпадающие подменю горизонтального меню (открытие по наведению) — */
 .hdr__nav .nav-i{position:relative;display:flex;align-items:center;height:44px}
