@@ -47,9 +47,8 @@ $home = $APPLICATION->GetCurPage(false) === '/';
     <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="drawer"><?= bt_icon('burger') . bt_icon('close') ?></button>
     <?php if ($home): ?><span class="brand" title="Чай и кофе для дома и бизнеса BEVERTEAM"><?= $logo ?></span><?php else: ?><a class="brand" href="/" title="Чай и кофе для дома и бизнеса BEVERTEAM" aria-label="Чай и кофе для дома и бизнеса BEVERTEAM — на главную"><?= $logo ?></a><?php endif ?>
     <button class="catbtn" id="catbtn" aria-expanded="false" aria-controls="mega"><span class="catbtn__i"><?= bt_icon('cat') . bt_icon('close') ?></span><span class="lbl">Каталог</span></button>
-    <div class="hdr__msgr"><?= $msgr() ?></div>
+    <div class="hdr__msgr"><?= $msgr() ?><a class="hdr__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a></div>
     <div class="hdr__acts">
-      <a class="hdr__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
       <button class="hact" id="srchBtn" aria-label="Поиск по сайту" aria-haspopup="dialog"><?= bt_icon('search') ?><span>Поиск</span></button>
       <a class="hact" href="/personal/"><?= bt_icon('user') ?><span>Кабинет</span></a>
       <a class="hact" href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span></a>

@@ -128,7 +128,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .hact svg{width:20px;height:20px}
 @media(hover:hover){.hact:hover{color:var(--lime)}}
 .hact .cnt{position:absolute;top:0;right:10px;background:var(--lime);color:var(--ink);border-radius:999px;font:700 10px/1 'JetBrains Mono';padding:3px 5px}
-.hdr__tel{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;white-space:nowrap;margin-right:6px}
+.hdr__tel{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;white-space:nowrap}
 .hdr__nav{display:flex;gap:22px;height:44px;align-items:center;border-top:1px solid #26261F;font-size:13.5px;font-weight:500;color:#C9C9C2}
 @media(hover:hover){.hdr__nav a:hover{color:var(--lime)}}
 .hdr__nav .r{margin-left:auto;color:#9C9C94;font-size:12.5px;white-space:nowrap}
@@ -1024,7 +1024,7 @@ input,textarea{caret-color:var(--ink)}
 @media(hover:hover){.msgr--lg a:hover{background:var(--lime);color:var(--ink)}}
 
 /* — адрес и город в шапке (доверие + LocalBusiness) — */
-.hdr__msgr{flex:1;display:flex;justify-content:flex-end;min-width:0;margin-right:calc(14px - clamp(12px,2vw,28px))}
+.hdr__msgr{flex:1;display:flex;justify-content:center;align-items:center;gap:16px;min-width:0}
 
 /* — выпадающие подменю горизонтального меню (открытие по наведению) — */
 .hdr__nav .nav-i{position:relative;display:flex;align-items:center;height:44px}
