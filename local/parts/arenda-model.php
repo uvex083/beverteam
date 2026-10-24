@@ -169,7 +169,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   </div></section>
   <?php endif ?>
 
-  <section class="sec sec--t0" id="form"><form class="card form" data-form="lead" data-goal="bt_lead_arenda_model" novalidate>
+  <section class="sec sec--t0" id="form"><form class="card form" data-form="lead" novalidate>
     <div><div class="mono muted">Заявка</div><h2 class="display h2" style="margin:14px 0 10px">Арендовать <?= $e($m['model']) ?></h2>
       <?php if (!empty($form['subtitle'])): ?><p class="muted" style="margin:0;max-width:40ch"><?= $e($form['subtitle']) ?></p><?php endif ?>
       <?php if (!empty($co['phone1'])): ?><p style="margin:18px 0 0"><a class="link" href="<?= $e($co['phone1_href']) ?>"><?= $e($co['phone1']) ?></a></p><?php endif ?></div>

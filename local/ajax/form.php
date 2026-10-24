@@ -109,7 +109,7 @@ if ($d['phone'] !== '') {
     $d['phone'] = '+7 ' . substr($digits, 1, 3) . ' ' . substr($digits, 4, 3) . '-' . substr($digits, 7, 2) . '-' . substr($digits, 9, 2);
 }
 // папка — по форме, с которой пришла заявка (код папки = код цели Метрики), неизвестная форма — в окно «Оставить заявку»;
-// одна и та же форма на разных страницах и кнопках — одна папка, хотя цели у них в Метрике свои
+// старые коды из закэшированного у посетителя скрипта — в папку объединённой формы
 $folder = static function (string $code) use ($ibId): int {
     $s = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'], false, ['ID'])->Fetch();
     return (int)($s['ID'] ?? 0);
