@@ -108,12 +108,14 @@ if (!$isAdmin && $recent >= 5) {
 if ($d['phone'] !== '') {
     $d['phone'] = '+7 ' . substr($digits, 1, 3) . ' ' . substr($digits, 4, 3) . '-' . substr($digits, 7, 2) . '-' . substr($digits, 9, 2);
 }
-// папка — по форме, с которой пришла заявка (код папки = код цели Метрики), неизвестная форма — в «Другие кнопки»
+// папка — по форме, с которой пришла заявка (код папки = код цели Метрики), неизвестная форма — в окно «Оставить заявку»;
+// одна и та же форма на разных страницах и кнопках — одна папка, хотя цели у них в Метрике свои
 $folder = static function (string $code) use ($ibId): int {
     $s = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'], false, ['ID'])->Fetch();
     return (int)($s['ID'] ?? 0);
 };
 $goal = (string)$req->getPost('goal');
+$goal = ['bt_lead_arenda_model' => 'bt_lead_arenda', 'bt_lead_menu' => 'bt_lead_other'][$goal] ?? $goal;
 $sectionId = preg_match('/^bt_[a-z_]{2,40}$/', $goal) ? $folder($goal) : 0;
 $sectionId = $sectionId ?: $folder('bt_lead_other');
 $status = CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'STATUS', 'XML_ID' => 'new'])->Fetch();

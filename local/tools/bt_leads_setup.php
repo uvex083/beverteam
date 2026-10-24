@@ -20,16 +20,14 @@ $folders = [
     'bt_lead_predlozhenie' => 'Главная: персональное предложение',
     'bt_lead_cfg' => 'Главная: подбор кофемашины',
     'bt_lead_contact' => 'Главная: форма внизу страницы',
-    'bt_lead_menu' => 'Мобильное меню: оставить заявку',
     'bt_lead_one_click' => 'Товар: купить в один клик',
     'bt_lead_podbor' => 'Подбор кофе',
-    'bt_lead_arenda' => 'Аренда: страница аренды',
-    'bt_lead_arenda_model' => 'Аренда: страница модели',
+    'bt_lead_arenda' => 'Аренда кофемашин',
     'bt_lead_ofis' => 'Кофе в офис',
     'bt_lead_servis' => 'Ремонт: вызов инженера',
     'bt_lead_about' => 'О компании',
     'bt_lead_write' => 'Контакты: напишите нам',
-    'bt_lead_other' => 'Другие кнопки «Оставить заявку»',
+    'bt_lead_other' => 'Окно «Оставить заявку»',
     'bt_order_question' => 'Кабинет: вопрос по заказу',
     'bt_order_cancel' => 'Кабинет: отмена заказа',
 ];
@@ -50,6 +48,17 @@ foreach (array_reverse($folders, true) as $code => $name) {
         $say("папка $code → «{$name}», сортировка $sort");
         $apply and (new CIBlockSection())->Update($s['ID'], ['NAME' => $name, 'SORT' => $sort]);
     }
+}
+
+// папки объединённых форм (одна форма на нескольких страницах): пустые удаляем, с заявками — оставляем и сообщаем
+foreach (array_diff_key($have, $folders) as $code => $s) {
+    if (CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, 'SECTION_ID' => $s['ID'], 'CHECK_PERMISSIONS' => 'N'], [])) {
+        echo "папка «{$s['NAME']}» не пустая — перенесите заявки и удалите вручную
+";
+        continue;
+    }
+    $say("удалить пустую папку «{$s['NAME']}»");
+    $apply and CIBlockSection::Delete($s['ID'], false);
 }
 
 // названия папок в меню админки и общий список: папки сверху, заявки внутри
