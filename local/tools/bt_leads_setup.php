@@ -52,9 +52,9 @@ foreach ($folders as $code => $name) {
 }
 
 // названия папок в меню админки и общий список: папки сверху, заявки внутри
-$ib = CIBlock::GetByID($ibId)->Fetch();
+$ib = CIBlock::GetList([], ['ID' => $ibId, 'CHECK_PERMISSIONS' => 'N'])->Fetch();
 $want = ['SECTIONS_NAME' => 'Папки', 'SECTION_NAME' => 'Папка', 'LIST_MODE' => 'C'];
-if (array_diff_assoc($want, array_intersect_key($ib, $want))) {
+if (array_diff_assoc($want, CIBlock::GetMessages($ibId) + ['LIST_MODE' => $ib['LIST_MODE']])) {
     $say('ИБ: папки в меню, общий список');
     $apply and (new CIBlock())->Update($ibId, $want);
 }
