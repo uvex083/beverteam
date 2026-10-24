@@ -1200,6 +1200,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-cfg-p]').textContent=d.p; q('[data-cfg-u]').textContent=d.u;
       if(d.lead){a.dataset.lead=d.lead; a.textContent='Оставить заявку';} else {delete a.dataset.lead; a.textContent=a.dataset.text; a.href=a.dataset.href;}
     });
+    /* место под самый длинный вариант: название и описание в 1 или 2 строки не двигают блок при переключении; пересчёт при смене ширины */
+    const fit=()=>{const el={m:q('[data-cfg-m]'),s:q('[data-cfg-s]'),p:q('[data-cfg-p]'),u:q('[data-cfg-u]')}, pr=q('.cfg__price'), was={}, max={m:0,s:0,pr:0};
+      if(Object.values(el).some(x=>!x)) return;
+      Object.keys(el).forEach(k=>{was[k]=el[k].textContent;}); [el.m,el.s,pr].forEach(x=>x&&(x.style.minHeight=''));
+      C.forEach(d=>{el.m.textContent=d.m; el.s.textContent=d.s; el.p.textContent=d.p; el.u.textContent=d.u;
+        max.m=Math.max(max.m,el.m.offsetHeight); max.s=Math.max(max.s,el.s.offsetHeight); if(pr) max.pr=Math.max(max.pr,pr.offsetHeight);});
+      Object.keys(el).forEach(k=>{el[k].textContent=was[k];});
+      el.m.style.minHeight=max.m+'px'; el.s.style.minHeight=max.s+'px'; if(pr) pr.style.minHeight=max.pr+'px';};
+    fit(); document.fonts&&document.fonts.ready.then(fit);
+    let ft; addEventListener('resize',()=>{clearTimeout(ft); ft=setTimeout(fit,150);});
   }
   document.querySelectorAll('.pill-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{
     const sec=b.closest('section'); if(!sec||!sec.querySelector('[data-tabpane]')) return; /* у вкладок доставки на оформлении заказа свой обработчик */
