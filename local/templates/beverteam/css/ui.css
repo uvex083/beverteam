@@ -259,6 +259,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 /* catalog layout */
 /* без якоря прокрутки: фильтр подменяет карточки, и браузер иначе перематывает страницу — липкий фильтр дёргается */
 .cat{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;overflow-anchor:none}
+/* колонка товаров кончается по последнему блоку без нижнего отступа — липкий фильтр останавливается вровень с ним */
+.cat>div>.sec:last-child{padding-bottom:0}
 .filters{background:var(--white);border-radius:var(--rad);padding:22px 20px 4px;position:sticky;top:130px}
 /* фильтр как на Озоне: группы всегда открыты, без линий и счётчиков, длинные списки — «Посмотреть все» */
 .fgrp{padding-bottom:24px}
