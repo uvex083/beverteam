@@ -25,10 +25,11 @@ $secHref = fn(string $url) => $url . ($smartPath !== '' ? 'filter/' . $smartPath
 $secList = function (int $parent) use ($arParams): array {
     $out = [];
     $r = CIBlockSection::GetList(['SORT' => 'ASC', 'NAME' => 'ASC'], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y',
-        'SECTION_ID' => $parent ?: false, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'SECTION_PAGE_URL']);
+        'SECTION_ID' => $parent ?: false, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'SECTION_PAGE_URL', 'UF_SHORT_NAME']);
     while ($s = $r->GetNext()) {
         if ((int)$s['ELEMENT_CNT'] > 0) {
-            $out[] = ['id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL']];
+            // короткое название раздела (поле в админке) — длинное SEO-название не помещается в колонку фильтра
+            $out[] = ['id' => (int)$s['ID'], 'name' => trim((string)($s['~UF_SHORT_NAME'] ?? '')) ?: $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL']];
         }
     }
     return $out;
@@ -39,8 +40,18 @@ $cur = ['id' => 0, 'name' => 'Все категории', 'url' => $catRoot];
 if ($sid) {
     $back[] = ['id' => 0, 'name' => 'Все категории', 'url' => $catRoot];
     $r = CIBlockSection::GetNavChain($arParams['IBLOCK_ID'], $sid, ['ID', 'NAME', 'SECTION_PAGE_URL']);
+    $short = [];
     while ($s = $r->GetNext()) {
         $back[] = ['id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL']];
+        $short[] = (int)$s['ID'];
+    }
+    // цепочка разделов — тоже короткими названиями, где они заданы
+    $r = $short ? CIBlockSection::GetList([], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ID' => $short, '!UF_SHORT_NAME' => false], false, ['ID', 'UF_SHORT_NAME']) : null;
+    while ($r && $s = $r->Fetch()) {
+        foreach ($back as &$b) {
+            $b['id'] === (int)$s['ID'] && $b['name'] = trim((string)$s['UF_SHORT_NAME']) ?: $b['name'];
+        }
+        unset($b);
     }
     $cur = array_pop($back);
 }

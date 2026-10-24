@@ -2482,6 +2482,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
+/* ---------- каталог: фильтр выше экрана липнет нижним краем — едет вместе с товарами, пока не покажется его низ
+   (с top:130px он вставал раньше товаров, а низ фильтра был недоступен до конца страницы); на телефоне фильтр — окно, не трогаем ---------- */
+document.addEventListener('DOMContentLoaded',()=>{
+  const f=document.querySelector('.cat>.filters'); if(!f) return;
+  const set=()=>{ f.style.top=''; if(getComputedStyle(f).position!=='sticky') return;
+    f.style.top=Math.min(130,innerHeight-f.offsetHeight-24)+'px'; };
+  set(); addEventListener('resize',set);
+  if(window.ResizeObserver) new ResizeObserver(set).observe(f);
+});
+
 /* ---------- электронная коммерция Метрики (dataLayer): списки, карточка товара, корзина; покупка — на оформлении заказа ---------- */
 window.dataLayer=window.dataLayer||[];
 window.BT_ec=(type,data)=>{try{dataLayer.push({ecommerce:{currencyCode:'RUB',[type]:data}});}catch(e){}};

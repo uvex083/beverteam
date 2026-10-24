@@ -261,6 +261,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .cat{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;overflow-anchor:none}
 /* колонка товаров кончается по последнему блоку без нижнего отступа — липкий фильтр останавливается вровень с ним */
 .cat>div>.sec:last-child{padding-bottom:0}
+.cat .seo>:last-child,.cat .seo .post__body>:last-child{margin-bottom:0}
 .filters{background:var(--white);border-radius:var(--rad);padding:22px 20px 4px;position:sticky;top:130px}
 /* фильтр как на Озоне: группы всегда открыты, без линий и счётчиков, длинные списки — «Посмотреть все» */
 .fgrp{padding-bottom:24px}
@@ -1169,7 +1170,7 @@ input,textarea{caret-color:var(--ink)}
   background:var(--white);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:13.5px;
   color:var(--ink);font-family:inherit;transition:border-color .15s,box-shadow .15s}
 @media(hover:hover){.sel__btn:hover{border-color:var(--line-h)}}
-.sel__btn[aria-expanded=true]{border-color:var(--ink);border-width:1.5px;box-shadow:none}
+.sel__btn[aria-expanded=true]{box-shadow:none}
 .sel__btn>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sel__btn>svg{width:12px;height:8px;flex:0 0 12px;stroke:var(--ink);fill:none;stroke-width:1.8;
   stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
