@@ -40,7 +40,7 @@ h1,h2,h3,h4{margin:0;line-height:1.1}
 .hr{border:0;border-top:1px solid var(--line);margin:0}
 .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 /* на телефоне кнопки в ряду — на всю ширину, друг под другом */
-@media(max-width:560px){.row>.btn{flex:1 1 100%}}
+@media(max-width:560px){.row>.btn,.hero__cta>.btn{flex:1 1 100%}.cfg__res .btn{width:100%}}
 .between{justify-content:space-between}
 /* единая стрелка у select: нативная прижимается к краю и выглядит по-разному в браузерах */
 select{-webkit-appearance:none;appearance:none;
