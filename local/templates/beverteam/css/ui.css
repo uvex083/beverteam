@@ -346,6 +346,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pill-tabs{display:inline-flex;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:4px}
 .pill-tabs button{background:none;border:0;border-radius:999px;padding:8px 18px;font-weight:600;font-size:13.5px;color:var(--gray)}
 .pill-tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+@media(max-width:560px){.pill-tabs{display:flex;width:100%}.pill-tabs button{flex:1 1 0;min-width:0;padding:8px 6px;white-space:nowrap}}
 
 /* tables */
 .tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
