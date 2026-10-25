@@ -5,9 +5,9 @@ $APPLICATION->SetTitle('Избранное');
 $APPLICATION->AddChainItem('Избранное');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 ?>
-<div class="wrap">
+<div class="wrap cat-page">
   <?php $APPLICATION->ShowViewContent('bt_crumbs') ?>
-  <h1 class="display h1" style="margin:14px 0 22px">Избранное</h1>
+  <div class="pagehead"><h1 class="display h1">Избранное</h1></div>
   <div class="grid g4" id="favList"></div>
   <div class="cmp__empty" id="favEmpty" hidden>
     <p class="display h3" style="margin:0 0 10px">В избранном пока пусто</p>

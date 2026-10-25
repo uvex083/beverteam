@@ -7,9 +7,9 @@ $APPLICATION->SetTitle('Сравнение товаров');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 $APPLICATION->AddChainItem('Сравнение товаров');
 ?>
-<div class="wrap">
+<div class="wrap cat-page">
   <?php $APPLICATION->ShowViewContent('bt_crumbs') ?>
-  <h1 class="display h1" style="margin:14px 0 22px">Сравнение товаров</h1>
+  <div class="pagehead"><h1 class="display h1">Сравнение товаров</h1></div>
   <div id="cmpCats" class="cmp__cats"></div>
   <div id="cmpBody"></div>
 </div>
