@@ -1743,7 +1743,7 @@ input,textarea{caret-color:var(--ink)}
 .home .cfg__price b{font-family:Unbounded;font-weight:700;font-size:23px}
 .home .cfg__price span{color:var(--gray);font-size:13px}
 .home .strip{background:var(--lime)}
-.home .strip__in{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:clamp(30px,3.4vw,44px) 0}
+.home .strip__in{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding-block:clamp(30px,3.4vw,44px)}
 .home .strip__i{display:flex;gap:16px;align-items:center;padding:4px clamp(20px,2.4vw,34px);border-left:1px solid rgba(14,14,12,.16)}
 .home .strip__i:first-child{border-left:0;padding-left:0}
 .home .strip__i:last-child{padding-right:0}
