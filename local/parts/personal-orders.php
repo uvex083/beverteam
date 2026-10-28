@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CUser $USER */
-// Кабинет: заказы покупателя по макету account-orders.html — фильтр по статусу, повтор последнего заказа
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale\Internals\BasketTable;
@@ -39,7 +38,7 @@ if ($ids) {
 $info = bt_order_ship_info($ids ?? []);
 $group = fn(array $o) => $o['CANCELED'] === 'Y' ? 'cancel' : ($o['STATUS_ID'] === 'F' ? 'done' : 'active');
 $cnt = array_count_values(array_map($group, $orders));
-// повторить предлагаем только завершённый заказ: активный ещё не доехал — повтор дал бы случайный дубль
+// повтор — только у завершённого заказа, иначе случайный дубль
 $word = fn(int $n) => $n . ' ' . (($n % 10 === 1 && $n % 100 !== 11) ? 'товар' : (in_array($n % 10, [2, 3, 4]) && !in_array($n % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
 bt_acc_start('orders', '<h1 class="display h1">Мои заказы</h1>');

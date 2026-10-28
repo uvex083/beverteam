@@ -1,6 +1,6 @@
 <?php
-// Статьи журнала из JSON-файлов (по одному на статью): создаются неактивными, вопросы к вычитке — в свойстве EDITOR_NOTES (на сайте не выводится).
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_articles.php [show|apply] <папка с *.json>. Статья с тем же кодом уже есть — не трогаем.
+// Статьи журнала из JSON-файлов: новые — неактивными, вопросы к вычитке — в EDITOR_NOTES; статью с тем же кодом не трогает.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_articles.php [show|apply] <папка с *.json>
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

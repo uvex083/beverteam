@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Сервис» по макету services.html: направления, прайс, бренды ремонта — ИБ типа «Сервис», оборудование — из аренды и каталога
 
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $head = bt_block('servis_head');

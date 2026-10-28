@@ -5,13 +5,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_be
 
 use Bt\Attr;
 
-// отчёт для администраторов: остальным 404
 if (!$USER->IsAdmin()) {
     require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
     die();
 }
 
-// пометка «бренд / не бренд», сумма сделки по заявке, процент и база — формой, после сохранения назад к тому же отчёту
+// сохранение пометок, сумм и процента — и назад к тому же отчёту
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_bitrix_sessid()) {
     $id = (int)($_POST['id'] ?? 0);
     switch ($_POST['action'] ?? '') {

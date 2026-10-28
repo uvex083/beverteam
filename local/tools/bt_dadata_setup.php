@@ -1,5 +1,5 @@
 <?php
-// Ключ API DaData для подсказок адреса на оформлении заказа — в опции bt/dadata_key, не в коде и не в гите.
+// Ключ API DaData для подсказок адреса на оформлении — в опции bt/dadata_key, не в коде и не в гите.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_dadata_setup.php <файл с ключом> (файл удаляется после чтения) | show
 
 if (PHP_SAPI !== 'cli') {

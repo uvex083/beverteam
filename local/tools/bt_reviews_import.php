@@ -1,6 +1,6 @@
 <?php
-// Отзывы с главной старого сайта (beverteam.ru), которых не было на странице «Отзывы о нас». Порядок — как на старой главной.
-// Повтор не дублирует (сверка по имени и началу текста). Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_reviews_import.php [show|apply]
+// Отзывы с главной старого сайта, которых нет на странице «Отзывы о нас»; повтор сверяет по имени и началу текста.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_reviews_import.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

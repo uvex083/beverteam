@@ -1,7 +1,6 @@
 <?php
-// Счёт для юрлиц: статус заказа «Подтверждён» (C) с письмом покупателю, данные покупателя в счёте из свойств заказа,
-// реквизиты продавца из инфоблока «Контакты». Текст письма — bt_mail_setup.php.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_bill_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Счёт для юрлиц: статус «Подтверждён» (C) с письмом, покупатель — из свойств заказа, продавец — из ИБ «Контакты».
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_bill_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -20,7 +19,7 @@ $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 const ST = 'C';
 const EV = 'SALE_STATUS_CHANGED_' . ST;
 
-// статус «Подтверждён» между «Принят» и «Оплачен»
+// статус «Подтверждён» — между «Принят» и «Оплачен»
 if (!Sale\Internals\StatusTable::getById(ST)->fetch()) {
     $say('статус ' . ST . ' «Подтверждён»');
     if ($apply) {
@@ -35,7 +34,7 @@ if (!Sale\Internals\StatusTable::getById(ST)->fetch()) {
     }
 }
 
-// письмо при смене статуса (текст и оформление задаёт bt_mail_setup.php)
+// письмо при смене статуса (текст — в bt_mail_setup.php)
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);
     $apply and (new CEventType())->Add(['LID' => 'ru', 'EVENT_NAME' => EV, 'NAME' => 'Изменение статуса заказа на «Подтверждён»', 'SORT' => 150, 'DESCRIPTION' =>

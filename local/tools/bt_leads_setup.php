@@ -36,7 +36,7 @@ $r = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, 'CHECK_PERMISSIONS' => '
 while ($s = $r->Fetch()) {
     $have[$s['CODE']] = $s;
 }
-// список заявок в админке — «новые сверху» (по ID), этот порядок действует и на папки: создаём с конца, чтобы первая папка получила больший ID
+// «новые сверху» (по ID) действует и на папки: создаём с конца, чтобы первая получила больший ID
 $sorts = array_combine(array_keys($folders), range(10, 10 * count($folders), 10));
 foreach (array_reverse($folders, true) as $code => $name) {
     $sort = $sorts[$code];
@@ -50,7 +50,7 @@ foreach (array_reverse($folders, true) as $code => $name) {
     }
 }
 
-// папки объединённых форм (одна форма на нескольких страницах): пустые удаляем, с заявками — оставляем и сообщаем
+// папки объединённых форм: пустые удаляем, с заявками — оставляем и сообщаем
 foreach (array_diff_key($have, $folders) as $code => $s) {
     if (CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, 'SECTION_ID' => $s['ID'], 'CHECK_PERMISSIONS' => 'N'], [])) {
         echo "папка «{$s['NAME']}» не пустая — перенесите заявки и удалите вручную
@@ -69,7 +69,7 @@ if (array_diff_assoc($want, CIBlock::GetMessages($ibId) + ['LIST_MODE' => $ib['L
     $apply and (new CIBlock())->Update($ibId, $want);
 }
 
-// статус обработки; новая заявка получает «Новая» (form.php)
+// статус обработки; новой заявке form.php ставит «Новая»
 $st = CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'STATUS'])->Fetch();
 if (!$st) {
     $say('свойство STATUS «Статус»: Новая / В работе / Закрыта');
@@ -81,7 +81,7 @@ if (!$st) {
     }
 }
 
-// колонки и порядок списка: новые сверху, статус и телефон видны сразу (общая настройка и у каждого пользователя)
+// колонки и порядок списка: новые сверху, статус и телефон сразу (общая настройка и у каждого пользователя)
 if ($st) {
     $pid = fn($code) => (int)(CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => $code])->Fetch()['ID'] ?? 0);
     $cols = implode(',', ['NAME', 'PROPERTY_' . $st['ID'], 'PROPERTY_' . $pid('CLIENT_NAME'), 'PROPERTY_' . $pid('PHONE'), 'DATE_CREATE', 'ID']);

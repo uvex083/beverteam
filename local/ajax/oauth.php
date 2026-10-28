@@ -1,6 +1,6 @@
 <?php
-// Вход через сервисы. ?go=<сервис>&back=<путь> — уводим к сервису; сюда же возвращают T-Bank, Сбер и Альфа (code, state).
-// Яндекс и VK возвращают на штатные /bitrix/tools/oauth/yandex.php и vkontakte.php модуля «Социальные сервисы».
+// Вход через сервисы: ?go=<сервис>&back=<путь>; сюда же возвращают T-Bank, Сбер и Альфа
+// Яндекс и VK возвращают на штатные /bitrix/tools/oauth/ модуля «Социальные сервисы»
 define('NOT_CHECK_PERMISSIONS', true);
 define('STOP_STATISTICS', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/socialservices/include/state_processing.php';

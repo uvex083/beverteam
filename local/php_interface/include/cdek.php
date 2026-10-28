@@ -1,6 +1,5 @@
 <?php
-// Расчёт доставки СДЭК по весу заказа через калькулятор API. Только расчёт — заказы в СДЭК не создаём.
-// Ключи — опции bt/cdek_account, bt/cdek_secure (не в гите). Тариф, город отправителя — опции bt/cdek_* с дефолтами.
+// Расчёт СДЭК по весу через калькулятор API, заказы не создаёт; ключи — опции bt/cdek_account, bt/cdek_secure
 
 namespace Bt\Cdek;
 
@@ -91,7 +90,7 @@ class Api
         return $code ?: null;
     }
 
-    // Расчёт тарифа: [цена, срок_дней] или null
+    // [цена, срок_дней] или null
     public static function tariff(int $toCity, int $weightGrams): ?array
     {
         $from = (int)self::opt('cdek_from', '270');          // Екатеринбург

@@ -1,6 +1,6 @@
 <?php
-// Инфоблоки страницы «Наши клиенты» (/nashi-klienty/): тип «Наши клиенты», первый экран, установки, призыв внизу.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_clients_setup.php [show|apply]. Повторный запуск ничего не дублирует и правки клиента не трогает.
+// Инфоблоки страницы «Наши клиенты» (/nashi-klienty/): первый экран, установки, призыв внизу; правки клиента не трогает.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_clients_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

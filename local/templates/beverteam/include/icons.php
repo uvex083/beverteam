@@ -1,5 +1,5 @@
 <?php
-// SVG-иконки шаблона, выгружены из объекта I в js/ui.js — правка иконки: в обоих местах
+// копия объекта I из js/ui.js — иконку править в обоих местах
 return [
     'cat' => '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
     'search' => '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',

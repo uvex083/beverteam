@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Наши клиенты»: установки кофемашин с фото — ИБ типа «Наши клиенты» (bt_clients_setup.php); фильтры и шахматка — ui.js (data-kl)
+// фильтры и шахматка — в ui.js (data-kl)
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $word = fn(int $n, string $one, string $few, string $many) => ($n % 10 === 1 && $n % 100 !== 11) ? $one : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? $few : $many);
@@ -10,7 +10,6 @@ $cases = array_values(array_filter(bt_clients(), fn($c) => $c['photos']));
 $n = count($cases);
 $demo = (bool)array_filter($cases, fn($c) => $c['demo']);
 
-// варианты фильтров: тип объекта — в порядке списка в админке, модели — по названию, города — по числу установок
 $segs = $models = $cities = [];
 foreach ($cases as $c) {
     $c['seg'] !== '' and $segs[$c['seg']] = [$c['segn'], $c['segs']];
@@ -26,7 +25,7 @@ $groups = array_filter([
     'city' => ['Город', array_combine(array_keys($cities), array_keys($cities))],
 ], fn($g) => count($g[1]) > 1);
 $cups = array_sum(array_column($cases, 'cups'));
-// иконки типов объектов по коду значения списка «Тип объекта»; для нового типа — общая
+// по коду значения «Тип объекта»; новому типу — общая иконка
 $icons = [
     'all' => '<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>',
     'bc' => '<rect x="5" y="3" width="14" height="18" rx="1.6"/><path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15M10.5 21v-2.5h3V21"/>',

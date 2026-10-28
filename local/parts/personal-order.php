@@ -1,7 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 /** @var \Bitrix\Sale\Order|null $order — загружен и проверен в personal/orders/detail.php */
-// Кабинет: заказ по макету account-order.html — ход заказа, состав, доставка, оплата и документы
 
 use Bitrix\Sale;
 
@@ -25,7 +24,7 @@ $pCode = $payment ? (string)(Sale\PaySystem\Manager::getById($payment->getPaymen
 $pCode === 'tinkoff' && !$payment->isPaid() && !$order->isCanceled() && bt_tbank_sync($payment);
 $toPay = !$order->isCanceled() && bt_tbank_payment($order);
 $payName = $payment ? trim(explode(' — ', $payment->getPaymentSystemName())[0]) : '';
-// в заказе «При получении» без контекста непонятно, о чём речь
+// «При получении» без контекста непонятно
 $pCode === 'cash' and $payName = 'Оплата при получении';
 $o = ['CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'STATUS_ID' => $order->getField('STATUS_ID'), 'PAYED' => $order->isPaid() ? 'Y' : 'N', 'BILL' => $pCode === 'bill']
     + (bt_order_ship_info([$order->getId()])[$order->getId()] ?? []);
@@ -43,14 +42,14 @@ foreach ($basket as $bi) {
 }
 $disc = $full - (float)$basket->getPrice();
 $num = $order->getField('ACCOUNT_NUMBER');
-// ход заказа — одна шкала для всех способов, как у маркетплейсов: оплата не шаг, она в блоке «Оплата и документы». Этап — bt_order_stage(), как у бейджа
+// одна шкала для всех способов: оплата не шаг; этап — bt_order_stage(), как у бейджа
 $sid = (string)$o['STATUS_ID'];
 $pickup = $dCode === 'bt_pickup';
 $track = (string)($o['TRACK'] ?? '');
 $trackUrl = bt_track_url($dCode, $track);
 $shipped = in_array($stage, ['ship', 'done'], true);
 $waitBill = $stage === 'wait';
-// дата шага «Передан в доставку / Готов к выдаче» — из истории заказа: после «Выполнен» дата статуса уже другая
+// дата шага — из истории: после «Выполнен» дата статуса уже другая
 $statusAt = fn(array $ids) => \Bitrix\Sale\Internals\OrderChangeTable::getList(['filter' => ['=ORDER_ID' => $order->getId(), '=TYPE' => 'ORDER_STATUS_CHANGED',
     array_merge(['LOGIC' => 'OR'], array_map(fn($s) => ['%DATA' => 's:9:"STATUS_ID";s:1:"' . $s . '"'], $ids))], 'select' => ['DATE_CREATE'], 'order' => ['ID' => 'ASC'], 'limit' => 1])->fetch()['DATE_CREATE'] ?? null;
 $shipAt = $shipped ? $statusAt(['R', 'S']) : null;
@@ -70,7 +69,6 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   <?php else: ?>
   <div class="track"><?php foreach ($steps as $k => [$t, $on, $when]): ?><div class="<?= $on ? 'done' : '' ?><?= $k === $lastDone ? ' cur' : '' ?>"><?= $e($t) ?><small><?= $e($when ?: ($on ? '' : '—')) ?></small></div><?php endforeach ?></div>
   <?php $tel = '<a class="link" style="white-space:nowrap" href="' . $e($co['phone1_href'] ?? '') . '">' . $e($co['phone1'] ?? '') . '</a>';
-  // при получении и по счёту с отсрочкой: сколько и как платить, пока не оплачено
   $due = $order->isPaid() ? '' : ($pCode === 'cash' ? ' К оплате при получении <b style="white-space:nowrap">' . bt_fmt((float)$order->getPrice()) . '</b>, наличными или картой.' : ($pCode === 'bill' ? ' Счёт ещё не оплачен, он в блоке «Оплата и документы».' : '')) ?>
   <div class="alert alert--info" style="flex-wrap:wrap;align-items:center"><span style="flex:1 1 260px"><?php if ($sid === 'F'): ?>Заказ <?= $pickup ? 'выдан' : 'получен' ?>. Спасибо, что выбрали BEVERTEAM! Вопросы по заказу: <?= $tel ?>.
     <?php elseif ($toPay): ?>Заказ ещё не оплачен. Оплатите его, и мы начнём собирать.
@@ -117,10 +115,10 @@ bt_acc_start('orders', '<div class="row"><h1 class="display h1">Заказ № '
   </dl></div>
   <div class="card"><h2 class="h3" style="margin-bottom:14px">Оплата и документы</h2><dl class="dl">
     <dt>Способ</dt><dd><?= $e($payName ?: '—') ?></dd>
-    <dt>Статус</dt><dd><?php $paidOnGet = !$order->isPaid() && $pCode === 'cash' && $sid === 'F'; // при получении: деньги взяли при выдаче, отметку в заказе менеджер мог не поставить ?>
+    <dt>Статус</dt><dd><?php $paidOnGet = !$order->isPaid() && $pCode === 'cash' && $sid === 'F'; // наличные взяли при выдаче, а отметку об оплате менеджер мог не поставить ?>
     <span class="pay<?= $order->isPaid() || $paidOnGet ? ' pay--ok' : '' ?>"><?= $order->isPaid() ? 'Оплачен' : ($paidOnGet ? 'Оплачен при получении' : 'Не оплачен') ?></span><?php if (!$order->isPaid() && !$paidOnGet && $pCode === 'cash' && !$order->isCanceled()): ?><span class="dnote" style="margin-top:6px">Наличными или картой</span><?php endif ?><?php if ($toPay): ?> <a class="btn btn--sm" href="/personal/order/pay/?id=<?= (int)$order->getId() ?>">Оплатить</a><?php endif ?></dd>
     <?php if (($props['COMPANY'] ?? '') !== ''): ?><dt>Покупатель</dt><dd><?= $e($props['COMPANY']) ?>, ИНН <?= $e($props['INN'] ?? '') ?></dd><?php endif ?>
-    <?php // онлайн-оплата: ссылка на чек из уведомления банка; у отменённого заказа документов нет
+    <?php
     $check = $pCode === 'tinkoff' && ($cp = $order->getPropertyCollection()->getItemByOrderPropertyCode('RECEIPT_URL')) ? (string)$cp->getValue() : '';
     if (!$order->isCanceled() && ($pCode !== 'tinkoff' || $order->isPaid())): ?>
     <dt>Документы</dt><dd><?php if ($pCode === 'tinkoff'): ?><?= $check !== '' ? '<a class="link" href="' . $e($check) . '" target="_blank" rel="noopener">Кассовый чек</a>' : '<span class="dnote">Кассовый чек придёт на e‑mail и появится здесь</span>' ?></dd>

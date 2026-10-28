@@ -2,7 +2,7 @@
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 /** @global CMain $APPLICATION */
 /** @global CUser $USER */
-// заказ /personal/orders/<ID>/ (правило в urlrewrite.php): гостю — вход, чужой или несуществующий заказ — 404
+// /personal/orders/<ID>/ (urlrewrite.php): гостю — вход, чужой или несуществующий заказ — 404
 \Bitrix\Main\Loader::includeModule('sale');
 $order = null;
 if ($USER->IsAuthorized()) {

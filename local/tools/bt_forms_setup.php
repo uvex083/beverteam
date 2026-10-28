@@ -1,6 +1,6 @@
 <?php
 // Заявки с сайта: тип ИБ «Заявки», ИБ form_requests, почтовое событие BT_FORM_REQUEST и шаблон письма.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_forms_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_forms_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -65,7 +65,6 @@ foreach ($props as $code => [$name, $type, $extra]) {
     }
 }
 
-// почтовое событие и шаблон
 const EV = 'BT_FORM_REQUEST';
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);

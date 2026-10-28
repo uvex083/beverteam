@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
-// Карточки рисует bt_card() по данным bt_catalog_data(): та же разметка, что у BT_card() в ui.js
+// та же разметка, что у BT_card() в ui.js
 ?>
 <div class="grid g3" id="cards">
 <?php $n = 0; foreach ($arResult['ITEMS'] as $item) {

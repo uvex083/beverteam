@@ -2,7 +2,7 @@
 /** @var array $arParams */
 /** @var array $arResult */
 /** @global CMain $APPLICATION */
-// Журнал по макету journal.html: рубрики — разделы инфоблока (/blog/<рубрика>/, section.php подключает этот же файл), список — news.list bt
+// section.php подключает этот же файл для рубрики
 
 $rubric = (string)($btRubric ?? '');
 $rubrics = bt_blog_rubrics();
@@ -13,7 +13,7 @@ $posts = $rubric !== '' ? array_values(array_filter(bt_posts(), fn($p) => $p['ru
 global $btJournalFilter;
 $btJournalFilter = [];
 if ($tag !== '') {
-    // подборка по тегу — служебная страница: не индексируем (canonical не ставим — с noindex он лишний)
+    // подборка по тегу — служебная: noindex, canonical с ним лишний
     $posts = array_values(array_filter($posts, fn($p) => in_array($tag, $p['tags'] ?? [], true)));
     $btJournalFilter['=CODE'] = array_column($posts, 'id') ?: ['-'];
     $APPLICATION->SetTitle('#' . $tag);
@@ -24,7 +24,6 @@ if ($tag !== '') {
     $sub = 'Статьи журнала по теме «' . $tag . '» — ' . $n . ' ' . ($n % 10 === 1 && $n % 100 !== 11 ? 'материал' : ($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20) ? 'материала' : 'материалов'));
     $APPLICATION->SetPageProperty('description', $sub . '. Журнал BEVERTEAM о кофе, чае и кофемашинах.');
 } elseif ($rubric !== '') {
-    // вводный текст рубрики — описание раздела в админке
     $sub = trim(strip_tags((string)(CIBlockSection::GetList([], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], '=CODE' => $rubric], false, ['DESCRIPTION'])->Fetch()['DESCRIPTION'] ?? '')));
 }
 // вторая и дальше страницы списка — не индексируем

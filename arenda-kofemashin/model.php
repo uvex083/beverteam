@@ -1,7 +1,7 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 /** @global CMain $APPLICATION */
-// страница модели в аренду /arenda-kofemashin/<код>/ (правило в urlrewrite.php); модели — ИБ rent, выключенная или неизвестная → 404
+// модель в аренду /arenda-kofemashin/<код>/ (urlrewrite.php); выключенная или неизвестная — 404
 $rentModel = bt_rent_by_code((string)($_GET['CODE'] ?? ''));
 if (!$rentModel) {
     require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
@@ -9,8 +9,7 @@ if (!$rentModel) {
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 $n = 'Аренда кофемашины ' . $rentModel['model'];
-// title, description и H1 — вкладка SEO элемента модели в ИБ «Модели в аренду», иначе собираются из данных модели
-// шаблоны SEO уровня инфоблока остались от старого импорта («в интернет-магазине…») — берём только заданные у самой модели
+// SEO — только заданное у самой модели (шаблоны ИБ остались от старого импорта), иначе из данных модели
 $rentId = (int)substr($rentModel['id'], 1);
 $own = array_filter((new \Bitrix\Iblock\InheritedProperty\ElementTemplates(bt_iblock('rent'), $rentId))->findTemplates(), fn($t) => ($t['INHERITED'] ?? 'Y') === 'N');
 $seo = array_intersect_key((new \Bitrix\Iblock\InheritedProperty\ElementValues(bt_iblock('rent'), $rentId))->getValues(), $own);

@@ -1,6 +1,6 @@
 <?php
-// Тестовые отзывы о товарах (с фото и без) — посмотреть, как выглядит вкладка «Отзывы». Помечены XML_ID «bt-demo-product».
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_product_reviews_demo.php [show|apply|delete]. Перед запуском сайта — delete.
+// Тестовые отзывы о товарах (с фото и без), XML_ID «bt-demo-product»; перед запуском сайта — delete.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_product_reviews_demo.php [show|apply|delete]
 if (PHP_SAPI !== 'cli') {
     die('cli only');
 }
@@ -28,7 +28,7 @@ if (CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=XML_ID' => $mark], []))
 }
 
 $product = fn(string $code) => CIBlockElement::GetList([], ['IBLOCK_ID' => $catId, '=CODE' => $code], false, false, ['ID', 'NAME', 'DETAIL_PICTURE', 'PREVIEW_PICTURE'])->Fetch();
-// фото к отзыву — копии картинок товара; у пачек кофе белый фон, поэтому для наглядности — живые фото чая
+// фото к отзыву — копии картинок товара; у кофе белый фон, поэтому берём фото чая
 $photos = function (array $p, int $n) use ($catId, $product): array {
     $p = str_contains($p['NAME'], 'BOTANICA') ? ($product('alpijskij-koktejl') ?: $p) : $p;
     $ids = [];

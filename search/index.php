@@ -1,7 +1,7 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
-// Результаты поиска: те же данные, что у живого поиска в шапке (товары, разделы и услуги, журнал); на страницу ведёт SearchAction главной
+// те же данные, что у живого поиска в шапке; сюда ведёт SearchAction главной
 $q = trim((string)($_GET['q'] ?? ''));
 $APPLICATION->SetTitle($q !== '' ? 'Результаты поиска' : 'Поиск по сайту');
 $APPLICATION->SetPageProperty('title', ($q !== '' ? '«' . $q . '» — поиск' : 'Поиск') . ' | Beverteam');

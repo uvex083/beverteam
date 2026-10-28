@@ -1,5 +1,5 @@
 <?php
-// Оформление заказа: POST action=city (поиск местоположения) | street (подсказки улицы и дома DaData) | calc (доставки, оплаты, итог без сохранения) | create | sbp (пришла ли оплата по СБП или SberPay) | sberpay (запрос на оплату в СберБанк Онлайн)
+// Оформление заказа: расчёт доставок и оплат, подсказки адреса, создание, статус оплаты СБП и SberPay
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -21,7 +21,7 @@ $out = fn(array $a) => die(json_encode($a, JSON_UNESCAPED_UNICODE));
 $in = fn(string $k) => trim((string)$req->getPost($k));
 $action = $in('action');
 
-// Улица и дом через DaData, только в выбранном городе; ключ API — опция bt/dadata_key (bt_dadata_setup.php)
+// подсказки DaData в пределах города; ключ — опция bt/dadata_key
 if ($action === 'street') {
     $q = $in('q');
     $city = $in('city');
@@ -69,7 +69,7 @@ if ($action === 'city') {
     $out(['ok' => true, 'list' => $list]);
 }
 
-// Пункты выдачи СДЭК города — из таблицы модуля ipol.sdek (синхронизирует агент модуля)
+// ПВЗ — из таблицы модуля ipol.sdek, обновляет агент модуля
 function bt_pvz_list(string $loc, string $code = ''): array
 {
     $l = Sale\Location\LocationTable::getList(['filter' => ['=CODE' => $loc], 'select' => ['ID']])->fetch();
@@ -104,7 +104,7 @@ $pt = $in('ptype') === 'UR' ? 'UR' : 'FIZ';
 $loc = $in('loc');
 $locOk = $loc !== '' && Sale\Location\LocationTable::getList(['filter' => ['=CODE' => $loc], 'select' => ['ID']])->fetch();
 
-// Заказ в памяти: плательщик, корзина, местоположение, отгрузка и оплата (если выбраны)
+// заказ в памяти, без сохранения — для расчёта
 function bt_order_build(int $userId, int $ptId, string $loc, int $deliveryId, int $payId, string $addr = ''): Sale\Order
 {
     $order = Sale\Order::create(SITE_ID, $userId ?: null);
@@ -152,10 +152,9 @@ $userId = $USER->IsAuthorized() ? (int)$USER->GetID() : 0;
 $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
 
-// доступные доставки и оплаты — по ограничениям Битрикса (город, тип плательщика)
 $deliveries = [];
 $pays = [];
-// модуль СДЭК после сбоя API сам не считает доставку несколько минут — тоже показываем покупателю
+// после сбоя API модуль СДЭК несколько минут не считает доставку — сообщаем покупателю
 $dead = (int)\COption::GetOptionString('ipol.sdek', 'sdekDeadServer', '0');
 $cdekDown = $dead && time() - $dead < 60 * (int)\COption::GetOptionString('ipol.sdek', 'timeoutRollback', '1');
 $own = false;
@@ -164,7 +163,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
     $shipment = bt_order_shipment($probe);
     $svcs = array_filter(Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment), fn($s) => !$s instanceof Sale\Delivery\Services\EmptyDeliveryService);
     $codes = array_column(Sale\Delivery\Services\Table::getList(['filter' => ['@ID' => array_map(fn($s) => $s->getId(), $svcs) ?: [0]], 'select' => ['ID', 'XML_ID']])->fetchAll(), 'XML_ID', 'ID');
-    // где возим сами (курьер, самовывоз — Екатеринбург), СДЭК не предлагаем: сначала свои службы, СДЭК — только если своих не вышло
+    // где возим сами (курьер, самовывоз), СДЭК не предлагаем — только если своих служб нет
     $isCdek = fn($s) => (bool)preg_match('/^(sdek_|bt_cdek)/', (string)($codes[$s->getId()] ?? ''));
     $svcs = array_merge(array_filter($svcs, fn($s) => !$isCdek($s)), array_filter($svcs, $isCdek));
     foreach ($svcs as $svc) {
@@ -172,7 +171,7 @@ if ($locOk && !Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID)->get
             continue;
         }
         $f = Sale\Delivery\Services\Table::getById($svc->getId())->fetch();
-        // модуль СДЭК падает, если API не ответил: такую службу просто не показываем, остальные работают
+        // модуль СДЭК падает, если API не ответил: такую службу не показываем
         try {
             $o = bt_order_build($userId, $ptypes[$pt], $loc, $svc->getId(), 0, $in('street'));
             // срок от СДЭК («3-4 дня») — только у служб модуля, у своих срок считает чекаут
@@ -243,7 +242,7 @@ if ($action === 'sberpay') {
     $out(['ok' => $ok]);
 }
 
-// экран оплаты по СБП или SberPay спрашивает, пришли ли деньги
+// опрос оплаты с экрана СБП и SberPay
 if ($action === 'sbp') {
     $order = bt_tbank_order((int)$in('id'));
     $p = $order && !$order->isPaid() && !$order->isCanceled() ? bt_tbank_payment($order) : null;
@@ -261,7 +260,6 @@ if ($in('website') !== '') {
     $out(['ok' => false, 'errors' => ['form' => 'Не получилось оформить заказ. Позвоните нам, поможем.']]);
 }
 
-// ---------- проверка полей ----------
 $f = [];
 foreach (['name', 'phone', 'email', 'company', 'inn', 'kpp', 'company_adr', 'mode', 'street', 'flat', 'entrance', 'pvz', 'comment', 'city'] as $k) {
     $f[$k] = $in($k);
@@ -324,7 +322,7 @@ if (bt_ip_flood('BT_ORDER_CREATE', 5, 600)) {
     $out(['ok' => false, 'errors' => ['form' => 'Слишком много заказов подряд. Позвоните нам или попробуйте через 10 минут.']]);
 }
 
-// ---------- покупатель: текущий, найденный по e-mail (без входа под ним) или новый ----------
+// покупатель: текущий, найденный по e-mail (без входа под ним) или новый
 if (!$userId) {
     $found = \Bitrix\Main\UserTable::getList(['filter' => ['=EMAIL' => $f['email']], 'select' => ['ID'], 'order' => ['ID' => 'ASC'], 'limit' => 1])->fetch();
     if ($found) {
@@ -338,7 +336,6 @@ if (!$userId) {
     }
 }
 
-// ---------- заказ ----------
 $delivery = (int)$req->getPost('delivery');
 $pay = (int)$req->getPost('pay');
 $addr = $f['mode'] === 'addr' ? implode(', ', array_filter([$f['street'], $f['flat'] !== '' ? 'кв./офис ' . $f['flat'] : '', $f['entrance']])) : '';
@@ -351,11 +348,11 @@ try {
     $out(['ok' => false, 'errors' => ['form' => 'Служба доставки сейчас не отвечает. Попробуйте через минуту или выберите другой способ доставки.']]);
 }
 $order->setField('USER_DESCRIPTION', mb_substr($f['comment'], 0, 2000));
-// для менеджера: заказ пришёл запросом счёта из прайс-листа и/или по персональной ссылке прайса (?m=…)
+// менеджеру: заказ из прайс-листа и/или по персональной ссылке прайса (?m=…)
 $note = [];
 $in('src') === 'price' and $note[] = 'Запрос счёта из прайс-листа: доставку и сроки согласовать с клиентом.';
 preg_match('/^[a-z0-9_-]{1,40}$/i', (string)($_COOKIE['bt_pm'] ?? ''), $pm) and $note[] = 'Персональная ссылка прайса: ' . $pm[0];
-// курьер считает цену по расстоянию: менеджеру — сколько км, или что адрес не нашёлся и стоимость минимальная
+// менеджеру: км для курьера или что адрес не нашёлся и цена минимальная
 if ($dCode === 'bt_courier') {
     $km = \Bt\Courier\Handler::km(bt_loc($loc)['n'], $addr);
     $note[] = $km === null ? 'Курьер: адрес не нашёлся на карте, доставка посчитана по минимальной цене — проверьте стоимость.'
@@ -375,7 +372,7 @@ foreach ($order->getPropertyCollection() as $prop) {
 $order->doFinalAction(true);
 // тариф СДЭК для выгрузки заказа модулем: штатно его пишет только sale.order.ajax
 if (str_starts_with($dCode, 'sdek_') && ($p = $order->getPropertyCollection()->getItemByOrderPropertyCode('IPOLSDEK_CNTDTARIF'))) {
-    // при сбое расчёта профиля модуль отдаёт не номер, а строку вида [["250",false]] — берём только число, иначе тариф по профилю
+    // при сбое модуль отдаёт не номер, а строку [["250",false]] — берём только число, иначе тариф по профилю
     $prof = substr($dCode, 5);
     $tarif = array_values(array_filter([\sdekShipmentCollection::getProfileTarif($prof), $_SESSION['IPOLSDEK_CHOSEN'][$prof] ?? ''], fn($t) => ctype_digit((string)$t)))[0]
         ?? ['pickup' => 136, 'courier' => 137][$prof] ?? '';
@@ -392,7 +389,7 @@ if (!$r->isSuccess()) {
 $_SESSION['BT_ORDERS'][] = (int)$order->getId();
 bt_ip_hit('BT_ORDER_CREATE', (string)$order->getId());
 
-// для следующего заказа: плательщик, способы доставки и оплаты, последний адрес; гость с чужим e-mail в чужой кабинет не пишет
+// выбор — для следующего заказа; гость с чужим e-mail в чужой кабинет не пишет
 if ($USER->IsAuthorized() || !empty($fresh)) {
     $prev = CUserOptions::GetOption('bt', 'last_ship', [], $userId);
     $ship = ['pt' => $pt, 'mode' => $f['mode'], 'dkey' => $in('dkey'), 'pay' => $pay, 'loc' => $loc, 'pvz' => $f['mode'] === 'pvz' ? $pvz['c'] : ($prev['pvz'] ?? ''), 'pvza' => $f['mode'] === 'pvz' ? $pvz['a'] : ($prev['pvza'] ?? '')];
@@ -400,7 +397,7 @@ if ($USER->IsAuthorized() || !empty($fresh)) {
         : array_intersect_key(is_array($prev) ? $prev : [], array_flip(['street', 'flat', 'entrance']));
     CUserOptions::SetOption('bt', 'last_ship', $ship, false, $userId);
     $f['mode'] === 'addr' and bt_address_remember($userId, $loc, $f['street'], $f['flat'], $f['entrance'], $f['name'], '+' . $phone);
-    // реквизиты организации — в профиль покупателя (по ИНН), чтобы в следующий раз выбрать её из списка
+    // реквизиты организации — в профиль покупателя по ИНН
     if ($pt === 'UR') {
         $urId = $ptypes['UR'];
         $orgId = 0;
@@ -424,7 +421,7 @@ if ($USER->IsAuthorized() || !empty($fresh)) {
         }
     }
 }
-// состав заказа для покупки в электронной коммерции Метрики: кофе на развес — в упаковках, как в корзине на сайте
+// состав для электронной коммерции Метрики: кофе на развес — упаковками, как в корзине
 $items = [];
 try {
     foreach ($order->getBasket() as $bi) {

@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
-// Мобильное меню: первый экран — крупные разделы, вход в кабинет и контакты; подпункты открываются слайдом справа (до третьего уровня)
 $items = array_values($arResult);
 $i = 0;
 $build = function (int $lvl) use (&$build, &$i, $items): array {
@@ -28,7 +27,6 @@ $tree = $build(1);
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $panels = [];
 $n = 0;
-// Пункт с подпунктами — кнопка слайда, его панель копится в $panels
 $row = function (array $it, string $cls) use (&$row, &$panels, &$n, $e): string {
     $img = !empty($it['P']['img']) ? '<img src="' . $e($it['P']['img']) . '" alt="" loading="lazy">' : '';
     $badge = !empty($it['P']['badge']) ? '<em>' . $e($it['P']['badge']) . '</em>' : '';

@@ -1,6 +1,6 @@
 <?php
-// Инфоблоки страницы «Кофе в офис» (/kofe-v-ofis/, бывшая «Кофе по подписке»): тип podpiska → «Кофе в офис», тексты, SEO, ссылки /podpiska/ в блоках других страниц.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_office_setup.php [show|apply]. Повторный запуск ничего не дублирует и правки клиента не трогает.
+// Страница «Кофе в офис» (/kofe-v-ofis/): тип podpiska, тексты, SEO, ссылки с /podpiska/ в других блоках; правки клиента не трогает.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_office_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -47,7 +47,6 @@ foreach ($def as $code => [$name, $sort, $single]) {
     $apply && $ibs[$code] and bt_grid_sort($type, $ibs[$code]);
 }
 
-// ссылки на /podpiska/ в блоках других страниц
 $fix = [];
 $r = CIBlock::GetList([], ['CHECK_PERMISSIONS' => 'N']);
 while ($ib = $r->Fetch()) {
@@ -158,7 +157,7 @@ foreach ([
     bt_el_seed($ibs['sub_faq'], '', ['NAME' => $q, 'SORT' => ($i + 1) * 10, 'PREVIEW_TEXT' => $a, 'PREVIEW_TEXT_TYPE' => 'text'], [], $say, $fail);
 }
 
-// «Услуги» (/servis/): карточка «Продажа оборудования» → «Кофе в офис»; цену сайт считает сам — от самого доступного сорта за кг
+// «Услуги»: карточка «Продажа оборудования» → «Кофе в офис»; цену сайт считает сам
 if (($ibId = bt_iblock('servis_dirs')) && ($el = CIBlockElement::GetList([], ['IBLOCK_ID' => $ibId, '=NAME' => 'Продажа оборудования'], false, false, ['ID'])->Fetch())) {
     $say('  ~ «Услуги»: карточка «Продажа оборудования» → «Кофе в офис»');
     (new CIBlockElement())->Update($el['ID'], ['NAME' => 'Кофе в офис', 'PREVIEW_TEXT' => 'Зерно BOTANICA свежей обжарки для офиса и кафе с доставкой по графику.', 'PREVIEW_TEXT_TYPE' => 'text']);

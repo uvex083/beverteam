@@ -1,5 +1,5 @@
 <?php
-// оплата по СБП: на компьютере QR-код, на телефоне кнопка приложения банка; оплату страница ждёт сама (ui.js, .sbp)
+// оплату страница ждёт сама — ui.js (.sbp)
 \Bitrix\Main\Loader::includeModule('sale');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $id = (int)($_GET['id'] ?? 0);

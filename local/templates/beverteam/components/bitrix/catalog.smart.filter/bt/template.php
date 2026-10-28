@@ -1,15 +1,13 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
 /** @global CMain $APPLICATION */
-// Фильтр в разметке catalog.html: применяется сразу при выборе (фоновая загрузка страницы), без кнопки; выбранное — чипсами
-// ЧПУ: адрес раздела без условий и адрес с выбранными условиями; «filter/clear/apply/» — это «без условий»
+// «filter/clear/apply/» — это адрес без условий
 $reset = preg_replace('~filter/clear/apply/$~', '', (string)($arResult['SEF_DEL_FILTER_URL'] ?? strtok($arResult['FORM_ACTION'], '?')));
 $sefUrl = (string)($arResult['SEF_SET_FILTER_URL'] ?? '');
 $sefUrl = $sefUrl === '' || str_ends_with($sefUrl, 'filter/clear/apply/') ? $reset : $sefUrl;
 $smartPath = preg_match('~/filter/(.+)/apply/$~', $sefUrl, $m) ? $m[1] : '';
 $keep = array_intersect_key($_GET, ['sort' => 1]);
-// условия пришли параметрами (фоновая загрузка, старая ссылка) или ЧПУ записан не так, как его строит фильтр
-// (пустой, другой порядок, значения не из этого раздела) — постоянный редирект на понятный адрес
+// условия в параметрах или ЧПУ не в том виде, как его строит фильтр, — 301 на адрес фильтра
 $curPage = (string)$APPLICATION->GetCurPage(false);
 if (isset($_GET['set_filter']) || (str_contains($curPage, '/filter/') && $curPage !== $sefUrl)) {
     LocalRedirect($sefUrl . ($keep ? '?' . http_build_query($keep) : ''), true, '301 Moved permanently');
@@ -18,8 +16,6 @@ $sort = isset($_GET['sort']) ? htmlspecialcharsbx($_GET['sort']) : '';
 $chips = [];
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 
-// «Категория» как на Озоне: цепочка родителей «‹», текущий раздел подсвечен, под ним подразделы (в конечном разделе — соседние).
-// Выбранные условия фильтра переносятся в адрес раздела
 $sid = (int)($arParams['SECTION_ID'] ?? 0);
 $secHref = fn(string $url) => $url . ($smartPath !== '' ? 'filter/' . $smartPath . '/apply/' : '') . ($keep ? '?' . http_build_query($keep) : '');
 $secList = function (int $parent) use ($arParams): array {
@@ -28,7 +24,7 @@ $secList = function (int $parent) use ($arParams): array {
         'SECTION_ID' => $parent ?: false, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'NAME', 'SECTION_PAGE_URL', 'UF_SHORT_NAME']);
     while ($s = $r->GetNext()) {
         if ((int)$s['ELEMENT_CNT'] > 0) {
-            // короткое название раздела (поле в админке) — длинное SEO-название не помещается в колонку фильтра
+            // короткое название — длинное SEO-название не помещается в колонку
             $out[] = ['id' => (int)$s['ID'], 'name' => trim((string)($s['~UF_SHORT_NAME'] ?? '')) ?: $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL']];
         }
     }
@@ -45,7 +41,6 @@ if ($sid) {
         $back[] = ['id' => (int)$s['ID'], 'name' => $s['~NAME'], 'url' => $s['~SECTION_PAGE_URL']];
         $short[] = (int)$s['ID'];
     }
-    // цепочка разделов — тоже короткими названиями, где они заданы
     $r = $short ? CIBlockSection::GetList([], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], 'ID' => $short, '!UF_SHORT_NAME' => false], false, ['ID', 'UF_SHORT_NAME']) : null;
     while ($r && $s = $r->Fetch()) {
         foreach ($back as &$b) {
@@ -74,10 +69,8 @@ $FMORE = 6;
   </div>
   <div class="filters__body">
     <?php
-    // порядок групп как в макете: цена, фасовка, страна, вкус, действие…; «Метки» — в конце
     $order = ['PRICE' => 0, 'NET_WEIGHT' => 1, 'PACKING' => 2, 'ROAST' => 3, 'COUNTRY' => 4, 'TEA_KIND' => 5, 'TASTE' => 6, 'EFFECT' => 7, 'PROCESSING' => 8,
         'WATER_TANK' => 10, 'BEAN_HOPPER' => 11, 'MATERIAL' => 12, 'VOLUME' => 13, 'COLOR' => 14, 'FILTER_SIZE' => 15, 'BADGES' => 99];
-    // свойство с единственным значением «Да» (код yes) — переключатель с названием свойства
     $isYes = fn($it) => count($it['VALUES'] ?? []) === 1 && (reset($it['VALUES'])['URL_ID'] ?? '') === 'yes';
     $items = $arResult['ITEMS'];
     uasort($items, fn($a, $b) => ($order[isset($a['PRICE']) ? 'PRICE' : $a['CODE']] ?? 50) <=> ($order[isset($b['PRICE']) ? 'PRICE' : $b['CODE']] ?? 50));
@@ -92,7 +85,6 @@ $FMORE = 6;
       <?php if ($i > $FMORE): ?><button class="fmore" type="button">Посмотреть все</button><?php endif ?>
       </div>
     <?php endif;
-    // «Метки» и свойства «да / нет» — переключателями сверху, как «Распродажа» на Озоне
     foreach ($items as $item) {
         $yes = $isYes($item);
         if ((($item['CODE'] ?? '') !== 'BADGES' && !$yes) || !$item['VALUES']) {
@@ -100,7 +92,7 @@ $FMORE = 6;
         } ?>
       <div class="fgrp fsw">
       <?php foreach ($item['VALUES'] as $v): $off = !empty($v['DISABLED']) && empty($v['CHECKED']);
-          // из меток в фильтре только «Скидка» и «Новинка»: «Хит» и «Топ продаж» — оформление карточки, не критерий выбора
+          // «Хит» и «Топ продаж» — оформление карточки, не критерий выбора
           if (!$yes && !in_array($v['URL_ID'] ?? '', ['sale', 'new'], true)) { continue; }
           if (!empty($v['CHECKED'])) { $chips[] = [$item['NAME'], $yes ? 'да' : mb_strtolower($v['VALUE']), [$v['CONTROL_NAME']]]; } ?>
         <label class="opt opt--sw"><?= $e($yes ? $item['NAME'] : $v['VALUE']) ?><input type="checkbox" role="switch" name="<?= $v['CONTROL_NAME'] ?>" value="<?= $v['HTML_VALUE'] ?>"<?= !empty($v['CHECKED']) ? ' checked' : '' ?><?= $off ? ' disabled' : '' ?>></label>
@@ -143,7 +135,7 @@ $FMORE = 6;
         if (!$values || isset($values['MIN'])) {
             continue;
         }
-        if ($item['CODE'] === 'NET_WEIGHT') { // вес по возрастанию: 50 г … 1 кг
+        if ($item['CODE'] === 'NET_WEIGHT') {
             $grams = fn($v) => (float)str_replace(',', '.', $v['VALUE']) * (str_contains($v['VALUE'], 'кг') ? 1000 : 1);
             uasort($values, fn($a, $b) => $grams($a) <=> $grams($b));
         }
@@ -152,7 +144,6 @@ $FMORE = 6;
         }
         foreach ($values as $v) {
             if (!empty($v['CHECKED'])) {
-                // страна и регион — имена собственные, с заглавной
                 $chips[] = [$item['NAME'], in_array($item['CODE'], ['COUNTRY', 'REGION', 'BRAND'], true) ? $v['VALUE'] : mb_strtolower($v['VALUE']), [$v['CONTROL_NAME']]];
             }
         } ?>
@@ -171,7 +162,6 @@ $FMORE = 6;
 document.addEventListener('DOMContentLoaded',()=>{
   const filters=document.getElementById('filters'), form=filters.querySelector('form'), fb=document.querySelector('.mob-f'),
     fx=document.getElementById('fClose'), fa=document.getElementById('fApply');
-  /* мобильная шторка фильтра: блокировка фона, Esc, закрытие по кнопке */
   const openF=()=>{filters.classList.add('open');BT_lock();setTimeout(()=>fx.focus(),40);};
   const closeF=()=>{filters.classList.remove('open');BT_lock();fb&&fb.focus();};
   fb&&fb.addEventListener('click',openF);
@@ -179,7 +169,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   fa.addEventListener('click',closeF);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&filters.classList.contains('open'))closeF();});
 
-  /* ---- применение на лету: фоновая загрузка той же страницы с фильтром и подмена списка ---- */
   const buildUrl=()=>{
     const u=new window.URL(form.getAttribute('action'),location.origin); let any=false;
     for(const [k,v] of new FormData(form)){ if(v==='') continue; u.searchParams.append(k,v); if(k!=='sort') any=true; }
@@ -187,7 +176,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     return u;
   };
   let ctrl=null;
-  /* фильтр при выборе остаётся на месте (как на Озоне): высоту колонки товаров держим, рядом с пунктом — «Показать N товаров» */
+  /* высоту колонки товаров держим, чтобы фильтр не уезжал при выборе */
   let lastEl=null, hint=null;
   const col=document.querySelector('.toolbar')?.parentElement;
   const dropHint=()=>{ hint&&hint.remove(); hint=null; };
@@ -206,33 +195,28 @@ document.addEventListener('DOMContentLoaded',()=>{
     ctrl&&ctrl.abort(); ctrl=new AbortController(); dropHint();
     if(col&&!filters.classList.contains('open')) col.style.minHeight=col.offsetHeight+'px';
     const cards=document.getElementById('cards'); if(cards) cards.style.opacity='.45';
-    let to=u; /* сервер перенаправляет на ЧПУ — в строку браузера пишем его */
+    let to=u; /* сервер перенаправит на ЧПУ — в адресную строку пишем его */
     return fetch(u,{signal:ctrl.signal,credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest'}})
       .then(r=>{ to=r.url||u; return r.text(); }).then(html=>{
         const d=new DOMParser().parseFromString(html,'text/html');
         ['#cards','#cardsEmpty','#fChips'].forEach(sel=>{const a=document.querySelector(sel),b=d.querySelector(sel);if(a&&b)a.replaceWith(b);});
         const cnt=document.querySelector('.toolbar .cnt'), cnt2=d.querySelector('.toolbar .cnt'); if(cnt&&cnt2) cnt.textContent=cnt2.textContent;
-        /* числа и доступность значений — без перерисовки фильтра: раскрытые группы и фокус остаются */
+        /* без перерисовки фильтра — раскрытые группы и фокус сохраняются */
         d.querySelectorAll('#filters input[name]').forEach(n=>{
           const o=form.querySelector(`input[name="${CSS.escape(n.name)}"]`); if(!o) return;
           if(o.type==='checkbox') o.disabled=n.disabled; else o.placeholder=n.placeholder;
         });
-        /* ссылки «Разделов» несут текущие условия фильтра — берём их из ответа */
         const ns=d.querySelectorAll('.fcat a'); form.querySelectorAll('.fcat a').forEach((a,i)=>{ if(ns[i]) a.href=ns[i].getAttribute('href'); });
         fa.textContent=cnt2?`Показать ${cnt2.textContent}`:'Показать товары';
         if(push) history.pushState({bt:1},'',to); else history.replaceState({bt:1},'',to);
-        /* начало списка выше экрана — страницу не двигаем, показываем кнопку к товарам */
         const tb=document.querySelector('.toolbar');
         if(tb&&!filters.classList.contains('open')&&tb.getBoundingClientRect().top<0) showHint('Показать '+(cnt2?cnt2.textContent.trim():'товары'));
         else if(col) col.style.minHeight='';
-        /* новые карточки: степперы корзины, сравнение, избранное */
         Object.keys(BT_CART).forEach(id=>document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id,q:BT_CART[id]}})));
         BT_cmpUpdate(); window.BT_favUpdate&&BT_favUpdate();
       }).catch(err=>{ if(err.name!=='AbortError') location.href=u; });
   };
-  /* «Посмотреть все» / «Свернуть» у длинных списков */
   form.addEventListener('click',e=>{ const m=e.target.closest('.fmore'); if(!m) return; m.textContent=m.closest('.fgrp').classList.toggle('is-all')?'Свернуть':'Посмотреть все'; });
-  /* ползунок цены: двигаем — пишем в поля, отпустили — применяем */
   const pr=form.querySelector('.fprice'), rg=pr?[...pr.querySelectorAll('input[type=range]')]:[];
   const syncSlider=()=>{ if(!pr) return; const [a,b]=rg, lo=+a.min, w=(+a.max-lo)||1;
     pr.querySelector('.fslider i').style.cssText=`left:${(a.value-lo)/w*100}%;right:${100-(b.value-lo)/w*100}%`; };
@@ -249,7 +233,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   form.addEventListener('change',e=>{ lastEl=e.target.closest('.opt,.fprice')||e.target; if(e.target.type==='checkbox') load(buildUrl(),true); });
   let pt; form.addEventListener('input',e=>{ if(e.target.type==='checkbox'||e.target.type==='range') return; clearTimeout(pt); pt=setTimeout(()=>load(buildUrl(),true),700); });
   form.addEventListener('submit',e=>{ e.preventDefault(); load(buildUrl(),true); });
-  /* снять одно условие чипсом или сбросить всё — тоже без перезагрузки */
   document.addEventListener('click',e=>{
     const a=e.target.closest('#fChips a[data-names]');
     if(a){ e.preventDefault(); a.dataset.names.split(',').forEach(n=>form.querySelectorAll(`[name="${CSS.escape(n)}"]`).forEach(i=>{ if(i.type==='checkbox') i.checked=false; else i.value=''; })); load(buildUrl(),true); return; }
@@ -258,7 +241,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       rg.forEach((i,k)=>i.value=k?i.max:i.min); syncSlider(); load(buildUrl(),true); }
   });
   addEventListener('popstate',e=>{ if(e.state&&e.state.bt) location.reload(); });
-  /* длинный фильтр на десктопе прокручивается вместе с товарами и встаёт, когда показался его низ; вверх — сразу едет вверх до шапки (как на Озоне) */
+  /* длинный фильтр на десктопе прокручивается с товарами и встаёт, когда показался его низ */
   const topGap=parseFloat(getComputedStyle(filters).top)||0, desk=matchMedia('(min-width:1051px)');
   let lastY=scrollY, off=topGap;
   const stick=()=>{
@@ -272,9 +255,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 <?php
-// чипсы выбранных условий; контейнер выводится всегда — его подменяет фоновая загрузка
+// контейнер выводится всегда — его подменяет фоновая загрузка
 $html = '<div class="chips" id="fChips"' . ($chips ? '' : ' style="display:none"') . '>';
-// выбранные условия полем → значение: ссылка «×» ведёт на раздел с остальными условиями, сервер перенаправит на ЧПУ
 $cur = [];
 foreach ($arResult['ITEMS'] as $it) {
     foreach ($it['VALUES'] as $k => $v) {

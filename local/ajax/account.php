@@ -1,6 +1,5 @@
 <?php
-// Личный кабинет: POST action=profile | company_save | company_del | addr_save | addr_del | addr_main | reorder. Только авторизованным, с sessid.
-// Реквизиты юрлиц и адреса — профили покупателя Битрикса (UR и FIZ). Ответ: {ok: true, ...} или {ok: false, errors: {поле: текст}}
+// Кабинет: реквизиты юрлиц и адреса — профили покупателя Битрикса (UR и FIZ)
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -30,7 +29,7 @@ Loader::includeModule('catalog');
 $uid = (int)$USER->GetID();
 $in = fn(string $k, int $max = 255) => mb_substr(trim(preg_replace('/\s+/u', ' ', (string)$req->getPost($k))), 0, $max);
 $pt = fn(string $code) => (int)Sale\Internals\PersonTypeTable::getList(['filter' => ['=CODE' => $code, '=LID' => SITE_ID], 'select' => ['ID']])->fetch()['ID'];
-// профиль покупателя: только свой и нужного типа
+// только свой профиль нужного типа
 $own = function (int $id, int $ptId) use ($uid) {
     return $id && UserPropsTable::getList(['filter' => ['=ID' => $id, '=USER_ID' => $uid, '=PERSON_TYPE_ID' => $ptId], 'select' => ['ID']])->fetch();
 };
@@ -75,7 +74,7 @@ switch ((string)$req->getPost('action')) {
             'inn' => !in_array(strlen($f['INN']), [10, 12], true) ? ($f['INN'] === '' ? 'Это поле нужно заполнить' : 'ИНН состоит из 10 цифр у компании и 12 у ИП') : (bt_inn_ok($f['INN']) ? '' : 'Проверьте ИНН — в номере ошибка'),
             'kpp' => $f['KPP'] !== '' && strlen($f['KPP']) !== 9 ? 'КПП состоит из 9 цифр' : '',
         ]);
-        // организация с таким ИНН уже сохранена — обновляем её, а не заводим вторую
+        // ИНН уже сохранён — обновляем ту же организацию, а не заводим вторую
         foreach (bt_profiles($uid, 'UR') as $p) {
             if (($p['v']['INN'] ?? '') === $f['INN'] && $p['id'] !== $id) {
                 if ($id) {
@@ -123,7 +122,7 @@ switch ((string)$req->getPost('action')) {
         $out(['ok' => true]);
 
     case 'reorder':
-        // позиции заказа — в корзину; товары, которых больше нет в каталоге, пропускаем
+        // повтор заказа: товары, которых больше нет в каталоге, пропускаем
         $order = Sale\Order::load((int)$req->getPost('id'));
         if (!$order || (int)$order->getUserId() !== $uid) {
             $out(['ok' => false, 'message' => 'Заказ не найден'], 404);

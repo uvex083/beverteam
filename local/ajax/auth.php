@@ -1,6 +1,5 @@
 <?php
-// Вход = регистрация по коду из письма. POST action=check (email → есть ли покупатель) | send (login) | verify (code) | register (name) | logout.
-// Код — 4 цифры, в сессии только хэш: 10 минут, 5 попыток. Отправки и ошибки пишутся в журнал событий — по нему лимиты на e-mail и IP.
+// Вход и регистрация по коду из письма; лимиты на e-mail и IP — по журналу событий
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -34,7 +33,7 @@ $log = fn(string $type, string $email) => CEventLog::Add(['SEVERITY' => 'SECURIT
 $count = fn(string $type, array $filter, int $sec) => EventLogTable::getCount(['=AUDIT_TYPE_ID' => $type,
     '>=TIMESTAMP_X' => DateTime::createFromTimestamp(time() - $sec)] + $filter);
 $user = fn(int $id) => UserTable::getList(['filter' => ['=ID' => $id], 'select' => ['ID', 'NAME', 'LAST_NAME', 'EMAIL', 'ACTIVE']])->fetch();
-// вход по коду — только для покупателей: администраторы входят через /bitrix/admin/ с паролем
+// администраторам вход по коду закрыт — только паролем через /bitrix/admin/
 $allowed = fn(array $u) => $u['ACTIVE'] === 'Y' && !in_array(1, array_map('intval', CUser::GetUserGroup((int)$u['ID'])), true);
 $login = function (int $id) use ($USER, $out, $user) {
     unset($_SESSION['BT_AUTH']);

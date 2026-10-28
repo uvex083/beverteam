@@ -1,7 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 /** @var array $expert */
-// Страница специалиста: данные — ИБ «О компании: команда», публикации — статьи журнала, где он указан автором
 
 use Bitrix\Main\Loader;
 

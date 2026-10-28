@@ -1,7 +1,6 @@
 <?php
-// Вход по коду и личный кабинет: почтовое событие BT_AUTH_CODE и шаблон письма, свойства заказа «Квартира / офис» и «Подъезд, этаж, домофон»
-// для адресов в профилях покупателя, свойство «Покупатель» у заявок с сайта.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_personal_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Вход по коду и кабинет: письмо BT_AUTH_CODE, свойства адреса для профилей покупателя, «Покупатель» у заявок с сайта.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_personal_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -21,7 +20,6 @@ $apply = ($argv[1] ?? 'show') === 'apply';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 
-// письмо с кодом входа
 const EV = 'BT_AUTH_CODE';
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);
@@ -39,7 +37,7 @@ if (!CEventMessage::GetList('id', 'asc', ['TYPE_ID' => EV])->Fetch()) {
     }
 }
 
-// адрес доставки в профиле покупателя хранится по частям, как в форме оформления заказа
+// адрес в профиле хранится по частям, как в форме оформления
 $fiz = (int)(PersonTypeTable::getList(['filter' => ['=CODE' => 'FIZ'], 'select' => ['ID']])->fetch()['ID'] ?? 0) or $fail('нет типа плательщика FIZ');
 $group = (int)OrderPropsTable::getList(['filter' => ['=PERSON_TYPE_ID' => $fiz, '=CODE' => 'ADDRESS'], 'select' => ['PROPS_GROUP_ID']])->fetch()['PROPS_GROUP_ID'];
 foreach (['FLAT' => ['Квартира / офис', 730], 'ENTRANCE' => ['Подъезд, этаж, домофон', 740]] as $code => [$name, $sort]) {
@@ -66,8 +64,8 @@ if (!CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'USER_ID'])->
     }
 }
 
-// паролей у покупателей нет: штатные регистрация и восстановление пароля Битрикса посетителям не нужны;
-// store_password = «запоминать авторизацию» — без неё вход по коду слетает вместе с сессией
+// паролей у покупателей нет — штатные регистрация и восстановление пароля не нужны;
+// store_password = «запоминать авторизацию», без неё вход по коду слетает с сессией
 foreach (['new_user_registration' => 'N', 'new_user_registration_email_confirmation' => 'N', 'store_password' => 'Y'] as $opt => $val) {
     if (COption::GetOptionString('main', $opt) !== $val) {
         $say("главный модуль: $opt = $val");

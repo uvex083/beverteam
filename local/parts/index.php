@@ -1,8 +1,8 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Главная по макету index.html; H1 — заголовок блока «О магазине», как на старом сайте (SetTitle в /index.php). Тексты — из инфоблоков типа «Главная», данные — из каталога, аренды, отзывов и журнала
+// H1 — заголовок блока «О магазине», как на старом сайте (SetTitle в /index.php)
 
-// неразрывные пробелы в числах и перед ₽: «3 000 ₽» не рвётся по строкам
+// неразрывные пробелы в числах и перед ₽
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $co = bt_contacts();
 $hero = bt_block('main_hero');
@@ -25,7 +25,6 @@ $seo = bt_block('main_seo');
 $map = bt_block('main_map');
 $rent = bt_rent_models();
 $data = bt_catalog_data();
-// на главной — только отмеченные галочкой «Показывать на главной»
 $onMain = fn(array $list, string $code, string $prefix = '') => array_values(array_filter($list, fn($m) => in_array((int)substr((string)$m['id'], strlen($prefix)), bt_main_ids($code), true)));
 $mainRent = $onMain($data['rent'], 'rent', 'r');
 $mainMachines = $onMain($data['machines'], 'catalog');
@@ -35,7 +34,6 @@ $head = fn(array $b, string $link = '', string $tag = 'h2') => '<div class="sec_
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'BEVERTEAM',
     'url' => 'https://beverteam.ru/'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
 
-// подбор кофемашины: модели аренды + пункты блока (мероприятие — по заявке)
 $chips = [];
 foreach ($rent as $m) {
     $chips[] = ['k' => $m['audience'], 'img' => $m['img'], 'm' => $m['model'],
@@ -154,7 +152,7 @@ $c0 = $chips[$cur] ?? null;
 <?php endif ?>
 
 <?php
-// «Зерно месяца»: первым — кофе из блока в админке, за ним сами подтягиваются кофе с метками «Хит» и «Топ продаж»
+// «Зерно месяца»: кофе из блока админки, за ним — с метками «Хит» и «Топ продаж»
 $bp = !empty($bean['product']) ? bt_product((string)$bean['product']) : null;
 $beans = $bp ? [[$bp, $bean['caption'] ?? '', $bean['title'] ?? $bp['n'], $bean['subtitle'] ?? '', ($bean['btn_text'] ?? '') ?: bt_fmt($bp['p']) . ' · к товару', ($bean['btn_link'] ?? '') ?: $bp['url']]] : [];
 if ($bp) {
@@ -230,7 +228,7 @@ if ($beans):
       <h2 class="display h2 wr__t"><?php $APPLICATION->ShowTitle(false) ?></h2>
       <div class="home__about"><?= $about['text'] ?? '' ?></div>
       <div class="row" style="margin-top:24px"><?= bt_btn($about['btn_text'] ?? '', $about['btn_link'] ?? '', 'btn btn--line') ?><?= bt_btn($about['btn2_text'] ?? '', $about['btn2_link'] ?? '', 'btn btn--line') ?></div>
-      <?php // фото установок — со страницы «Наши клиенты», только когда она открыта для всех
+      <?php
       $works = bt_clients_on() ? array_slice(array_values(array_filter(array_map(fn($c) => $c['photos'] && !$c['demo'] ? ['t' => $c['photos'][0]['t'], 'b' => $c['photos'][0]['b'], 'cap' => $c['name']] : null, bt_clients()))), 0, 5) : [];
       if ($works): ?>
       <div class="works">

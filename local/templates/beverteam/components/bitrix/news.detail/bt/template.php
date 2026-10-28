@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
-// Статья: заголовкам текста проставляются якоря, из них — оглавление сбоку (если заголовков два и больше)
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $kind = $arResult['PROPERTIES']['KIND']['VALUE_XML_ID'] ?? 'article';
@@ -15,20 +14,16 @@ $body = preg_replace_callback('~<(h[2-4])([^>]*)>(.*?)</\1>~si', function ($m) u
     $toc[] = [$id, trim(strip_tags($m[3])), strtolower($m[1]) === 'h2' ? 2 : 3];
     return '<' . $m[1] . ' id="' . $id . '"' . $m[2] . '>' . $m[3] . '</' . $m[1] . '>';
 }, (string)$arResult['~DETAIL_TEXT']);
-// фото в тексте — уменьшенная копия не шире 1200 px в webp, грузится при прокрутке
 $body = preg_replace_callback('~<img\b([^>]*?)\ssrc="(/upload/[^"]+\.(?:jpe?g|png))"([^>]*)>~i', function ($m) {
     $src = bt_img(bt_upload_file_id($m[2]), 1200, 2400) ?: $m[2];
     $attrs = $m[1] . $m[3];
     return '<img' . $m[1] . ' src="' . $src . '"' . $m[3] . (str_contains($attrs, 'loading=') ? '' : ' loading="lazy"') . (str_contains($attrs, 'decoding=') ? '' : ' decoding="async"') . '>';
 }, $body);
-// таблица — в прокручиваемой обёртке: на телефоне листается сама, на широком экране тянется во всю колонку
 $body = preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $body);
-// товары из статьи — карточки каталога (выключенные и удалённые товары пропускаются)
 $prods = array_values(array_filter(array_map(fn($id) => bt_product((string)$id), (array)($arResult['PROPERTIES']['PRODUCTS']['VALUE'] ?? []))));
 if ($prods) {
     $toc[] = ['prods', 'Товары из статьи', 2];
 }
-// оглавление: разделы H2 с номерами, подзаголовки H3–H4 — внутри своего раздела
 $tree = [];
 foreach ($toc as [$id, $t, $lv]) {
     if ($lv === 3 && $tree) {
@@ -47,7 +42,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     <?php if ($mod): ?><meta itemprop="dateModified" content="<?= $e(date('Y-m-d', MakeTimeStamp($mod))) ?>"><?php endif ?>
     <link itemprop="mainEntityOfPage" href="<?= $e($host . $arResult['~DETAIL_PAGE_URL']) ?>">
     <?php if ($pic): ?><link itemprop="image" href="<?= $e($host . $pic) ?>"><?php endif ?>
-    <?php /* издатель — компания (Яндекс требует у организации адрес и телефон); автор — специалист из поля «Автор статьи», иначе тоже компания */
+    <?php /* у организации Яндекс требует адрес и телефон; без автора-специалиста автор — компания */
     $author = bt_experts()[(int)($arResult['PROPERTIES']['AUTHOR']['VALUE'] ?? 0)] ?? null; ?>
     <?php if ($author): ?><div hidden itemprop="author" itemscope itemtype="https://schema.org/Person"<?= $author['url'] ? ' itemid="' . $e($host . $author['url']) . '#person"' : '' ?>>
       <meta itemprop="name" content="<?= $e($author['name']) ?>"><?php if ($author['job'] !== ''): ?><meta itemprop="jobTitle" content="<?= $e($author['job']) ?>"><?php endif ?><?php if ($author['url']): ?><link itemprop="url" href="<?= $e($host . $author['url']) ?>"><?php endif ?>

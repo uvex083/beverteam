@@ -1,6 +1,6 @@
 <?php
-// Инфоблоки страницы «Аренда кофемашин» (/arenda-kofemashin/): тип «Аренда кофемашин», блок страницы = инфоблок, сортировка = порядок на странице.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_rent_page_setup.php [show|apply]. Повторный запуск ничего не дублирует и правки клиента не трогает.
+// Инфоблоки страницы «Аренда кофемашин» (/arenda-kofemashin/): блок страницы = инфоблок; правки клиента не трогает.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_rent_page_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -82,7 +82,7 @@ $list = function (string $code, array $items) use ($ibs, $say, $fail) {
     }
 };
 
-// тексты новой версии страницы (30.09.2026); условия договора — заготовки до подтверждения клиентом (OPEN-QUESTIONS.md)
+// условия договора — заготовки до подтверждения клиентом
 $v2 = [
     'rent_top' => [
         'CAPTION' => 'Аренда · Екатеринбург и Свердловская область',

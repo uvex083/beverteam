@@ -1,6 +1,5 @@
 <?php
-// Заявки с сайта: POST form=lead|contact|write|subscribe + поля. Сначала запись в ИБ form_requests, потом письмо BT_FORM_REQUEST.
-// Ответ: {ok: true} или {ok: false, errors: {поле: текст}}
+// Заявки с сайта: сначала запись в ИБ form_requests, потом письмо BT_FORM_REQUEST
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -23,7 +22,6 @@ if (!check_bitrix_sessid()) {
 }
 Loader::includeModule('iblock');
 
-// обязательные поля по типу формы; остальные — по желанию
 $rules = [
     'lead' => ['name', 'phone'],
     'contact' => ['name', 'phone'],
@@ -40,7 +38,7 @@ $d = [
     'topic' => $v('topic', 150) ?: 'Заявка с сайта', 'page' => preg_match('~^/[^\s]*$~', (string)$req->getPost('page')) ? mb_substr((string)$req->getPost('page'), 0, 255) : '',
     'message' => mb_substr(trim((string)$req->getPost('message')), 0, 2000),
 ];
-// товар («Купить в один клик»), модель кофемашины (ремонт, аренда), компания — первой строкой сообщения
+// товар, модель кофемашины, компания — первой строкой сообщения
 if ($product = $v('product', 255)) {
     $d['message'] = 'Товар: ' . $product . ($d['message'] !== '' ? "\n" . $d['message'] : '');
 }
@@ -81,7 +79,7 @@ if ($errors) {
     $out(200, ['ok' => false, 'errors' => $errors]);
 }
 
-// подписка на журнал не заявка: свой список подписчиков, адрес подтверждается письмом
+// подписка на журнал — не заявка: свой список подписчиков, адрес подтверждается письмом
 if ($form === 'subscribe') {
     if (time() - (int)($_SESSION['BT_FORM_LAST'] ?? 0) < 15 || bt_ip_flood('BT_JOURNAL_SUB', 5, 600)) {
         $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Слишком много подписок подряд. Попробуйте через 10 минут.']);
@@ -92,7 +90,7 @@ if ($form === 'subscribe') {
     $out(200, ['ok' => true]);
 }
 
-// защита от спама: не чаще раза в 15 секунд из сессии и не больше 5 заявок за 10 минут с одного IP; администраторам не мешает проверять формы
+// антиспам: раз в 15 с на сессию и 5 заявок за 10 мин с IP; администраторов не ограничиваем
 $ip = (string)$req->getRemoteAddress();
 $ibId = bt_iblock('form_requests');
 $isAdmin = $USER->IsAdmin();
@@ -108,7 +106,7 @@ if (!$isAdmin && $recent >= 5) {
 if ($d['phone'] !== '') {
     $d['phone'] = '+7 ' . substr($digits, 1, 3) . ' ' . substr($digits, 4, 3) . '-' . substr($digits, 7, 2) . '-' . substr($digits, 9, 2);
 }
-// папка — по форме, с которой пришла заявка (код папки = код цели Метрики), неизвестная форма — в окно «Оставить заявку»;
+// папка = код цели Метрики; неизвестная форма — в окно «Оставить заявку»,
 // старые коды из закэшированного у посетителя скрипта — в папку объединённой формы
 $folder = static function (string $code) use ($ibId): int {
     $s = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'], false, ['ID'])->Fetch();
@@ -137,7 +135,6 @@ CEvent::Send('BT_FORM_REQUEST', SITE_ID, [
     'EMAIL_TO' => bt_notify_email(),
     'TOPIC' => $d['topic'], 'CLIENT_NAME' => $d['name'] ?: '—', 'PHONE' => $d['phone'] ?: '—', 'EMAIL' => $d['email'] ?: '—',
     'MESSAGE' => $d['message'] ?: '—', 'PAGE' => $d['page'] ? $host . $d['page'] : '—',
-    // строки письма — только заполненные поля: у подписки нет имени и телефона, у заявки — e-mail
     'ROWS' => bt_mail_rows(array_filter([
         'Имя' => htmlspecialcharsbx($d['name']),
         'Телефон' => $d['phone'] !== '' ? '<a href="tel:' . preg_replace('/[^\d+]/', '', $d['phone']) . '" style="color:#0E0E0C;font-weight:700;text-decoration:none;white-space:nowrap">' . htmlspecialcharsbx($d['phone']) . '</a>' : '',

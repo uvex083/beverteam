@@ -1,6 +1,6 @@
 <?php
 // Общесайтовые настройки: тип ИБ «Сайт: общие блоки», ИБ «Контакты и реквизиты», шаблон сайта.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_site_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_site_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -38,7 +38,6 @@ $props = [
     'VK' => ['Ссылка ВКонтакте', 230, ''],
 ];
 
-// тип инфоблоков
 if (!CIBlockType::GetByID(TYPE)->Fetch()) {
     $say('создать тип ИБ ' . TYPE . ' «Сайт: общие блоки»');
     if ($apply) {
@@ -50,7 +49,6 @@ if (!CIBlockType::GetByID(TYPE)->Fetch()) {
     }
 }
 
-// инфоблок контактов
 $ibId = (int)(CIBlock::GetList([], ['=CODE' => CONTACTS, 'CHECK_PERMISSIONS' => 'N'])->Fetch()['ID'] ?? 0);
 if (!$ibId) {
     $say('создать ИБ ' . CONTACTS . ' «Контакты и реквизиты»');
@@ -65,7 +63,6 @@ if (!$ibId) {
     }
 }
 
-// свойства
 if ($ibId) {
     $have = [];
     $r = CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId]);
@@ -99,7 +96,6 @@ if ($ibId) {
     }
 }
 
-// шаблон сайта s1
 $tpl = [];
 $r = CSite::GetTemplateList('s1');
 while ($t = $r->Fetch()) {

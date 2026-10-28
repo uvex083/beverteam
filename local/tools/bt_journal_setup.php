@@ -1,6 +1,6 @@
 <?php
-// Рассылка журнала: ИБ подписчиков, почтовые события (подтверждение, подборка), агент. Оформление писем — bt_mail_setup.php.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_journal_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Рассылка журнала: ИБ подписчиков, почтовые события (подтверждение, подборка), агент.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_journal_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -19,13 +19,11 @@ $apply = ($argv[1] ?? 'show') === 'apply';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 
-// ---------- подписчики: e-mail = название, «Активность» включается подтверждением из письма ----------
 $ib = bt_ib_ensure(['IBLOCK_TYPE_ID' => 'forms', 'CODE' => 'journal_subs', 'NAME' => 'Подписка на журнал', 'SORT' => 310,
     'DESCRIPTION' => 'Кто получает подборки новых статей. Название — e-mail. Активные — подтвердили адрес; снять галочку «Активность» — письма перестанут приходить.'],
     ['TOKEN' => ['Ключ подтверждения и отписки (не менять)', 'S', []]], $apply, $say, $fail);
 $apply && $ib and bt_grid_sort('forms', $ib);
 
-// ---------- почтовые события ----------
 $events = [
     'BT_JOURNAL_CONFIRM' => ['Журнал: подтверждение подписки', "#EMAIL_TO# — адрес подписчика\n#TOKEN# — ключ подтверждения", []],
     'BT_JOURNAL_DIGEST' => ['Журнал: подборка новых статей', "#EMAIL_TO# — подписчик\n#POSTS# — карточки статей (HTML)\n#TOKEN# — ключ отписки",
@@ -48,7 +46,7 @@ foreach ($events as $ev => [$name, $desc, $headers]) {
     }
 }
 
-// ---------- порог и отметка «прошлая подборка»: первая подборка — только из статей, вышедших после запуска ----------
+// первая подборка — только из статей, вышедших после запуска
 if (Option::get('bt', 'journal_digest_min', '') === '') {
     $say('порог подборки: 5 статей');
     $apply and Option::set('bt', 'journal_digest_min', '5');
@@ -62,7 +60,7 @@ if (!CAgent::GetList([], ['NAME' => 'bt_journal_digest_agent();'])->Fetch()) {
     $apply and CAgent::AddAgent('bt_journal_digest_agent();', '', 'N', 86400, '', 'Y', date('d.m.Y 10:00:00', strtotime('+1 day')), 100, false, false);
 }
 
-// ---------- старые подписки журнала из «Заявок с сайта» (тестовые) ----------
+// удаляем старые тестовые подписки журнала из «Заявок с сайта»
 if ($fr = bt_iblock('form_requests')) {
     $r = CIBlockElement::GetList([], ['IBLOCK_ID' => $fr, '=PROPERTY_TOPIC' => 'Подписка на новые материалы журнала'], false, false, ['ID', 'NAME']);
     while ($x = $r->Fetch()) {

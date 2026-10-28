@@ -1,6 +1,6 @@
 <?php
-// Магазин переехал с /magazin/ на /catalog/: шаблоны адресов инфоблока каталога и ссылки в текстах элементов всех инфоблоков.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_catalog_url.php [show|apply]. Повторный запуск ничего не меняет.
+// Перенос магазина с /magazin/ на /catalog/: шаблоны адресов каталога и ссылки в текстах элементов всех инфоблоков.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_catalog_url.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -26,11 +26,11 @@ $el = new CIBlockElement();
 $r = CIBlockElement::GetList([], [['LOGIC' => 'OR', '%PREVIEW_TEXT' => '/magazin/', '%DETAIL_TEXT' => '/magazin/']], false, false, ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'DETAIL_TEXT']);
 while ($x = $r->Fetch()) {
     $say("ссылки в тексте: {$x['ID']} {$x['NAME']}");
-    // только тексты — свойства не передаём, чтобы не затереть их (Update с частичными свойствами стирает остальные)
+    // только тексты: Update с частичными свойствами стирает остальные
     $apply and ($el->Update($x['ID'], ['PREVIEW_TEXT' => $fix($x['PREVIEW_TEXT']), 'DETAIL_TEXT' => $fix($x['DETAIL_TEXT'])]) or print('  ошибка: ' . $el->LAST_ERROR . "\n"));
 }
 
-// свойства-строки и HTML (кнопки, тексты блоков): меняем по одному свойству через SetPropertyValuesEx — остальные не трогаются
+// свойства — по одному через SetPropertyValuesEx, остальные не трогаются
 $r = CIBlockElement::GetList([], ['CHECK_PERMISSIONS' => 'N'], false, false, ['ID', 'IBLOCK_ID', 'NAME']);
 while ($x = $r->Fetch()) {
     $pr = CIBlockElement::GetProperty($x['IBLOCK_ID'], $x['ID'], [], ['PROPERTY_TYPE' => 'S']);

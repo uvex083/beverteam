@@ -1,6 +1,6 @@
 <?php
-// Подписка на журнал по ссылкам из писем: confirm=<ключ> — подтвердить адрес, unsub=<ключ> — отписаться.
-// POST с unsub в адресе — отписка в один клик из почтового клиента (заголовок List-Unsubscribe-Post), отвечаем без редиректа.
+// Ссылки из писем журнала: confirm=<ключ> — подтвердить адрес, unsub=<ключ> — отписаться
+// POST с unsub — отписка в один клик из почтового клиента (List-Unsubscribe-Post), без редиректа
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';

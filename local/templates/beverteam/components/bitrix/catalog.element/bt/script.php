@@ -1,12 +1,10 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die(); ?>
 <script>
-// Страница товара: скрипт из product.html, обобщённый на любой товар — данные из BT_PAGE и BT_find()
 document.addEventListener('DOMContentLoaded',()=>{
   const P=window.BT_PAGE, PID=P.id, PM=BT_find(PID)||{p:0}, U=P.unit;
   const qty=document.getElementById('qty'), pTotal=document.getElementById('pTotal'), pPer=document.getElementById('pPer'),
     pPacks=document.getElementById('pPacks'), pAdd=document.getElementById('pAdd'), tiers=document.getElementById('tiers');
 
-  /* ---- галерея ---- */
   if(P.photos){
     const swThumbs=new Swiper('#thumbs',{
       direction:'vertical', slidesPerView:'auto', spaceBetween:10, freeMode:true, watchSlidesProgress:true,
@@ -19,13 +17,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       thumbs:{swiper:swThumbs}, a11y:{prevSlideMessage:'Предыдущее фото',nextSlideMessage:'Следующее фото'},
       on:{slideChange(){ galN.textContent=(this.activeIndex+1)+' / '+P.photos; }}
     });
-    /* клик по фото — просмотр на весь экран */
     const imgs=[...document.querySelectorAll('#galBig img[data-full]')];
     imgs.forEach((im,i)=>im.addEventListener('click',()=>{ if(!big.allowClick) return;
       BT_lightbox(imgs.map(x=>({src:x.dataset.full||x.src})),i); }));
   }
 
-  /* ---- блок покупки: фасовка → «В корзину»; в корзине — «− N +» и переход в корзину с суммой ---- */
   const key = () => BT_keyOf(PM), pSt=document.getElementById('pSt');
   const label=(kg,q)=>PM.bulk?`${+(kg*q).toFixed(2)} кг`:`${q} шт`;
   function sync(anim){
@@ -50,7 +46,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(n<1){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } else BT_cartSet(key(),n);
     sync();
   });
-  // объём заказа: плашка ставит столько кг в корзину
   pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_packPut(PID,+b.dataset.kg); sync(true); });
   document.addEventListener('bt:cart',e=>{ if(e.detail&&String(e.detail.id).split(':')[0]===String(PID)) sync(); });
   sync();
@@ -63,7 +58,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 
 
-  /* ---- отзывы: сводка, распределение оценок, карточки ---- */
   const RV=P.reviews||[], n=RV.length;
   if(n){
     const avg=Math.round(RV.reduce((a,x)=>a+x.r,0)/n*10)/10, w=n===1?'отзыв':n<5?'отзыва':'отзывов';
@@ -89,7 +83,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelector('.tabsblock').scrollIntoView({behavior:'smooth',block:'start'});});
 
 
-  /* «Поделиться»: на телефоне — системное окно, на компьютере — своё меню (системное окно Windows непонятное) */
+  /* на компьютере — своё меню: системное окно Windows непонятное */
   const shM=document.getElementById('shareMenu');
   const shOpen=on=>{ shM.hidden=!on; bShare.setAttribute('aria-expanded',on); };
   bShare.addEventListener('click',e=>{
@@ -99,7 +93,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const links={tg:`https://t.me/share/url?url=${u}&text=${t}`,wa:`https://wa.me/?text=${t}%20${u}`,vk:`https://vk.com/share.php?url=${u}`};
     shM.querySelectorAll('[data-share]').forEach(a=>{ if(links[a.dataset.share]) a.href=links[a.dataset.share]; });
     shOpen(shM.hidden);
-    /* иконки нарисованы с разными полями — подгоняем рамку каждой по контуру, чтобы все были одного размера */
+    /* у иконок разные поля — подгоняем viewBox по контуру, чтобы были одного размера */
     if(!shM.hidden&&!shM.dataset.fit){ shM.dataset.fit=1; shM.querySelectorAll('svg').forEach(v=>{
       const b=v.getBBox(), pad=v.getAttribute('stroke')?1:0, m=Math.max(b.width,b.height)+pad*2;
       v.setAttribute('viewBox',`${b.x-(m-b.width)/2} ${b.y-(m-b.height)/2} ${m} ${m}`); }); }
@@ -112,7 +106,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   document.addEventListener('click',e=>{ if(!shM.hidden&&!e.target.closest('.share')) shOpen(false); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!shM.hidden){ shOpen(false); bShare.focus(); } });
-  /* сравнение — общий список BT_CMP, как у карточек в каталоге */
   bCmp.setAttribute('aria-pressed',BT_cmpHas(PID));
   bCmp.addEventListener('click',()=>{BT_cmpToggle(PID);const on=BT_cmpHas(PID);
     bCmp.setAttribute('aria-pressed',on);BT_toast(on?'Товар добавлен к сравнению':'Товар убран из сравнения');});

@@ -1,6 +1,6 @@
 <?php
-// Самовывоз: статус заказа «Готов к выдаче» (R) с письмом покупателю — менеджер ставит его, когда заказ собран на складе.
-// Текст письма — bt_mail_setup.php. Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_pickup_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Самовывоз: статус «Готов к выдаче» (R) с письмом покупателю — менеджер ставит, когда заказ собран.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_pickup_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -19,7 +19,7 @@ $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 const ST = 'R';
 const EV = 'SALE_STATUS_CHANGED_' . ST;
 
-// между «Оплачен, формируется к отправке» и «Выполнен»
+// статус — между «Оплачен, формируется к отправке» и «Выполнен»
 if (!Sale\Internals\StatusTable::getById(ST)->fetch()) {
     $p = (int)(Sale\Internals\StatusTable::getById('P')->fetch()['SORT'] ?? 200);
     $f = (int)(Sale\Internals\StatusTable::getById('F')->fetch()['SORT'] ?? 300);
@@ -36,7 +36,7 @@ if (!Sale\Internals\StatusTable::getById(ST)->fetch()) {
     }
 }
 
-// письмо при смене статуса (текст и оформление задаёт bt_mail_setup.php)
+// письмо при смене статуса (текст — в bt_mail_setup.php)
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);
     $apply and (new CEventType())->Add(['LID' => 'ru', 'EVENT_NAME' => EV, 'NAME' => 'Изменение статуса заказа на «Готов к выдаче»', 'SORT' => 250, 'DESCRIPTION' =>

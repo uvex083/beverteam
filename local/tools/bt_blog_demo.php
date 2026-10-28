@@ -1,8 +1,6 @@
 <?php
-// Демо-наполнение журнала для проверки вёрстки: 14 материалов с картинками (фото из каталога и аренды) и полным набором элементов статьи
-// (подзаголовки, фото с подписью, списки, нумерация, цитата, таблица). Картинки получают и существующие материалы без картинок.
-// Демо-материалы помечены XML_ID «bt-demo» — перед запуском удалить: ... bt_blog_demo.php delete
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_demo.php [show|apply|delete]. Повторный запуск ничего не дублирует.
+// Демо-материалы журнала для проверки вёрстки (XML_ID «bt-demo», перед запуском сайта — delete).
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_demo.php [show|apply|delete]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -36,7 +34,6 @@ while ($s = $r->Fetch()) {
 }
 $kindId = fn(string $xml) => (int)(CIBlockPropertyEnum::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'KIND', 'XML_ID' => $xml])->Fetch()['ID'] ?? 0);
 
-// картинки: фото товаров каталога (по одному с раздела по кругу) и кофемашин из аренды
 $pool = [];
 foreach ([bt_iblock('catalog'), bt_iblock('rent')] as $src) {
     $r = CIBlockElement::GetList(['IBLOCK_SECTION_ID' => 'ASC', 'SORT' => 'ASC'], ['IBLOCK_ID' => $src, 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false], false, ['nTopCount' => 40], ['PREVIEW_PICTURE']);
@@ -53,7 +50,6 @@ $pick = function () use (&$pool) {
 };
 $src = fn(int $id) => (string)(CFile::GetFileArray($id)['SRC'] ?? '');
 
-// тело статьи со всеми элементами оформления
 $body = function (string $topic) use ($pick, $src): string {
     $i1 = $src($pick());
     $i2 = $src($pick());

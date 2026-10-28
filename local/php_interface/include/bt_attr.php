@@ -1,6 +1,5 @@
 <?php
-// Источник заказов и заявок для отчёта /seo-otchet/: вход из поиска запоминается в cookie на 180 дней
-// (последний значимый источник: прямой заход его не перебивает), заказ и заявка берут источник при создании.
+// Источник заказов и заявок для /seo-otchet/: вход из поиска — в cookie на 180 дней, прямой заход его не перебивает
 
 namespace Bt\Attr;
 
@@ -42,7 +41,7 @@ class Table extends \Bitrix\Main\ORM\Data\DataManager
     }
 }
 
-// источник по адресу и referer; null — прямой заход, переход внутри сайта или служебный сайт (оплата, вход, почта)
+// null — прямой заход, переход внутри сайта или служебный сайт (оплата, вход, почта)
 function classify(string $ref, array $get, string $host, string $path = '/', bool $hasSource = false): ?array
 {
     $own = fn(string $h) => $h !== '' && ($h === preg_replace('/^www\./', '', strtolower($host)) || preg_match('/(^|\.)beverteam\.(ru|na4u\.ru)$/', $h));
@@ -80,7 +79,7 @@ function classify(string $ref, array $get, string $host, string $path = '/', boo
             return ['s' => 'organic', 'e' => $e, 'r' => $refHost];
         }
     }
-    // ysclid Яндекс добавляет к переходам из поиска, но он остаётся и в скопированной ссылке — засчитываем, только если источника ещё нет
+    // ysclid остаётся и в скопированной ссылке — засчитываем, только если источника ещё нет
     if ($refHost === '' && isset($get['ysclid']) && !$hasSource) {
         return ['s' => 'organic', 'e' => 'yandex', 'r' => ''];
     }
@@ -92,7 +91,6 @@ function classify(string $ref, array $get, string $host, string $path = '/', boo
     return ['s' => 'referral', 'e' => '', 'r' => $refHost];
 }
 
-// адрес страницы входа без index.php и в нижнем регистре: /Kontakty/index.php → /kontakty/
 function landing(string $path): string
 {
     $p = mb_strtolower(preg_replace('#/index\.php$#', '/', $path));
@@ -110,8 +108,7 @@ function sign(string $v): string
     return substr(hash_hmac('sha256', $v, $key), 0, 20);
 }
 
-// main:OnEpilog — запомнить значимый источник входа; вход из поиска — ещё и строкой статистики.
-// На эпилоге уже известно, что страница не 404 и не редирект (после LocalRedirect эпилога нет)
+// на эпилоге уже известно, что страница не 404 и не редирект (после LocalRedirect эпилога нет)
 function track(): void
 {
     if (defined('ADMIN_SECTION') || defined('ERROR_404') || PHP_SAPI === 'cli' || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET' || headers_sent()) {
@@ -141,7 +138,6 @@ function track(): void
     }
 }
 
-// действующий источник посетителя (подпись верна, не старше 180 дней) или null
 function current(): ?array
 {
     [$sig, $json] = array_pad(explode('.', (string)($_COOKIE[COOKIE] ?? ''), 2), 2, '');
@@ -153,7 +149,7 @@ function current(): ?array
         'l' => mb_substr((string)($c['l'] ?? ''), 0, 255), 'b' => ($c['b'] ?? 'N') === 'Y' ? 'Y' : 'N', 't' => (int)$c['t']];
 }
 
-// строка отчёта; сбой записи не должен ронять страницу или оформление заказа
+// сбой записи не должен ронять страницу или оформление заказа
 function add(string $type, int $id, ?array $c): void
 {
     try {
@@ -171,7 +167,7 @@ function add(string $type, int $id, ?array $c): void
     }
 }
 
-// sale:OnSaleOrderSaved (D7) — новый заказ с сайта получает источник покупателя; заказы из админки и CLI не трогаем (там cookie менеджера)
+// заказы из админки и CLI не трогаем: там cookie менеджера
 function onOrderSaved(\Bitrix\Main\Event $event): void
 {
     if (!$event->getParameter('IS_NEW') || defined('ADMIN_SECTION') || PHP_SAPI === 'cli') {
@@ -181,7 +177,6 @@ function onOrderSaved(\Bitrix\Main\Event $event): void
     $order && add('order', (int)$order->getId(), current());
 }
 
-// iblock:OnAfterIBlockElementAdd — заявка с сайта
 function onLeadAdd(array &$f): void
 {
     if (empty($f['ID']) || (int)$f['IBLOCK_ID'] !== (int)bt_iblock('form_requests') || defined('ADMIN_SECTION') || PHP_SAPI === 'cli') {
@@ -203,7 +198,6 @@ function withDelivery(): bool
 const ENGINES = ['yandex' => 'Яндекс', 'google' => 'Google', 'bing' => 'Bing', 'mail' => 'Mail.ru', 'duckduckgo' => 'DuckDuckGo', 'rambler' => 'Рамблер', 'yahoo' => 'Yahoo'];
 const SOURCES = ['organic' => 'Поиск', 'ads' => 'Реклама', 'utm' => 'Ссылка с меткой', 'referral' => 'Переход с сайта', 'direct' => 'Прямой заход'];
 
-// фильтр отчёта из запроса: период (по умолчанию текущий месяц), источник, брендовость
 function filter(array $q): array
 {
     $d = fn($v, $def) => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$v) ? (string)$v : $def;
@@ -215,7 +209,6 @@ function filter(array $q): array
     ];
 }
 
-// строки отчёта одного типа (order | lead | visit) за период с расчётом: засчитана ли строка, база и вознаграждение
 function report(string $type, array $f): array
 {
     $flt = ['=TYPE' => $type,
@@ -287,22 +280,21 @@ function report(string $type, array $f): array
     return $rows;
 }
 
-// итоги по строкам: сколько засчитано, база, вознаграждение
 function totals(array $rows): array
 {
     $c = array_filter($rows, fn($r) => $r['COUNTED']);
     return ['all' => count($rows), 'n' => count($c), 'base' => array_sum(array_column($c, 'BASE')), 'fee' => array_sum(array_column($c, 'FEE'))];
 }
 
-// брендовый запрос: название компании в любом написании («бэвертим», «бевертим», «beverteam»); корни — опция bt/seo_brand_re
+// брендовый запрос — название компании в любом написании; корни — опция bt/seo_brand_re
 function isBrandPhrase(string $phrase): bool
 {
     $re = Option::get('bt', 'seo_brand_re', 'бэвер|бевер|бивер|bever|beaver');
     return (bool)@preg_match('/' . str_replace('/', '\/', $re) . '/iu', $phrase);
 }
 
-// поисковый запрос последнего значимого входа перед заказом или заявкой — из Метрики по номеру посетителя (_ym_uid).
-// null — визита в Метрике нет (ещё не обработан, блокировщик рекламы); '' — визит есть, запрос поисковик не передал
+// запрос последнего значимого входа — из Метрики по _ym_uid;
+// null — визита в Метрике ещё нет, '' — визит есть, запрос поисковик не передал
 function metrikaPhrase(string $uid, DateTime $at): ?string
 {
     $file = Option::get('bt', 'metrika_token_file', '');
@@ -329,7 +321,7 @@ function metrikaPhrase(string $uid, DateTime $at): ?string
     return ($row[1]['id'] ?? '') === 'organic' ? mb_substr((string)($row[2]['name'] ?? ''), 0, 255) : '';
 }
 
-// агент: запросы для новых заказов и заявок. Визит появляется в Метрике не сразу — не нашли, повторяем раз в час двое суток
+// визит появляется в Метрике не сразу — повторяем раз в час двое суток
 function phraseAgent(): string
 {
     $now = time();

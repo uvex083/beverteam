@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Контакты» по макету contacts.html: реквизиты — bt_contacts(), «Как добраться» и фото — ИБ типа «Контакты»
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $co = bt_contacts();

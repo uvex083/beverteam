@@ -1,7 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
 /** @global CMain $APPLICATION */
-// Лента журнала: сетка по 3 в ряд (12 на страницу — ровные ряды); «Показать ещё» — следующая страница
 
 $posts = [];
 foreach ($arResult['ITEMS'] as $it) {

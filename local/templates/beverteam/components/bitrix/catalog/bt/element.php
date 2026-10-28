@@ -5,7 +5,7 @@
  * @var CBitrixComponent $component
  * @global CMain $APPLICATION
  */
-// обёртка и крошки здесь, а не в шаблоне товара: ShowViewContent внутри кешируемого шаблона теряет вывод
+// обёртка и крошки здесь: ShowViewContent внутри кешируемого шаблона теряет вывод
 ?><div class="wrap"><?php $APPLICATION->ShowViewContent('bt_crumbs') ?><?php
 $APPLICATION->IncludeComponent('bitrix:catalog.element', 'bt', [
     'IBLOCK_TYPE' => $arParams['IBLOCK_TYPE'], 'IBLOCK_ID' => $arParams['IBLOCK_ID'],

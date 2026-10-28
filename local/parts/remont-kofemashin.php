@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Ремонт кофемашин»: все тексты — ИБ типа «Ремонт кофемашин» (bt_repair_setup.php), модели Jetinno — из каталога, отзывы — из отзывов о компании
 
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $plain = fn($h) => trim(html_entity_decode(strip_tags(str_replace('<br>', ' ', (string)$h)), ENT_QUOTES));
@@ -14,7 +13,7 @@ $sympH = bt_block('repair_symptoms_head');
 $symptoms = bt_blocks('repair_symptoms');
 $types = bt_block('repair_types');
 $jet = bt_block('repair_jetinno');
-$cert = bt_block('about_cert'); // сертификат сервисного центра — тот же, что на «О компании»
+$cert = bt_block('about_cert');
 $priceH = bt_block('repair_price_head');
 $price = bt_blocks('repair_price');
 $contract = bt_block('repair_contract');
@@ -39,7 +38,6 @@ $stepItems = array_values(array_filter((array)($steps['items'] ?? []), fn($t) =>
 $contractItems = $vals($contract['items'] ?? []);
 $revs = $revH ? bt_reviews() : [];
 
-// разметка для поисковиков — из тех же данных, что на странице
 $num = fn($t) => preg_match('/(\d[\d\x{00A0} ]*)\s*₽/u', (string)$t, $m) ? (int)preg_replace('/\D/', '', $m[1]) : null;
 $offer = fn($name, $p, $desc = '') => array_filter(['@type' => 'Offer', 'name' => $name, 'description' => $desc ?: null, 'priceCurrency' => 'RUB',
     'priceSpecification' => $num($p) !== null ? ['@type' => 'PriceSpecification', 'minPrice' => $num($p), 'priceCurrency' => 'RUB'] : null,

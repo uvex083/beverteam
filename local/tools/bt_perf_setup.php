@@ -1,6 +1,6 @@
 <?php
-// Настройки скорости главного модуля. Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_perf_setup.php [show|apply|rollback]
-// apply выставляет значения из $want, rollback возвращает то, что было до первого apply (сохраняется в опции bt/perf_backup)
+// Настройки скорости главного модуля; rollback возвращает значения до первого apply (опция bt/perf_backup).
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_perf_setup.php [show|apply|rollback]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -12,8 +12,8 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 
 use Bitrix\Main\Config\Option;
 
-// «Оптимизация CSS/JS»: объединять и брать .min-версии — да; перенос JS в конец body — нет: слайдеры и счётчики шапки
-// дорисовывались бы после первой отрисовки (прыжки); gzip-копии не нужны — сжимает nginx; автокеш компонентов — включён
+// JS в конец body не переносим: слайдеры и счётчики шапки прыгают после первой отрисовки;
+// gzip-копии не нужны — сжимает nginx
 $want = [
     'optimize_css_files' => 'Y',
     'optimize_js_files' => 'Y',

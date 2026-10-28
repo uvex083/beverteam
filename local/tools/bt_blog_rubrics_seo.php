@@ -1,5 +1,5 @@
 <?php
-// Рубрики журнала: вводный текст под H1 (описание раздела) и title / description (вкладка SEO раздела). Заполняет только пустое.
+// Рубрики журнала: вводный текст под H1 и title / description. Заполняет только пустое.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_rubrics_seo.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {

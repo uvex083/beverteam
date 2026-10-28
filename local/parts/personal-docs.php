@@ -1,7 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CUser $USER */
-// Кабинет: счета и документы по макету account-docs.html. Документов в системе нет — показываем заказы с оплатой по счёту,
-// документы сверх счёта менеджер высылает по запросу. Отсрочки и задолженности из макета не выводим — данных нет
+// документов в системе нет — показываем заказы с оплатой по счёту
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale\Internals\OrderTable;
@@ -16,7 +15,7 @@ $uid = (int)$USER->GetID();
 $bill = array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => 'bill'], 'select' => ['ID']])->fetchAll(), 'ID');
 $ids = $bill ? array_unique(array_column(PaymentTable::getList(['filter' => ['@PAY_SYSTEM_ID' => $bill, '=ORDER.USER_ID' => $uid], 'select' => ['ORDER_ID']])->fetchAll(), 'ORDER_ID')) : [];
 $orders = $ids ? OrderTable::getList(['filter' => ['@ID' => $ids, '=LID' => SITE_ID], 'select' => ['ID', 'ACCOUNT_NUMBER', 'DATE_INSERT', 'PRICE', 'PAYED', 'CANCELED', 'STATUS_ID'], 'order' => ['ID' => 'DESC']])->fetchAll() : [];
-// организация — из самого заказа: на неё выписан счёт
+// организация — из заказа: на неё выписан счёт
 $org = [];
 if ($orders) {
     $r = \Bitrix\Sale\Internals\OrderPropsValueTable::getList(['filter' => ['@ORDER_ID' => array_column($orders, 'ID'), '@CODE' => ['COMPANY', 'INN']], 'select' => ['ORDER_ID', 'CODE', 'VALUE']]);

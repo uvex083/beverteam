@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Отзывы о компании — ИБ reviews (тип «О компании»), новые отзывы приходят заявкой и публикуются из админки
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $revs = bt_reviews();

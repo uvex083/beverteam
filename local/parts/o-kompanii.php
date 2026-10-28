@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «О компании» по макету about.html: тексты — ИБ типа «О компании», отзывы — ИБ reviews
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $intro = bt_block('about_intro');
@@ -18,7 +17,6 @@ $gallery = array_values(array_filter(bt_list('about_gallery'), fn($g) => $g['pic
 $work = bt_block('about_work');
 $cert = bt_block('about_cert');
 $team = bt_list('about_team');
-// ссылка на страницу специалиста — у кого она заполнена (тот же порядок, что у bt_list)
 $experts = array_values(bt_experts());
 $revs = bt_reviews();
 ?>

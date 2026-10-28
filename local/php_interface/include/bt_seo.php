@@ -1,7 +1,7 @@
 <?php
-// Посадочные страницы для SEO (ИБ seo_landings): по адресу страницы — свои title, description, H1 и SEO-текст
+// Посадочные страницы (ИБ seo_landings): свои title, description, H1 и SEO-текст по адресу
 
-// Адрес без служебных параметров: utm, пагинация, сортировка, ajax. Параметры фильтра остаются — посадочная может быть страницей фильтра
+// адрес без utm, пагинации, сортировки и ajax; параметры фильтра остаются — посадочная бывает страницей фильтра
 function bt_url_key(string $url): string
 {
     $p = parse_url(trim($url));
@@ -12,7 +12,6 @@ function bt_url_key(string $url): string
     return mb_strtolower($path) . ($q ? '?' . http_build_query($q) : '');
 }
 
-// Посадочная для текущего адреса или null
 function bt_landing(): ?array
 {
     static $done = false, $cur = null;
@@ -47,7 +46,7 @@ function bt_landing(): ?array
     return $cur = $map[bt_url_key($uri)] ?? null;
 }
 
-// OnEpilog: title и description (из них же og:title и og:description), H1 у страниц, где он выводится через заголовок страницы
+// og:title и og:description — из них же; H1 — где он выводится через заголовок страницы
 function bt_landing_meta(): void
 {
     global $APPLICATION;
@@ -59,7 +58,7 @@ function bt_landing_meta(): void
     $l['h1'] !== '' and $APPLICATION->SetTitle($l['h1']);
 }
 
-// OnEndBufferContent: H1 в готовой разметке (товар, раздел каталога) и SEO-текст — вместо текста раздела или под содержимым; на 2-й и дальше страницах списка текста нет
+// H1 и SEO-текст — в готовой разметке (товар, раздел каталога); на 2-й и дальше страницах списка текста нет
 function bt_landing_body(&$content): void
 {
     if (!str_contains($content, '</head>') || !($l = bt_landing())) {
@@ -89,7 +88,7 @@ function bt_landing_body(&$content): void
     $content = preg_replace('~<footer class="ftr"~', '<section class="sec sec--t0 seo-landing"><div class="wrap"><div class="seo post__body">' . bt_seo_html($l['text']) . '</div></div></section>$0', $content, 1);
 }
 
-// Понятные коды значений списка для ЧПУ фильтра (/filter/country-is-efiopiya/apply/): Битрикс сам ставит хеш — меняем его на транслит названия
+// коды значений списка для ЧПУ фильтра: вместо хеша Битрикса — транслит названия
 function bt_enum_codes(int $propId): int
 {
     $used = $fix = [];
@@ -109,7 +108,6 @@ function bt_enum_codes(int $propId): int
     return count($fix);
 }
 
-// OnAfterIBlockPropertyAdd / OnAfterIBlockPropertyUpdate: значения, добавленные в админке
 function bt_enum_codes_on_save(array $f): void
 {
     // название, сортировка и галочки свойства видны на сайте сразу

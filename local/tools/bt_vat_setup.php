@@ -1,6 +1,6 @@
 <?php
 // НДС 5 % (включён в цену) у товаров каталога и служб доставки — как в кассе Т-Банка: счёт показывает «в т.ч. НДС», цены не меняются.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_vat_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_vat_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

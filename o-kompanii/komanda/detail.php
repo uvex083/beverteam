@@ -1,7 +1,7 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 /** @global CMain $APPLICATION */
-// страница специалиста /o-kompanii/komanda/<код>/ (правило в urlrewrite.php); без адреса или биографии у специалиста — 404
+// специалист /o-kompanii/komanda/<код>/ (urlrewrite.php); без адреса или биографии — 404
 $code = (string)($_GET['CODE'] ?? '');
 $expert = null;
 foreach (bt_experts() as $x) {

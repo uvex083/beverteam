@@ -1,5 +1,5 @@
 <?php
-// Контентные инфоблоки: журнал, отзывы, бренды ремонта; названия типов ИБ как разделы сайта. Перенос реального контента старого сайта.
+// Контентные инфоблоки (журнал, отзывы, бренды ремонта) и перенос контента старого сайта.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_content_setup.php [show|apply] <папка выгрузки>
 
 if (PHP_SAPI !== 'cli') {
@@ -18,7 +18,7 @@ $dir = rtrim($argv[2] ?? '', '/') . '/';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 
-// ---------- типы ИБ: название = раздел сайта, сортировка = порядок в админке ----------
+// типы ИБ: название = раздел сайта, сортировка = порядок в админке
 $types = [
     'catalog' => ['Магазин', 10],
     'services' => ['Аренда и сервис', 20],
@@ -39,7 +39,7 @@ foreach ($types as $id => [$name, $sort]) {
     $o = new CIBlockType();
     ($t ? $o->Update($id, $f) : $o->Add(['ID' => $id, 'SECTIONS' => 'Y', 'IN_RSS' => 'N'] + $f)) or $fail("type $id");
 }
-// пустой тип демо-решения «Торговые предложения»
+// пустой тип демо-решения «Торговые предложения» — удаляем
 if (CIBlockType::GetByID('offers')->Fetch() && !CIBlock::GetList([], ['TYPE' => 'offers', 'CHECK_PERMISSIONS' => 'N'])->Fetch()) {
     $say('удалить пустой тип ИБ offers');
     $apply and CIBlockType::Delete('offers');
@@ -117,7 +117,6 @@ if (!$apply) {
     return;
 }
 
-// ---------- контент ----------
 function bt_el_ensure(int $ibId, string $code, array $fields, array $props, callable $say, callable $fail): void
 {
     $filter = ['IBLOCK_ID' => $ibId] + ($code !== '' ? ['=CODE' => $code] : ['=NAME' => $fields['NAME']]);
@@ -130,7 +129,6 @@ function bt_el_ensure(int $ibId, string $code, array $fields, array $props, call
     $props and CIBlockElement::SetPropertyValuesEx($id, $ibId, $props);
 }
 
-// статьи старого сайта
 foreach (glob($dir . 'pages/news__*.json') as $f) {
     $a = json_decode(file_get_contents($f), true);
     $code = substr(basename($f, '.json'), 6);
@@ -144,7 +142,7 @@ foreach (glob($dir . 'pages/news__*.json') as $f) {
         'RUBRIC' => 'Уход за кофемашиной', 'READ_TIME' => max(1, (int)round(mb_strlen(strip_tags($a['content_html'])) / 1200))], $say, $fail);
 }
 
-// отзывы о компании со старого сайта (без дат и оценок — их там нет)
+// отзывы со старого сайта — без дат и оценок, их там нет
 if (is_file($dir . 'reviews.json')) {
     $sort = 0;
     foreach (json_decode(file_get_contents($dir . 'reviews.json'), true) as $r) {
@@ -153,7 +151,7 @@ if (is_file($dir . 'reviews.json')) {
     }
 }
 
-// бренды ремонта: подтверждён только Jetinno (авторизованный сервис), остальные выключены до ответа клиента
+// бренды ремонта: подтверждён только Jetinno, остальные выключены до ответа клиента
 $brands = [
     ['jetinno', 'Jetinno', 'JL05, JL15 VIVA, JL32, JL33, JL36', 'авторизованный сервис, оригинальные запчасти на складе', 'Y'],
     ['saeco', 'Saeco', 'Lirika, Aulika, Royal, Idea', 'частая проблема — заварочный блок и помпа', 'N'],

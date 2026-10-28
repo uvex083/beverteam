@@ -32,7 +32,6 @@ foreach ($basket as $bi) {
 }
 $nWord = $nItems . ' ' . (($nItems % 10 === 1 && $nItems % 100 !== 11) ? 'товар' : (in_array($nItems % 10, [2, 3, 4]) && !in_array($nItems % 100, [12, 13, 14]) ? 'товара' : 'товаров'));
 
-// популярные города из макета; названия и области — из местоположений Битрикса
 $popular = [];
 $codes = ['0000812044', '0000814374', '0000815343', '0000854968', '0000794760', '0000670178', '0000073738', '0000103664', '0000949228'];
 $r = Sale\Location\LocationTable::getList([
@@ -60,11 +59,10 @@ $orgSel = 0;
 if ($USER->IsAuthorized()) {
     $cu = CUser::GetByID($USER->GetID())->Fetch() ?: [];
     $u = ['name' => trim(($cu['NAME'] ?? '') . ' ' . ($cu['LAST_NAME'] ?? '')), 'email' => $cu['EMAIL'] ?? '', 'phone' => $cu['PERSONAL_PHONE'] ?: ($cu['PERSONAL_MOBILE'] ?? '')];
-    // основной адрес и первые реквизиты из кабинета
     $addrs = array_map(fn($x) => ['loc' => $x['loc'], 'city' => $x['city'], 'street' => $x['street'], 'flat' => $x['flat'], 'entr' => $x['entr']], bt_addresses((int)$USER->GetID()));
     $a = $addrs[0] ?? null;
     $u += $a ? ['street' => $a['street'], 'flat' => $a['flat'], 'entrance' => $a['entr']] : [];
-    // из прошлого заказа — плательщик, способы доставки и оплаты, организация; адрес — основной из кабинета, а нет его — из прошлого заказа
+    // адрес — основной из кабинета, а нет его — из прошлого заказа
     $ship = CUserOptions::GetOption('bt', 'last_ship', [], (int)$USER->GetID());
     $ship = is_array($ship) ? $ship : [];
     if (!$a && ($ship['street'] ?? '') !== '') {
@@ -227,7 +225,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const N_ITEMS=<?= $nItems ?>;
   let pt=<?= Json::encode($ptDef) ?>, dl=[], avail=[], sel=null, tab=<?= Json::encode(in_array($ship['mode'] ?? '', ['addr', 'pvz', 'pickup'], true) ? $ship['mode'] : 'addr') ?>, want=<?= Json::encode((string)($ship['dkey'] ?? '')) ?>, wantPay=<?= (int)($ship['pay'] ?? 0) ?>, payId=0, calcN=0, sending=false;
 
-  /* доставки Битрикса → варианты макета; СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
+  /* СДЭК — службы модуля ipol.sdek: пункт выдачи и курьер */
   const isCdek=d=>/^(sdek_|bt_cdek)/.test(d.code);
   const opts=()=>dl.map(d=>({key:d.code||'d'+d.id,tab:d.code==='bt_pickup'?'pickup':d.code==='sdek_pickup'?'pvz':'addr',d,t:d.name,desc:d.desc}));
   const dateOf=o=>{const x=BT_dates();
@@ -264,8 +262,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     backF();
   }
 
-  /* пункты выдачи СДЭК: карточка доставки показывает выбранный пункт, выбор — в окне с картой.
-     Пункты и Яндекс Карты грузим только при открытии окна */
+  /* пункты выдачи и Яндекс Карты грузим только при открытии окна */
   let pvzCur=<?= Json::encode(($ship['pvz'] ?? '') !== '' && ($ship['pvza'] ?? '') !== '' ? ['c' => $ship['pvz'], 'a' => $ship['pvza'], 'loc' => $ship['loc'] ?? ''] : null) ?>;
   if(pvzCur&&pvzCur.loc===locIn.value) pvzIn.value=pvzCur.c; else pvzCur=null;
   const pvzCache={}; let pvzAll=[], pvzLoc='', pvzMap=null, pvzOm=null, pvzOpenId=-1;
@@ -338,7 +335,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const f=[...pvzModal.querySelectorAll('button,input,[tabindex="0"]')].filter(x=>!x.closest('[hidden]')&&x.offsetParent!==null);
     if(!f.length)return; const i=f.indexOf(document.activeElement);
     if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();} else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();} });
-  /* кнопка в карточке или клик по карточке, пока пункт не выбран, — открывают окно */
   deliv.addEventListener('click',e=>{const card=e.target.closest('.radio-card'); const r=card&&card.querySelector('input[value="sdek_pickup"]'); if(!r) return;
     const btn=e.target.closest('[data-pvz]'); if(btn) e.preventDefault();
     if(!btn&&pvzIn.value) return;
@@ -367,8 +363,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     sEta.innerHTML=sel?`${esc(sel.t)}${dateOf(sel)?` · <b>${dateOf(sel)}</b>`:''}${p?' · '+esc(/^[А-ЯЁ][а-яё]/.test(p.name)?p.name.charAt(0).toLowerCase()+p.name.slice(1):p.name):''}`:'&nbsp;';
   }
   let last=null, calcSt='', busyT=0, calcing=false;
-  // расчёт дольше 250 мс — показываем, что считаем: старые цены приглушены, сумм в итоге нет, кнопка ждёт.
-  // Отправку держим с первой миллисекунды (calcing), а вид меняем только после 250 мс, чтобы быстрые расчёты не мигали
+  // отправку держим сразу (calcing), а вид «считаем» включаем через 250 мс — чтобы быстрые расчёты не мигали
   const cop=document.querySelector('.cop'), sTot0=sTot.textContent;
   function calcShown(){ return document.querySelector('.cop').classList.contains('is-calc'); }
   function waiting(){ return calcShown()||(!!locIn.value&&!last&&calcing); }
@@ -417,7 +412,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';calc();ready();});
   coNameL.textContent=pt==='UR'?'Имя контактного лица *':'Имя *';
 
-  /* сохранённые организации: выбрали — подставили реквизиты, «Другая» — пустые поля */
   window.orgs&&orgs.addEventListener('change',e=>{const r=e.target;if(r.name!=='org')return;
     orgs.querySelectorAll('.radio-card').forEach(c=>c.classList.toggle('on',c.contains(r)));
     const v=r.value==='0'?{}:JSON.parse(r.dataset.v);
@@ -438,10 +432,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(coEmail.value.trim())coEmail.dispatchEvent(new Event('blur'));
   }
 
-  /* город: популярные из макета + поиск по местоположениям Битрикса */
   const cityRow=c=>`<li role="option" data-code="${c.code}" data-n="${esc(c.n)}">${esc(c.n)}${c.r?`<small>${esc(c.r)}</small>`:''}</li>`;
   const showCities=list=>{cityList.innerHTML=list.map(cityRow).join('');const o=list.length>0;cityList.classList.toggle('open',o);cityIn.setAttribute('aria-expanded',o);cityIn.removeAttribute('aria-activedescendant');};
-  // ↑/↓ двигают подсветку по подсказкам, Enter берёт подсвеченную (без подсветки — первую)
+  // Enter без подсветки берёт первую подсказку
   const navList=(inp,ul)=>inp.addEventListener('keydown',e=>{ if(!ul.classList.contains('open')||(e.key!=='ArrowDown'&&e.key!=='ArrowUp'))return; e.preventDefault();
     const li=[...ul.querySelectorAll('li')], i=li.findIndex(x=>x.classList.contains('act')), j=e.key==='ArrowDown'?Math.min(i+1,li.length-1):Math.max(i-1,0);
     li.forEach((x,k)=>{x.id=x.id||ul.id+'-'+k; x.classList.toggle('act',k===j); x.setAttribute('aria-selected',k===j);});
@@ -479,13 +472,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   cityIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(locIn.value){showCities([]);return;}const li=pickLi(cityList);li?li.click():autoCity();}
     if(e.key==='Escape')showCities([]);});
 
-  /* улица и дом: подсказки DaData в пределах выбранного города; без дома — дописываем номер дальше */
+  /* подсказка без дома — номер дописывают дальше */
   const stIn=document.getElementById('coStreet'), stList=document.getElementById('streetList');
   const showStreets=list=>{stList.innerHTML=list.map(s=>`<li role="option" data-v="${esc(s.v)}" data-h="${s.house?1:0}">${esc(s.v)}${s.r?`<small>${esc(s.r)}</small>`:''}</li>`).join('');
     const o=list.length>0;stList.classList.toggle('open',o);stIn.setAttribute('aria-expanded',o);stIn.removeAttribute('aria-activedescendant');};
   navList(stIn,stList);
   let stT=0, stN=0, stCalcT=0;
-  /* адрес с домом изменился — пересчитать цену курьера (она зависит от расстояния) */
+  /* цена курьера зависит от расстояния — пересчёт при смене адреса с домом */
   const reStreet=()=>{const v=stIn.value.trim();if(v!==calcSt&&/\d/.test(v))calc();};
   stIn.addEventListener('input',()=>{clearTimeout(stCalcT);stCalcT=setTimeout(reStreet,900);});
   stIn.addEventListener('input',()=>{ready();const v=stIn.value.trim();clearTimeout(stT);if(v.length<2){showStreets([]);return;}
@@ -508,7 +501,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   stIn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const li=pickLi(stList);li?li.click():autoStreet();}
     if(e.key==='Escape'){e.preventDefault();showStreets([]);}});
 
-  // × в поле города и улицы: виден, пока в поле что-то есть
   // по центру поля по вертикали: высота подписи над полем разная на телефоне и компьютере
   const placeClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{const i=b.parentNode.querySelector('input:not([type=hidden])');if(i.offsetHeight)b.style.top=(i.offsetTop+(i.offsetHeight-40)/2)+'px';});
   placeClr(); addEventListener('resize',placeClr);
@@ -517,7 +509,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     b.addEventListener('click',()=>{inp.value='';inp.focus();inp.dispatchEvent(new Event('input',{bubbles:true}));setErr(inp,'');});});
   const syncClr=()=>document.querySelectorAll('.cop [data-clr]').forEach(b=>{b.hidden=!b.parentNode.querySelector('input:not([type=hidden])').value;});
 
-  // миниатюры состава — окно со всеми позициями, нажатая подсвечена
   // окно — прямо в body: внутри страницы шапка и нижняя плашка остаются поверх затемнения
   document.body.appendChild(itemsModal);
   let itmFrom=null;
@@ -558,7 +549,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     submit.disabled=sending||calcShown();
     return !miss.length;
   }
-  // онлайн-оплата — кнопка ведёт в банк, поэтому и называется по-другому
   const btnText=()=>(PAYS.find(x=>x.id===payId)||{}).code==='tinkoff'?'Оплатить заказ':'Оформить заказ';
   form.addEventListener('input',ready); form.addEventListener('change',ready);
   BT_mbar(submit,sTot,()=>submit.disabled?sLeft.scrollIntoView({behavior:'smooth',block:'center'}):form.requestSubmit(submit),sHint.innerHTML);
@@ -587,7 +577,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         Object.keys(BT_CART).forEach(k=>delete BT_CART[k]);
         try{localStorage.setItem('bt_cart','{}');}catch(x){}
         window.BT_BASKET={items:{},sum:0}; BT_cartUpdate(false);
-        /* Метрика: покупка (электронная коммерция) и цель «Заказ оформлен» — до перехода на оплату, иначе при уходе в банк они теряются; переход на оплату от Метрики не зависит */
+        /* покупка и цель Метрики — до перехода в банк, иначе теряются; переход на оплату от Метрики не зависит */
         let gone=false; const go=()=>{if(!gone){gone=true;location.href=r.redirect;}};
         setTimeout(go,1200);
         try{

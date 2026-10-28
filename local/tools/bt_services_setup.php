@@ -1,6 +1,6 @@
 <?php
 // Инфоблоки страниц услуг: «Аренда кофемашин», «Кофе по подписке», «Сервис» (с ремонтом); стартовое наполнение — только реальные факты.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_services_setup.php [show|apply] [папка выгрузки]. Повторный запуск ничего не дублирует.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_services_setup.php [show|apply] [папка выгрузки]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -18,7 +18,6 @@ $dir = rtrim($argv[2] ?? (getenv('HOME') . '/import'), '/') . '/';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 
-// ---------- типы ИБ: название = страница сайта ----------
 $types = ['services' => ['Аренда кофемашин', 20], 'podpiska' => ['Кофе по подписке', 22], 'servis' => ['Сервис', 25]];
 foreach ($types as $id => [$name, $sort]) {
     $t = CIBlockType::GetByIDLang($id, 'ru');
@@ -33,7 +32,7 @@ foreach ($types as $id => [$name, $sort]) {
     }
 }
 
-// единый набор полей блока страницы — как у блоков главной (bt_pages_setup.php)
+// единый набор полей блока страницы — как у главной (bt_pages_setup.php)
 $lead = 'Чтобы кнопка открывала форму заявки, укажите #zayavka';
 $blockProps = [
     'TITLE' => ['Заголовок', 'S', ['ROW_COUNT' => 3, 'HINT' => 'Перенос строки в поле = перенос строки на сайте']],
@@ -177,7 +176,7 @@ while ($e = $r->Fetch()) {
     }
 }
 
-// SEO страниц брендов ремонта: шаблоны в настройках ИБ, сеошник правит их в админке
+// SEO брендов ремонта — шаблоны в настройках ИБ, сеошник правит их в админке
 if ($ibs['repair_brands']) {
     $tpl = [
         'ELEMENT_PAGE_TITLE' => 'Ремонт кофемашин {=this.Name} в Екатеринбурге',
@@ -198,7 +197,6 @@ if (!$apply) {
     return;
 }
 
-// ---------- стартовое наполнение ----------
 $one = fn(string $code, array $p, array $f = []) => bt_el_seed($ibs[$code], 'main', ['NAME' => $def[$code][1]] + $f, $p, $say, $fail);
 $list = function (string $code, array $items) use ($ibs, $say, $fail) {
     foreach ($items as $i => $it) {

@@ -1,5 +1,5 @@
 <?php
-// Счёт на оплату для юрлиц: PDF штатного обработчика «Счёт», выпускается после подтверждения заказа менеджером (статус C)
+// Счёт юрлицу: PDF штатного обработчика «Счёт», выпускается после подтверждения заказа (статус C)
 
 use Bitrix\Main\Config\Option;
 use Bitrix\Main\Loader;
@@ -24,7 +24,7 @@ function bt_bill_ready(Sale\Order $order): bool
     return !$order->isCanceled() && $order->getField('STATUS_ID') !== 'N' && bt_bill_payment($order) !== null;
 }
 
-// ID файла счёта; выпускается заново, если сумма заказа изменилась (менеджер уточнил доставку)
+// счёт выпускается заново, если сумма заказа изменилась
 function bt_bill_file(Sale\Order $order): int
 {
     $payment = bt_bill_payment($order);
@@ -40,8 +40,7 @@ function bt_bill_file(Sale\Order $order): int
     if ((int)$fid && $sum === $cur && $was === $ver && CFile::GetFileArray((int)$fid)) {
         return (int)$fid;
     }
-    // в строках счёта служебные свойства позиций не нужны: фасовка уже в названии, «цена без скидки» — для сайта и писем.
-    // Правим копию заказа, сам заказ не меняется
+    // служебные свойства позиций в счёте не нужны — правим копию заказа, сам заказ не меняется
     $copy = $order->createClone();
     foreach ($copy->getBasket() as $bi) {
         $drop = array_filter(iterator_to_array($bi->getPropertyCollection()), fn($p) => in_array($p->getField('CODE'), ['PACK', 'FULL_PRICE'], true));
@@ -58,7 +57,7 @@ function bt_bill_file(Sale\Order $order): int
     return (int)$file['ID'];
 }
 
-// Отпечаток реквизитов продавца: поменялся — счёт синхронизируем и выпускаем заново
+// отпечаток реквизитов продавца: поменялся — счёт выпускаем заново
 function bt_bill_ver(): string
 {
     $co = bt_contacts();
@@ -93,7 +92,7 @@ function bt_bill_sync(): void
     Option::set('bt', 'bill_ver', bt_bill_ver());
 }
 
-// iblock:OnAfterIBlockElementUpdate — правка контактов сразу попадает в счёт
+// правка контактов сразу попадает в счёт
 function bt_bill_sync_on_contacts(array $f): void
 {
     if ((int)($f['IBLOCK_ID'] ?? 0) === bt_iblock('site_contacts')) {
@@ -101,7 +100,7 @@ function bt_bill_sync_on_contacts(array $f): void
     }
 }
 
-// main:OnBeforeEventSend — к письму «Заказ подтверждён» прикладываем счёт
+// к письму «Заказ подтверждён» прикладываем счёт
 function bt_bill_attach(array &$fields, array &$message): void
 {
     if (($message['EVENT_NAME'] ?? '') !== 'SALE_STATUS_CHANGED_' . BT_BILL_STATUS || !Loader::includeModule('sale')

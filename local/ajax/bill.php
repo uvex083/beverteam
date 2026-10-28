@@ -1,5 +1,5 @@
 <?php
-// Счёт по заказу (PDF) — открывается в браузере, сохранить покупатель решает сам: только владельцу заказа или в браузере, где заказ оформлен
+// Счёт PDF — только владельцу заказа или в браузере, где заказ оформлен
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';

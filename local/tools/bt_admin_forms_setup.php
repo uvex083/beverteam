@@ -1,6 +1,5 @@
 <?php
-// Формы редактирования блоков страниц в админке: только поля, которые выводит сайт, в порядке страницы, с понятными подписями.
-// Общая настройка для всех пользователей (личные настройки форм этих инфоблоков сбрасываются). Данные элементов не меняются.
+// Формы редактирования блоков страниц в админке: только поля сайта, в порядке страницы, общие для всех пользователей.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_admin_forms_setup.php [show|apply|rollback]
 
 if (PHP_SAPI !== 'cli') {
@@ -19,7 +18,7 @@ $mode = $argv[1] ?? 'show';
 $apply = $mode === 'apply';
 $say = fn(string $s) => print(($apply || $mode === 'rollback' ? '' : '[show] ') . $s . "\n");
 
-// код ИБ => [как выводит сайт: block — один элемент, list/blocks — список, поля в порядке страницы]
+// код ИБ => [block — один элемент, list/blocks — список; поля в порядке страницы]
 $forms = [
     'about_cert' => ['block', ['caption', 'title', 'subtitle', 'btn_text', 'file', 'pic']],
     'about_faq' => ['list', ['name', 'text']],
@@ -119,7 +118,7 @@ $labels = [
     'contacts_how' => ['Заголовок', 'Текст'], 'repair_symptoms' => ['Симптом', 'Описание'], 'repair_errors' => ['Ошибка на экране', 'Что она значит'],
     'repair_price' => ['Услуга'], 'repair_links' => ['Название', 'Текст'], 'repair_brands' => ['Марка'], 'servis_dirs' => ['Направление', 'Описание'],
 ];
-// первые блоки страниц: вкладка SEO — title, description (и H1 у ремонта)
+// первые блоки страниц: вкладка SEO — title и description, true — ещё и H1
 $seo = ['main_hero' => false, 'rent_top' => true, 'sub_head' => false, 'repair_top' => true, 'clients_head' => true];
 
 $backupKey = 'bt.admin_forms_backup';
@@ -181,7 +180,7 @@ foreach ($forms as $code => [$kind, $keys]) {
     $say("$code: " . implode(' · ', $fields) . (isset($tabs['edit14']) ? ' | SEO' : '') . ($miss ? ' | НЕТ СВОЙСТВ: ' . implode(', ', $miss) : ''));
     if ($apply) {
         array_key_exists($formId, $backup) or $backup[$formId] = CUserOptions::GetOption('form', $formId, false, 0);
-        // личные настройки формы у пользователей перекрыли бы общую — сбрасываем все и ставим общую
+        // личные настройки формы перекрыли бы общую — сбрасываем у всех
         CUserOptions::DeleteOptionsByName('form', $formId);
         CAdminFormSettings::setTabsArray($formId, $tabs, true);
     }

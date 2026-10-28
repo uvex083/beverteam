@@ -1,7 +1,6 @@
 <?php
-// Товары в статьях журнала: свойство «Товары в статье» (привязка к каталогу, несколько) и демо-заполнение по рубрике:
-// «Выбор кофе» — кофе, «Уход за кофемашиной» — средства для чистки, «Новости» — кофемашины. Заполняет только пустые.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_products.php [show|apply]. Повторный запуск ничего не дублирует.
+// Товары в статьях журнала: свойство «Товары в статье» и демо-заполнение пустых по рубрике.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_products.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -24,7 +23,6 @@ if (!CIBlockProperty::GetList([], ['IBLOCK_ID' => $ibId, 'CODE' => 'PRODUCTS'])-
         'HINT' => 'Показываются под текстом статьи карточками с кнопкой «В корзину»']) or die("ошибка свойства\n"));
 }
 
-// товары раздела каталога (с подразделами), фильтр по названию — необязательно
 $pick = function (string $code, string $name = '', int $n = 3) use ($catId): array {
     $f = ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'SECTION_CODE' => $code, 'INCLUDE_SUBSECTIONS' => 'Y'] + ($name !== '' ? ['%NAME' => $name] : []);
     $ids = [];

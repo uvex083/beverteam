@@ -1,6 +1,6 @@
 <?php
-// Аренда: поле «Особенность» у моделей и метки #RENT_FROM# / #RENT_FREE_KG# вместо зашитых «от 3 500 ₽» и «от 3 кг» в текстах блоков.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_rent_setup.php [show|apply]. Повторный запуск ничего не меняет.
+// Аренда: поле «Особенность» у моделей и метки #RENT_FROM# / #RENT_FREE_KG# вместо зашитых цифр в текстах блоков.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_rent_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

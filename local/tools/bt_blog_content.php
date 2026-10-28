@@ -1,6 +1,6 @@
 <?php
 // Наполнение журнала: статья «Как выбрать зерновой кофе…», новости магазина и теги статей со старого сайта.
-// Повторный запуск ничего не дублирует (поиск по символьному коду). Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_content.php [show|apply]
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_content.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -126,7 +126,6 @@ foreach ($posts as $p) {
     echo $id ? "  ID {$id}\n" : '  ошибка: ' . $el->LAST_ERROR . "\n";
 }
 
-// теги статей, перенесённых со старого сайта
 $oldTags = [
     'kak-pravilno-chistit-avtomaticheskuyu-kofemashinu-v-domashnih-usloviyah' => 'уход, чистка, автоматическая кофемашина, декальцинация',
     'kak-pravilno-chistit-kofemashinu' => 'уход, чистка, рожковая кофемашина',

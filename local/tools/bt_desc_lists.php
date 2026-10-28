@@ -1,6 +1,6 @@
 <?php
-// Описания товаров: абзац из коротких строк через <br> (характеристики построчно) → маркированный список <ul><li>.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_desc_lists.php [show|apply]. Повторный запуск ничего не меняет.
+// Описания товаров: абзац из коротких строк через <br> → маркированный список <ul><li>.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_desc_lists.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -14,7 +14,7 @@ CModule::IncludeModule('iblock');
 $apply = ($argv[1] ?? 'show') === 'apply';
 $toList = fn(string $html) => preg_replace_callback('~<p\b[^>]*>((?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*)</p>~isu', function ($m) {
     $items = array_filter(array_map('trim', preg_split('~<br\s*/?>~i', $m[1])), fn($s) => trim(strip_tags(str_replace('&nbsp;', ' ', $s))) !== '');
-    // список — только строки-характеристики: от трёх коротких строк; переносы внутри обычного текста не трогаем
+    // список — от трёх коротких строк; переносы в обычном тексте не трогаем
     if (count($items) < 3 || max(array_map(fn($s) => mb_strlen(strip_tags($s)), $items)) > 120) {
         return $m[0];
     }
@@ -29,7 +29,7 @@ while ($x = $r->Fetch()) {
         continue;
     }
     echo ($apply ? '' : '[show] ') . "{$x['ID']} {$x['NAME']}\n";
-    // только текст — свойства не передаём, чтобы не затереть их
+    // только текст: Update с частичными свойствами стирает остальные
     $apply and ($el->Update($x['ID'], ['DETAIL_TEXT' => $new, 'DETAIL_TEXT_TYPE' => 'html']) or print('  ошибка: ' . $el->LAST_ERROR . "\n"));
 }
 $apply and CIBlock::clearIblockTagCache(bt_iblock('catalog'));

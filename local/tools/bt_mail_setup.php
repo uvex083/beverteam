@@ -1,6 +1,6 @@
 <?php
-// Почтовые шаблоны сайта: оформление bt_mail (local/templates/bt_mail), тексты писем, выключение ненужных шаблонов решения.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_mail_setup.php [show|apply]. Повторный запуск ничего не дублирует, тексты обновляет.
+// Почтовые шаблоны сайта: оформление bt_mail, тексты писем (apply перезаписывает), выключение ненужных шаблонов решения.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_mail_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -16,7 +16,6 @@ $fail = fn(string $s) => die("ERROR: $s\n");
 const SITE = 's1';
 const TPL = 'bt_mail';
 
-// ---------- блоки письма (инлайн-стили, табличная вёрстка) ----------
 const FONT = 'font-family:Manrope,Arial,Helvetica,sans-serif;';
 const DISPLAY = "font-family:Unbounded,'Arial Black',Arial,Helvetica,sans-serif;";
 
@@ -56,7 +55,6 @@ function m_box(string $html): string
         . '<tr><td style="padding:18px 20px 8px">' . $html . "</td></tr></table>\n";
 }
 
-// крупный код или трек-номер на тёмной плашке
 function m_code(string $code, string $caption): string
 {
     return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#0E0E0C" style="background-color:#0E0E0C;border-radius:14px;margin:8px 0 18px"><tr>'
@@ -71,7 +69,7 @@ $cabinet = m_btn('https://#SERVER_NAME#/personal/', 'Войти в кабине�
 $phonesBelow = 'позвоните нам — телефоны внизу письма';
 $ifText = fn(string $field, string $html) => '<?if (trim(strip_tags((string)$arParams["' . $field . '"])) !== ""):?>' . $html . '<?endif?>';
 
-// ---------- письма: событие => [тема, кому, от кого, скрытая копия, текст] ----------
+// письма: событие => [тема, кому, от кого, скрытая копия, текст]
 $sale = ['#EMAIL#', '#SALE_EMAIL#'];
 $messages = [
     // главный модуль
@@ -166,7 +164,7 @@ $messages = [
         . $ifText('BT_BILL', m_box(m_p('<b>Счёт на оплату во вложении.</b> Его также можно скачать в личном кабинете.')))
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
-    // статус ставит и оплата, и менеджер (заказ «при получении» — перед отправкой в СДЭК): «оплачен» пишем, только если оплачен
+    // статус ставит и оплата, и менеджер (заказ «при получении»): «оплачен» пишем, только если оплачен
     'SALE_STATUS_CHANGED_P' => ['Собираем заказ № #ORDER_ID#', $sale[0], $sale[1], '',
         m_head('Собираем заказ', 'Заказ № #ORDER_ID#')
         . '<?if ($arParams["BT_PAID"] === "Y"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# оплачен — собираем его. #BT_TRACK#')
@@ -174,7 +172,7 @@ $messages = [
         . '<?else:?>' . m_p('#BT_HELLO# Собираем заказ № #ORDER_ID#. #BT_TRACK#') . '<?endif?>'
         . $ifText('TEXT', m_p('#HTML_TEXT#'))
         . '#BT_ORDER#' . $orderBtn],
-    // курьер BEVERTEAM или СДЭК: заказ отправлен. У СДЭК с трек-номером письмо не уходит — его заменяет «Трек-номер заказа»
+    // курьер или СДЭК; у СДЭК с трек-номером письмо не уходит — его заменяет «Трек-номер заказа»
     'SALE_STATUS_CHANGED_S' => ['Заказ № #ORDER_ID# передан в доставку', $sale[0], $sale[1], '',
         m_head('Заказ в пути', 'Заказ № #ORDER_ID#')
         . '<?if ($arParams["BT_DCODE"] === "bt_courier"):?>' . m_p('#BT_HELLO# Заказ № #ORDER_ID# передан курьеру, он позвонит перед приездом.')
@@ -213,16 +211,13 @@ $messages = [
         . m_btn('https://#SERVER_NAME#/bitrix/admin/sale_order_view.php?ID=#ORDER_ID#&amp;lang=ru', 'Заказ в админке')],
 ];
 
-// не нужны магазину: блог, форум, опросы, рассылки, подписка на товар, продление подписки, форма обратной связи main.feedback,
-// подтверждение регистрации и вход по коду ядра (на сайте свой вход BT_AUTH_CODE), «вход с нового устройства» (у покупателей нет пароля),
-// «статус: принят» — дублирует письмо о новом заказе
-// паролей у покупателей нет (вход по коду или через сервисы) — письма о смене пароля не нужны
+// не нужны: блог, форум, опросы, рассылки, подписки, main.feedback, подтверждение регистрации и вход по коду ядра (свой BT_AUTH_CODE),
+// «вход с нового устройства» и письма о пароле (паролей у покупателей нет), «статус: принят» (дублирует письмо о заказе)
 $off = ['USER_PASS_REQUEST', 'USER_PASS_CHANGED', 'FEEDBACK_FORM', 'NEW_USER_CONFIRM', 'USER_CODE_REQUEST', 'NEW_DEVICE_LOGIN', 'SALE_STATUS_CHANGED_N', 'SALE_SUBSCRIBE_PRODUCT',
     'SALE_NEW_ORDER_RECURRING', 'SALE_RECURRING_CANCEL', 'CATALOG_PRODUCT_SUBSCRIBE_LIST_CONFIRM', 'CATALOG_PRODUCT_SUBSCRIBE_NOTIFY',
     'CATALOG_PRODUCT_SUBSCRIBE_NOTIFY_REPEATED', 'SENDER_SUBSCRIBE_CONFIRM', 'SUBSCRIBE_CONFIRM', 'VOTE_FOR'];
 $offPrefix = ['NEW_BLOG_', 'BLOG_', 'NEW_FORUM_', 'EDIT_FORUM_', 'FORUM_'];
 
-// ---------- применение ----------
 $list = [];
 $r = CEventMessage::GetList('id', 'asc', ['SITE_ID' => SITE]);
 while ($m = $r->Fetch()) {

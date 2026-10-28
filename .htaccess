@@ -5,15 +5,14 @@ ErrorDocument 404 /404.php
   Options +FollowSymLinks
   RewriteEngine On
 
-  # один адрес сайта: без www
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
-  # служебные файлы репозитория и счета по прямой ссылке закрыты: счёт отдаёт local/ajax/bill.php после проверки владельца
+  # .git и счета закрыты: счёт отдаёт local/ajax/bill.php после проверки владельца
   RewriteRule (^|/)\.git - [F,L]
   RewriteRule ^upload/sale/.+\.pdf$ - [F,L]
 
-  # дубли адресов: /…/index.php и двойной слеш → основной адрес
+  # /…/index.php и двойной слеш → основной адрес
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{THE_REQUEST} \s/([^?\s]*/)?index\.php[?\s]
   RewriteRule ^(.*/)?index\.php$ https://%{HTTP_HOST}/$1 [R=301,L]
@@ -21,14 +20,14 @@ ErrorDocument 404 /404.php
   RewriteCond %{THE_REQUEST} \s(/[^?\s]*?)//+([^?\s]*)
   RewriteRule ^ https://%{HTTP_HOST}%1/%2 [R=301,L]
 
-  # адреса старого сайта (конструктор) → новые, чтобы не потерять позиции в поиске
+  # адреса старого сайта → новые, чтобы не потерять позиции в поиске
   RewriteRule ^magazin/(zavarnye-chayniki|voronki|chaynaya-posuda)/?$ https://%{HTTP_HOST}/catalog/aksessuary/$1/ [R=301,L]
   RewriteRule ^magazin/folder/sredstva-dlya-chistki-kofemashin/?$ https://%{HTTP_HOST}/catalog/aksessuary/sredstva-dlya-chistki-kofemashin/ [R=301,L]
   RewriteRule ^magazin/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
   RewriteRule ^magazin/product/jl-05-arenda(/prev|/next)?/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl-05/ [R=301,L]
   RewriteRule ^magazin/product/jl-15-viva-arenda(/prev|/next)?/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl-15-viva/ [R=301,L]
   RewriteRule ^magazin/product/jl-36-arenda(/prev|/next)?/?$ https://%{HTTP_HOST}/arenda-kofemashin/jetinno-jl36/ [R=301,L]
-  # карта редиректов сеошника: разделы /magazin/folder/…, старые /chaj, /kofe, снятые товары
+  # карта редиректов от сеошника
   RewriteRule ^magazin/folder/aksessuary/?$ https://%{HTTP_HOST}/catalog/aksessuary/ [R=301,L]
   RewriteRule ^magazin/folder/arenda-kofemashin/?$ https://%{HTTP_HOST}/arenda-kofemashin/ [R=301,L]
   RewriteRule ^magazin/folder/barer-filtry-dlya-vody/?$ https://%{HTTP_HOST}/ [R=301,L]
@@ -55,19 +54,18 @@ ErrorDocument 404 /404.php
   RewriteRule ^(folder/)?kofe/?$ https://%{HTTP_HOST}/catalog/kofe/ [R=301,L]
   RewriteRule ^magazin/product/glintvejn/?$ https://%{HTTP_HOST}/catalog/chay/ [R=301,L]
   RewriteRule ^podpiska/?$ https://%{HTTP_HOST}/kofe-v-ofis/ [R=301,L]
-  # разделы старого магазина, которых нет в карте выше, — в каталог, а не на несуществующий /catalog/folder/…
+  # прочие разделы старого магазина — в каталог (после карты выше)
   RewriteRule ^magazin/folder/.+$ https://%{HTTP_HOST}/catalog/ [R=301,L]
-  # магазин переехал на /catalog/ — все старые адреса /magazin/ одним прыжком
+  # /magazin/ → /catalog/ одним прыжком
   RewriteRule ^magazin/?$ https://%{HTTP_HOST}/catalog/ [R=301,L]
   RewriteRule ^magazin/(.+?)/?$ https://%{HTTP_HOST}/catalog/$1/ [R=301,L]
   RewriteRule ^news/view/([^/]+)/?$ https://%{HTTP_HOST}/blog/$1/ [R=301,L]
-  # журнал переехал с /news/ на /blog/
   RewriteRule ^news/?$ https://%{HTTP_HOST}/blog/ [R=301,L]
   RewriteRule ^news/([^/]+)/?$ https://%{HTTP_HOST}/blog/$1/ [R=301,L]
   RewriteRule ^napishite-nam/?$ https://%{HTTP_HOST}/kontakty/#form [R=301,NE,L]
   RewriteRule ^registraciya/?$ https://%{HTTP_HOST}/personal/ [R=301,L]
 
-  # старые адреса были без слеша на конце — страницам сайта добавляем слеш
+  # старые адреса были без слеша на конце — добавляем слеш
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{REQUEST_URI} !^/(bitrix|local|upload)/
   RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{1,5}$
@@ -86,7 +84,7 @@ ErrorDocument 404 /404.php
   DirectoryIndex index.php index.html
 </IfModule>
 
-# статика: CSS/JS Битрикс отдаёт с ?версией, шрифты — с хешем в имени, поэтому кешируем на год; картинки — на месяц
+# CSS/JS Битрикс отдаёт с ?версией, шрифты — с хешем в имени: кеш на год; картинки — на месяц
 <IfModule mod_expires.c>
   ExpiresActive on
   ExpiresByType text/css "access plus 1 year"

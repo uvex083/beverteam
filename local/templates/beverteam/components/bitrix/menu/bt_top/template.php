@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arResult */
-// Верхнее меню: пункт 1-го уровня + выпадающий список 2-го уровня; пункт без ссылки — только заголовок выпадашки
+// пункт без ссылки — только заголовок выпадающего списка
 $tree = [];
 foreach ($arResult as $item) {
     if (($item['PARAMS']['DEPTH_LEVEL'] ?? 1) == 1) {

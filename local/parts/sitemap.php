@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Карта сайта по макету sitemap.html: разделы каталога и журнал — из инфоблоков, остальное — страницы сайта
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $ul = function (array $items) use (&$ul, $e): string {
@@ -13,7 +12,7 @@ $ul = function (array $items) use (&$ul, $e): string {
 $shop = [];
 foreach (bt_mega_cats() as $c) {
     if ($c['h'] !== '/arenda-kofemashin/') {
-        // только разделы: ссылки на товары карту не перегружают
+        // товары в карту не выводим — только разделы
         $shop[] = [$c['t'], $c['h'], array_values(array_filter(array_map(fn($s) => [$s[0], $s[1]], $c['sub']), fn($s) => !str_contains($s[1], '/catalog/product/')))];
     }
 }

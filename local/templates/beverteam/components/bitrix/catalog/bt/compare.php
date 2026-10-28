@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Сравнение товаров: список — BT_CMP в браузере, характеристики — bt_catalog_specs()
 use Bitrix\Main\Web\Json;
 
 $APPLICATION->SetTitle('Сравнение товаров');
@@ -44,7 +43,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       cmpStickRow.innerHTML=''; cmpStick.classList.remove('on'); return;
     }
     const P=ids.map(id=>BT_find(id)), S=ids.map(id=>BT_SPECS.vals[id]||{});
-    /* строки — свойства с галочкой «Показывать на детальной странице»; пустые у всех сравниваемых не выводим */
     const groups=[['Характеристики',BT_SPECS.names.filter(f=>S.some(x=>x[f[0]]))]];
 
     const head=ids.map((id,i)=>{const m=P[i]; if(!m) return '<div class="swiper-slide"></div>';
@@ -93,7 +91,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     swRows=[...wrap.querySelectorAll('.cmp-row')].map(el=>new Swiper(el,Object.assign({},common,{allowTouchMove:false})));
     swStick=new Swiper(cmpStickRow.querySelector('.cmp-stick-sw'),Object.assign({},common,{
       navigation:{prevEl:cmpStickRow.querySelector('.sw-btn--p'),nextEl:cmpStickRow.querySelector('.sw-btn--n')}}));
-    /* строки характеристик и липкая панель ходят синхронно с шапкой */
     swHead.controller.control=swRows.concat(swStick);
     swStick.controller.control=[swHead].concat(swRows);
   }
@@ -112,12 +109,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(f){ const on=BT_favToggle(f.dataset.fav); f.setAttribute('aria-pressed',on);
       BT_toast(on?'Добавлено в <a href="/personal/favorites/">избранное</a>':'Убрано из избранного'); return; }
   });
-  /* после «В корзину» — степпер количества, как в каталоге */
   document.addEventListener('bt:cart',e=>{ const id=e.detail&&e.detail.id, m=id&&BT_find(id);
     cmpBody.querySelectorAll(`[data-ctl="${id}"]`).forEach(c=>{ if(m) c.innerHTML=BT_addCtl(m); }); });
   cmpBody.addEventListener('change',e=>{ if(e.target.id==='cDiff'){ onlyDiff=e.target.checked; renderBody(); } });
 
-  /* мини-панель выезжает, когда карточки ушли под шапку */
   const hdrH=()=>{const h=document.querySelector('.hdr');return h?Math.round(h.getBoundingClientRect().height):0;};
   addEventListener('scroll',()=>{
     const h=document.getElementById('cHead'); if(!h){cmpStick.classList.remove('on');return;}

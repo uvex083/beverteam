@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     favEmpty.hidden=items.length>0;
     BT_favUpdate(); BT_cmpUpdate();
   };
-  // сняли сердечко здесь же — карточка уходит из списка
   favList.addEventListener('click',e=>{ if(e.target.closest('.pc__fav')) setTimeout(paint,0); });
   paint();
 });

@@ -1,6 +1,6 @@
 <?php
 // Магазин под макет checkout.html: плательщики, свойства заказа, доставки, оплаты.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_sale_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_sale_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -24,7 +24,7 @@ $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 $check = fn($r, string $what) => $r->isSuccess() or $fail($what . ': ' . implode('; ', $r->getErrorMessages()));
 
-// ---------- типы плательщиков: символьные коды для кода и шаблонов ----------
+// символьные коды типов плательщиков — для кода и шаблонов
 $pt = [];
 foreach (PersonTypeTable::getList(['select' => ['ID', 'NAME', 'CODE']])->fetchAll() as $p) {
     $code = str_contains($p['NAME'], 'Юрид') ? 'UR' : 'FIZ';
@@ -41,7 +41,6 @@ if ($apply && ($pt['UR'] ?? 0)) {
     }
 }
 
-// ---------- свойства заказа: обязательность под сценарии макета ----------
 // самовывоз и курьер по городу не требуют индекса и адреса; ИНН юрлицу нужен для счёта
 $propsWant = [
     'FIZ' => ['ZIP' => ['REQUIRED' => 'N'], 'ADDRESS' => ['REQUIRED' => 'N'], 'CITY' => ['ACTIVE' => 'N']],
@@ -60,7 +59,7 @@ foreach ($propsWant as $ptCode => $list) {
             $apply and $check(OrderPropsTable::update($p['ID'], $diff), "prop $code");
         }
     }
-    // пункт выдачи СДЭК — адрес ПВЗ строкой (виджет подключим с ключами API)
+    // пункт выдачи СДЭК — адрес ПВЗ строкой
     if (!OrderPropsTable::getList(['filter' => ['=PERSON_TYPE_ID' => $pt[$ptCode], '=CODE' => 'PVZ']])->fetch()) {
         $say("свойство $ptCode.PVZ «Пункт выдачи»");
         if ($apply) {
@@ -72,7 +71,6 @@ foreach ($propsWant as $ptCode => $list) {
     }
 }
 
-// ---------- доставки ----------
 $ekb = \Bitrix\Sale\Location\LocationTable::getList(['filter' => ['=NAME.NAME' => 'Екатеринбург', '=NAME.LANGUAGE_ID' => 'ru', '=TYPE.CODE' => 'CITY'], 'select' => ['CODE']])->fetch()['CODE'] ?? $fail('нет местоположения Екатеринбург');
 
 function bt_delivery(array $f, bool $apply, callable $say, callable $check): int
@@ -100,7 +98,6 @@ function bt_delivery(array $f, bool $apply, callable $say, callable $check): int
     $check($r, 'delivery add');
     return (int)$r->getId();
 }
-// ограничение по местоположению — только Екатеринбург
 function bt_delivery_only_city(int $id, string $locCode, bool $apply, callable $say): void
 {
     if (!$id || \Bitrix\Sale\Delivery\DeliveryLocationTable::getList(['filter' => ['=DELIVERY_ID' => $id, '=LOCATION_CODE' => $locCode]])->fetch()) {
@@ -164,11 +161,10 @@ if ($old) {
     $apply and \Bitrix\Sale\Internals\DiscountTable::update($old['ID'], ['ACTIVE' => 'N']);
 }
 
-// ---------- оплаты ----------
 $payWant = [
     'cash' => ['NAME' => 'При получении', 'ACTIVE' => 'Y', 'SORT' => 10, 'DESCRIPTION' => 'Наличными или картой курьеру или при самовывозе в Екатеринбурге'],
     'bill' => ['NAME' => 'По счёту', 'ACTIVE' => 'Y', 'SORT' => 20, 'DESCRIPTION' => 'Для юрлиц и ИП: выставим счёт после подтверждения заказа'],
-    // демо-оплаты решения: без договоров не работают
+    // демо-оплаты решения без договоров не работают
     'inner' => ['ACTIVE' => 'N'], 'cashondeliverycalc' => ['ACTIVE' => 'N'], 'yandex' => ['ACTIVE' => 'N'], 'sberbank' => ['ACTIVE' => 'N'], 'webmoney' => ['ACTIVE' => 'N'],
 ];
 foreach (PaySystemActionTable::getList(['select' => ['ID', 'NAME', 'ACTION_FILE', 'ACTIVE', 'SORT', 'DESCRIPTION']])->fetchAll() as $ps) {

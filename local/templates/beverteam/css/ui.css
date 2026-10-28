@@ -1,9 +1,8 @@
-/* BEVERTEAM UI — общие стили, стилистика v2 (лайм + чёрный + светлый фон) */
-/* шрифты — сабсет под кириллицу, латиницу и знаки сайта (₽ № « » — стрелки), один вариативный файл на семейство */
+/* шрифты — сабсет: кириллица, латиница и знаки сайта (₽ № « » — стрелки) */
 @font-face {font-family: 'JetBrains Mono';font-style: normal;font-weight: 400 700;font-display: swap;src: url(../fonts/JetBrainsMono-6ca536.woff2) format('woff2');unicode-range: U+0020-007E, U+00A0-00BF, U+00D7, U+00F7, U+0301, U+0400-045F, U+2010-2027, U+2030-203A, U+20BD, U+2116, U+2122, U+2190-2195, U+21BB, U+2212, U+2248;}
 @font-face {font-family: 'Manrope';font-style: normal;font-weight: 400 700;font-display: swap;src: url(../fonts/Manrope-e5e254.woff2) format('woff2');unicode-range: U+0020-007E, U+00A0-00BF, U+00D7, U+00F7, U+0301, U+0400-045F, U+2010-2027, U+2030-203A, U+20BD, U+2116, U+2122, U+2190-2195, U+21BB, U+2212, U+2248;}
 @font-face {font-family: 'Unbounded';font-style: normal;font-weight: 500 800;font-display: swap;src: url(../fonts/Unbounded-3959e2.woff2) format('woff2');unicode-range: U+0020-007E, U+00A0-00BF, U+00D7, U+00F7, U+0301, U+0400-045F, U+2010-2027, U+2030-203A, U+20BD, U+2116, U+2122, U+2190-2195, U+21BB, U+2212, U+2248;}
-/* фолбэк с подогнанными метриками: пока грузится Unbounded, блоки не меняют размер */
+/* фолбэк с подогнанными метриками: пока грузится Unbounded, блоки не прыгают */
 @font-face{font-family:'BT Fallback';src:local('Arial');size-adjust:112%;ascent-override:90%;descent-override:22%;line-gap-override:0%}
 
 :root{
@@ -30,19 +29,17 @@ h1,h2,h3,h4{margin:0;line-height:1.1}
 .h3{font-family:Unbounded;font-weight:700;font-size:17px;letter-spacing:-.01em}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .muted{color:var(--gray)}
-/* контент 1340px, как у крупных магазинов (Tasty Coffee), + поля по краям */
 .wrap{max-width:calc(1340px + 2*clamp(16px,4vw,40px));margin:0 auto;padding:0 clamp(16px,4vw,40px)}
 .sec{padding:var(--pad) 0}.sec--t0{padding-top:0}.sec--s{padding:clamp(24px,3vw,40px) 0}
 .grid{display:grid;gap:20px}
-.grid>*,.cat>*,.prod>*,.gal>*,.home .hero__grid>*,.home .svc>*{min-width:0} /* колонка 1fr не должна раздуваться по самому широкому содержимому карточки */
+.grid>*,.cat>*,.prod>*,.gal>*,.home .hero__grid>*,.home .svc>*{min-width:0} /* иначе колонка 1fr раздувается по содержимому */
 .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
 .card{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px}
 .hr{border:0;border-top:1px solid var(--line);margin:0}
 .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-/* на телефоне кнопки в ряду — на всю ширину, друг под другом */
 @media(max-width:560px){.row>.btn,.hero__cta>.btn,.cfg__res .btn{width:100%}}
 .between{justify-content:space-between}
-/* единая стрелка у select: нативная прижимается к краю и выглядит по-разному в браузерах */
+/* своя стрелка select: нативная в браузерах разная */
 select{-webkit-appearance:none;appearance:none;
   background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%230E0E0C' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
@@ -50,7 +47,7 @@ select::-ms-expand{display:none}
 .field select{padding-right:40px}
 
 :focus,:focus-visible{outline:none}
-/* сброс браузерных мелочей: подсветка тапа, внутренняя рамка кнопок в Firefox, крестики и стрелки полей, жёлтый автозаполнения */
+/* сброс браузерных мелочей */
 *{-webkit-tap-highlight-color:transparent}
 button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border:0;padding:0}
 input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration,input[type=search]::-webkit-search-results-button{-webkit-appearance:none;appearance:none}
@@ -59,16 +56,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 input:-webkit-autofill,input:-webkit-autofill:focus{-webkit-text-fill-color:var(--ink);-webkit-box-shadow:0 0 0 1000px var(--white) inset;transition:background-color 9999s}@media(hover:hover){input:-webkit-autofill:hover{-webkit-text-fill-color:var(--ink);-webkit-box-shadow:0 0 0 1000px var(--white) inset;transition:background-color 9999s}}
 summary{list-style:none}summary::-webkit-details-marker{display:none}
-/* единый фокус сайта: лаймовая рамка у полей, лаймовое кольцо у кнопок и ссылок (только с клавиатуры) */
+/* — фокус — */
 input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select:focus{outline:none;border-color:var(--lime-d);box-shadow:0 0 0 3px rgba(215,232,92,.45)}
 .field.is-err input:focus,.field.is-err textarea:focus,.field.is-err select:focus{border-color:var(--err);box-shadow:0 0 0 3px rgba(192,57,43,.12)}
 :focus-visible:not(input,textarea,select){outline:none;box-shadow:0 0 0 3px rgba(215,232,92,.7)}
-/* на сенсорных экранах кольца фокуса нет: его рисует касание и программный фокус */
+/* на сенсорных экранах кольца фокуса нет */
 @media(hover:none){:focus-visible:not(input,textarea,select){box-shadow:none}}
 .pc:has(:focus-visible),.vol:focus-within,.radio-card:focus-within,.symp label:focus-within{border-color:#C2C2B6}
 [hidden]{display:none!important}
 
-/* buttons */
+/* кнопки */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--lime);color:var(--ink);
   border:1px solid var(--lime);border-radius:999px;padding:13px 24px;font-weight:700;font-size:14px;white-space:nowrap;
   transition:transform .15s,background .15s,border-color .15s,color .15s;text-decoration:none}
@@ -87,19 +84,18 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .link{color:var(--ink);font-weight:600;border-bottom:1px solid var(--lime);padding-bottom:1px}
 @media(hover:hover){.link:hover{border-color:var(--ink)}}
 
-/* badges */
+/* бейджи */
 .badge{display:inline-block;background:var(--lime);border-radius:999px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .badge--soft{background:var(--paper);color:var(--gray)}
 .badge--ok{background:var(--ok-s);color:var(--ok)}
 .badge--err{background:var(--err-s);color:var(--err)}
 .badge--warn{background:var(--warn-s);color:var(--warn)}
 .badge--dark{background:var(--ink);color:var(--lime)}
-/* метки товара: скидка — красная, хит — оранжевая, топ продаж — фиолетовая, новинка — лаймовая (как обычный .badge) */
 .badge--sale{background:#E5364B;color:#fff}
 .badge--hit{background:#FF6B1A;color:#fff}
 .badge--top{background:#6B4EFF;color:#fff}
 
-/* header */
+/* шапка */
 .hdr{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff}
 .hdr__top{display:flex;align-items:center;gap:clamp(12px,2vw,28px);height:68px}
 .brand{display:flex;align-items:center;flex-shrink:0}
@@ -107,7 +103,6 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .catbtn{display:inline-flex;align-items:center;gap:9px;background:var(--lime);color:var(--ink);border:0;border-radius:999px;
   padding:10px 18px;font-weight:700;font-size:13.5px;cursor:pointer;transition:background-color .18s,color .18s}
 .catbtn svg{width:16px;height:16px;display:block}
-/* открытый каталог: кнопка становится тёмной, «бургер» превращается в крестик */
 .catbtn__i{position:relative;width:16px;height:16px;flex:0 0 16px;display:block}
 .catbtn__i svg{position:absolute;inset:0;transition:opacity .18s,transform .22s cubic-bezier(.22,1,.36,1)}
 .catbtn__i svg.x{opacity:0;transform:rotate(-45deg) scale(.7)}
@@ -124,13 +119,13 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .hdr__acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .hact{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:10px;
   font-size:11px;color:#C9C9C2;position:relative;background:none;border:0;
-  /* одинаковая ширина у всех действий: сумма в корзине меняется, шапка не прыгает */
+  /* фиксированная ширина: сумма в корзине меняется, шапка не прыгает */
   min-width:64px;text-align:center}
 .hact>span:not(.cnt){display:block;width:100%;white-space:nowrap;font-variant-numeric:tabular-nums}
 .hact svg{width:20px;height:20px}
 @media(hover:hover){.hact:hover{color:var(--lime)}}
 .hact .cnt{position:absolute;top:0;right:10px;background:var(--lime);color:var(--ink);border-radius:999px;font:700 10px/1 'JetBrains Mono';padding:3px 5px}
-/* трубка в шапке и её всплывашка — только там, где номера в шапке нет; кабинет, избранное и сравнение на телефоне — в меню */
+/* трубка — только там, где номера в шапке нет */
 .hact--tel{display:none}
 @media(max-width:1050px){.hact--tel{display:flex}}
 @media(max-width:720px){.hact--m{display:none}}
@@ -152,7 +147,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .burger{display:none;background:none;border:0;color:#fff;padding:6px}
 .burger svg{width:24px;height:24px;display:block}
 
-/* mega menu */
+/* мегаменю */
 .mega{position:absolute;left:0;right:0;top:100%;background:var(--white);color:var(--ink);border-bottom:1px solid var(--line);
   box-shadow:0 24px 40px rgba(0,0,0,.18);display:none;z-index:5}
 .mega.open{display:block}
@@ -169,7 +164,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .mega__promo img{flex:1 1 0;min-height:140px;width:100%;object-fit:contain;mix-blend-mode:multiply}
 .mega__promo b{font-family:Unbounded;font-weight:700;font-size:13px}
 
-/* drawer (mobile): под шапкой на всю ширину, подпункты — слайдом справа */
+/* мобильное меню */
 .drawer{position:fixed;left:0;right:0;bottom:0;top:var(--dtop,68px);z-index:59;display:none;background:var(--white);color:var(--ink)}
 .drawer.open{display:block;animation:dnIn .22s cubic-bezier(.22,1,.36,1)}
 @keyframes dnIn{from{opacity:0;transform:translateY(-6px)}}
@@ -217,14 +212,14 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .dn__i img{width:56px;height:56px;object-fit:contain;background:var(--paper);border-radius:12px;padding:4px;flex-shrink:0;mix-blend-mode:multiply}
 .burger svg.x{display:none}.burger[aria-expanded=true] svg:not(.x){display:none}.burger[aria-expanded=true] svg.x{display:block}
 
-/* breadcrumbs / page head */
+/* хлебные крошки, заголовок страницы */
 .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--gray);padding:18px 0 0}
 @media(hover:hover){.crumbs a:hover{color:var(--ink)}}
 .crumbs span::before{content:"/";margin-right:8px;color:var(--gray-2)}
 .pagehead{padding:18px 0 28px}
 .pagehead .sub{color:var(--gray);margin:10px 0 0;max-width:none}
 
-/* product card */
+/* карточка товара */
 .pc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px;display:flex;flex-direction:column;position:relative;transition:border-color .18s}
 @media(hover:hover){.pc:hover{border-color:var(--line-h)}}
 .pc h3 a,.pc .pc__t a{background-image:linear-gradient(180deg,transparent 30%,var(--lime) 30%,var(--lime) 96%,transparent 96%);
@@ -251,10 +246,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pc__par{font-size:12.5px;color:var(--gray);margin:0 0 10px;flex:1}
 .pc__sp{list-style:none;margin:0 0 12px;padding:0;font-size:13px}.pc__sp li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}.pc__sp span{color:var(--gray)}
 .pc__stock{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600;margin:0;white-space:nowrap}
-/* есть оценка — наличие уходит вправо, нет — стоит слева */
 .pc__rv+.pc__stock{margin-left:auto}
 .pc__meta{display:flex;align-items:center;gap:8px;margin:0 0 8px;min-height:20px}
-/* подвал с ценой прижат к низу карточки */
 .pc>.pc__foot{margin-top:auto}
 .pc__stock::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .pc__stock--no{color:var(--gray)}.pc__stock--no::before{background:var(--gray-2)}
@@ -267,20 +260,20 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .price s{display:block;font-family:Manrope;font-weight:500;font-size:12px;color:var(--gray);text-decoration:none}
 .price--old{font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray);text-decoration:line-through;display:block}
 
-/* qty */
+/* количество */
 .qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--white)}
 .qty button{width:36px;height:36px;background:none;border:0;font-size:18px;color:var(--gray)}
 @media(hover:hover){.qty button:hover{color:var(--ink)}}
 .qty input{width:44px;text-align:center;border:0;background:none;font-weight:700;font-family:'JetBrains Mono'}
 
-/* catalog layout */
-/* без якоря прокрутки: фильтр подменяет карточки, и браузер иначе перематывает страницу — липкий фильтр дёргается */
+/* каталог */
+/* без якоря прокрутки: иначе при подмене карточек браузер дёргает страницу */
 .cat{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;overflow-anchor:none}
-/* колонка товаров кончается по последнему блоку без нижнего отступа — липкий фильтр останавливается вровень с ним */
+/* без нижнего отступа: липкий фильтр останавливается вровень со списком */
 .cat>div>.sec:last-child{padding-bottom:0}
 .cat .seo>:last-child,.cat .seo .post__body>:last-child{margin-bottom:0}
 .filters{background:var(--white);border-radius:var(--rad);padding:22px 20px 4px;position:sticky;top:130px}
-/* фильтр как на Озоне: группы всегда открыты, без линий и счётчиков, длинные списки — «Посмотреть все» */
+/* фильтр */
 .fgrp{padding-bottom:24px}
 .fsw:has(+ .fsw){padding-bottom:12px}
 .filters .opt+.opt{margin-top:12px}
@@ -324,7 +317,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .filters .opt input,.symp input,.vol input,.radio-card input,.check input{cursor:pointer}
 .filters summary,.faq summary,.drawer .acc summary,.symp label,.vol,.check,.radio-card label,label.check{cursor:pointer}
 .subcats a,.chip button,.pager a,.jfilter button,.pill-tabs button,.tabs button,.chipx,.opts button{cursor:pointer}
-/* пилюля-переключатель: общий стиль для всех страниц, активная — лаймовая */
+/* пилюля-переключатель */
 .chipx{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:9px 16px;
   font-size:13.5px;font-weight:600;color:var(--ink);font-family:inherit;transition:background-color .15s,border-color .15s,color .15s}
 @media(hover:hover){.chipx:hover{border-color:var(--line-h)}}
@@ -334,7 +327,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .toolbar>.sel{margin-left:auto}
 .field .sel{display:block;width:100%}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-/* выбранные условия фильтра, как на Озоне: заливка фирменным цветом, крестик в кружке, весь чипс — ссылка «убрать» */
+/* выбранные условия фильтра */
 .chip{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:var(--ink);border:1px solid var(--lime);border-radius:999px;padding:7px 8px 7px 14px;font-size:13.5px;font-weight:600;line-height:1.2;transition:background .15s,border-color .15s}
 .chip i{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ink);flex:none}
 .chip i svg{width:12px;height:12px;fill:none;stroke:var(--lime);stroke-width:2;stroke-linecap:round}
@@ -352,7 +345,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 @media(hover:hover){.subcats a:not(.cur):hover{border-color:var(--line-h)}}
 .subcats a span{color:var(--gray);font-weight:400;font-size:12px}
 
-/* tabs */
+/* вкладки */
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;
   overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -363,7 +356,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pill-tabs button[aria-selected=true]{background:var(--ink);color:#fff}
 @media(max-width:560px){.pill-tabs{display:flex;width:100%}.pill-tabs button{flex:1 1 0;min-width:0;padding:8px 6px;white-space:nowrap}}
 
-/* tables */
+/* таблицы */
 .tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
 .tbl th,.tbl td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
 .tbl thead th{background:var(--paper);font-family:'JetBrains Mono';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
@@ -371,15 +364,15 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .dl{margin:0;display:grid;grid-template-columns:200px 1fr;gap:10px 20px;font-size:14px}
 .dl dt{color:var(--gray)}.dl dd{margin:0;font-weight:600}
 
-/* forms */
+/* формы */
 .field{display:grid;gap:7px;margin-bottom:16px;position:relative;padding-bottom:20px;align-content:start}
 .field--flat{padding-bottom:0}
 .field label{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
 .field input,.field select,.field textarea{width:100%;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:12px 14px;font-size:15px}
-/* место под сообщение зарезервировано, сам текст абсолютом — ничего не прыгает */
+/* место под сообщение зарезервировано, текст абсолютом — ничего не прыгает */
 .field .err{position:absolute;left:0;right:0;top:100%;margin-top:-18px;color:var(--err);font-size:12.5px;
   line-height:1.35;display:block;pointer-events:none}
-/* подсказка живёт в той же зарезервированной строке, что и ошибка, и уступает ей место */
+/* подсказка в той же строке, ошибка её заменяет */
 .field>.hint,.field>.muted{position:absolute;left:0;right:0;top:100%;margin-top:-18px;
   font-size:12px;color:var(--gray);line-height:1.35;transition:opacity .12s}
 .field.is-err>.hint,.field.is-err>.muted{opacity:0}
@@ -390,7 +383,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .check{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--gray);line-height:1.5;cursor:pointer}
 .check input{margin:0;accent-color:var(--ink);width:16px;height:16px;flex-shrink:0;cursor:pointer}
-/* свой чекбокс: ошибка перекрашивает саму рамку, без внешней обводки */
+/* свой чекбокс */
 .check input[type=checkbox]{appearance:none;width:18px;height:18px;border:1.5px solid #C2C2B6;border-radius:5px;background:var(--white) center/11px no-repeat;transition:border-color .15s,background-color .15s}
 @media(hover:hover){.check:hover input[type=checkbox]:not(:checked){border-color:var(--ink)}}
 .check input[type=checkbox]:checked{background-color:var(--ink);border-color:var(--ink);
@@ -406,7 +399,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .radio-card.off{opacity:.45;pointer-events:none}
 .radio-card .t{font-weight:700;display:flex;justify-content:space-between;gap:10px}
 .radio-card .t .p{font-family:'JetBrains Mono';font-size:13px;white-space:nowrap}
-/* логотипы онлайн-оплаты в плитке способа оплаты */
+/* логотипы онлайн-оплаты */
 .paylogos{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .paylogo{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;min-width:42px;padding:0 8px;background:#fff;border:1px solid var(--line);border-radius:6px}
 .paylogo svg{height:11px;width:auto;display:block}.paylogo--mc svg{height:15px}.paylogo--sbp svg{height:16px}
@@ -415,12 +408,12 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .radio-card .d{font-size:13px;color:var(--gray);margin-top:3px}
 .radio-card .lg{margin-left:auto;font-family:Unbounded;font-weight:800;font-size:11px;padding:3px 8px;border-radius:6px;background:var(--paper)}
 
-/* modal */
+/* окна */
 .modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:24px}
 .modal.open{display:flex}
 .modal__bg{position:absolute;inset:0;background:rgba(14,14,12,.62)}
 .modal__p{position:relative;background:var(--white);border-radius:var(--rad);width:min(440px,100%);padding:28px;max-height:92vh;overflow:auto}
-/* крестик окна: зона нажатия 44×44, сам знак остаётся на прежнем месте */
+/* зона нажатия 44×44, знак на прежнем месте */
 .modal__x{position:absolute;top:3px;right:3px;width:44px;height:44px;display:grid;place-items:center;padding:0;background:none;border:0;border-radius:50%;font-size:22px;line-height:1;color:var(--gray);cursor:pointer;transition:color .15s}
 @media(hover:hover){.modal__x:hover{color:var(--ink)}}
 .soc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -448,7 +441,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .idp--big .i-tb{background:#FFDD2D;color:#333}.idp--big .i-sber{background:#21A038}.idp--big .i-alfa{background:#EF3124}
 .idp--big a i{font:800 15px/1 Unbounded,sans-serif;font-style:normal}
 
-/* cookie */
+/* cookie-баннер */
 .cookie{position:fixed;right:24px;bottom:24px;z-index:89;width:360px;max-width:calc(100vw - 32px);background:var(--ink);color:#fff;border-radius:var(--rad);padding:22px 22px 20px;box-shadow:0 18px 44px rgba(14,14,12,.28);opacity:0;transform:translateY(14px);transition:opacity .3s,transform .3s}
 .cookie[hidden]{display:none}
 .cookie.on{opacity:1;transform:none}
@@ -460,13 +453,13 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 @media(max-width:599px){.cookie{left:12px;right:12px;bottom:12px;width:auto;max-width:none;padding:16px 16px 14px;border-radius:16px}.cookie__t{font-size:15px;margin-bottom:6px}.cookie p:not(.cookie__t){font-size:13px;line-height:1.45;margin-bottom:14px}.cookie__ok{min-height:44px;padding-top:0;padding-bottom:0}}
 @media(max-width:900px){body.has-mbar .cookie{bottom:calc(84px + env(safe-area-inset-bottom))}}
 @media(prefers-reduced-motion:reduce){.cookie{transition:none;transform:none}}
-/* toast */
+/* тост */
 .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:13px 20px;border-radius:999px;font-size:14px;z-index:100;opacity:0;transition:opacity .25s,transform .25s;display:flex;gap:12px;align-items:center;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px)}
 @media(max-width:599px){.toast{white-space:normal;width:max-content;border-radius:18px;line-height:1.35}.toast a{white-space:nowrap}}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast a{color:var(--lime);font-weight:700}
 
-/* steps (checkout) */
+/* шаги оформления */
 .steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--white)}
 .steps div{flex:1;padding:11px 16px;font-size:13px;font-weight:600;color:var(--gray);display:flex;gap:8px;align-items:center;border-right:1px solid var(--line)}
 .steps div:last-child{border-right:0}
@@ -474,7 +467,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .steps div.done{color:var(--ink)}.steps div.done b{background:var(--lime)}
 .steps div.cur{color:var(--ink)}.steps div.cur b{background:var(--ink);color:var(--lime)}
 
-/* account */
+/* кабинет */
 .acc-l{display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:start}
 .acc-nav{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:12px;position:sticky;top:130px}
 .acc-nav .u{display:flex;gap:12px;align-items:center;padding:10px 12px 16px;border-bottom:1px solid var(--line);margin-bottom:8px}
@@ -487,7 +480,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .acc-nav a.cur .cnt{color:var(--lime)}
 .acc-nav .out{color:var(--err);margin-top:6px;border-top:1px solid var(--line);border-radius:0;padding-top:14px}
 
-/* info pages */
+/* инфостраницы */
 .info-l{display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:start}
 .info-nav{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:12px;position:sticky;top:130px}
 .info-nav a{display:block;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}
@@ -499,31 +492,29 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .prose ul{padding-left:20px;margin:0 0 14px}.prose li{margin-bottom:6px}
 .prose a{color:var(--ink);font-weight:600;border-bottom:1px solid var(--lime)}
 
-/* status */
+/* статусы */
 .status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:999px}
 .status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-/* оплата заказа: «Оплачен» — зелёная с галочкой, «Не оплачен» — только контур */
 .pay{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--gray)}
 .pay--ok{border-color:transparent;background:var(--ok-s);color:var(--ok)}
 .pay--ok::before{content:"";width:4px;height:8px;margin:-3px 1px 0 1px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .st-new{background:var(--warn-s);color:var(--warn)}.st-paid{background:#E5EEF9;color:#2C5AA0}.st-ship{background:var(--lime-soft);color:#5A6A0E}.st-done{background:var(--ok-s);color:var(--ok)}.st-cancel{background:var(--err-s);color:var(--err)}
 
-/* alerts / empty */
+/* уведомления, пустые состояния */
 .alert{border-radius:var(--rad-s);padding:14px 16px;font-size:14px;display:flex;gap:12px;align-items:flex-start}
 .alert--info{background:var(--lime-soft)}.alert--ok{background:var(--ok-s);color:var(--ok)}.alert--err{background:var(--err-s);color:var(--err)}
 .empty{text-align:center;padding:60px 20px;color:var(--gray)}
-/* панель администратора Битрикса задаёт div.empty{width:1px} — у админа пустые состояния сжимались в полоску */
-.wrap .empty{width:auto;height:auto;overflow:visible;background-image:none}   /* под панелью администратора Битрикс подключает pubstyles.css: div.empty{width:1px;height:1px;overflow:hidden} */
+/* панель администратора Битрикса (pubstyles.css) задаёт div.empty{width:1px;height:1px} */
+.wrap .empty{width:auto;height:auto;overflow:visible;background-image:none}
 .empty .display{font-size:22px;color:var(--ink);margin-bottom:10px}
 
-/* footer */
+/* подвал */
 #app{display:flex;flex-direction:column;min-height:100vh}#app>*{flex-shrink:0}#app>.wrap{width:100%}#app>.drawer+*{flex-grow:1}
 .ftr{background:var(--ink);color:#9C9C94;margin-top:var(--pad);padding:52px 0 32px;font-size:13.5px}
 .ftr__g{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.1fr;gap:28px}
 .ftr h5,.ftr .ftr__h{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
 .ftr ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 @media(hover:hover){.ftr a:hover{color:var(--lime)}}
-/* колонки ссылок футера: на компьютере открыты, на телефоне сворачиваются по заголовку */
 .ftr__acc>.ftr__h{display:block;width:100%;background:none;border:0;padding:0;text-align:left;cursor:default;pointer-events:none}
 @media(max-width:720px){
   .ftr__acc,.ftr__cont{border-top:1px solid rgba(255,255,255,.12)}.ftr__acc+.ftr__acc,.ftr__acc+.ftr__cont{margin-top:-28px}.ftr__cont{padding-top:16px}
@@ -537,7 +528,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .ftr__soc a{width:36px;height:36px;border-radius:10px;background:#26261F;display:grid;place-items:center;font-family:'JetBrains Mono';font-size:11px;color:#C9C9C2}
 .ftr__b{border-top:1px solid #2A2A25;margin-top:38px;padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:#9C9C94}
 
-/* — качество: фокус, скип-линк, типографика чисел, тактильный отклик — */
+/* — доступность и мелочи — */
 html,body{overflow-x:clip}
 html{color-scheme:light}
 [id]{scroll-margin-top:124px}
@@ -549,26 +540,26 @@ p,li,dd{text-wrap:pretty}
 .price,.price--old,.tiers,.tbl td,.hdr__tel,.mono,.qty input,.sum .l,.facts b,.rev__score b,.pc__foot,.tel{font-variant-numeric:tabular-nums}
 .toolbar select,.field select{color:var(--ink);background-color:var(--white)}
 .modal__p,.drawer__p{overscroll-behavior:contain}
-/* попапы: полоса прокрутки не исчезает и контент не прыгает */
+/* попапы: полоса прокрутки не исчезает, контент не прыгает */
 html{scrollbar-gutter:stable}
-/* скролл держит html, поэтому запираем и его — иначе фон едет под попапом */
+/* скролл держит html — запираем и его, иначе фон едет под попапом */
 html.is-locked,body.is-locked{overflow:hidden!important;overscroll-behavior:none;touch-action:none}
 body.is-locked{padding-right:var(--sbw,0)}
-/* сенсорные экраны: body зафиксирован (см. BT_lock) — шапка остаётся на месте */
+/* сенсорные экраны: body фиксирует BT_lock — шапка остаётся на месте */
 body.is-tlock .hdr{position:fixed;top:0;left:0;right:0}
-/* место под полосу прокрутки остаётся пустым, пока открыт поиск, — красим его как поиск: тёмная полоса шапки, дальше фон */
+/* место под полосу прокрутки при открытом поиске — в цвета поиска */
 html.is-locked:has(.srch.open){background:linear-gradient(var(--ink) 0 var(--hdrh,112px),var(--paper) var(--hdrh,112px))}
 body.is-locked .hdr{padding-right:var(--sbw,0)}
-/* под блокировкой прокрутки sticky-шапка уезжает к началу страницы — пока открыто мобильное меню, держим её fixed */
+/* под блокировкой прокрутки sticky-шапка уезжает к началу — держим fixed */
 body:has(.drawer.open) .hdr{position:fixed;top:0;left:0;right:0}
 
-/* — browser surfaces: выделение, каретка, скроллбар — из палитры, а не дефолт браузера — */
+/* — выделение, каретка, скроллбар — */
 ::selection{background:var(--lime);color:var(--ink)}
 input,textarea{caret-color:var(--ink)}
 @supports (scrollbar-color:auto){html{scrollbar-color:#B9B9AF var(--paper)}}
 .hdr,.ftr,.drawer__p{scrollbar-color:#4A4A43 var(--ink)}
 
-/* — motion: одно оркестрованное появление первого экрана + счётчики цифр — */
+/* — анимация первого экрана и счётчики — */
 @media (prefers-reduced-motion:no-preference){
   .hero-in>*{animation:bt-in .55s cubic-bezier(.16,1,.3,1) both}
   .hero-in>*:nth-child(2){animation-delay:.07s}.hero-in>*:nth-child(3){animation-delay:.14s}
@@ -576,12 +567,12 @@ input,textarea{caret-color:var(--ink)}
   @keyframes bt-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .hero-in>h1{animation-name:bt-slide}@keyframes bt-slide{from{transform:translateY(10px)}to{transform:none}}
 }
-/* маркер-подсветка в заголовке: полоса за x-высотой, а не заливка всей строки */
+/* маркер-подсветка в заголовке */
 .hero h1:not(.hero__title) em{background-image:linear-gradient(180deg,transparent 34%,var(--lime) 34%,var(--lime) 94%,transparent 94%);
   background-repeat:no-repeat;background-size:100% 100%;padding:0 .08em;font-style:normal;
   -webkit-box-decoration-break:clone;box-decoration-break:clone}
 
-/* — корзина: кнопка морфится в степпер на месте (паттерн Tasty Coffee), тихий успех без тоста — */
+/* — кнопка «В корзину» → степпер — */
 .addq{display:inline-flex;align-items:center;background:var(--lime);border-radius:999px;height:36px;overflow:hidden}
 .addq--new{animation:addq-in .25s cubic-bezier(.16,1,.3,1)}
 .addq button{width:34px;height:36px;border:0;background:none;font-size:18px;line-height:1;color:var(--ink)}
@@ -595,7 +586,7 @@ input,textarea{caret-color:var(--ink)}
 @keyframes hact-pulse{0%{transform:scale(1)}35%{transform:scale(1.28)}100%{transform:scale(1)}}
 .hact .sum{font-family:'JetBrains Mono';font-size:11px;color:#fff}
 
-/* — таймлайн заказа: соберём → передадим → доставим — */
+/* — таймлайн заказа — */
 .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;margin-bottom:16px}
 .tl3 div{padding:14px 18px;border-right:1px solid var(--line);display:flex;gap:12px;align-items:center}
 .tl3 div:last-child{border-right:0}
@@ -605,11 +596,10 @@ input,textarea{caret-color:var(--ink)}
 /* — прогресс до бесплатной доставки — */
 .free i{display:block;height:5px;border-radius:3px;background:rgba(14,14,12,.12);margin-top:8px;position:relative;overflow:hidden}
 .free i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p,0%);background:var(--ink);border-radius:3px;transition:width .4s cubic-bezier(.16,1,.3,1)}
-/* — способы доставки: дата и бейджи — */
+/* — способы доставки — */
 .radio-card .t .p{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:flex-end;gap:2px 0}
 .radio-card .dd{color:var(--ink);white-space:nowrap}
 .radio-card .dd::before{content:", "}
-/* узкая карточка (телефон и планшет с колонкой итога): цена и срок столбиком под названием */
 #deliv{container-type:inline-size}
 @container (max-width:520px){#deliv .radio-card .t{flex-direction:column;gap:4px}#deliv .radio-card .t .p{flex-direction:column;align-items:flex-start}#deliv .radio-card .dd::before{content:none}#deliv .radio-card .t>span:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}#deliv .radio-card .badge{margin-left:0}}
 .radio-card .badge{margin-left:8px;vertical-align:middle}
@@ -619,7 +609,7 @@ input,textarea{caret-color:var(--ink)}
 .dship b{font-variant-numeric:tabular-nums}
 @media(max-width:720px){.tl3{grid-template-columns:1fr}.tl3 div{border-right:0;border-bottom:1px solid var(--line)}.tl3 div:last-child{border-bottom:0}}
 
-/* — код из письма: 4 отдельные ячейки — */
+/* — код из письма — */
 .code4{display:flex;gap:10px;margin:4px 0 10px}
 .code4 input{width:56px;height:62px;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:24px;
   border:1px solid var(--line);border-radius:var(--rad-s);background:var(--white);padding:0}
@@ -649,7 +639,6 @@ input,textarea{caret-color:var(--ink)}
 .jtags--post a{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0;font-size:13px}
 @media(hover:hover){.jtags--post a:hover{border-color:var(--line-h)}}
 .jlead{display:grid;grid-template-columns:1.25fr .75fr;gap:20px;margin-bottom:20px;align-items:stretch}
-/* крупная карточка: картинка слева во всю высоту, текст сверху с ровными полями */
 .jlead>.ncard{display:grid;grid-template-columns:1.02fr .98fr;min-height:330px}
 .jlead>.ncard>.ncard__ph{align-self:stretch}.jlead>.ncard>.ncard__ph>img{width:100%;height:100%;aspect-ratio:auto;min-height:0;object-fit:cover}
 .jlead>.ncard .ncard__b{justify-content:flex-start;gap:12px;padding:clamp(24px,2.4vw,36px)}
@@ -674,7 +663,6 @@ input,textarea{caret-color:var(--ink)}
 .post__body ol>li::before{content:counter(li);position:absolute;left:0;top:.2em;width:22px;height:22px;border-radius:50%;background:var(--lime);
   font:700 11.5px/22px 'JetBrains Mono',monospace;text-align:center}
 .post__body a{color:var(--ink);font-weight:600;text-decoration:none;padding-bottom:2px;background:linear-gradient(var(--lime),var(--lime)) no-repeat 100% 100%/100% 2px}
-/* при наведении линия уходит вправо и выезжает слева */
 @keyframes btLink{0%{background-position:100% 100%;background-size:100% 2px}50%{background-position:100% 100%;background-size:0 2px}50.01%{background-position:0 100%;background-size:0 2px}100%{background-position:0 100%;background-size:100% 2px}}
 @media(hover:hover){.post__body a:hover{animation:btLink .6s cubic-bezier(.65,0,.35,1)}}
 .post__body strong,.post__body b{font-weight:700;color:var(--ink)}
@@ -683,7 +671,6 @@ input,textarea{caret-color:var(--ink)}
 .post__body blockquote p{margin:0}
 .post__body blockquote cite{display:block;margin-top:10px;font-size:13px;font-style:normal;font-weight:400;color:var(--gray)}
 .post__body blockquote cite::before{content:"— "}
-/* таблица: обёртка .tbl листается на узком экране, сама таблица — во всю ширину колонки */
 .post__body .tbl{max-width:100%;overflow-x:auto;margin:24px 0;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s)}
 .post__body table{width:100%;border-collapse:separate;border-spacing:0;font-size:14.5px;line-height:1.5}
 .post__body th,.post__body td{padding:11px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);white-space:normal;min-width:120px}
@@ -706,10 +693,10 @@ input,textarea{caret-color:var(--ink)}
 .post__toc-bar{display:block;height:4px;margin:12px 0 10px;background:var(--paper);border-radius:99px;overflow:hidden}
 .post__toc-bar i{display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--lime);border-radius:inherit}
 .post__toc ol{list-style:none;margin:0;padding:0}
-.post>aside{align-self:stretch}   /* колонка во всю высоту статьи — оглавление внутри неё липнет при прокрутке */
+.post>aside{align-self:stretch}   /* иначе оглавление не липнет */
 .post__toc li>a{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;margin:0 -8px;border-radius:var(--rad-xs);color:#3A3A34;line-height:1.35;transition:color .15s,background-color .15s}
 .post__toc-n{flex:0 0 auto;min-width:17px;padding-top:.2em;font:500 11px/1.35 'JetBrains Mono';color:#B5B5AC}
-/* подпункты всегда раскрыты, у активного пункта меняется только цвет — жирность переносила бы строки и список прыгал */
+/* активный пункт — только цветом: жирность переносит строки */
 .post__toc li.is-open>a{background:var(--lime);color:var(--ink)}
 .post__toc li>a.on{background:var(--lime);color:var(--ink)}
 .post__toc li.is-open>a .post__toc-n,.post__toc li>a.on .post__toc-n{color:var(--ink)}
@@ -788,7 +775,7 @@ input,textarea{caret-color:var(--ink)}
 .quiz__res img{max-height:200px;width:auto;margin:auto;mix-blend-mode:multiply}
 @media(max-width:640px){.quiz__opts{grid-template-columns:1fr}.quiz__res{grid-template-columns:1fr}}
 
-/* ================= B2B: повтор заказа, счета ================= */
+/* ================= B2B ================= */
 .docs{width:100%;border-collapse:collapse;font-size:14px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);overflow:hidden}
 .docs th,.docs td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
 .docs thead th{background:var(--paper);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
@@ -816,7 +803,7 @@ input,textarea{caret-color:var(--ink)}
 .srch.open{display:flex;flex-direction:column;animation:srch-in .22s cubic-bezier(.16,1,.3,1)}
 @keyframes srch-in{from{opacity:0}to{opacity:1}}
 .srch__top{background:var(--ink);color:#fff;padding:0;flex-shrink:0}
-/* полоса поиска — ровно высотой шапки (--hdrh ставит BT_search): при открытии ничего не прыгает */
+/* высота шапки (--hdrh ставит BT_search): при открытии ничего не прыгает */
 .srch__in{display:flex;align-items:center;gap:clamp(12px,2vw,24px);height:var(--hdrh,clamp(76px,9vw,96px))}
 .srch__f{flex:1;display:flex;align-items:center;gap:14px;min-width:0}
 .srch__f>svg{width:24px;height:24px;stroke:var(--lime);flex-shrink:0}
@@ -824,14 +811,13 @@ input,textarea{caret-color:var(--ink)}
   font-size:clamp(18px,2.6vw,30px);letter-spacing:-.01em;padding:0;min-width:0}
 .srch__f input::placeholder{color:#6E6E66;font-weight:500}
 .srch__f input:focus{outline:none;box-shadow:none}
-.srch__f input{caret-color:var(--lime)}  /* тёмная каретка на тёмном фоне была не видна */
+.srch__f input{caret-color:var(--lime)}
 .srch__f input::-webkit-search-cancel-button,.srch__f input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .srch__clr{width:34px;height:34px;border-radius:50%;background:#2C2C27;border:0;color:#C9C9C2;display:none;place-items:center;font-size:17px;flex-shrink:0}
 .srch__clr.show{display:grid}
 @media(hover:hover){.srch__clr:hover{background:var(--lime);color:var(--ink)}}
 .srch__x{background:none;border:1px solid #3A3A33;border-radius:999px;color:#C9C9C2;padding:9px 18px;font-size:13.5px;font-weight:600;flex-shrink:0}
 .srch__x i{display:none;font-style:normal}
-/* телефон: вместо «Закрыть Esc» — круглый крестик */
 @media(max-width:768px){.srch__x{width:40px;height:40px;padding:0;display:grid;place-items:center}.srch__x span,.srch__x kbd{display:none}.srch__x i{display:block;font-size:24px;line-height:1}}
 @media(hover:hover){.srch__x:hover{border-color:var(--lime);color:var(--lime)}}
 .srch__x kbd{font-family:'JetBrains Mono';font-size:10.5px;opacity:.65;margin-left:7px}
@@ -862,7 +848,6 @@ input,textarea{caret-color:var(--ink)}
 .spromo img{position:absolute;right:14px;top:50%;transform:translateY(-50%);max-height:104px;width:auto;
   background:#fff;border-radius:14px;padding:8px;box-shadow:0 8px 20px rgba(0,0,0,.18)}
 .spromo .k,.spromo b,.spromo span{position:relative;z-index:1;max-width:min(30ch,62%)}
-/* картинка не шире трети карточки — на узком экране не наезжает на заголовок */
 .spromo img{max-width:34%;object-fit:contain}
 @media(max-width:560px){.spromo img{max-height:84px}}
 /* результаты */
@@ -933,7 +918,7 @@ input,textarea{caret-color:var(--ink)}
 .jmore .bar{width:min(260px,60%);height:4px;border-radius:3px;background:var(--paper-2);overflow:hidden;margin-bottom:10px}
 .jmore .bar i{display:block;height:100%;background:var(--ink);border-radius:3px;transition:width .35s cubic-bezier(.16,1,.3,1)}
 
-/* — выбор объёма и фасовки (торговые предложения) — */
+/* — выбор фасовки (торговые предложения) — */
 .packs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .packs button{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:999px;
   padding:7px 13px;font-size:12.5px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;
@@ -948,12 +933,11 @@ input,textarea{caret-color:var(--ink)}
 .ci__pack{margin:2px 0 4px;font-size:13px;color:var(--gray)}.ci__pack b{color:var(--ink)}
 .packs__lab{width:100%;font-family:'JetBrains Mono';font-size:10px;letter-spacing:.07em;text-transform:uppercase;
   color:var(--gray);margin-bottom:2px}
-/* крупный вариант для страницы товара */
 .packs--lg button{padding:11px 18px;font-size:14px}
 .packs--lg button s{font-size:11px;margin-top:3px}
 .packs--lg{gap:8px;margin-bottom:18px}
 
-/* — карточка товара: покупка в первом экране — */
+/* — страница товара: блок покупки — */
 .pmeta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 18px}
 .pmeta .ptools{margin:0 0 0 auto;display:flex;gap:6px}
 .pmeta .ptools button{width:40px;height:40px;padding:0;border-radius:50%;
@@ -974,20 +958,19 @@ input,textarea{caret-color:var(--ink)}
   padding:12px 0;font-weight:700;font-size:14.5px}
 .tiers__wrap summary::-webkit-details-marker{display:none}
 @media(min-width:901px){
-  /* блок покупки остаётся на виду при прокрутке описания */
   .prod>div:last-child{position:relative}
 }
 
-/* prototype note */
+/* плашка прототипа */
 .proto{position:fixed;left:14px;bottom:14px;z-index:70;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:11.5px;color:var(--gray);box-shadow:0 6px 20px rgba(0,0,0,.08);max-width:260px}
 .proto b{color:var(--ink)}
 
-/* — мобильный фильтр: шторка на весь экран, сплошной белый фон, кнопка прижата к низу — */
+/* — мобильный фильтр — */
 @media(max-width:1050px){
   .filters{position:fixed;inset:0;width:100%;height:100dvh;z-index:90;margin:0;border:0;border-radius:0;padding:0;
     background:var(--white);overflow:hidden;display:none;grid-template-rows:auto 1fr auto}
   .filters.open{display:grid}
-  .filters>form{display:contents}   /* шапка, список и кнопка — строки сетки шторки, кнопка прижата к низу */
+  .filters>form{display:contents}
   .filters__hd{display:flex;align-items:center;gap:14px;background:var(--white);
     border-bottom:1px solid var(--line);padding:16px 18px}
   .filters__hd b{font-family:Unbounded;font-weight:700;font-size:17px}
@@ -995,7 +978,6 @@ input,textarea{caret-color:var(--ink)}
     display:grid;place-items:center;flex-shrink:0}
   @media(hover:hover){.filters__x:hover{background:var(--paper-2)}}
   .filters .fdesk{display:none}
-  /* середина скроллится, всё остальное стоит на месте */
   .filters__body{grid-row:2;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--white)}
   .filters .fgrp{padding:18px 18px 4px}
   .filters .fgrp__t{font-size:16px}
@@ -1006,7 +988,6 @@ input,textarea{caret-color:var(--ink)}
     font-size:15px;border-left:0;border-right:0;box-shadow:0 -6px 18px rgba(0,0,0,.07)}
 }
 @media(min-width:1051px){.filters__hd{display:none}.filters .fbtn{display:none}}
-/* фильтр применяется на лету: недоступное при текущем выборе значение гаснет, но остаётся на месте */
 .filters .opt:has(input:disabled){opacity:.4;pointer-events:none}
 
 @media(max-width:1050px){
@@ -1016,7 +997,7 @@ input,textarea{caret-color:var(--ink)}
   .hdr__acts{margin-left:auto}.burger{order:10;margin-right:-6px}
   .burger{display:flex;align-items:center;justify-content:center}
   .cat,.acc-l,.info-l{grid-template-columns:1fr}
-  .acc-nav,.info-nav{position:static}   /* .filters на мобильных — шторка fixed, static её ломал */
+  .acc-nav,.info-nav{position:static}   /* без .filters: её шторка — fixed */
   .mega{display:none!important}
 }
 @media(max-width:720px){
@@ -1032,16 +1013,11 @@ input,textarea{caret-color:var(--ink)}
   .proto{display:none}
 }
 @media(max-width:480px){.g2,.g3,.g4{grid-template-columns:1fr}
-  /* узкие телефоны: шапка в одну строку без обрезки корзины */
   .hdr__top{gap:6px}.hdr .brand img{height:30px}.hdr__acts{gap:0}.catbtn{padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 
-/* ==========================================================================
-   ДОБАВЛЕНО по прототипам сеошника и «Списку доработок beverteam.ru»
-   ========================================================================== */
-
-/* — мессенджеры в шапке / футере / контактах — */
+/* — мессенджеры — */
 .msgr{display:inline-flex;gap:7px;align-items:center}
 .msgr a{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#26261F;color:#C9C9C2;transition:.15s}
 .msgr a svg{width:16px;height:16px}
@@ -1050,10 +1026,10 @@ input,textarea{caret-color:var(--ink)}
 .msgr--lg a svg{width:21px;height:21px}
 @media(hover:hover){.msgr--lg a:hover{background:var(--lime);color:var(--ink)}}
 
-/* — адрес и город в шапке (доверие + LocalBusiness) — */
+/* — адрес в шапке — */
 .hdr__msgr{flex:1;display:flex;justify-content:center;align-items:center;gap:16px;min-width:0}
 
-/* — выпадающие подменю горизонтального меню (открытие по наведению) — */
+/* — подменю верхнего меню — */
 .hdr__nav .nav-i{position:relative;display:flex;align-items:center;height:44px}
 .hdr__nav .nav-i>a{display:flex;align-items:center;gap:6px}
 .hdr__nav .nav-i>a::after{content:"";width:5px;height:5px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:.7}
@@ -1064,15 +1040,14 @@ input,textarea{caret-color:var(--ink)}
 .hdr__nav .nav-d{position:absolute;top:100%;left:-14px;min-width:230px;background:var(--white);color:var(--ink);border:1px solid var(--line);
   border-radius:var(--rad-s);box-shadow:0 18px 34px rgba(0,0,0,.16);padding:8px;display:none;z-index:70}
 .hdr__nav .nav-i:focus-within .nav-d{display:block}@media(hover:hover){.hdr__nav .nav-i:hover .nav-d{display:block}}
-/* Пока открыт каталог, выпадашки верхнего меню не перехватывают курсор:
-   иначе по пути от кнопки «Каталог» к пунктам мегаменю открывается чужой дропдаун. */
+/* при открытом каталоге подменю не ловят курсор — иначе по пути к мегаменю открывается чужое */
 .hdr.mega-on .hdr__nav .nav-d{display:none!important}
 .hdr.mega-on .hdr__nav{pointer-events:none}
 .hdr.mega-on .hdr__nav a{pointer-events:auto}
 .hdr__nav .nav-d a{display:block;padding:9px 12px;border-radius:9px;font-size:14px;font-weight:600;color:#55554E;transition:color .15s}
 @media(hover:hover){.hdr__nav .nav-d a:hover{color:var(--ink)}}
 
-/* — УТП-плитка (иконка + заголовок + текст) — */
+/* — УТП-плитка — */
 .utp{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .utp__i{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:22px}
 .utp__i .ic{width:46px;height:46px;border-radius:12px;background:var(--lime-soft);display:grid;place-items:center;margin-bottom:14px}
@@ -1080,12 +1055,12 @@ input,textarea{caret-color:var(--ink)}
 .utp__i b{display:block;font-family:Unbounded;font-weight:700;font-size:14px;line-height:1.3;margin-bottom:7px}
 .utp__i p{margin:0;font-size:13.5px;color:var(--gray);line-height:1.6}
 
-/* — иконки внутри лаймовой полосы преимуществ на главной — */
+/* — полоса преимуществ — */
 .strip__i .ic{width:clamp(38px,3vw,46px);height:clamp(38px,3vw,46px);flex-shrink:0;display:grid;place-items:center;
   background:rgba(14,14,12,.07);border-radius:14px}
 .strip__i .ic svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:1.7}
 
-/* — блок «Новости и статьи» с датой публикации — */
+/* — «Новости и статьи» — */
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .ncard{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;display:flex;flex-direction:column;transition:.18s}
 @media(hover:hover){.ncard:hover{border-color:#C2C2B6}}
@@ -1098,12 +1073,12 @@ input,textarea{caret-color:var(--ink)}
 .ncard h3,.ncard .ncard__t{font-family:Unbounded;font-weight:700;font-size:15.5px;line-height:1.3;text-transform:uppercase}
 .ncard p{margin:0;font-size:13.5px;color:var(--gray);line-height:1.6}
 
-/* — FAQ-аккордеон (общий: категории, инфостраницы, аренда) + микроразметка FAQPage — */
+/* — FAQ-аккордеон — */
 .faq details{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:10px}
 .faq summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:15px}
 .faq summary::-webkit-details-marker{display:none}
 :root{--i-plus:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 1.5v9M1.5 6h9' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");--i-minus:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1.5 6h9' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")}
-/* плюс/минус по всему сайту — одна маска: аккордеоны и кнопки количества */
+/* плюс/минус — одна маска для аккордеонов и кнопок количества */
 .faq summary::after,.tiers__wrap summary::after,.qty button::before,.addq button::before,.bb__step button::before,.prcq button::before,.prcrec__add::before{content:"";flex:none;width:12px;height:12px;background:currentColor;-webkit-mask:var(--i-plus) center/12px no-repeat;mask:var(--i-plus) center/12px no-repeat}
 .faq summary::after,.tiers__wrap summary::after{background:var(--ink)}
 .faq details[open] summary::after,.tiers__wrap[open] summary::after,.qty [data-d="-"]::before,.addq [data-q="-"]::before,.bb__step [data-q="-"]::before,.prcq [data-prc-step="-1"]::before{-webkit-mask-image:var(--i-minus);mask-image:var(--i-minus)}
@@ -1111,7 +1086,7 @@ input,textarea{caret-color:var(--ink)}
 .faq details>ul,.faq details>ol{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .post__body .faq{margin:4px 0 24px}
 
-/* — карта (заглушка под виджет Яндекс.Карт) — */
+/* — карта — */
 .ymap{border-radius:var(--rad);min-height:380px;border:1px solid var(--line);position:relative;overflow:hidden;
   background:repeating-linear-gradient(0deg,#E8E8E6 0 1px,transparent 1px 44px),repeating-linear-gradient(90deg,#E8E8E6 0 1px,transparent 1px 44px),#F6F6F4}
 .ymap .pin{position:absolute;z-index:1;left:48%;top:44%;width:30px;height:30px;border-radius:50% 50% 50% 2px;background:var(--ink);transform:rotate(-45deg)}
@@ -1119,7 +1094,7 @@ input,textarea{caret-color:var(--ink)}
 .ymap .addr{position:absolute;z-index:2;left:16px;top:16px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:14px 18px;font-size:13.5px;max-width:280px}
 .ymap .addr b{display:block;font-family:Unbounded;font-size:13px;margin-bottom:6px}
 .ymap iframe{position:absolute;inset:0;z-index:1}
-/* верхняя полоса виджета (линейка, «Пробки») уходит за край блока; копирайт и условия Яндекса внизу остаются */
+/* верхняя полоса виджета уходит за край, копирайт Яндекса внизу остаётся */
 .map__tiles{position:absolute;inset:0;z-index:1;overflow:hidden;opacity:0;transition:opacity .3s}
 .map__tiles img{position:absolute;max-width:none;display:block}
 .is-map .map__tiles{opacity:1}.is-map>.pin,.is-map>.cap{display:none}
@@ -1129,14 +1104,13 @@ input,textarea{caret-color:var(--ink)}
 .map__btn{background:var(--white);color:var(--ink);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(14,14,12,.15)}
 @media(hover:hover){.map__btn:hover{background:var(--paper)}}.map__btn--lime{background:var(--lime)}@media(hover:hover){.map__btn--lime:hover{background:var(--lime-d)}}
 
-/* — компактная форма «Напишите нам» на главной — */
+/* — форма «Напишите нам» — */
 .wr{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,3vw,40px);align-items:start}
 .wr__f{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:26px}
 .wr__f .hd{display:flex;gap:12px;align-items:center;margin-bottom:18px}
 .wr__f .hd i{width:44px;height:44px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-style:normal;font-size:20px}
 .wr__f .hd b{display:block;font-family:Unbounded;font-weight:700;font-size:15px}
 .wr__f .hd small{color:var(--gray);font-size:12.5px}
-/* главная: форма компактнее (имя и телефон в строку), левая колонка по центру формы; лента фото установок — когда открыта «Наши клиенты» */
 .home .wr{align-items:center}
 .home .wr__f{padding:24px}.home .wr__f .hd{margin-bottom:16px}.home .wr__f .field{margin-bottom:2px}
 .wr__2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
@@ -1150,7 +1124,7 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:480px){.wr__2{grid-template-columns:1fr}}
 @media(max-width:640px){.works__g{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:40%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}.works__g::-webkit-scrollbar{display:none}.works__g li{scroll-snap-align:start}}
 
-/* — карточка товара: краткие характеристики вместо «простыни» (по прототипу) — */
+/* — краткие характеристики — */
 .pc__scales{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin:0 0 12px}
 .pc__scale span{display:block;font-size:10.5px;font-family:'JetBrains Mono';letter-spacing:.05em;text-transform:uppercase;color:var(--gray);margin-bottom:4px}
 .pc__scale i{display:block;height:4px;border-radius:3px;background:var(--line);position:relative}
@@ -1159,14 +1133,14 @@ input,textarea{caret-color:var(--ink)}
 .pc__tiers span{background:var(--white);border:1px solid var(--ok);color:var(--ok);border-radius:999px;
   font-family:'JetBrains Mono';font-size:9.5px;font-weight:700;padding:3px 7px;line-height:1.2;white-space:nowrap}
 
-/* — страница товара: перелистывание, поделиться, сравнить — */
+/* — страница товара: поделиться, сравнить — */
 .pline{border-top:1px solid var(--line);margin:18px 0 20px}
 .ptools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .ptools button{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--gray)}
 .ptools button svg{width:15px;height:15px}
 @media(hover:hover){.ptools button:hover{border-color:var(--line-h);color:var(--ink)}}
 
-/* — фото офиса и входной группы (страница контактов) — */
+/* — фото офиса — */
 .office{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .office figure{margin:0;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);overflow:hidden}
 .office .ph{height:200px;background:repeating-linear-gradient(135deg,#EDEDE7 0 12px,#E5E5DD 12px 24px);display:grid;place-items:center;color:var(--gray-2);font-size:12.5px;text-align:center;padding:16px}
@@ -1179,7 +1153,7 @@ input,textarea{caret-color:var(--ink)}
 .smap ul{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-size:14px}
 .smap ul ul{padding-left:14px;margin-top:9px;color:var(--gray)}
 
-/* — футер: время работы и карта сайта — */
+/* — подвал: время работы — */
 .ftr__hours{margin-top:14px;font-size:12.5px;line-height:1.7;color:#9C9C94}
 .ftr__hours b{display:block;color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-weight:500}
 
@@ -1193,7 +1167,7 @@ input,textarea{caret-color:var(--ink)}
   .pc__tiers{position:static;max-width:none;margin-bottom:10px}
 }
 @media(max-width:640px){
-  /* карточка компактнее — цена и кнопка попадают в первый экран каталога */
+  /* компактная карточка: цена и кнопка — в первом экране каталога */
   .pc{padding:13px}
   .pc__ph{height:132px;margin:4px 0 10px}
   .pc__ph img{max-height:118px}
@@ -1203,7 +1177,7 @@ input,textarea{caret-color:var(--ink)}
 
 }
 
-/* ---------- кастомный выпадающий список (замена нативного select) ---------- */
+/* ---------- выпадающий список вместо select ---------- */
 .sel{position:relative;display:inline-block;vertical-align:top;max-width:100%}
 .sel--block{display:block;width:100%}
 .sel>select.sel__native{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;margin:0;padding:0;border:0}
@@ -1239,7 +1213,7 @@ input,textarea{caret-color:var(--ink)}
 @media(prefers-reduced-motion:reduce){.sel__list{transition:none}.sel__btn>svg{transition:none}}
 @media(max-width:600px){.sel__list{max-width:min(340px,calc(100vw - 32px))}}
 
-/* ---------- сдержанная анимация появления: при загрузке и при скролле ---------- */
+/* ---------- анимация появления ---------- */
 [data-rv]{opacity:0;transform:translateY(14px);
   transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1);
   transition-delay:var(--d,0ms);will-change:opacity,transform}
@@ -1248,7 +1222,6 @@ input,textarea{caret-color:var(--ink)}
 [data-rv="left"]{transform:translateX(-18px)}
 [data-rv="scale"]{transform:scale(.97)}
 [data-rv].rv-done{will-change:auto}
-/* первый экран: заголовок проявляется построчно, подсветка «прорисовывается» */
 .hero h1:not(.hero__title){animation:rv-slide .7s cubic-bezier(.22,1,.36,1) .05s both}
 .hero h1:not(.hero__title) em{background-size:0% 100%;animation:rv-mark .7s cubic-bezier(.22,1,.36,1) .5s forwards}
 .hero__lead,.hero .row,.hero .link,.hero__right{opacity:0;animation:rv-up .7s cubic-bezier(.22,1,.36,1) forwards}
@@ -1263,14 +1236,14 @@ input,textarea{caret-color:var(--ink)}
   .hero h1:not(.hero__title) em{background-size:100% 100%}
 }
 
-/* дескрипторы вкуса маркером — приём Tasty Coffee, сразу продаёт вкус */
+/* дескрипторы вкуса маркером */
 .notes{display:inline;line-height:2}
 .notes i{font-style:normal;padding:2px 7px;border-radius:6px;background:var(--lime);color:var(--ink);
   font-weight:600;white-space:nowrap;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .notes i+i{margin-left:4px}
 .notes--dark i{background:var(--ink);color:var(--lime)}
 
-/* ---------- Swiper: фирменная тема ---------- */
+/* ---------- Swiper ---------- */
 .sw{position:relative}
 .sw .swiper{overflow:hidden}
 .sw .swiper-slide{height:auto;display:flex}
@@ -1289,9 +1262,8 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:1200px){.sw-btn--p{left:4px}.sw-btn--n{right:4px}}
 @media(max-width:700px){.sw-btn{display:none}}
 
-/* ---------- страница раздела каталога (catalog.html) ---------- */
+/* ---------- раздел каталога (catalog.html) ---------- */
 .rootcats{display:grid;grid-template-columns:repeat(auto-fit,minmax(calc((100% - 48px) / 5),1fr));gap:12px;margin-bottom:22px}
-/* плитка раздела: название, подпись и иконка в лаймовом круге (как в «Почему BEVERTEAM»); активный раздел — лаймовый */
 .rootcat{position:relative;display:block;height:150px;padding:18px;border-radius:var(--rad);background:var(--paper);border:1px solid var(--line);
   color:var(--ink);transition:background-color .25s,border-color .25s}
 .rootcat__n{display:block;max-width:calc(100% - 8px);font-family:Unbounded,sans-serif;font-weight:800;font-size:14px;line-height:1.2;text-transform:uppercase}
@@ -1312,18 +1284,16 @@ input,textarea{caret-color:var(--ink)}
 .cat .seo{margin-top:40px}
 .mob-f{display:none}
 @media(max-width:1050px){.mob-f{display:inline-flex}
-  /* лента со снапом во всю ширину экрана: поля — как у .wrap */
   .rootcats{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:170px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
     margin-inline:calc(-1 * clamp(16px,4vw,40px));padding-inline:clamp(16px,4vw,40px);scroll-padding-inline:clamp(16px,4vw,40px)}
   .rootcats::-webkit-scrollbar{display:none}
   .rootcat{height:120px;padding:14px;scroll-snap-align:start}.rootcat__n{font-size:11.5px}.rootcat__ic{right:12px;bottom:12px;width:56px;height:56px}.rootcat__ic svg{width:28px;height:28px}}
 @media(max-width:640px){
-  /* первый экран на мобильных: сразу видны товары с ценами */
   .rootcats{gap:8px;margin-bottom:16px}
   .subcats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
   .subcats a{flex:0 0 auto;padding:7px 12px;font-size:12.5px}
   .cat-page .pagehead{padding:10px 0 14px}
-  .cat-page .pagehead .sub{display:none}      /* тот же текст раскрыт в SEO-блоке внизу страницы */
+  .cat-page .pagehead .sub{display:none}      /* текст — в SEO-блоке внизу */
   .cat-page .crumbs{padding-top:12px}
   .toolbar{gap:8px}
 }
@@ -1341,7 +1311,6 @@ input,textarea{caret-color:var(--ink)}
 .gal__badges{position:absolute;top:18px;left:18px;display:flex;gap:6px;z-index:2}
 .gal__n:empty{display:none}.gal__n{position:absolute;right:16px;bottom:14px;z-index:2;background:rgba(14,14,12,.06);border-radius:999px;
   padding:4px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--gray);font-variant-numeric:tabular-nums}
-/* вертикальная лента миниатюр слева */
 .gal--empty{grid-template-columns:minmax(0,1fr)}.gal--empty .gal__side{display:none}
 .gal__side{position:relative;height:480px;display:flex;flex-direction:column;gap:8px}
 .gal__thumbs{flex:1;min-height:0;width:84px;padding:2px 3px}
@@ -1365,14 +1334,13 @@ input,textarea{caret-color:var(--ink)}
   .gal__thumbs .swiper-slide>span{width:66px;height:66px}.gal__thumbs img{width:50px;height:50px;max-height:none;object-fit:contain}
   .gal__ar{display:none}
 }
-/* блок покупки: плотный, всё главное в одном экране */
 .buy{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:20px;margin:0}
 .buy__price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .buy__price b{font-family:Unbounded;font-weight:800;font-size:clamp(26px,2.6vw,34px);line-height:1}
 .buy__price .per{color:var(--gray);font-size:13px}
 .buy__row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
 .buy__row .btn{flex:1;min-width:190px}
-/* «В корзину» живёт в обёртке #pAdd — растягиваем её на всё оставшееся место, кнопку — на всю обёртку */
+/* кнопка «В корзину» в обёртке #pAdd — тянем обе */
 .buy__row #pAdd{flex:1 1 190px;display:flex}
 .buy__row #pAdd .btn{flex:1;min-width:0}
 .buy .btn--line{width:100%;margin-top:10px}
@@ -1383,7 +1351,6 @@ input,textarea{caret-color:var(--ink)}
 .tiers th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);font-weight:500}
 .tiers tr:last-child td{border-bottom:0}
 .tiers tr.on td{color:var(--ink);font-weight:700;background:var(--lime-soft)}
-/* текущая ступень — плашка со скруглёнными краями; линии вокруг неё прячем, чтобы не резали плашку */
 .tiers tr.on td:first-child{border-radius:10px 0 0 10px}
 .tiers tr.on td:last-child{border-radius:0 10px 10px 0}
 .tiers tr.on td,.tiers tbody tr:has(+ tr.on) td{border-bottom-color:transparent}
@@ -1399,7 +1366,7 @@ input,textarea{caret-color:var(--ink)}
 .pane[hidden]{display:none}
 .revform{max-width:720px}
 .revform .f2{gap:0 18px}
-/* загрузка фото: зона и превью с удалением */
+/* загрузка фото */
 .field label.drop,.drop{display:flex;align-items:center;gap:14px;width:100%;background:var(--white);border:1.5px dashed var(--line);
   border-radius:var(--rad-s);padding:16px 18px;cursor:pointer;transition:border-color .15s,background-color .15s;
   font-family:Manrope,system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--ink);font-size:14px}
@@ -1418,12 +1385,9 @@ input,textarea{caret-color:var(--ink)}
 @media(hover:hover){.thumbs button:hover{background:var(--err)}}
 .thumbs figcaption{position:absolute;left:0;right:0;bottom:0;background:rgba(14,14,12,.6);color:#fff;font-size:10px;
   padding:3px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* характеристики шире текстовой колонки */
 .pane .pspecs{max-width:860px}
-/* вкладка отзывов — одной ширины со «Характеристиками»: сводка, отзывы и форма ровно по одному краю */
 #reviews{max-width:860px}
 #reviews .revform{max-width:none}
-/* характеристики первым блоком в «Описании» — как на Tasty Coffee */
 .pspecs{margin:0 0 26px}
 .pspecs h3,.pspecs .th3{font-family:Unbounded;font-weight:800;font-size:17px;margin:0 0 12px}
 .pspecs__grid{display:block;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:6px 22px}
@@ -1435,8 +1399,7 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:900px){.prod{grid-template-columns:1fr}.gal{position:static}.gal__main{height:360px;order:1}.specs{grid-template-columns:1fr}}
 @media(max-width:900px){.prod{display:flex;flex-direction:column;gap:0;align-items:stretch}.pinfo{display:contents}.pinfo>*{order:3}.pinfo>.pkick{order:0}.pinfo>.h1{order:1;margin-bottom:16px}.prod>.gal{order:2;margin-bottom:22px}}
 
-/* ---------- страница сравнения (compare.html) ---------- */
-/* вкладки категорий */
+/* ---------- сравнение (compare.html) ---------- */
 .cmp__cats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 22px}.cmp__cats:empty{display:none}
 .cmp__cat{display:inline-flex;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:999px;
   overflow:hidden;transition:border-color .15s}
@@ -1449,13 +1412,11 @@ input,textarea{caret-color:var(--ink)}
 .cmp__cat.on .x{border-left-color:rgba(255,255,255,.18);color:rgba(255,255,255,.55)}
 @media(hover:hover){.cmp__cat.on .x:hover{color:#fff}}
 
-/* лента колонок */
 .cmp{position:relative}
 .cmp>.sw-btn{top:170px;transform:none}
 .cmp__stick .sw-btn{width:34px;height:34px}
 .cmp__stick .sw-btn--p{left:8px}.cmp__stick .sw-btn--n{right:8px}
 
-/* карточка-колонка */
 .cc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px 18px;
   display:flex;flex-direction:column;min-width:0;height:100%;transition:border-color .18s}
 @media(hover:hover){.cc:hover{border-color:#C2C2B6}}
@@ -1475,7 +1436,6 @@ input,textarea{caret-color:var(--ink)}
 .cc__p{font-family:Unbounded;font-weight:800;font-size:17px;white-space:nowrap}
 .cc__p small{display:block;font-family:Manrope;font-weight:400;font-size:12px;color:var(--gray)}
 
-/* липкая мини-шапка */
 .cmp__stick{position:fixed;left:0;right:0;top:0;z-index:29;background:var(--white);border-bottom:1px solid var(--line);
   box-shadow:0 10px 26px -18px rgba(14,14,12,.4);transform:translateY(-100%);transition:transform .25s ease;padding:10px 0}
 .cmp__stick.on{transform:none}
@@ -1486,7 +1446,6 @@ input,textarea{caret-color:var(--ink)}
 .cs span{display:block;font-size:12px;color:var(--gray);line-height:1.3;overflow:hidden;text-overflow:ellipsis;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
-/* таблица характеристик */
 .cmp__opts{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:26px 0 8px;padding-top:22px;border-top:1px solid var(--line)}
 .cmp__grp{margin-top:14px}
 .cmp__grp>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
@@ -1496,7 +1455,6 @@ input,textarea{caret-color:var(--ink)}
   transform:rotate(-135deg);margin-top:4px;transition:transform .2s}
 .cmp__grp:not([open])>summary::after{transform:rotate(45deg);margin-top:-2px}
 .cmp__r{border-radius:12px;padding:0 2px;transition:background-color .35s ease}
-/* строку подсвечиваем только под курсором — чтобы глазом пройти её через все товары */
 @media(hover:hover){.cmp__r:hover{background:#F4F8E4}}
 .cmp__r .lbl{font-size:12.5px;color:var(--gray);padding:10px 20px 0}
 .cmp__r .swiper-slide{padding:2px 18px 12px;font-size:14px;color:var(--ink);min-width:0;overflow-wrap:anywhere;height:auto;
@@ -1535,7 +1493,6 @@ input,textarea{caret-color:var(--ink)}
 .cop .coemail__note{margin:0 0 25px;font-size:13px;line-height:1.5}
 @media(max-width:700px){.cop .coemail{row-gap:8px}.cop .coemail__note{margin:0}}
 .cop .coidp{margin-bottom:18px}.cop .coidp p{font-size:12.5px;margin:10px 0 0}
-/* фокус с клавиатуры — мягкое лаймовое кольцо вместо чёрной двойной рамки */
 .cop .corec{display:flex;align-items:center;gap:16px;margin:-6px 0 20px;padding:16px 18px;border-radius:var(--rad-s);background:var(--lime-soft);border:1px solid var(--lime)}
 .cop .corec[hidden]{display:none}
 .cop .corec>div{flex:1;display:grid;gap:3px;font-size:13.5px;line-height:1.45;color:var(--gray)}
@@ -1547,7 +1504,6 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:600px){.okp .oklogin{grid-template-columns:1fr}.okp .oklogin .btn{grid-row:auto;margin-top:8px}}
 .cop .blk h2 b{width:26px;height:26px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-family:'JetBrains Mono';font-size:12px}
 .cop .opts{display:grid;gap:10px}
-/* пересчёт доставки: старые варианты приглушены, в заголовке — что считаем */
 .cop .calcst{margin-left:auto;font-family:Manrope;font-weight:500;font-size:13px;color:var(--gray)}
 .cop .calcst:not(:empty)::before{content:"";display:inline-block;vertical-align:1px;margin-right:8px;width:8px;height:8px;border-radius:50%;background:var(--lime-d);animation:calcPulse 1s ease-in-out infinite}
 @keyframes calcPulse{50%{transform:scale(.55);opacity:.5}}
@@ -1558,7 +1514,7 @@ input,textarea{caret-color:var(--ink)}
 @media(prefers-reduced-motion:reduce){.cop .calcst::before{animation:none}}
 @media(max-width:600px){.cop .calcst{font-size:12px}.cop .calcst__c{display:none}}
 .cop .dtabs{margin-bottom:14px}
-/* пункт выдачи СДЭК: выбранный адрес в карточке доставки + окно с картой */
+/* пункт выдачи СДЭК */
 .cop .cdekdown{margin-bottom:12px;background:var(--paper);border:1px solid var(--line)}
 .cop .pvzpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .cop .pvzpick__a{flex:1 1 220px;font-size:14px;font-weight:600;color:var(--ink)}
@@ -1591,7 +1547,7 @@ input,textarea{caret-color:var(--ink)}
 .pvzm__dl dd{margin:2px 0 0;font-size:14px;line-height:1.45}
 .pvzm__img{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
 .pvzm__img img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--paper)}
-/* пункт выдачи на странице заказа: адрес, режим, как найти, карта */
+/* пункт выдачи на странице заказа */
 .pvzv__go{display:inline-block;background:none;border:0;border-bottom:1px solid var(--lime);padding:0 0 1px;margin-top:6px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .modal--pvzv .modal__p{width:min(980px,100%);padding:26px 28px 28px}
 .pvzv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px}
@@ -1691,7 +1647,7 @@ input,textarea{caret-color:var(--ink)}
 .okp .next b{display:block;font-size:14px;margin-bottom:4px}
 .okp .next span{font-size:13px;color:var(--gray)}
 @media(max-width:700px){.okp .next{grid-auto-flow:row;grid-template-columns:1fr}.okp .dl{grid-template-columns:1fr;gap:4px}.okp .dl dd{margin-bottom:10px}}
-/* оплата по СБП: QR в тёмной рамке с уголками видоискателя; на телефоне главное — кнопка приложения банка, QR по запросу */
+/* оплата по СБП */
 .sbp__card{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,44px);align-items:center}
 .sbp__qr{max-width:100%;outline:none}
 .sbp__vf{position:relative;max-width:100%;background:var(--ink);border-radius:var(--rad);padding:22px}
@@ -1729,7 +1685,7 @@ input,textarea{caret-color:var(--ink)}
 }
 @media(max-width:720px){.sbp__card{grid-template-columns:minmax(0,1fr)}.sbp__qr{order:2;justify-self:center}}
 @media(prefers-reduced-motion:reduce){.sbp__st::before{animation:none}.sbp__vf::before,.sbp__vf::after{transition:none}}
-/* оплата через SberPay: знак Сбера вместо QR; на телефоне кнопка в приложение, на компьютере запрос по номеру телефона */
+/* оплата через SberPay */
 .spay__mark{position:relative;width:220px;aspect-ratio:1;border-radius:var(--rad);background:#21A038;color:#fff;display:grid;place-items:center;align-content:center;gap:14px}
 .spay__mark svg{width:76px;height:76px;transition:opacity .25s}
 .spay__mark b{font:800 22px/1 Unbounded,'BT Fallback',Manrope,sans-serif;letter-spacing:-.01em;transition:opacity .25s}
@@ -1801,7 +1757,7 @@ input,textarea{caret-color:var(--ink)}
 .home .tile img{max-height:118px;max-width:calc(100% - 28px);width:auto;height:auto;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s cubic-bezier(.22,1,.36,1)}
 .home .tile b{padding:14px 16px 4px;font-size:14.5px}
 .home .tile small{padding:0 16px 14px;color:var(--gray);font-size:12px}
-/* фон карточки белый, тёмный — у левой колонки: иначе по краям белой половины просвечивает тёмная кайма сглаживания */
+/* тёмный фон — у колонки, не у карточки: иначе по краям белой половины тёмная кайма сглаживания */
 .home .svc{background:#fff;color:#fff;border-radius:var(--rad);overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr}
 .home .svc__l{background:var(--ink);padding:clamp(32px,4vw,56px)}
 .home .svc__l h2 span,.home .svc__l .svc__t span{color:var(--lime)}
@@ -1847,20 +1803,19 @@ input,textarea{caret-color:var(--ink)}
   .home .strip__i:first-child{border-top:0;padding-top:0}
   .home .strip__i:last-child{padding-bottom:0}
   .home .tiles,.home .stepsx,.home .facts{grid-template-columns:1fr}.home .cfg__res{grid-template-columns:1fr}
-  /* главная на телефоне легче: без фото кофемашин в тёмных блоках, шаги аренды листаются вбок */
   .home .svc__r{display:none}
   .home .stepsx{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:84%;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
   .home .stepsx::-webkit-scrollbar{display:none}.home .stepx{scroll-snap-align:start}
 }
 
-/* ---------- текстовые страницы: оплата и доставка, возврат, политика, соглашение (info-*.html) ---------- */
+/* ---------- текстовые страницы (info-*.html) ---------- */
 .infop .prose{max-width:78ch}
 .infop__cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 30px}
 .infop__cards div{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px}
 .infop__cards b{display:block;font-size:14px;margin-bottom:4px}.infop__cards span{font-size:13px;color:var(--gray)}
 .infop .faq{margin-top:40px}
 .infop .faq p{margin:12px 0 0}
-/* «Конфиденциальности» — одно длинное слово: на телефоне заголовок уменьшается по ширине экрана, чтобы слово влезло */
+/* «Конфиденциальности» — длинное слово: на телефоне шрифт заголовка от ширины экрана */
 @media(max-width:640px){.infop .h1{font-size:min(24px,5vw)}}
 .infop .legal h2{font-family:Unbounded;font-weight:800;font-size:19px;margin:34px 0 12px;scroll-margin-top:130px}
 .infop .legal h2:first-child{margin-top:0}
@@ -1908,7 +1863,7 @@ a.person{display:block;color:inherit;text-decoration:none;transition:border-colo
 .aboutp .vals__hd h2{margin-bottom:16px}
 .aboutp .vals__hd p{font-size:16px;color:#3A3A34;max-width:44ch;margin:0}
 .aboutp .vals__g{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-/* фотогалерея: фото одной высоты, листаются стрелками и свайпом, клик — просмотр на весь экран */
+/* фотогалерея */
 .aboutp .agal .swiper-slide{width:auto}
 .aboutp .agal .swiper-slide>a{display:block;width:auto;height:clamp(200px,22vw,300px);border-radius:var(--rad);overflow:hidden;background:var(--white)}
 .aboutp .agal img{height:100%;width:auto;max-width:none;display:block;object-fit:cover;transition:transform .4s}
@@ -1917,7 +1872,7 @@ a.person{display:block;color:inherit;text-decoration:none;transition:border-colo
 .aboutp .areq h2{margin-bottom:14px}
 .aboutp .areq .muted{margin:0;font-size:15px;line-height:1.6;max-width:42ch}
 .aboutp .areq .req__btns{margin-top:22px}
-/* плашка над блоком с тестовым наполнением */
+/* плашка «тестовое наполнение» */
 .demo-note{margin:0 0 16px;padding:10px 14px;border-radius:var(--rad-s);background:var(--warn-s);color:#6B4A12;font-size:13px;line-height:1.5}
 .demo-note b{color:var(--warn);margin-right:4px;text-transform:uppercase;font:700 11px/1 'JetBrains Mono';letter-spacing:.06em}
 .aboutp .anum{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -1973,7 +1928,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .contp .office img{width:100%;height:200px;object-fit:cover;display:block}
 @media(max-width:900px){.contp .cl,.contp .form{grid-template-columns:1fr}.contp .how{grid-template-columns:1fr}}
 
-/* ---------- 404 (404.html) ---------- */
+/* ---------- 404 ---------- */
 .nfp .nf{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:clamp(40px,6vw,90px) 0}
 .nfp .code{font-family:Unbounded;font-weight:800;font-size:clamp(90px,16vw,180px);line-height:.9;color:var(--lime);-webkit-text-stroke:2px var(--ink);letter-spacing:-.04em}
 .nfp .nf p{color:var(--gray);margin:14px 0 24px;max-width:40ch}
@@ -2008,14 +1963,14 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .fsp .meanwhile{margin-top:36px;text-align:left}
 .fsp .meanwhile ul{margin:10px 0 0;padding-left:18px;color:#3A3A34;font-size:14px}
 
-/* ---------- журнал: лента и статья (journal.html, journal-post.html) ---------- */
+/* ---------- журнал: лента и статья ---------- */
 .journalp .jfilter a{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600}
 @media(hover:hover){.journalp .jfilter a:hover{border-color:var(--line-h)}}
 .journalp .jfilter a[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .journalp .post__meta .tag{background:var(--lime-soft);border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono';font-size:11px;color:#4E5A12}
 .journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%;aspect-ratio:16/9;object-fit:cover}
 .post__body h3,.post__body h4,.post__body .th3{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
-/* лестница заголовков в тексте статьи: H1 страницы один, заголовок первого уровня из редактора выглядит крупнее H2 */
+/* H1 страницы один: h1 из редактора — просто крупнее H2 */
 .post__body h1{font-family:Unbounded;font-weight:800;font-size:26px;line-height:1.2;margin:38px 0 14px;scroll-margin-top:130px}
 .post__body h4{font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin:24px 0 8px}
 .post__body h5,.post__body h6{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:22px 0 8px}
@@ -2115,7 +2070,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .acc-nav .out{display:flex;width:100%;padding:14px 12px 10px;margin-top:6px;border:0;border-top:1px solid var(--line);background:none;
   font:inherit;font-weight:600;font-size:14px;color:var(--err);text-align:left;cursor:pointer}
 @media(hover:hover){.accp .acc-nav .out:hover{background:var(--paper)}}
-/* телефон и планшет: меню кабинета — строка вкладок, листается пальцем; край гаснет, пока есть что листать; «Выйти» — внизу профиля */
+/* телефон и планшет: меню кабинета — строка вкладок */
 .acc-out-m{display:none}
 @media(max-width:1050px){
   .accp .acc-l{gap:18px}
@@ -2138,7 +2093,6 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .accp .empty{text-align:center;padding:40px 20px}
 .accp .empty .display{margin:0 0 10px}
 .accp .empty p{margin:0 0 20px}
-/* юрлица и адреса списком: название, строка деталей, действия справа */
 .accp .li{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;padding:16px 20px;margin-bottom:12px}
 .accp .li > div:first-child{min-width:0;flex:1 1 240px}
 .accp .li b{display:block;margin-bottom:4px}
@@ -2195,7 +2149,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 /* документы */
 .accp .docs-w{overflow-x:auto;border-radius:var(--rad-s)}
 .accp .docs td{vertical-align:middle}
-/* окно адреса: карта слева (только с ключом Яндекс Карт), поля справа */
+/* окно адреса: карта — только с ключом Яндекс Карт */
 #addrModal .modal__p{width:min(640px,100%);padding:26px 28px 28px}
 #addrModal.has-map .modal__p{width:min(980px,100%)}
 #addrModal .amap{display:grid;grid-template-columns:1fr;gap:24px;align-items:start}
@@ -2214,7 +2168,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 @media(max-width:700px){.accp .ord{grid-template-columns:1fr;padding:18px}.accp .ord .r{align-items:flex-start;text-align:left}
   .accp .li .acts{justify-content:flex-start}.accp .two .dl{grid-template-columns:1fr;gap:2px}.accp .two .dl dd{margin-bottom:8px}}
 
-/* узкие телефоны: УТП раздела в одну колонку; в шапке 5 иконок не помещаются — «Сравнение» уходит в мобильное меню */
+/* узкие телефоны: 5 иконок в шапке не помещаются — «Сравнение» в мобильном меню */
 .cat .utp{grid-template-columns:repeat(2,1fr)}
 @media(max-width:640px){.cat .utp{grid-template-columns:1fr}}
 @media(max-width:374px){.hdr__acts .hact--cmp{display:none}.btn{white-space:normal;max-width:100%;text-align:center}.home .hero__title{font-size:27px}.home .svc__list li i{white-space:normal;text-align:right}}
@@ -2231,7 +2185,6 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .req__btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .req__btns .btn svg{width:18px;height:18px;margin-right:8px;flex-shrink:0}
 @media(max-width:480px){.req__list>div{grid-template-columns:1fr;gap:2px}.req__btns .btn{flex:1 1 100%}}
-/* корзина: «Очистить корзину» справа от заголовка */
 .cart__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .cart__clear{background:none;border:0;padding:0 0 4px;font:600 14px/1.4 Manrope,sans-serif;color:var(--gray);cursor:pointer}
 @media(hover:hover){.cart__clear:hover{color:var(--err,#C0392B)}}
@@ -2263,12 +2216,12 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .lbox__ar{top:50%;margin-top:-24px}
 .lbox__ar--p{left:20px}.lbox__ar--n{right:20px}
 .lbox__ar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* неактивная стрелка ловит клик сама — иначе он проходит на фон и окно закрывается */
+/* неактивная стрелка ловит клик сама — иначе он уходит на фон и окно закрывается */
 .lbox__ar.swiper-button-disabled{opacity:.3;cursor:default;background:rgba(255,255,255,.12)}@media(hover:hover){.lbox__ar.swiper-button-disabled:hover{opacity:.3;cursor:default;background:rgba(255,255,255,.12)}}
 .lbox__n{position:absolute;top:28px;left:50%;transform:translateX(-50%);z-index:2;color:#fff;font:500 14px 'JetBrains Mono',monospace;opacity:.8}
 @media(max-width:700px){.lbox .swiper-slide{padding:64px 12px 40px}.lbox__ar{display:none}}
 .gal__big img{cursor:zoom-in}
-/* отзывы: карточки одной высоты, длинный текст обрезан — «Читать полностью» открывает окно */
+/* отзывы: карточки одной высоты */
 .revs{grid-auto-rows:1fr}
 .rev{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:24px;display:flex;flex-direction:column;gap:14px;margin:0;min-width:0}
 .rev__hd{display:flex;align-items:center;gap:12px}
@@ -2295,7 +2248,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 
 .lead__prod input{background:var(--paper);color:var(--ink);cursor:default}
 .auth__agree{margin:4px 0 16px;font-size:12.5px}
-/* меню «Поделиться» в карточке товара */
+/* меню «Поделиться» */
 .share{position:relative}
 .share__m{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:220px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);
   box-shadow:0 12px 32px rgba(14,14,12,.12);padding:6px}
@@ -2303,25 +2256,23 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .share__m a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;font-size:14px;color:#55554E;text-decoration:none;transition:color .15s}
 @media(hover:hover){.share__m a:hover{color:var(--ink)}}
 .share__m svg{width:22px;height:22px;flex-shrink:0;display:block}
-/* SEO-текст посадочной страницы, если на странице нет своего блока текста */
+/* SEO-текст посадочной, если на странице нет своего */
 .seo-landing .seo{margin:0}
-/* окно получает фокус само (для Esc и клавиатуры) — без рамки */
+/* окно получает фокус само (Esc, клавиатура) — без рамки */
 .lbox:focus,.modal__p:focus{outline:none;box-shadow:none}
-/* описание товара — стили текста статьи, в колонке вкладки */
 .pdesc{max-width:none;font-size:15.5px;line-height:1.75}
-/* разделы в окне поиска — иконки из каталога в лаймовом круге */
 .srch__ic{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--lime);display:grid;place-items:center}
 .srch__ic svg{width:20px;height:20px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .srch__ic .ico-badge{fill:var(--lime)}
-/* SEO-тексты (разделы каталога, посадочные, главная, аренда) — стили текста статьи, на всю ширину колонки */
+/* SEO-тексты разделов и страниц */
 .seo.post__body,.seo .post__body{font-size:16.5px;color:var(--ink-3);max-width:none}
 .seo.post__body>:first-child,.seo .post__body>:first-child{margin-top:0}
-/* подсказка у фильтра: «Показать N товаров» — ведёт к началу списка */
+/* подсказка «Показать N товаров» у фильтра */
 .fhint{position:absolute;z-index:40;transform:translateY(-50%);background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 16px;
   font:600 13.5px/1.2 Manrope,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 8px 24px rgba(14,14,12,.18);animation:fhint .2s ease-out}
 @media(hover:hover){.fhint:hover{background:var(--ink-3)}}
 @keyframes fhint{from{opacity:0;transform:translate(-6px,-50%)}}
-/* «Заказы по счёту» на телефоне — карточками: номер и сумма, дата, организация, внизу оплата и ссылка на счёт */
+/* «Заказы по счёту» на телефоне — карточками */
 @media(max-width:640px){
   .docs,.docs tbody{display:block}.docs thead{display:none}
   .docs tr{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
@@ -2336,10 +2287,9 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
   .docs .d-bill{grid-area:bill;margin-top:8px;align-self:center}
   .docs .d-bill a{min-height:44px}
 }
-/* обводка при наведении — серая и плавная, как у выпадающего списка */
 .pc__acts button,.subcats a,.soc a,.idp a,.jfilter a,.jtags--post a,.jside a,.quiz__opts button,.brands a,.srch__chips button,.srch__secs a,.sres a,
 .spage__pages a,.ptools button,.drop,.nfp .links a,.chipx{transition:border-color .15s,background-color .15s,color .15s}
-/* отзывы о товаре: пустой блок оценки скрыт, призыв оставить первый отзыв, фото, «спасибо» */
+/* отзывы о товаре */
 .rating:empty{display:none}
 .rev-empty{display:flex;align-items:center;gap:14px;background:var(--lime-soft);border:1px solid var(--lime);border-radius:var(--rad);padding:16px 20px;color:var(--ink);text-decoration:none;font-size:14px;line-height:1.5;transition:border-color .15s}
 @media(hover:hover){.rev-empty:hover{border-color:var(--lime-d)}}
@@ -2351,11 +2301,11 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .rev__ph img{width:100%;height:100%;object-fit:cover;display:block}
 .rev-sent{background:var(--lime-soft);border-radius:var(--rad);padding:20px 22px;font-size:14.5px;line-height:1.6}
 .rev-sent b{display:block;font-size:17px;margin-bottom:4px}
-/* форма отзыва: оценка, PDF в превью, окно отзыва о компании */
+/* форма отзыва */
 .rpick{display:flex;gap:6px}
 .thumbs__pdf{display:grid;place-items:center;width:100%;height:100%;background:var(--paper);font:700 13px/1 Manrope,sans-serif;color:var(--err)}
 .modal--revf .modal__p{width:min(640px,100%)}
-/* блок покупки на карточке товара (макет buybox-final) */
+/* блок покупки на странице товара */
 .bb .packs--lg{margin:0 0 18px}
 .bb__price{display:flex;align-items:flex-end;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;margin-bottom:14px}
 .bb__sum{font:800 32px/1 Unbounded,sans-serif;letter-spacing:-.01em;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -2372,7 +2322,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .bb__go{flex:1;min-width:0;height:52px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 20px;font:700 14.5px Manrope,sans-serif;white-space:nowrap;transition:background-color .15s}
 .bb__go span{display:inline-flex;align-items:center;gap:8px}
 .bb__go b{font:800 16px/1 Unbounded,sans-serif;color:var(--lime);font-variant-numeric:tabular-nums}
-/* сумма на кнопке — только на широких экранах, уже она не помещается рядом со степпером и иконками */
+/* сумма на кнопке — только на широких: на узких не помещается рядом со степпером */
 @media(max-width:1399px){.bb__go b{display:none}.bb__go{justify-content:center}}
 .bb__go svg{width:16px;height:16px;stroke:var(--lime);fill:none}
 .bb__ic{grid-area:ic;display:flex;gap:8px}
@@ -2391,31 +2341,29 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .bb .dship{margin-top:16px}
 .pkick{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
 @media(hover:hover){.bb__add:hover{background:var(--lime-d)}.bb__step button:hover{background:var(--paper)}.bb__go:hover{background:#2A2A26}.bb__ic>button:hover,.bb__ic .share>button:hover{border-color:var(--line-h);color:var(--ink)}}
-/* до 1099px — мобильная раскладка: кнопка на всю ширину, иконки строкой ниже рядом с «Купить в 1 клик» */
 @media(max-width:1099px){.bb__grid{grid-template-areas:"main main" "sub ic"}.bb__go{padding:0 16px}}
 @media(max-width:480px){.bb__sum{font-size:28px}}
 .pop{animation:bbpop .22s cubic-bezier(.16,1,.3,1)}
 @keyframes bbpop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.pop{animation:none}}
-/* оценка в карточке каталога: «★ 4,5 · 2 отзыва» — ведёт на вкладку отзывов */
+/* оценка в карточке каталога */
 .pc__rv{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--gray);text-decoration:none;white-space:nowrap;min-width:0}
 .pc__rv svg{width:14px;height:14px;fill:#E8B400;stroke:none}
 .pc__rv b{color:var(--ink);font-weight:700}
 @media(hover:hover){.pc__rv:hover span{color:var(--ink)}}
-/* переключатель вне фильтра (сравнение «только отличия») — как «Новинка» / «Скидка» в фильтре */
+/* переключатель вне фильтра (сравнение) */
 .tgl{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;user-select:none}
 .tgl input{appearance:none;flex-shrink:0;position:relative;width:38px;height:22px;margin:0;border-radius:999px;background:#D5D5CC;cursor:pointer;transition:background-color .15s}
 .tgl input::before{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--white);transition:transform .15s}
 .tgl input:checked{background:var(--ink)}
 .tgl input:checked::before{transform:translateX(16px);background:var(--lime)}
-/* симптомы на странице ремонта — наш чекбокс вместо браузерного */
 .symp input[type=checkbox]{appearance:none;width:18px;height:18px;border:1.5px solid #C2C2B6;border-radius:5px;background:var(--white) center/11px no-repeat;transition:border-color .15s,background-color .15s}
 .symp input[type=checkbox]:checked{background-color:var(--ink);border-color:var(--ink);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' fill='none' stroke='%23D7E85C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
-/* iOS Safari приближает страницу при фокусе на поле со шрифтом меньше 16px и не возвращает масштаб — на сенсорных экранах поля не мельче 16px */
+/* iOS Safari приближает поле со шрифтом меньше 16px и не возвращает масштаб */
 @media(hover:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not(.srch__f input),select,textarea{font-size:16px!important}}
 /* viewport-fit=cover: в альбомной ориентации iPhone контент не уходит под вырез */
 body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
-/* мобильная панель оформления (корзина, чекаут) */
+/* мобильная панель оформления */
 .mbar{display:none}
 @media(max-width:900px){
   .mbar:not([hidden]){display:flex;align-items:center;gap:14px;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--white);border-top:1px solid var(--line);
@@ -2431,14 +2379,14 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   body.has-mbar .toast{bottom:calc(var(--mbar-h,76px) + 8px)}
 }
 @keyframes mbarIn{from{transform:translateY(100%)}}
-/* короткий футер на оформлении заказа: контакты и условия, без меню */
+/* короткий подвал на оформлении заказа */
 .ftr--s{padding:32px 0 24px}
 .ftr__s{display:flex;justify-content:space-between;gap:12px 32px;flex-wrap:wrap}
 .ftr__c{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center}
 .ftr--s .ftr__c:first-child a{color:#fff}
 .ftr--s .ftr__b{margin-top:22px;padding-top:18px}
 @media(max-width:700px){.ftr__s,.ftr__c{flex-direction:column;align-items:flex-start}}
-/* ---------- ремонт: новая версия страницы (/servis/remont-kofemashin-new/) ---------- */
+/* ---------- ремонт: новая версия (/servis/remont-kofemashin-new/) ---------- */
 .rep2 .h2+.r2lead,.rep2 .r2lead{margin:8px 0 22px;max-width:70ch}
 .rep2 section>.h2{margin-bottom:8px}
 .rep2 .r2head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -2456,7 +2404,6 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .r2facts div:first-child b{color:var(--lime)}
 .r2facts span{font-size:13px;line-height:1.4;color:var(--gray)}
 .r2facts div:first-child span{color:#A8A8A0}
-/* узкие телефоны: длинные слова в крупном тексте не вылезают за край */
 @media(max-width:400px){.r2facts div{padding:14px}.r2facts b{font-size:19px;overflow-wrap:anywhere}.h1{font-size:min(24px,6vw);overflow-wrap:break-word}.home .svc__list li i{white-space:normal;text-align:right}}
 .r2symp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .r2symp label{display:flex;gap:12px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px 18px;cursor:pointer;transition:border-color .2s}
@@ -2475,7 +2422,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 @media(max-width:900px){.r2sympcta{flex-direction:column;align-items:stretch}.r2sympcta__b{flex-direction:column}.r2sympcta__b .btn{width:100%}}
 .r2symp i{font-style:normal;font-family:'JetBrains Mono';font-size:12px;color:var(--ink);background:var(--lime-soft);border-radius:999px;padding:3px 9px;justify-self:start}
 .r2models{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-/* сертификат сервисного центра под моделями Jetinno: превью, текст, PDF справа; на телефоне превью с заголовком в ряд, текст на всю ширину */
+/* сертификат сервисного центра */
 .certs{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"img t pdf" "img p pdf";column-gap:24px;row-gap:4px;align-items:center;margin-top:12px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:16px 24px 16px 16px}
 .certs__img{grid-area:img;display:block;border-radius:var(--rad-xs);overflow:hidden;border:1px solid var(--line);cursor:zoom-in;transition:border-color .2s}
 @media(hover:hover){.certs__img:hover{border-color:var(--line-h)}}
@@ -2678,16 +2625,15 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 /* журнал: статья на вычитке (свойство «Вычитка») */
 .tag.tag--draft{background:#FFE08A;color:var(--ink)}
 .post__draft{display:inline-block;margin:0 0 16px;padding:8px 14px;border-radius:999px;background:#FFE08A;font-size:13.5px;font-weight:600}
-/* рубрика статьи — на фото карточки, в строке под фото только дата */
 .ncard__ph{position:relative;display:block}
 .ncard__ph .ncard__cat{position:absolute;top:14px;left:14px;background:var(--white);color:var(--ink);border-radius:999px;padding:5px 11px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-/* журнал: темы — первые 10, остальные по кнопке */
+/* журнал: темы */
 .jtags .jtags__more{display:none}
 .jtags.is-open .jtags__more{display:inline}
 .jtags.is-open .jtags__btn{display:none}
 .jtags__btn{background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font:600 13px/1.4 Manrope,sans-serif;color:var(--ink);cursor:pointer;transition:border-color .2s}
 @media(hover:hover){.jtags__btn:hover{border-color:var(--line-h)}}
-/* журнал: подписка — тёмный баннер, форма в одну строку */
+/* журнал: подписка */
 .jsub{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr minmax(0,440px);gap:24px 48px;align-items:center;background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(28px,3.4vw,44px) clamp(24px,3.4vw,48px)}
 .jsub::before{content:"";position:absolute;right:-140px;top:-170px;width:460px;height:460px;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 44px,rgba(255,255,255,.07) 44px 46px);pointer-events:none}
 .jsub::after{content:"";position:absolute;right:48px;top:18px;width:84px;height:84px;border-radius:50%;border:20px solid var(--lime);box-sizing:border-box;pointer-events:none}
@@ -2713,7 +2659,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .jsub .field.is-err input{background:#2A1917;border-color:#E5533D;color:#fff}
 .jsub .field .err{color:#FF8A7A}
 @media(hover:hover){.jsub .check:hover input[type=checkbox]:not(:checked){border-color:#B9B9B0}}
-/* наши клиенты: шахматка «фото — текст», фильтры на лету */
+/* наши клиенты */
 .klhero{display:grid;grid-template-columns:1.35fr 1fr;gap:clamp(24px,4vw,56px);align-items:end;padding:clamp(8px,1.5vw,16px) 0 clamp(28px,3.5vw,48px)}
 .klhero .h1{margin:12px 0 0}
 .klkick{margin:0;font:600 12px/1.3 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
@@ -2892,7 +2838,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 @media(max-width:760px){.prcbar__row{flex-direction:column;align-items:stretch;gap:8px}.prcsw{align-self:flex-start}.prcbag__show{display:none}}
 .prcpv{position:fixed;z-index:95;width:220px;height:220px;object-fit:contain;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);box-shadow:0 18px 40px -14px rgba(14,14,12,.3);pointer-events:none}
 .prcpv[hidden]{display:none}
-/* прайс: редактор цен — только сотрудникам с правом менять цены, рисует ui.js */
+/* прайс: редактор цен (рисует ui.js) */
 .prced{margin:0 0 24px;padding:clamp(16px,2.4vw,24px);background:var(--white);border:1px dashed var(--ink-3);border-radius:var(--rad)}
 .prced__hd{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
 .prced__t{font:700 18px/1.2 Manrope,sans-serif}
@@ -2996,9 +2942,9 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   .prct__n a{color:#000;text-decoration:none}
   .prct__n small{font-size:10px}
 }
-/* кнопки ±: глиф шрифта прячем, рисует маска --i-plus/--i-minus (правило в конце — перебивает font-size блоков) */
+/* кнопки ±: глиф рисует маска; правило в конце — перебивает font-size блоков */
 .qty button,.addq button,.bb__step button,.prcq button,.prcrec__add{display:inline-flex;align-items:center;justify-content:center;font-size:0}
-/* отчёт «Заказы из поиска» (/seo-otchet/, только администраторы) */
+/* отчёт «Заказы из поиска» (/seo-otchet/) */
 .seor{padding-bottom:56px}
 .seor .muted,.seor td>span,.seor td>b{display:block}
 .seor__filter{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;padding:20px}

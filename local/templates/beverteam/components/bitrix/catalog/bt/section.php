@@ -5,7 +5,7 @@
  * @var CBitrixComponent $component
  * @global CMain $APPLICATION
  */
-// Раздел каталога и корень /catalog/ (sections.php подключает этот же файл без раздела)
+// sections.php подключает этот же файл без раздела (корень /catalog/)
 $sectionCode = $arResult['VARIABLES']['SECTION_CODE'] ?? '';
 $section = $rootSection = null;
 if ($sectionCode !== '') {
@@ -20,7 +20,6 @@ if ($sectionCode !== '') {
         : $section;
 }
 
-// сортировка из выпадающего списка тулбара
 $priceSort = 'CATALOG_PRICE_' . (int)CCatalogGroup::GetBaseGroup()['ID'];
 $sorts = [
     'pop' => ['По популярности', 'SORT', 'ASC'],
@@ -34,10 +33,9 @@ $folder = isset($GLOBALS['BT_ROOT_FILTER']) ? '/catalog/' : $arResult['FOLDER'];
 $sectionUrl = $folder . $arResult['URL_TEMPLATES']['section'];
 $cache = ['CACHE_TYPE' => $arParams['CACHE_TYPE'], 'CACHE_TIME' => $arParams['CACHE_TIME'], 'CACHE_GROUPS' => 'N'];
 
-// ЧПУ фильтра: /catalog/<раздел>/filter/<условия>/apply/, в корне — /catalog/filter/<условия>/apply/
 $smartPath = (string)($GLOBALS['BT_ROOT_FILTER'] ?? $arResult['VARIABLES']['SMART_FILTER_PATH'] ?? '');
 $sefRule = $folder . ($section ? $arResult['URL_TEMPLATES']['smart_filter'] : 'filter/#SMART_FILTER_PATH#/apply/');
-// старые адреса с условиями в параметрах (?btFilter_…): компонент их прочитает, шаблон фильтра перенаправит на ЧПУ
+// старые адреса ?btFilter_…: компонент их прочитает, шаблон фильтра перенаправит на ЧПУ
 if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET))) {
     $_GET['set_filter'] = $_REQUEST['set_filter'] = 'Y';
 }
@@ -66,7 +64,7 @@ if (!isset($_GET['set_filter']) && preg_grep('~^btFilter_~', array_keys($_GET)))
         'DISPLAY_ELEMENT_COUNT' => 'Y', 'SEF_MODE' => 'Y', 'SEF_RULE' => $sefRule, 'SMART_FILTER_PATH' => $smartPath, 'INSTANT_RELOAD' => 'N', 'XML_EXPORT' => 'N',
         'HIDE_NOT_AVAILABLE' => 'N', 'CONVERT_CURRENCY' => 'N',
     ] + $cache, $component, ['HIDE_ICONS' => 'Y']);
-    // у кофе оптовые ступени — тоже строки цены: фильтр и сортировка по цене за 1 шт/кг
+    // оптовые ступени — тоже строки цены: фильтр и сортировка по цене за 1 шт/кг
     $GLOBALS[$arParams['FILTER_NAME']]['CATALOG_SHOP_QUANTITY_' . (int)CCatalogGroup::GetBaseGroup()['ID']] = 1; ?>
 
     <div>
@@ -97,6 +95,6 @@ if ($smartPath !== '' && !bt_landing()) {
     $APPLICATION->SetPageProperty('robots', 'noindex, follow');
     $APPLICATION->SetPageProperty('canonical', 'https://beverteam.ru' . $folder . (($cp = (string)($arResult['VARIABLES']['SECTION_CODE_PATH'] ?? '')) !== '' ? $cp . '/' : ''));
 }
-// крошки и H1 выводим после компонентов: только тогда в цепочке и заголовке уже есть раздел
+// крошки и H1 — после компонентов, когда раздел уже в цепочке и заголовке
 $APPLICATION->AddViewContent('bt_crumbs', $APPLICATION->GetNavChain(false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false));
 $APPLICATION->AddViewContent('bt_h1', htmlspecialcharsbx($APPLICATION->GetTitle(false)));

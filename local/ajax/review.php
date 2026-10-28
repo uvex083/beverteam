@@ -1,7 +1,5 @@
 <?php
-// Отзыв о товаре (POST product) или о компании (без product): rating, name, email, machine | company, text, agree, photos[] (до 5 файлов до 10 МБ; JPG/PNG, у компании ещё PDF).
-// Сохраняется выключенным (ACTIVE=N) в ИБ «Отзывы» — публикует менеджер после проверки; менеджеру — письмо BT_FORM_REQUEST.
-// Ответ: {ok: true} или {ok: false, errors: {поле: текст}}
+// Отзыв о товаре или компании: сохраняется выключенным, публикует менеджер; ему — письмо BT_FORM_REQUEST
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -82,7 +80,7 @@ if ($errors) {
     $out(200, ['ok' => false, 'errors' => $errors]);
 }
 
-// частота: не чаще раза в 30 секунд из сессии и не больше 5 отзывов за 10 минут с одного IP
+// антиспам: раз в 30 с на сессию и 5 отзывов за 10 мин с IP
 $ibId = bt_iblock('reviews');
 if (time() - (int)($_SESSION['BT_REVIEW_LAST'] ?? 0) < 30) {
     $out(429, ['ok' => false, 'message' => 'Отзыв уже отправлен. Повторить можно через полминуты.']);
@@ -105,7 +103,7 @@ $id = (int)$el->Add([
     'PROPERTY_VALUES' => $product
         ? ['RATING' => $d['rating'], 'PRODUCT' => $product['ID'], 'MACHINE' => $d['machine'], 'EMAIL' => $d['email'],
             'PHOTOS' => array_map(fn($f) => ['VALUE' => $f], $photos), 'VERIFIED' => $yes ?: false]
-        // отзыв о компании: файлы — в «Благодарственное письмо», подпись видна под миниатюрой
+        // отзыв о компании: файлы — в «Благодарственное письмо», описание файла — подпись под миниатюрой
         : ['RATING' => $d['rating'], 'COMPANY' => $d['company'], 'EMAIL' => $d['email'],
             'LETTER' => array_map(fn($f) => ['VALUE' => $f, 'DESCRIPTION' => $f['type'] === 'application/pdf' ? 'Благодарственное письмо' : 'Фото'], $photos)],
 ]);

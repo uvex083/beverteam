@@ -1,7 +1,6 @@
 <?php
-// Импорт товаров и аренды из выгрузки старого сайта (_import/products.json + img/).
+// Импорт товаров и аренды из выгрузки старого сайта; повтор обновляет поля, картинки грузит только новым.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_catalog_import.php [show|apply] <папка выгрузки>
-// Повторный запуск обновляет поля и свойства, картинки грузит только новым товарам.
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -22,7 +21,7 @@ $apply = ($argv[1] ?? 'show') === 'apply';
 $dir = rtrim($argv[2] ?? '', '/') . '/';
 is_file($dir . 'products.json') or die("нет {$dir}products.json\n");
 $products = json_decode(file_get_contents($dir . 'products.json'), true);
-// H1 товаров с живого старого сайта: сеошник правил их отдельно от названий
+// H1 товаров — с живого старого сайта, они отличаются от названий
 $h1Live = is_file($dir . 'h1_live.json') ? json_decode(file_get_contents($dir . 'h1_live.json'), true) : [];
 $fail = fn(string $s) => die("ERROR: $s\n");
 
@@ -36,7 +35,6 @@ while ($s = $r->Fetch()) {
     $sections[$s['CODE']] = (int)$s['ID'];
 }
 
-// значения списочных свойств: создаём недостающие
 function bt_enum(int $ibId, string $code, string $value, bool $apply): ?int
 {
     static $cache = [];
@@ -82,17 +80,17 @@ if (!$kgId && $apply) {
     $kgId = (int)CCatalogMeasure::add(['CODE' => 166, 'MEASURE_TITLE' => 'Килограмм', 'SYMBOL_RUS' => 'кг', 'SYMBOL_INTL' => 'kg', 'IS_DEFAULT' => 'N']);
 }
 
-// оптовая сетка известна только для Эфиопии Оромия (beverteam-context.md, раздел 8)
+// оптовая сетка известна только для Эфиопии Оромия
 $bulk = ['botanica-efiopiya-oromiya' => [[1, 4, 2687], [5, 9, 2203], [10, 19, 2090], [20, 29, 1990], [30, null, 1940]]];
 
-// аренда: условия из beverteam-context.md (бесплатно от N кг кофе, для кого), название — H1 старого сайта
+// аренда: kg — бесплатно от N кг кофе, aud — для кого; название — H1 старого сайта
 $rentMeta = [
     'jl-05-arenda' => ['machine' => 'jetinno-jl-05', 'kg' => 3, 'aud' => 'Дом и малый офис', 'sort' => 10, 'name' => 'Аренда кофемашины Jetinno Jl 05'],
     'jl-15-viva-arenda' => ['machine' => 'jetinno-jl-15-viva', 'kg' => 6, 'aud' => 'Офис', 'sort' => 20, 'name' => 'Аренда кофемашины Jetinno Jl 15 (VIVA)'],
     'jl-36-arenda' => ['machine' => 'jetinno-jl36', 'kg' => 9, 'aud' => 'Кафе и HoReCa', 'sort' => 30, 'name' => 'Аренда кофемашины Jetinno JL 36'],
 ];
 
-// характеристики кофе BOTANICA — из описаний товаров на старом сайте (свойствами там не заведены)
+// характеристики кофе BOTANICA — из описаний на старом сайте
 $coffee = [
     'botanica-efiopiya-oromiya' => ['country' => 'Эфиопия', 'region' => 'Оромия', 'q' => '82,5', 'notes' => 'чёрный чай, сухофрукты, лимон, шоколад'],
     'botanica-efiopiya-sidamo-1' => ['country' => 'Эфиопия', 'region' => 'Сидамо', 'proc' => 'Мытая', 'q' => '83', 'notes' => 'чёрный чай, цветы, лайм'],
@@ -151,7 +149,6 @@ foreach ($products as $p) {
         if ($old && $old <= $p['price']) {
             $notes[] = "$code: старая цена $old не больше текущей {$p['price']} — не перенесена";
         }
-        // кратко для карточки: страна · вид · действие
         $short = array_filter([$country, $pr['Вид чая'] ?? '', is_string($pr['Действие'] ?? null) ? $pr['Действие'] : '']);
         $props['SHORT_DESC'] = implode(' · ', $short);
         $props['BADGES'] = $props['OLD_PRICE'] ? [bt_enum($catId, 'BADGES', 'Скидка', $apply)] : [];
@@ -176,7 +173,7 @@ foreach ($products as $p) {
     ];
     if (!$isRent) {
         $fields['IBLOCK_SECTION_ID'] = $sections[$secCode] ?? $fail("нет раздела $secCode для $code");
-        // товар бывает в нескольких разделах (улуны — и в «Зелёном чае»), основной — первый
+        // товар бывает в нескольких разделах, основной — первый
         $fields['IBLOCK_SECTION'] = array_values(array_unique(array_map(fn($c) => $sections[basename($c)] ?? $fail("нет раздела $c"), $p['sections'])));
     }
 
@@ -186,7 +183,7 @@ foreach ($products as $p) {
         continue;
     }
     $el = new CIBlockElement();
-    // картинки грузим только тем, у кого их ещё нет — повторный запуск не плодит копии файлов
+    // картинки — только товарам без них, иначе повтор плодит копии файлов
     $needImg = $imgs && !($ex['DETAIL_PICTURE'] ?? 0);
     if ($needImg) {
         $fields['DETAIL_PICTURE'] = CFile::MakeFileArray($imgs[0]);
@@ -203,7 +200,6 @@ foreach ($products as $p) {
     }
     CIBlockElement::SetPropertyValuesEx($id, $ibId, $props);
 
-    // SEO со старого сайта
     $h1 = $h1Live[$code] ?? '';
     $seo = array_filter(['ELEMENT_META_TITLE' => $p['seo_title'] ?? '', 'ELEMENT_META_DESCRIPTION' => $p['meta_description'] ?? '', 'ELEMENT_META_KEYWORDS' => $p['meta_keywords'] ?? '',
         'ELEMENT_PAGE_TITLE' => $h1 !== $p['name'] ? $h1 : '']);
@@ -214,7 +210,7 @@ foreach ($products as $p) {
     if ($isRent) {
         continue;
     }
-    // товар торгового каталога: всегда доступен к покупке (складской учёт выключен)
+    // всегда доступен к покупке: складской учёт выключен
     $w = bt_weight($p['name']);
     $pf = ['QUANTITY_TRACE' => 'N', 'CAN_BUY_ZERO' => 'Y', 'AVAILABLE' => 'Y', 'WEIGHT' => $w[0] ?? 0,
         'MEASURE' => ($secCode === 'dlya-espresso' || $secCode === 'filtr-kofe') && $kgId ? $kgId : null];
@@ -234,7 +230,7 @@ foreach ($products as $p) {
     }
 }
 
-// SEO разделов со старого сайта (настраивал сеошник): H1, title, description
+// SEO разделов со старого сайта: H1, title, description
 if (is_file($dir . 'sections.json')) {
     foreach (json_decode(file_get_contents($dir . 'sections.json'), true) as $sec) {
         $sid = $sections[basename($sec['code'])] ?? 0;

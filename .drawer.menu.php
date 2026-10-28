@@ -1,5 +1,5 @@
 <?php
-// Мобильное меню: DEPTH_LEVEL 1 — пункты первого экрана (accent — крупные), 2 и 3 — слайды; разделы каталога добавляет .drawer.menu_ext.php
+// DEPTH_LEVEL 1 — первый экран (accent — крупные пункты), 2 и 3 — слайды; разделы каталога — в .drawer.menu_ext.php
 $a = ['DEPTH_LEVEL' => 1, 'accent' => 'Y'];
 $sub = ['DEPTH_LEVEL' => 2];
 $rubrics = array_values(bt_blog_rubrics());

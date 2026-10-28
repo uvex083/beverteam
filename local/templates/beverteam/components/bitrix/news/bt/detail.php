@@ -2,7 +2,6 @@
 /** @var array $arParams */
 /** @var array $arResult */
 /** @global CMain $APPLICATION */
-// Статья журнала по макету journal-post.html; title/description — из SEO-шаблонов элемента
 
 ?>
 <div class="wrap journalp">

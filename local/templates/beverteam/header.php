@@ -7,7 +7,7 @@ use Bitrix\Main\Web\Json;
 /** @global CMain $APPLICATION */
 $co = bt_contacts();
 $asset = Asset::getInstance();
-// товары для поиска, корзины и сравнения в ui.js — до подключения скриптов
+// данные для ui.js — до подключения скриптов
 $asset->addString('<script>window.BT_DATA=' . Json::encode(bt_catalog_data()) . ';window.BT_CATS=' . Json::encode(bt_mega_cats()) . ';window.BT_SUMDISC=' . Json::encode(bt_sum_discounts()) . ';window.BT_BASKET=' . Json::encode(bt_basket_state()) . ';window.BT_POSTS=' . Json::encode(bt_posts()) . ';window.BT_SRCH=' . Json::encode(bt_search_cfg()) . bt_map_js() . ';window.BT_PAGES=' . Json::encode(bt_search_pages())
     . ';window.BT_UTP=' . Json::encode(array_map(fn($u) => [$u['icon'], $u['name'], $u['text']], bt_list('main_utp_items'))) . ';window.BT_USER=' . Json::encode(bt_user_js()) . ';window.BT_IDP=' . Json::encode(bt_idp()) . ';window.BT_SID=' . Json::encode(bitrix_sessid())
     . ';window.BT_YMAPS_KEY=' . Json::encode(\Bitrix\Main\Config\Option::get('fileman', 'yandex_map_api_key', ''))
@@ -57,7 +57,7 @@ $home = $APPLICATION->GetCurPage(false) === '/';
       <a class="hact" href="/personal/cart/" aria-label="Корзина"><?= bt_icon('cart') ?><span class="cnt" hidden>0</span><span>Корзина</span></a>
     </div>
   </div>
-  <?php /* телефон: всплывашка с номерами, мессенджерами и заявкой — на планшетах и телефонах, где номера нет в шапке */ ?>
+  <?php /* окно телефона — для экранов, где номера нет в шапке */ ?>
   <div class="telpop" id="telpop" hidden>
     <a class="telpop__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
     <?php if (!empty($co['phone2'])): ?><a class="telpop__tel2" href="<?= $co['phone2_href'] ?? '' ?>"><?= $co['phone2'] ?></a><?php endif ?>
@@ -85,7 +85,7 @@ $home = $APPLICATION->GetCurPage(false) === '/';
     ], false, ['HIDE_ICONS' => 'Y']) ?>
   </div>
 </div>
-<?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): // текстовые страницы для покупателей: крошки, заголовок, боковое меню ?>
+<?php if ($APPLICATION->GetDirProperty('bt_layout') === 'info'): ?>
 <div class="wrap infop">
   <?php $APPLICATION->AddBufferContent([$APPLICATION, 'GetNavChain'], false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false) ?>
   <div class="pagehead"><h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1></div>

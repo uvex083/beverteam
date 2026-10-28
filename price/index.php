@@ -3,7 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_be
 /** @global CMain $APPLICATION */
 /** @global CUser $USER */
 
-// прайс пока в доработке — видит только администратор, остальным 404 (из меню и карты сайта убран)
+// прайс в доработке: только администратору, остальным 404
 if (!$USER->IsAdmin()) {
     require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
     die();
@@ -51,7 +51,7 @@ if (($_GET['format'] ?? '') === 'csv') {
     die();
 }
 
-// ?format=pdf — прайс в PDF: открывается во вкладке браузера, оттуда его скачивают или печатают
+// ?format=pdf — открывается во вкладке браузера
 if (($_GET['format'] ?? '') === 'pdf' && \Bitrix\Main\Loader::includeModule('sale') && CSalePdf::isPdfAvailable()) {
     $list = bt_price_list();
     $ts = bt_price_date();
@@ -77,7 +77,6 @@ if (($_GET['format'] ?? '') === 'pdf' && \Bitrix\Main\Loader::includeModule('sal
         $pdf->Cell($W, 12, $t('Цены на ' . FormatDate('j F Y', $ts)), 0, 0, 'R');
         $pdf->SetY(82);
     };
-    // перенос названия по ширине колонки
     $wrap = function (string $s, float $w) use ($pdf, $t) {
         $lines = [''];
         foreach (preg_split('/\s+/u', trim($s)) as $word) {

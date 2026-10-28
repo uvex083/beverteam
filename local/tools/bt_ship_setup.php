@@ -1,7 +1,6 @@
 <?php
-// Доставка: статус заказа «Передан в доставку» (S) с письмом покупателю — менеджер ставит его, когда отдал заказ курьеру или в СДЭК.
-// У СДЭК статус ставится сам, когда модуль получил трек-номер (bt_order_ship_guard). «Готов к выдаче» (R) — только самовывоз.
-// Текст письма — bt_mail_setup.php. Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_ship_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Доставка: статус «Передан в доставку» (S) с письмом — ставит менеджер, у СДЭК ставится сам по трек-номеру.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_ship_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -20,7 +19,7 @@ $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 const ST = 'S';
 const EV = 'SALE_STATUS_CHANGED_' . ST;
 
-// между «Оплачен, формируется к отправке» и «Готов к выдаче»
+// статус — между «Оплачен, формируется к отправке» и «Готов к выдаче»
 if (!Sale\Internals\StatusTable::getById(ST)->fetch()) {
     $say('статус ' . ST . ' «Передан в доставку»');
     if ($apply) {
@@ -48,13 +47,13 @@ foreach ($hints as $id => $d) {
     }
 }
 
-// «оплачен → Оплачен, формируется к отправке» ставит bt_order_ship_guard и только неотправленному заказу; штатная настройка откатила бы отправленный назад
+// P после оплаты ставит bt_order_ship_guard и только неотправленному; штатная настройка откатила бы отправленный заказ
 if (\Bitrix\Main\Config\Option::get('sale', 'status_on_paid', '') !== '') {
     $say('sale.status_on_paid: выключить (было ' . \Bitrix\Main\Config\Option::get('sale', 'status_on_paid', '') . ')');
     $apply and \Bitrix\Main\Config\Option::set('sale', 'status_on_paid', '');
 }
 
-// письмо при смене статуса (текст и оформление задаёт bt_mail_setup.php)
+// письмо при смене статуса (текст — в bt_mail_setup.php)
 if (!CEventType::GetList(['TYPE_ID' => EV, 'LID' => 'ru'])->Fetch()) {
     $say('почтовое событие ' . EV);
     $apply and (new CEventType())->Add(['LID' => 'ru', 'EVENT_NAME' => EV, 'NAME' => 'Изменение статуса заказа на «Передан в доставку»', 'SORT' => 240, 'DESCRIPTION' =>

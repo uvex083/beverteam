@@ -1,6 +1,6 @@
 <?php
-// Инфоблок «Посадочные страницы» (тип «SEO») и пример — страница фильтра «Скидка» в каталоге.
-// Пример помечен XML_ID «bt-demo». Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_landings_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Инфоблок «Посадочные страницы» (тип «SEO») и пример — страница фильтра «Скидка» (XML_ID «bt-demo»).
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_landings_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -14,7 +14,7 @@ CModule::IncludeModule('iblock');
 $apply = ($argv[1] ?? 'show') === 'apply';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 
-// свой тип «SEO» в «Контенте» — чтобы SEO-специалист видел посадочные отдельно от блоков страниц
+// свой тип «SEO» — чтобы посадочные были отдельно от блоков страниц
 if (!CIBlockType::GetByID('seo')->Fetch()) {
     $say('тип инфоблоков «SEO»');
     $apply and ((new CIBlockType())->Add(['ID' => 'seo', 'SECTIONS' => 'N', 'IN_RSS' => 'N', 'SORT' => 800,

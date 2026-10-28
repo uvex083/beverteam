@@ -1,7 +1,6 @@
 <?php
-// Отзывы о компании: дата, компания, логотип и благодарственные письма (картинки или PDF) + одна тестовая карточка со всеми полями.
-// Тестовый отзыв помечен XML_ID «bt-demo» — перед запуском удалить: ... bt_reviews_setup.php delete
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_reviews_setup.php [show|apply|delete]. Повторный запуск ничего не дублирует.
+// Отзывы о компании: дата, компания, логотип, письма + тестовая карточка (XML_ID «bt-demo», перед запуском сайта — delete).
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_reviews_setup.php [show|apply|delete]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');

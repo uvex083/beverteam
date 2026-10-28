@@ -1,7 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 /** @var array $rentModel */
-// Страница модели в аренду: цены — ИБ rent, фото и характеристики — карточка товара каталога, общие блоки — ИБ типа «Аренда кофемашин»
 
 use Bitrix\Main\Loader;
 
@@ -16,7 +15,6 @@ $form = bt_block('rent_form');
 $others = array_values(array_filter(bt_rent_models(), fn($x) => $x['id'] !== $m['id']));
 $data = bt_catalog_data();
 
-// карточка товара: фото, описание, характеристики
 $photos = $specs = $tech = [];
 $about = '';
 $specCodes = ['SCREEN' => 'Экран', 'WATER_SUPPLY' => 'Подключение к водопроводу', 'WATER_TANK' => 'Бак для воды', 'BEAN_HOPPER' => 'Бункер зерна', 'TELEMETRY' => 'Онлайн-телеметрия', 'MDB' => 'Платёжный терминал', 'DIMENSIONS' => 'Габариты, Ш×Г×В'];
@@ -40,7 +38,7 @@ if ($code !== '' && Loader::includeModule('iblock')) {
                 $tech[] = preg_replace(['/\s+-\s+/u', '/\s{2,}/u'], ' — ', $line);
             }
         }
-        // в описании товара есть список характеристик — он уже выше, оставляем только текст
+        // список характеристик из описания уже выведен выше — оставляем только текст
         $about = trim(preg_replace('~<(ul|ol)\b.*?</\1>~isu', '', (string)($f['~DETAIL_TEXT'] ?: $f['~PREVIEW_TEXT'])));
     }
 }
@@ -48,7 +46,7 @@ if (!$photos && $m['img']) {
     $photos = [['big' => $m['img'], 'full' => $m['img'], 'th' => $m['img']]];
 }
 
-// калькулятор этой модели: чашек в день × 8 г × дней в месяц, цена зерна из каталога
+// калькулятор: чашек в день × 8 г × дней в месяц
 $beans = array_values(array_filter($data['coffee'], fn($c) => str_contains($c['n'], 'BOTANICA')));
 $bean0 = 'botanica-espresso-smes';
 $next = null;

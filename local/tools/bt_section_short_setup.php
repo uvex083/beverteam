@@ -27,7 +27,7 @@ if (!CUserTypeEntity::GetList([], ['ENTITY_ID' => $entity, 'FIELD_NAME' => 'UF_S
     }
 }
 
-// стартовые значения: заполняем только пустые, ручную правку в админке не трогаем
+// заполняем только пустые — ручную правку в админке не трогаем
 foreach (['professionalnye-kofemashiny' => 'Кофемашины Jetinno'] as $code => $short) {
     $s = CIBlockSection::GetList([], ['IBLOCK_ID' => $ibId, '=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'], false, ['ID', 'UF_SHORT_NAME'])->Fetch();
     if ($s && (string)($s['UF_SHORT_NAME'] ?? '') === '') {

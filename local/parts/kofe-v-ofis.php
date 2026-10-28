@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Кофе в офис»: регулярные поставки зерна тем, у кого кофемашина уже есть; тексты — ИБ типа «Кофе в офис» (bt_office_setup.php), цены — каталог, порог бесплатной аренды — ИБ rent
 
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $vals = fn($items) => array_values(array_filter(array_column((array)$items, 0), fn($v) => $v !== ''));
@@ -21,7 +20,7 @@ foreach ($coffee as $i => $c) {
 $kgs = [1, 2, 3, 5, 10, 20];
 $kg0 = 3;
 $periods = [[1, 'Раз в месяц'], [2, 'Раз в 2 недели'], [4, 'Раз в неделю']];
-// доставка по Екатеринбургу: курьер 350 ₽, бесплатно за одну доставку от 3 000 ₽
+// курьер по Екатеринбургу 350 ₽, бесплатно от 3 000 ₽ за доставку
 $ship = 350;
 $free = 3000;
 $cfg = [
@@ -31,7 +30,6 @@ $cfg = [
 ];
 $short = fn(string $n) => trim(preg_replace(['/^BOTANICA\s+/u', '/,\s*1\s*кг$/u'], '', $n));
 
-// цифры первого экрана — из каталога: самая большая оптовая скидка и минимальный объём
 $maxPct = 0;
 foreach ($coffee as $c) {
     foreach ((array)($c['bulk'] ?? []) as $t) {

@@ -13,7 +13,6 @@ foreach (['OnAfterIBlockSectionAdd', 'OnAfterIBlockSectionUpdate', 'OnAfterIBloc
 require_once __DIR__ . '/include/bt_mail.php';
 require_once __DIR__ . '/include/bt_dkim.php';
 
-// письма о заказе: состав и детали заказа полями #BT_*#
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_route');
 AddEventHandler('main', 'OnBeforeEventSend', 'bt_mail_before_send');
 AddEventHandler('main', 'OnBeforeEventAdd', 'bt_mail_skip_p');
@@ -21,9 +20,7 @@ AddEventHandler('main', 'OnBeforeEventAdd', 'bt_mail_skip_extra');
 // статус заказа только вперёд; трек-номер СДЭК — «Передан в доставку»
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderBeforeSaved', 'bt_order_ship_guard');
 
-// счёт юрлицу: PDF в письме «Заказ подтверждён» и в кабинете; реквизиты продавца — из «Контактов»
 require_once __DIR__ . '/include/bt_bill.php';
-// оплата картой/СБП через Т-Банк: ссылка на оплату, сверка статуса агентом
 require_once __DIR__ . '/include/bt_tbank.php';
 AddEventHandler('main', 'OnBeforeEventAdd', 'bt_tbank_paid_mail_once');
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderBeforeSaved', 'bt_tbank_keep_comments');
@@ -32,12 +29,11 @@ AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_bill_sync_on_contact
 AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'bt_sale_badge_sync');
 AddEventHandler('iblock', 'OnAfterIBlockElementUpdate', 'bt_sale_badge_sync');
 
-// посадочные страницы для SEO: свои title, description, H1 и SEO-текст по адресу
 require_once __DIR__ . '/include/bt_seo.php';
 AddEventHandler('main', 'OnEpilog', 'bt_landing_meta');
 AddEventHandler('main', 'OnEpilog', 'bt_desc_unescape');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_landing_body');
-// FAQPage для поисковиков — из блоков вопросов-ответов готовой страницы (после SEO-текста посадочной)
+// FAQPage из вопросов-ответов готовой страницы — после SEO-текста посадочной
 AddEventHandler('main', 'OnEndBufferContent', 'bt_faq_ld');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_tokens_buffer');
 AddEventHandler('main', 'OnEndBufferContent', 'bt_nbsp_buffer');
@@ -45,26 +41,23 @@ AddEventHandler('main', 'OnEndBufferContent', 'bt_defer_buffer');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyAdd', 'bt_enum_codes_on_save');
 AddEventHandler('iblock', 'OnAfterIBlockPropertyUpdate', 'bt_enum_codes_on_save');
 
-// источник заказов и заявок (вход из поиска) для отчёта /seo-otchet/
 require_once __DIR__ . '/include/bt_attr.php';
 AddEventHandler('main', 'OnEpilog', 'Bt\\Attr\\track');
 AddEventHandler('iblock', 'OnAfterIBlockElementAdd', 'Bt\\Attr\\onLeadAdd');
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'OnSaleOrderSaved', 'Bt\\Attr\\onOrderSaved');
 
-// вход через Яндекс ID, VK ID, T-Bank, Сбер, Альфа (модуль «Социальные сервисы»)
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, array_fill_keys(['BtOAuth', 'BtOAuthBank', 'BtOAuthTbank', 'BtOAuthSber', 'BtOAuthAlfa'], '/local/php_interface/include/bt_oauth.php'));
 AddEventHandler('socialservices', 'OnAuthServicesBuildList', ['BtOAuth', 'services']);
 AddEventHandler('socialservices', 'OnFindSocialservicesUser', ['BtOAuth', 'findUser']);
 AddEventHandler('socialservices', 'OnUserLoginSocserv', ['BtOAuth', 'remember']);
 
-// обработчики доставки: СДЭК (расчёт по весу через калькулятор; заказы в СДЭК не создаём) и курьер по расстоянию от склада
 \Bitrix\Main\Loader::registerAutoLoadClasses(null, ['Bt\\Cdek\\Api' => '/local/php_interface/include/cdek.php', 'Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php',
     'Bt\\Courier\\Handler' => '/local/php_interface/include/bt_courier.php']);
 \Bitrix\Main\EventManager::getInstance()->addEventHandler('sale', 'onSaleDeliveryHandlersClassNamesBuildList', fn() => new \Bitrix\Main\EventResult(
     \Bitrix\Main\EventResult::SUCCESS, ['Bt\\Cdek\\Handler' => '/local/php_interface/include/cdek.php', 'Bt\\Courier\\Handler' => '/local/php_interface/include/bt_courier.php'], 'sale'));
 AddEventHandler('ipol.sdek', 'onFormation', 'bt_cdek_formation');
 
-// заголовки безопасности отдаём из PHP: mod_headers у хостинга не действует. Фреймом встраивать сайт можно только себе и Метрике (карта кликов, Вебвизор)
+// mod_headers у хостинга не действует — заголовки из PHP; во фрейме — только сам сайт и Метрика (Вебвизор)
 if (!headers_sent() && PHP_SAPI !== 'cli') {
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
@@ -77,7 +70,7 @@ if (preg_match('/\.na4u\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
     header('X-Robots-Tag: noindex, nofollow');
 }
 
-// push-сервер не подключён: клиент Push & Pull на сайте не запускаем, иначе у авторизованных ошибка PULL_DISABLED в консоли
+// push-сервера нет: без этого у авторизованных ошибка PULL_DISABLED в консоли
 if (!defined('ADMIN_SECTION')) {
     define('BX_PULL_SKIP_INIT', true);
     // ядро BX посетителям не нужно: его тянут только клиент pull и счётчик модуля «Конверсия»

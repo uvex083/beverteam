@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// «Аренда кофемашин»: тексты — ИБ типа «Аренда кофемашин» (bt_rent_page_setup.php), модели и цены — ИБ rent и каталог, города — блок «Где работаем» ремонта
 
 $e = fn($s) => preg_replace(['/(\d) (\d{3})/u', '/ (₽)/u'], ["$1\u{00A0}$2", "\u{00A0}$1"], htmlspecialcharsbx((string)$s));
 $plain = fn($h) => trim(html_entity_decode(strip_tags(str_replace(['<br>', '</p>'], ' ', (string)$h)), ENT_QUOTES));
@@ -9,7 +8,6 @@ $models = bt_rent_models();
 $data = bt_catalog_data();
 usort($models, fn($a, $b) => $a['cups'] <=> $b['cups']);
 
-// характеристики машин — из карточек каталога
 $specCodes = ['SCREEN' => 'Экран', 'WATER_SUPPLY' => 'Водопровод', 'WATER_TANK' => 'Бак для воды', 'BEAN_HOPPER' => 'Бункер зерна', 'TELEMETRY' => 'Онлайн-телеметрия', 'MDB' => 'Платёжный терминал', 'DIMENSIONS' => 'Габариты, Ш×Г×В'];
 $specs = [];
 if ($models && \Bitrix\Main\Loader::includeModule('iblock')) {
@@ -26,7 +24,7 @@ if ($models && \Bitrix\Main\Loader::includeModule('iblock')) {
 }
 $spec = fn($m, $c) => $specs[basename(rtrim($m['url'], '/'))][$c] ?? '';
 
-// кофе BOTANICA: цена за кг (оптовая ступень от 5 кг, если есть) и себестоимость чашки 8 г
+// цена BOTANICA за кг — оптовая ступень от 5 кг, если есть; чашка — 8 г
 $beans = array_values(array_filter($data['coffee'], fn($c) => str_contains($c['n'], 'BOTANICA')));
 $tier = function (array $c, float $kg): float {
     $p = $c['p'];
@@ -75,7 +73,6 @@ $geo = bt_block('repair_geo');
 $cities = array_values(array_filter(array_column((array)($geo['items'] ?? []), 0), fn($v) => $v !== ''));
 $revs = bt_reviews();
 
-// разметка для поисковиков — из тех же данных
 $page = 'https://beverteam.ru/arenda-kofemashin/';
 $org = ['@id' => 'https://beverteam.ru/#org'];
 $h1 = $APPLICATION->GetTitle(false);

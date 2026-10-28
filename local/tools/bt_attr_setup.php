@@ -20,7 +20,7 @@ if (!$conn->isTableExists($t)) {
     }
 } else {
     echo "таблица $t есть, строк: " . \Bt\Attr\Table::getCount() . "\n";
-    // запрос из Метрики (добавлено после запуска)
+    // фраза запроса из Метрики
     foreach (['PHRASE' => 'varchar(255) NULL', 'PHRASE_AT' => 'datetime NULL'] as $col => $type) {
         if (!$conn->getTableField($t, $col)) {
             echo ($apply ? '' : '[show] ') . "колонка $col\n";
@@ -28,7 +28,7 @@ if (!$conn->isTableExists($t)) {
         }
     }
 }
-// токен Метрики (только чтение) — файл вне сайта, в гит и базу не попадает
+// токен Метрики — файл вне сайта, не в гите и не в базе
 $file = dirname($_SERVER['DOCUMENT_ROOT'], 2) . '/secrets/metrika.token';
 if (\Bitrix\Main\Config\Option::get('bt', 'metrika_token_file', '') !== $file) {
     echo ($apply ? '' : '[show] ') . "опция bt/metrika_token_file = $file\n";
@@ -40,7 +40,7 @@ if (!CAgent::GetList([], ['NAME' => $agent])->Fetch()) {
     echo ($apply ? '' : '[show] ') . "агент $agent раз в 20 минут\n";
     $apply and CAgent::AddAgent($agent, 'main', 'N', 1200);
 }
-// отчёт закрыт от посетителей — и из поиска по сайту тоже
+// отчёт не попадает и в поиск по сайту
 $mask = COption::GetOptionString('search', 'exclude_mask');
 if (!str_contains($mask, '/seo-otchet/*')) {
     echo ($apply ? '' : '[show] ') . "поиск по сайту: исключить /seo-otchet/*\n";

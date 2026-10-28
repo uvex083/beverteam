@@ -9,7 +9,6 @@ $html = fn(string $code) => trim((string)($pr[$code]['~VALUE']['TEXT'] ?? ''));
 
 $arResult['BT'] = bt_product((string)$id) ?? [];
 
-// галерея: основное фото + дополнительные
 $files = array_filter(array_merge([$arResult['DETAIL_PICTURE']['ID'] ?? 0], (array)($pr['MORE_PHOTO']['VALUE'] ?? [])));
 $arResult['BT_PHOTOS'] = array_map(fn($f) => [
     'big' => bt_img($f, 900, 900),
@@ -18,7 +17,6 @@ $arResult['BT_PHOTOS'] = array_map(fn($f) => [
     'og' => CFile::ResizeImageGet($f, ['width' => 900, 'height' => 900])['src'] ?? '',
 ], array_values($files));
 
-// характеристики «Подробнее»: заполненные свойства с галочкой «Показывать на детальной странице» — название и порядок из настроек свойства в админке
 $show = (array)\Bitrix\Iblock\Model\PropertyFeature::getDetailPageShowProperties((int)$arResult['IBLOCK_ID'], ['CODE' => 'Y']);
 $arResult['BT_SPECS'] = [];
 foreach ($pr as $code => $p) {
@@ -29,18 +27,15 @@ foreach ($pr as $code => $p) {
 $arResult['BT_NOTES'] = $val('NOTES');
 $arResult['BT_Q'] = $val('Q_SCORE');
 
-// вкладки «Как готовить» / «Как хранить» / «Характеристики» — тексты со старого сайта; название вкладки хранения — название свойства в админке
 $arResult['BT_BREW'] = implode('', array_filter([$html('HOW_TO_BREW'), $html('HOW_TO_USE')]));
-// текст хранения одинаковый у всех товаров — его заголовки оформляем стилями, не тегами H2/H3
+// текст хранения одинаковый у всех товаров — заголовки не H2/H3, а стилями
 $arResult['BT_STORE'] = preg_replace(['~<h([23])\b([^>]*)>~i', '~</h[23]>~i'], ['<div class="th th$1"$2>', '</div>'], (string)$html('STORAGE'));
 $arResult['BT_STORE_T'] = htmlspecialcharsbx(trim((string)($pr['STORAGE']['NAME'] ?? '')) ?: 'Как хранить');
 $arResult['BT_TECH'] = $html('TECH_SPECS');
 
-// раздел товара
 $sectionId = (int)$arResult['IBLOCK_SECTION_ID'];
 $arResult['BT_SECTION'] = $sectionId ? CIBlockSection::GetList([], ['ID' => $sectionId], false, ['NAME', 'SECTION_PAGE_URL'])->GetNext() : null;
 
-// «Рекомендуем»: заданные вручную или товары той же группы
 $rec = array_map('strval', (array)($pr['RECOMMEND']['VALUE'] ?: []));
 if (!$rec) {
     foreach (bt_catalog_data() as $group => $list) {
@@ -52,7 +47,6 @@ if (!$rec) {
 }
 $arResult['BT_REC'] = array_values(array_filter(array_map('bt_product', $rec)));
 
-// отзывы о товаре
 $arResult['BT_REVIEWS'] = [];
 $r = CIBlockElement::GetList(['ACTIVE_FROM' => 'DESC', 'ID' => 'DESC'], ['IBLOCK_ID' => bt_iblock('reviews'), 'ACTIVE' => 'Y', 'PROPERTY_PRODUCT' => $id], false, false,
     ['ID', 'IBLOCK_ID', 'NAME', 'PREVIEW_TEXT', 'ACTIVE_FROM', 'DATE_CREATE', 'PROPERTY_RATING', 'PROPERTY_MACHINE', 'PROPERTY_VERIFIED']);
@@ -67,10 +61,10 @@ while ($e = $r->Fetch()) {
     $arResult['BT_REVIEWS'][] = ['id' => (int)$e['ID'], 'a' => $e['NAME'], 'r' => (int)$e['PROPERTY_RATING_VALUE'], 't' => $e['PREVIEW_TEXT'],
         'd' => ConvertDateTime($e['ACTIVE_FROM'] ?: $e['DATE_CREATE'], 'YYYY-MM-DD'), 'm' => $e['PROPERTY_MACHINE_VALUE'], 'ok' => (bool)$e['PROPERTY_VERIFIED_VALUE'], 'ph' => $ph];
 }
-// отзыв опубликовали в админке — кэш карточки сбрасывается по тегу ИБ отзывов
+// публикация отзыва в админке сбрасывает кэш карточки
 defined('BX_COMP_MANAGED_CACHE') && $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('reviews'));
 
-// бренд для разметки Product и данные для Open Graph (component_epilog работает и при кеше)
+// бренд для разметки Product; данные Open Graph — через кэш компонента в component_epilog
 $arResult['BT_BRAND'] = preg_match('/botanica/i', $arResult['~NAME']) ? 'BOTANICA' : (preg_match('/jetinno/i', $arResult['~NAME']) ? 'Jetinno' : '');
 $arResult['BT_OG'] = ['image' => $arResult['BT_PHOTOS'][0]['og'] ?? '', 'price' => $arResult['BT']['bulk'][0]['p'] ?? ($arResult['BT']['p'] ?? 0)];
 $cp = $this->getComponent();

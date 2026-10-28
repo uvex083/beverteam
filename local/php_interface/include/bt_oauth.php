@@ -1,6 +1,5 @@
 <?php
-// Вход через сервисы на модуле «Социальные сервисы»: Яндекс и VK — штатные классы модуля, банки — классы ниже.
-// Ключи всех пяти — в настройках модуля (Настройки → Настройки продукта → Настройки модулей → Социальные сервисы).
+// Вход через «Социальные сервисы»: Яндекс и VK — классы модуля, банки — ниже; ключи всех — в настройках модуля
 
 use Bitrix\Main\Security\Random;
 use Bitrix\Main\UserTable;
@@ -21,7 +20,7 @@ class BtOAuth
     ];
     private const LINK_TTL = 1200;
 
-    // OnAuthServicesBuildList: банки в списке сервисов модуля — там же их ключи
+    // банки — в списке сервисов модуля, там же их ключи
     public static function services(): array
     {
         $r = [];
@@ -45,8 +44,8 @@ class BtOAuth
         return $r;
     }
 
-    // OnFindSocialservicesUser: привязки к сервису ещё нет — ищем покупателя по e-mail или создаём.
-    // Существующий аккаунт без подтверждения e-mail сервисом не отдаём: сначала код на почту, потом привязка (BtOAuth::link)
+    // привязки ещё нет — ищем покупателя по e-mail или создаём;
+    // существующий аккаунт без подтверждённого сервисом e-mail — сначала код на почту, потом привязка
     public static function findUser(&$f): int
     {
         $id = (string)($f['EXTERNAL_AUTH_ID'] ?? '');
@@ -75,7 +74,7 @@ class BtOAuth
         return (int)$u['ID'];
     }
 
-    // OnUserLoginSocserv: штатные Яндекс и VK входят без «запомнить» — переавторизуем с ним, как при входе по коду (наши банки уже с ним)
+    // штатные Яндекс и VK входят без «запомнить» — переавторизуем с ним
     public static function remember(array $f): void
     {
         global $USER;
@@ -134,7 +133,7 @@ class BtOAuth
     }
 }
 
-// OpenID Connect, код авторизации. Возврат — на /local/ajax/oauth.php, сервис — из state
+// OpenID Connect: возврат — на /local/ajax/oauth.php, сервис — из state
 abstract class BtOAuthBank extends CSocServAuth
 {
     public const ID = '';

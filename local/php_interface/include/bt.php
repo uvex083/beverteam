@@ -2,10 +2,9 @@
 
 use Bitrix\Main\Loader;
 
-// картинка товара без фото
 const BT_NO_PHOTO = '/local/templates/beverteam/images/no-photo.svg';
 
-// ID инфоблока по символьному коду — ID на dev и проде могут не совпадать
+// ID инфоблока по коду: на dev и проде ID разные
 function bt_iblock(string $code): int
 {
     static $ids = [];
@@ -21,14 +20,14 @@ function bt_iblock(string $code): int
     return $ids[$code];
 }
 
-// Картинка для вывода: ресайз ядра (не больше $w×$h) и WebP-копия рядом в resize_cache
+// Ресайз ядра (не больше $w×$h) + WebP-копия в resize_cache
 function bt_img($file, int $w, int $h, int $mode = BX_RESIZE_IMAGE_PROPORTIONAL): string
 {
     $src = $file ? (\CFile::ResizeImageGet($file, ['width' => $w, 'height' => $h], $mode)['src'] ?? '') : '';
     return $src !== '' ? bt_webp($src) : '';
 }
 
-// iblock:OnAfterIBlockElementAdd/Update — метка «Скидка» в каталоге = заполнена старая цена; по метке работает фильтр «Скидка»
+// iblock:OnAfterIBlockElementAdd/Update: метка «Скидка» = заполнена старая цена, по ней работает фильтр
 function bt_sale_badge_sync(array $f): void
 {
     $ib = (int)bt_iblock('catalog');
@@ -67,7 +66,6 @@ function bt_inn_ok(string $inn): bool
         : count($d) === 12 && $k([7, 2, 4, 10, 3, 5, 9, 4, 6, 8]) === $d[10] && $k([3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]) === $d[11];
 }
 
-// ID файла по пути /upload/<папка>/<имя> — для уменьшенных копий картинок, вставленных в текст
 function bt_upload_file_id(string $src): int
 {
     if (!preg_match('~^/upload/(.+)/([^/]+)$~', $src, $m)) {
@@ -77,14 +75,14 @@ function bt_upload_file_id(string $src): int
     return (int)($f['ID'] ?? 0);
 }
 
-// Атрибуты width/height по файлу картинки — место под неё резервируется до загрузки
+// Атрибуты width/height по файлу картинки
 function bt_img_wh(string $src): string
 {
     $s = $src !== '' ? @getimagesize($_SERVER['DOCUMENT_ROOT'] . $src) : false;
     return $s ? ' width="' . $s[0] . '" height="' . $s[1] . '"' : '';
 }
 
-// WebP-копия файла из /upload: /upload/resize_cache/<путь>.webp, создаётся при первом обращении; удаляется ядром вместе с resize_cache файла
+// WebP-копия: /upload/resize_cache/<путь>.webp, создаётся при первом обращении, чистится ядром вместе с resize_cache
 function bt_webp(string $src): string
 {
     if (!preg_match('~^/upload/(?:resize_cache/)?(.+\.(jpe?g|png))$~i', $src, $m)) {
@@ -111,7 +109,7 @@ function bt_webp(string $src): string
     return $ok ? $dst : $src;
 }
 
-// Контакты и реквизиты: один элемент инфоблока site_contacts, единый источник для шапки, футера и страниц
+// Один элемент ИБ site_contacts — единый источник контактов для шапки, футера и страниц
 function bt_contacts(): array
 {
     static $co;
@@ -144,8 +142,7 @@ function bt_contacts(): array
     return $co;
 }
 
-// Мессенджеры из контактов: [код иконки, название, ссылка], пустые ссылки не выводятся
-// Соцсети и мессенджеры из ИБ socials: [код иконки, название, ссылка, SVG]. Выключенные и без ссылки не выводятся
+// Соцсети и мессенджеры из ИБ socials: [иконка, название, ссылка, SVG]; без ссылки не выводятся
 function bt_messengers(): array
 {
     $ibId = bt_iblock('socials');
@@ -179,7 +176,6 @@ function bt_icon(string $name): string
     return $icons[$name] ?? '';
 }
 
-// Товар из bt_catalog_data() по ID элемента
 function bt_product(string $id): ?array
 {
     static $index;
@@ -194,7 +190,7 @@ function bt_product(string $id): ?array
     return $index[$id] ?? null;
 }
 
-// неразрывный пробел после коротких предлогов и союзов и в «ООО «…»»: строка не кончается на «в» или «и»
+// Неразрывный пробел после коротких предлогов и союзов и в «ООО «…»»
 function bt_typo(string $s): string
 {
     return preg_replace('/(?<![\p{L}\d])(в|во|и|к|с|у|о|а|на|по|за|из|до|от|ООО) (?=\S)/iu', "$1\u{00A0}", $s);
@@ -205,14 +201,13 @@ function bt_fmt(float $n): string
     return number_format($n, 0, '', "\u{00A0}") . "\u{00A0}₽";
 }
 
-// Метка товара («Метки» в каталоге): у каждой свой цвет, чтобы выделялась на фото
 function bt_badge(string $b): string
 {
     $mod = ['хит' => 'hit', 'скидка' => 'sale', 'распродажа' => 'sale', 'новинка' => 'new', 'топ продаж' => 'top'][mb_strtolower(trim($b))] ?? '';
     return '<span class="badge' . ($mod ? ' badge--' . $mod : '') . '">' . htmlspecialcharsbx($b) . '</span>';
 }
 
-// Карточка товара — серверная копия BT_card() из ui.js в состоянии «не в корзине»; разметку менять в обоих местах
+// Серверная копия BT_card() из ui.js («не в корзине»): разметку менять в обоих местах
 function bt_card(array $m, bool $eager = false): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -241,7 +236,6 @@ function bt_card(array $m, bool $eager = false): string
         . '<div class="pc__acts"><button class="pc__fav" aria-pressed="false" title="В избранное" aria-label="В избранное">' . bt_icon('heart') . '</button>'
         . ($rent ? '' : '<button class="pc__cmpi" aria-pressed="false" title="Сравнить" aria-label="Сравнить">' . bt_icon('compare') . '</button>') . '</div>'
         . '<a class="pc__ph" href="' . $e($m['url']) . '">' . ($m['img'] ? '<img src="' . $e($m['img']) . '" alt="' . $e($m['n']) . '"' . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async">' : '') . '</a>'
-        // сразу под фото: оценка слева, наличие справа — на одной высоте во всех карточках ряда
         . '<div class="pc__meta">' . (!empty($m['rv']) ? '<a class="pc__rv" href="' . $e($m['url']) . '#reviews">' . bt_icon('star') . '<b>' . str_replace('.', ',', (string)$m['rv'][0]) . '</b><span>· ' . $m['rv'][1] . ' '
             . (($m['rv'][1] % 10 === 1 && $m['rv'][1] % 100 !== 11) ? 'отзыв' : (($m['rv'][1] % 10 >= 2 && $m['rv'][1] % 10 <= 4 && ($m['rv'][1] % 100 < 10 || $m['rv'][1] % 100 >= 20)) ? 'отзыва' : 'отзывов')) . '</span></a>' : '')
         . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span></div>'
@@ -256,7 +250,7 @@ function bt_card(array $m, bool $eager = false): string
         . '</article>';
 }
 
-// Состояние корзины Битрикса для ui.js: {items: {ID товара: количество}, sum}
+// Для ui.js: {items: {ID товара: количество}, sum}
 function bt_basket_state(?\Bitrix\Sale\BasketBase $basket = null): array
 {
     if (!Loader::includeModule('sale')) {
@@ -273,21 +267,21 @@ function bt_basket_state(?\Bitrix\Sale\BasketBase $basket = null): array
     return ['items' => (object)$items, 'sum' => (float)$basket->getPrice()];
 }
 
-// Фасовка строки корзины (кофе на развес): 20 — упаковка 20 кг; 0 — штучный товар. Старые строки без свойства — упаковки по 1 кг
+// Фасовка, кг: 20 — упаковка 20 кг, 0 — штучный товар; старые строки без свойства — по 1 кг
 function bt_basket_pack(\Bitrix\Sale\BasketItemBase $bi): int
 {
     $v = $bi->getPropertyCollection()->getPropertyValues()['PACK']['VALUE'] ?? '';
     return $v !== '' ? (int)$v : (!empty(bt_product((string)$bi->getProductId())['bulk']) ? 1 : 0);
 }
 
-// Количество строки для заказа и писем: «2 шт × 20 кг» у кофе на развес, «3 шт» у остального
+// «2 шт × 20 кг» у кофе на развес, «3 шт» у остального
 function bt_basket_qty(\Bitrix\Sale\BasketItemBase $bi): string
 {
     $kg = bt_basket_pack($bi);
     return $kg === 1 ? (float)$bi->getQuantity() . ' кг' : ($kg ? round($bi->getQuantity() / $kg) . ' шт × ' . $kg . ' кг' : (float)$bi->getQuantity() . ' шт');
 }
 
-// Что дальше по доставке — для кабинета, страницы заказа и писем: у самовывоза и своего курьера трек-номера нет
+// «Что дальше» по доставке: у самовывоза и своего курьера трек-номера нет
 function bt_delivery_next(string $dCode): string
 {
     return match (true) {
@@ -298,13 +292,12 @@ function bt_delivery_next(string $dCode): string
     };
 }
 
-// Отслеживание отправления: у СДЭК — страница трекинга по номеру, у своей доставки трек-номера нет
 function bt_track_url(string $dCode, string $num): string
 {
     return $num !== '' && (str_starts_with($dCode, 'sdek_') || $dCode === 'bt_cdek') ? 'https://www.cdek.ru/ru/tracking?order_id=' . rawurlencode($num) : '';
 }
 
-// Фото пункта СДЭК: модуль хранит список сериализованным, элементы — строка-ссылка или ['url' => …]
+// ipol.sdek хранит фото сериализованными: элемент — строка-ссылка или ['url' => …]
 function bt_pvz_images(string $raw): array
 {
     $list = $raw === '' ? [] : @unserialize($raw, ['allowed_classes' => false]);
@@ -316,7 +309,7 @@ function bt_pvz_images(string $raw): array
     return array_slice($urls, 0, 4);
 }
 
-// Строка таблицы пунктов модуля ipol.sdek → данные пункта для оформления и кабинета
+// Строка таблицы ipol_sdek_points → данные пункта
 function bt_pvz_row(array $p): array
 {
     return ['c' => $p['CODE'], 'a' => $p['ADDRESS'], 'w' => (string)$p['WORK_TIME'], 'm' => (string)$p['NEAREST_METRO_STATION'],
@@ -324,7 +317,7 @@ function bt_pvz_row(array $p): array
         'cash' => $p['HAVE_CASH'] === 'Y', 'card' => $p['HAVE_CASHLESS'] === 'Y', 'img' => bt_pvz_images((string)$p['OFFICE_IMAGE_LIST'])];
 }
 
-// Пункт выдачи СДЭК по коду — для страницы заказа и писем; закрытый пункт тоже: заказ мог уйти до его закрытия
+// Закрытые пункты тоже: заказ мог уйти до закрытия пункта
 function bt_pvz_point(string $code): ?array
 {
     if ($code === '' || !Loader::includeModule('ipol.sdek')) {
@@ -335,8 +328,8 @@ function bt_pvz_point(string $code): ?array
     return $p ? bt_pvz_row($p) : null;
 }
 
-// Цена без скидки за единицу количества (шт или кг) — в свойство позиции при оформлении: по нему кабинет и письма показывают скидку.
-// setProperty заменяет весь набор свойств, поэтому «Фасовку» передаём вместе с новым
+// Цена без скидки за шт/кг в свойство FULL_PRICE: по нему кабинет и письма показывают скидку
+// setProperty заменяет весь набор свойств — PACK передаём вместе с ним
 function bt_basket_full_save(\Bitrix\Sale\BasketItemBase $bi): void
 {
     $m = bt_product((string)$bi->getProductId());
@@ -349,15 +342,14 @@ function bt_basket_full_save(\Bitrix\Sale\BasketItemBase $bi): void
     $bi->getPropertyCollection()->setProperty($props);
 }
 
-// Сумма строки без скидки: по цене без скидки из свойства, без него — по базовой цене Битрикса
+// Сумма строки без скидки: по FULL_PRICE, без него — по базовой цене
 function bt_basket_full(\Bitrix\Sale\BasketItemBase $bi): float
 {
     $u = (float)($bi->getPropertyCollection()->getPropertyValues()['FULL_PRICE']['VALUE'] ?? 0);
     return max($u * (float)$bi->getQuantity(), (float)$bi->getBasePrice() * (float)$bi->getQuantity(), (float)$bi->getFinalPrice());
 }
 
-// Положить в корзину: $kg — фасовка кофе на развес (каждая фасовка — своя строка, количество в Битриксе — в кг), $q — штук.
-// $add — прибавить к тому, что уже лежит (повтор заказа). Возвращает текст ошибки или ''
+// $kg — фасовка (своя строка, количество в кг), $q — штук, $add — прибавить к лежащему; возвращает ошибку или ''
 function bt_basket_put(\Bitrix\Sale\BasketBase $basket, int $id, int $kg, float $q, bool $add = false): string
 {
     $m = bt_product((string)$id);
@@ -391,7 +383,7 @@ function bt_basket_put(\Bitrix\Sale\BasketBase $basket, int $id, int $kg, float 
     return $r->isSuccess() ? '' : implode('; ', $r->getErrorMessages());
 }
 
-// Мегаменю «Каталог»: корневые разделы с подразделами и промо-товаром + аренда; формат CATS из ui.js
+// Мегаменю «Каталог» в формате CATS из ui.js
 function bt_mega_cats(): array
 {
     $catId = bt_iblock('catalog');
@@ -415,7 +407,6 @@ function bt_mega_cats(): array
             $cats[$roots[$s['IBLOCK_SECTION_ID']]]['sub'][] = [$s['NAME'], $s['SECTION_PAGE_URL']];
         }
     }
-    // промо: первый товар раздела с фото
     foreach ($cats as &$c) {
         $el = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'SECTION_ID' => $c['id'], 'INCLUDE_SUBSECTIONS' => 'Y', 'ACTIVE' => 'Y', '!PREVIEW_PICTURE' => false], false, ['nTopCount' => 1], ['ID'])->Fetch();
         $m = $el ? bt_product((string)$el['ID']) : null;
@@ -443,8 +434,7 @@ function bt_mega_cats(): array
     return $cats;
 }
 
-// Характеристики каталога: vals — значения свойств товаров (id => код => текст), names — свойства с галочкой «Показывать на детальной странице»
-// в порядке сортировки, [[код, название], …] — по ним строится сравнение
+// vals — значения свойств (id => код => текст), names — [[код, название]] свойств с галочкой «Показывать на детальной»
 function bt_catalog_specs(): array
 {
     $catId = bt_iblock('catalog');
@@ -481,13 +471,12 @@ function bt_catalog_specs(): array
     return $specs;
 }
 
-// Группа товара для витрины и сравнения — по корневому разделу каталога
 function bt_product_group(string $rootCode): string
 {
     return ['kofe' => 'coffee', 'chay' => 'tea', 'professionalnye-kofemashiny' => 'machines'][$rootCode] ?? 'acc';
 }
 
-// Все товары и аренда в формате window.BT_PRODUCTS из ui.js: {coffee:[], tea:[], machines:[], acc:[], rent:[]}
+// Товары и аренда в формате window.BT_PRODUCTS из ui.js
 function bt_catalog_data(): array
 {
     $catId = bt_iblock('catalog');
@@ -505,7 +494,6 @@ function bt_catalog_data(): array
     $img = fn($fileId) => bt_img($fileId, 480, 340);
     $data = ['coffee' => [], 'tea' => [], 'machines' => [], 'acc' => [], 'rent' => []];
 
-    // корневой раздел каждого раздела
     $root = [];
     $r = \CIBlockSection::GetList([], ['IBLOCK_ID' => $catId], false, ['ID', 'CODE', 'NAME', 'IBLOCK_SECTION_ID', 'DEPTH_LEVEL']);
     $sec = [];
@@ -524,7 +512,6 @@ function bt_catalog_data(): array
         $path[$id] = implode('/', array_slice($names, 0, 5));
     }
 
-    // цены: базовая и оптовая сетка по количеству
     $prices = [];
     $r = \Bitrix\Catalog\PriceTable::getList([
         'filter' => ['=CATALOG_GROUP.BASE' => 'Y', '=PRODUCT.IBLOCK_ELEMENT.IBLOCK_ID' => $catId],
@@ -548,7 +535,7 @@ function bt_catalog_data(): array
         if ($pr['OLD_PRICE']['VALUE']) {
             $m['old'] = (float)$pr['OLD_PRICE']['VALUE'];
         }
-        // «Скидка» — только у товара со старой ценой, и у него всегда (метку в админке ставит bt_sale_badge_sync)
+        // «Скидка» — ровно у товаров со старой ценой (в админке метку ставит bt_sale_badge_sync)
         $badges = array_values(array_filter((array)($pr['BADGES']['VALUE'] ?: []), fn($b) => mb_strtolower($b) !== 'скидка'));
         empty($m['old']) || array_unshift($badges, 'Скидка');
         if ($badges) {
@@ -589,7 +576,7 @@ function bt_catalog_data(): array
         ];
     }
 
-    // отзывы о товарах: средняя оценка и число опубликованных — для строки «★ 4,5 · 2 отзыва» в карточке
+    // средняя оценка и число отзывов для строки «★ 4,5 · 2 отзыва» в карточке
     if ($revId = bt_iblock('reviews')) {
         $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $revId);
         $rv = [];
@@ -615,13 +602,13 @@ function bt_catalog_data(): array
     return $data;
 }
 
-// Блок страницы из одноэлементного инфоблока (главная, «О компании»): поля по коду свойства в нижнем регистре
+// Блок страницы из одноэлементного ИБ: поля по коду свойства в нижнем регистре
 function bt_block(string $code): array
 {
     return bt_blocks($code, 1)[0] ?? [];
 }
 
-// Элементы инфоблока в формате bt_block + название и HTML анонса: карточки со своими полями, вопросы и ответы
+// Элементы ИБ в формате bt_block + название и HTML анонса
 function bt_blocks(string $code, int $limit = 0): array
 {
     $ibId = bt_iblock($code);
@@ -666,8 +653,7 @@ function bt_blocks(string $code, int $limit = 0): array
     return $list;
 }
 
-// Плашка «Демо» над блоком с тестовым наполнением: текст — описание инфоблока (что запросить у клиента).
-// Выключена на сайте, включается опцией bt/demo_notes = Y; демо-элементы видны в админке по галочке «Демо»
+// Плашка «Демо» с описанием ИБ (что запросить у клиента); включается опцией bt/demo_notes = Y
 function bt_demo_note(string $code, bool $on): string
 {
     if (!$on || \Bitrix\Main\Config\Option::get('bt', 'demo_notes', 'N') !== 'Y') {
@@ -677,7 +663,7 @@ function bt_demo_note(string $code, bool $on): string
     return '<div class="demo-note"><b>Демо-данные</b>' . ($d !== '' ? ' ' . htmlspecialcharsbx($d) : '') . '</div>';
 }
 
-// Карточки спискового инфоблока: название, текст анонса, картинка, иконка
+// Карточки спискового ИБ: название, анонс, картинка, иконка
 function bt_list(string $code): array
 {
     $ibId = bt_iblock($code);
@@ -714,7 +700,7 @@ function bt_list(string $code): array
     return $list;
 }
 
-// Специалисты (ИБ «О компании: команда»): своя страница есть только у того, у кого заполнены адрес (код) и биография
+// Своя страница специалиста — только если заполнены код и биография
 function bt_experts(): array
 {
     $ibId = bt_iblock('about_team');
@@ -750,7 +736,7 @@ function bt_experts(): array
     return $list;
 }
 
-// Отзывы о компании: дата, компания, логотип, благодарственные письма (картинки — в просмотр, PDF — ссылкой)
+// Отзывы о компании; благодарственные письма: картинки — в просмотр, PDF — ссылкой
 function bt_reviews(): array
 {
     $ibId = bt_iblock('reviews');
@@ -793,7 +779,7 @@ function bt_reviews(): array
     return $list;
 }
 
-// ID элементов с галочкой «Показывать на главной» (кофемашины каталога, модели аренды, отзывы)
+// ID элементов с галочкой «Показывать на главной»
 function bt_main_ids(string $code): array
 {
     $ibId = bt_iblock($code);
@@ -817,14 +803,14 @@ function bt_main_ids(string $code): array
     return $ids;
 }
 
-// Разметка без микроданных schema.org: карточки товаров, которые на странице не главные (рекомендации к товару)
+// Без микроданных schema.org — для неглавных карточек на странице (рекомендации к товару)
 function bt_nomicro(string $html): string
 {
     $html = preg_replace('~<(meta|link)\s+itemprop="[^"]*"[^>]*>~i', '', $html);
     return preg_replace('~\s(itemscope|itemtype="[^"]*"|itemprop="[^"]*"|itemid="[^"]*")~i', '', $html);
 }
 
-// Форма отзыва (товар и компания): отправка — BT_reviewForm (ui.js) → /local/ajax/review.php, отзыв уходит на проверку
+// Отправка: BT_reviewForm (ui.js) → /local/ajax/review.php, отзыв уходит на проверку
 function bt_review_form(array $o = []): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -851,7 +837,7 @@ function bt_review_form(array $o = []): string
         . '<button class="btn" type="button" data-send>Отправить отзыв</button><p class="err-form" data-err role="alert"></p></div>';
 }
 
-// Карточка отзыва — одна на все страницы. Длинный текст обрезается, «Читать полностью» открывает окно (ui.js)
+// Одна на все страницы; «Читать полностью» открывает окно (ui.js)
 function bt_rev_card(array $r): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -864,14 +850,14 @@ function bt_rev_card(array $r): string
             ? '<a class="rev__doc rev__doc--pdf" href="' . $e($d['src']) . '" target="_blank" rel="noopener"><span>PDF</span>' . $e($d['cap']) . '</a>'
             : '<a class="rev__doc" href="' . $e($d['src']) . '" data-lbox><img src="' . $e($d['th']) . '" alt="" loading="lazy">' . $e($d['cap']) . '</a>';
     }
-    // отзыв о компании: организация — та же, что в разметке LocalBusiness на всех страницах (itemid = @id)
+    // организация — та же, что в LocalBusiness на всех страницах (itemid = @id)
     $co = bt_contacts();
     $org = '<div hidden itemprop="itemReviewed" itemscope itemtype="https://schema.org/LocalBusiness" itemid="https://beverteam.ru/#org"><meta itemprop="name" content="BEVERTEAM">'
         . (($co['phone1'] ?? '') !== '' ? '<meta itemprop="telephone" content="' . $e($co['phone1']) . '">' : '')
         . '<div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><meta itemprop="streetAddress" content="' . $e($co['street'] ?? '') . '">'
         . '<meta itemprop="addressLocality" content="' . $e($co['city'] ?? '') . '"><meta itemprop="postalCode" content="' . $e($co['zip'] ?? '') . '"></div></div>'
         . (($r['rating'] ?? 0) > 0 ? '<div hidden itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating"><meta itemprop="ratingValue" content="' . (int)$r['rating'] . '"><meta itemprop="bestRating" content="5"></div>' : '');
-    // дата в разметке — всегда (без «Даты отзыва» — дата добавления, на странице её не показываем)
+    // без «Даты отзыва» в разметку идёт дата добавления, на странице её не показываем
     $org .= ($r['date'] === '' ? '<meta itemprop="datePublished" content="' . $r['iso'] . '">' : '')
         . (!empty($r['id']) ? '<link itemprop="url" href="https://beverteam.ru/otzyvy-o-nas/#rev' . (int)$r['id'] . '">' : '');
     return '<article class="rev"' . (!empty($r['id']) ? ' id="rev' . (int)$r['id'] . '"' : '') . ' itemscope itemtype="https://schema.org/Review">' . $org
@@ -884,7 +870,7 @@ function bt_rev_card(array $r): string
         . '</article>';
 }
 
-// Текст товара для вывода: строки через <br> (от трёх коротких подряд) — маркированным списком, таблицы — в обёртке с прокруткой
+// Строки через <br> (от трёх коротких подряд) — списком, таблицы — в обёртке с прокруткой
 function bt_br_list(string $html): string
 {
     $list = function (string $chunk): string {
@@ -902,13 +888,13 @@ function bt_br_list(string $html): string
     return preg_replace(['~<table\b~i', '~</table>~i'], ['<div class="tbl"><table', '</table></div>'], $html);
 }
 
-// SEO-текст из админки: списки через <br> → <ul> и блок вопросов → аккордеон (разметку FAQPage добавляет bt_faq_ld)
+// Списки через <br> → <ul>, блок вопросов → аккордеон (FAQPage добавляет bt_faq_ld)
 function bt_seo_html(string $html): string
 {
     return bt_faq_html(bt_br_list($html));
 }
 
-// После заголовка со словом «вопрос» абзац, который кончается на «?» (или заголовок h3), — вопрос, следующие блоки до нового вопроса — ответ
+// Вопрос — абзац на «?» (или h3) после заголовка со словом «вопрос»; ответ — блоки до следующего вопроса
 function bt_faq_html(string $html): string
 {
     return preg_replace_callback('~(<h2\b[^>]*>(?:(?!</h2>).)*вопрос(?:(?!</h2>).)*</h2>)(.*?)(?=<h2\b|$)~isu', function ($m) {
@@ -933,21 +919,21 @@ function bt_faq_html(string $html): string
     }, $html);
 }
 
-// Иконки разделов каталога (плитки каталога и окно поиска): спрайт выводится один раз в футере, иконка — <use href="#ico-…">.
-// viewBox — по границам рисунка плюс половина линии: иконка стоит ровно по центру круга
+// Спрайт иконок разделов, выводится один раз в футере; иконка — <use href="#ico-…">
+// viewBox — по границам рисунка плюс половина линии: иконка ровно по центру круга
 function bt_cat_sprite(): string
 {
     return '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>   <symbol id="ico-tea" viewBox="3.25 3.25 17.5 17.5"><path d="M4 20C4 11 10 5 20 4c-1 10-7 16-16 16z"/><path d="M4 20c3-6 7-9 12-11"/></symbol>   <symbol id="ico-bean" viewBox="4.38 2.9 15.24 18.2"><ellipse cx="12" cy="12" rx="6" ry="9" transform="rotate(-30 12 12)"/><path d="M8.5 6.5c-2 5 6 8 4 12"/></symbol>   <symbol id="ico-machine" viewBox="4.25 2.25 15.5 19.5"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="4" rx="1"/><path d="M12 13v2M9 18h6"/></symbol>   <symbol id="ico-rent" viewBox="3.25 2.25 20 21"><rect x="4" y="3" width="13" height="16" rx="2"/><rect x="7" y="6" width="7" height="3.5" rx="1"/><circle cx="18" cy="18" r="4.5" class="ico-badge" style="fill:var(--lime)"/><path d="M16.6 20v-4h1.6a1.2 1.2 0 0 1 0 2.4h-2.2M16.2 19.2h2"/></symbol>   <symbol id="ico-cup" viewBox="3.25 7.25 18 13.5"><path d="M5 8h11v6a5.5 5.5 0 0 1-11 0z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M4 20h14"/></symbol> </defs></svg>';
 }
 
-// Точка на карте из «Контакты и реквизиты» (поле «Привязка к Яндекс.Карте»: «широта,долгота») → window.BT_CO_COORDS = [долгота, широта]
+// «широта,долгота» из контактов → window.BT_CO_COORDS = [долгота, широта]
 function bt_map_js(): string
 {
     [$lat, $lon] = array_map('floatval', array_pad(explode(',', (string)(bt_contacts()['map'] ?? '')), 2, 0));
     return $lat && $lon ? ';window.BT_CO_COORDS=' . json_encode([$lon, $lat]) : '';
 }
 
-// Окно поиска: «Часто ищут», карточки «Предложения», разделы каталога — всё из админки
+// Окно поиска: «Часто ищут», «Предложения», разделы каталога
 function bt_search_cfg(): array
 {
     $styles = ['Лаймовый' => 'lime', 'Кофейный' => 'esp', 'Чёрный' => 'dark'];
@@ -965,7 +951,7 @@ function bt_search_cfg(): array
     ];
 }
 
-// Написания одного слова кириллицей и латиницей: «джетино» находит Jetinno, «ботаника» — BOTANICA. Слова — в нижнем регистре, ё = е
+// Написания слова кириллицей и латиницей («джетино» → Jetinno); слова в нижнем регистре, ё = е
 function bt_search_alias(): array
 {
     return [
@@ -990,9 +976,8 @@ function bt_search_alias(): array
     ];
 }
 
-// Поиск по данным сайта (товары, разделы, журнал) — та же логика, что у живого поиска в ui.js (paintResults):
-// слова в любом порядке без окончаний, написания брендов кириллицей и латиницей, другая раскладка — если по набранному пусто;
-// порядок — название совпало лучше описания
+// Логика живого поиска из ui.js (paintResults): слова в любом порядке без окончаний, бренды кириллицей и латиницей,
+// другая раскладка — если по набранному пусто; название весит больше описания
 function bt_search(string $q): array
 {
     $norm = fn(string $s) => preg_replace(['/([a-zа-я])(\d)/u', '/(\d)([a-zа-я])/u'], '$1 $2', str_replace('ё', 'е', mb_strtolower($s)));
@@ -1016,8 +1001,8 @@ function bt_search(string $q): array
         }
         $ws = array_map($alts, $words);
         $hit = fn(string $h) => !array_filter($ws, fn($alt) => !array_filter($alt, fn($a) => str_contains($h, $a)));
-        // 0 — название равно запросу, 1 — начинается с него, 2 — слова запроса отдельными словами названия («кофе», но не «кофемашина»),
-        // 3 — слова внутри слов названия, 4 — совпало только описание
+        // 0 — название = запрос, 1 — начинается с него, 2 — слова запроса отдельными словами («кофе», не «кофемашина»),
+        // 3 — внутри слов названия, 4 — совпало только описание
         $rank = function (string $title) use ($norm, $q, $ws): int {
             $t = $norm($title);
             $qq = $norm(trim($q));
@@ -1069,7 +1054,7 @@ function bt_search(string $q): array
     return ['q' => $used, 'fixed' => $used !== $q, 'prod' => $res[0], 'pages' => $res[1], 'posts' => $res[2]];
 }
 
-// Запрос в другой раскладке: «rjat» → «кофе», «ощеттщ» → «jetinno»; пустая строка — если переключать нечего
+// «rjat» → «кофе», «ощеттщ» → «jetinno»; '' — если переключать нечего
 function bt_layout_swap(string $q): string
 {
     $en = str_split('qwertyuiop[]asdfghjkl;\'zxcvbnm,.`');
@@ -1099,7 +1084,7 @@ function bt_svg(int $fileId): string
     return preg_replace('/<svg\b/i', '<svg aria-hidden="true" focusable="false"', trim($svg), 1);
 }
 
-// Кнопка блока: ссылка #zayavka открывает попап заявки с темой = текст кнопки
+// Ссылка #zayavka открывает попап заявки, тема = текст кнопки
 function bt_btn(string $text, string $link, string $cls = 'btn', string $attrs = ''): string
 {
     if ($text === '') {
@@ -1112,7 +1097,7 @@ function bt_btn(string $text, string $link, string $cls = 'btn', string $attrs =
     return '<a class="' . $cls . '" href="' . $e($link ?: '#') . '"' . $attrs . '>' . $e($text) . '</a>';
 }
 
-// Заголовок блока: переносы строк из поля, выделенная часть — в теге $tag
+// Переносы строк из поля, выделенная часть — в теге $tag
 function bt_title(string $title, string $mark = '', string $tag = 'em'): string
 {
     $h = nl2br(htmlspecialcharsbx($title), false);
@@ -1126,7 +1111,7 @@ function bt_title(string $title, string $mark = '', string $tag = 'em'): string
     return $h;
 }
 
-// Материалы журнала для поиска в шапке и карточек: формат BT_POSTS из ui.js
+// Материалы журнала в формате BT_POSTS из ui.js
 function bt_posts(): array
 {
     $ibId = bt_iblock('journal');
@@ -1148,7 +1133,7 @@ function bt_posts(): array
     return $posts;
 }
 
-// Поля элемента журнала (выборка с IBLOCK_SECTION_ID и PROPERTY_KIND/RUBRIC/READ_TIME) → формат BT_POSTS; рубрика — раздел инфоблока
+// Ждёт выборку с IBLOCK_SECTION_ID и PROPERTY_KIND/RUBRIC/READ_TIME; рубрика — раздел ИБ
 function bt_post_data(array $f): array
 {
     $kind = 'article';
@@ -1173,8 +1158,8 @@ function bt_date_ru(string $iso): string
     return $t ? date('j', $t) . ' ' . $m[date('n', $t) - 1] . ' ' . date('Y', $t) : '';
 }
 
-// Карточка под оглавлением статьи (ИБ «Журнал: карточка под оглавлением»): своя для рубрики, иначе общая — без рубрик.
-// #PRICE# в тексте — «от N ₽» по разделу из ссылки; без картинки берётся фото самого дешёвого товара раздела
+// Карточка под оглавлением статьи: своя для рубрики, иначе общая
+// #PRICE# — «от N ₽» по разделу из ссылки; без картинки — фото самого дешёвого товара раздела
 function bt_journal_promo(int $sectionId): ?array
 {
     $all = bt_blocks('journal_promo');
@@ -1201,7 +1186,7 @@ function bt_journal_promo(int $sectionId): ?array
         'img' => bt_img($b['pic_id'], 160, 160) ?: ($items[0]['img'] ?? '')];
 }
 
-// Карточка журнала — серверная копия BT_postCard() из ui.js; без фото — фирменная заглушка (рисует BT_phFit)
+// Серверная копия BT_postCard() из ui.js; без фото — заглушка (рисует BT_phFit)
 function bt_post_card(array $p): string
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -1214,9 +1199,8 @@ function bt_post_card(array $p): string
         . '<div class="ncard__t th th3"><span>' . $e($p['t']) . '</span></div><p>' . $e($p['lead']) . '</p></div></a>';
 }
 
-// Модели аренды для главной: подбор на первом экране и «кофе по подписке»
-// Подстановки в текстах сайта (блоки, статьи, SEO): считаются по активным моделям аренды, в админке остаются метками.
-// Вызывается из обработчика буфера — без кеша Битрикса: кеш открывает свой буфер, а внутри обработчика буфера это фатальная ошибка
+// Метки #RENT_…# в текстах — по активным моделям аренды
+// Без кеша Битрикса: вызывается из обработчика буфера, а кеш открывает свой буфер — фатальная ошибка
 function bt_rent_tokens(): array
 {
     if (!Loader::includeModule('iblock')) {
@@ -1246,7 +1230,7 @@ function bt_rent_tokens(): array
     ];
 }
 
-// main:OnEndBufferContent — метки #RENT_…# в готовой странице заменяются значениями
+// main:OnEndBufferContent: метки #RENT_…# → значения
 function bt_tokens_buffer(&$content): void
 {
     if (defined('ADMIN_SECTION') || !str_contains($content, '#RENT_')) {
@@ -1255,7 +1239,7 @@ function bt_tokens_buffer(&$content): void
     $content = strtr($content, bt_rent_tokens());
 }
 
-// main:OnEndBufferContent — общий скрипт шаблона с defer: страница рисуется до выполнения JS. Встроенные скрипты страниц ждут DOMContentLoaded
+// main:OnEndBufferContent: скрипт шаблона с defer — встроенные скрипты страниц ждут DOMContentLoaded
 function bt_defer_buffer(&$content): void
 {
     if (!defined('ADMIN_SECTION')) {
@@ -1263,8 +1247,8 @@ function bt_defer_buffer(&$content): void
     }
 }
 
-// main:OnEndBufferContent — неразрывные пробелы в числах, суммах и датах: «8 000 ₽», «до 17:00», «20 октября 2026» не рвутся по строкам.
-// Меняется только текст между тегами HTML-страницы: скрипты, стили, атрибуты и ответы не-HTML не трогаем
+// main:OnEndBufferContent: неразрывные пробелы в числах, суммах и датах («8 000 ₽», «до 17:00»)
+// Только текст между тегами HTML-страниц: скрипты, стили, атрибуты и не-HTML не трогаем
 function bt_nbsp_buffer(&$content): void
 {
     if (defined('ADMIN_SECTION') || stripos(substr($content, 0, 300), '<html') === false && stripos(substr($content, 0, 300), '<!doctype') === false) {
@@ -1286,7 +1270,7 @@ function bt_nbsp_buffer(&$content): void
         fn($m) => isset($m[3]) && $m[3] !== '' && preg_match('/\d|—/u', $m[3]) ? preg_replace(array_keys($re), $re, $m[3]) : $m[0], $content) ?? $content;
 }
 
-// title и description страницы: вкладка SEO элемента первого блока в админке, если заполнена, иначе текст по умолчанию
+// title/description — из вкладки SEO первого блока страницы, иначе переданные по умолчанию
 function bt_page_seo(string $blockCode, string $title, string $description): void
 {
     global $APPLICATION;
@@ -1341,7 +1325,7 @@ function bt_rent_by_code(string $code): ?array
     return null;
 }
 
-// Установки для страницы «Наши клиенты»: фото, клиент, город, тип объекта, модель из каталога (ссылка — на аренду, если модель в аренде)
+// Установки «Наши клиенты»; ссылка модели — на аренду, если модель в аренде
 function bt_clients(): array
 {
     $ibId = bt_iblock('clients');
@@ -1384,7 +1368,7 @@ function bt_clients(): array
     return $list;
 }
 
-// Прайс-лист (/price/): товары каталога по разделам — [код раздела => [name, url, subs => [название подраздела => [товары bt_product]]]]
+// [код раздела => [name, url, subs => [название подраздела => [товары bt_product]]]]
 function bt_price_list(): array
 {
     $catId = bt_iblock('catalog');
@@ -1430,8 +1414,7 @@ function bt_price_list(): array
     return array_filter($tree, fn($t) => $t['cnt'] > 0);
 }
 
-// Скидки от суммы заказа — из правил корзины с XML_ID bt_sum_*: [['from' => 20000, 'pct' => 5], …] по возрастанию порога.
-// Порог и процент меняют в админке (Магазин → Правила работы с корзиной), сайт подхватывает их сам.
+// Скидки от суммы — правила корзины с XML_ID bt_sum_* (правятся в админке): [['from' => 20000, 'pct' => 5], …] по возрастанию
 function bt_sum_discounts(): array
 {
     if (!\Bitrix\Main\Loader::includeModule('sale')) {
@@ -1460,7 +1443,7 @@ function bt_sum_discounts(): array
     return $out;
 }
 
-// Агент: цены каталога изменились (обмен с 1С, админка) — письмо подписчикам прайса. Раз в час; ждёт 2 часа тишины, чтобы правка цен пачкой дала одно письмо
+// Агент раз в час: письмо подписчикам прайса после 2 часов без правок цен (пачка правок = одно письмо)
 function bt_price_notify_agent(): string
 {
     $ts = bt_price_date();
@@ -1470,7 +1453,7 @@ function bt_price_notify_agent(): string
     return 'bt_price_notify_agent();';
 }
 
-// Письмо «Цены обновились» всем активным подписчикам прайса; отметка, чтобы агент не повторил. Возвращает число писем
+// Ставит отметку, чтобы агент не повторил; возвращает число писем
 function bt_price_notify_send(int $ts): int
 {
     $n = 0;
@@ -1487,7 +1470,7 @@ function bt_price_notify_send(int $ts): int
     return $n;
 }
 
-// Подписка на журнал: адрес попадает в ИБ journal_subs выключенным и включается по ссылке из письма BT_JOURNAL_CONFIRM
+// Адрес попадает в journal_subs выключенным, включается по ссылке из письма BT_JOURNAL_CONFIRM
 function bt_journal_subscribe(string $email): bool
 {
     if (!($ib = bt_iblock('journal_subs'))) {
@@ -1512,7 +1495,7 @@ function bt_journal_subscribe(string $email): bool
     return true;
 }
 
-// Агент раз в сутки: 1-го числа подборка журнала, если с прошлой вышло не меньше bt/journal_digest_min материалов (иначе ждём следующего месяца)
+// Агент раз в сутки: 1-го числа подборка, если с прошлой вышло не меньше bt/journal_digest_min материалов
 function bt_journal_digest_agent(): string
 {
     if ((int)date('j') === 1 && \Bitrix\Main\Config\Option::get('bt', 'journal_digest_month') !== date('Y-m')) {
@@ -1522,7 +1505,7 @@ function bt_journal_digest_agent(): string
     return 'bt_journal_digest_agent();';
 }
 
-// Подборка новых материалов журнала подписчикам; $to — проверка: только этому подписчику, без порога и без сдвига отметки «прошлая подборка»
+// $to — тестовая отправка: только ему, без порога и без сдвига отметки «прошлая подборка»
 function bt_journal_digest_send(string $to = ''): int
 {
     $opt = fn(string $k, string $d = '') => \Bitrix\Main\Config\Option::get('bt', $k, $d);
@@ -1555,7 +1538,6 @@ function bt_journal_digest_send(string $to = ''): int
     return $n;
 }
 
-// Карточки материалов для письма: обложка, рубрика, заголовок, анонс
 function bt_journal_digest_html(array $posts, string $host): string
 {
     $e = fn($s) => htmlspecialcharsbx($s);
@@ -1580,14 +1562,14 @@ function bt_journal_digest_html(array $posts, string $host): string
     return $out;
 }
 
-// Может ли текущий пользователь править цены прямо на странице прайса (право каталога «Изменение цен»; у администраторов есть всегда)
+// Правка цен на странице прайса: право каталога «Изменение цен» (администраторам — всегда)
 function bt_price_editor(): bool
 {
     global $USER;
     return is_object($USER) && $USER->IsAuthorized() && $USER->CanDoOperation('catalog_price');
 }
 
-// Дата последнего изменения товаров или цен каталога — «Цены актуальны на …»
+// Последнее изменение товаров или цен — для «Цены актуальны на …»
 function bt_price_date(): int
 {
     $catId = bt_iblock('catalog');
@@ -1600,7 +1582,7 @@ function bt_price_date(): int
     return $ts ?: time();
 }
 
-// Область, общая для всех городов, в родительном падеже («Свердловской области») по справочнику местоположений; города из разных областей или не найдены — пусто
+// Общая область городов в родительном падеже («Свердловской области»); разные области или не найдены — ''
 function bt_cities_region(array $cities): string
 {
     $cities = array_values(array_unique(array_filter($cities)));
@@ -1628,7 +1610,7 @@ function bt_cities_region(array $cities): string
     return $out;
 }
 
-// Плитка разделов на главной и в каталоге: корневые разделы каталога с картинкой раздела и иконкой + аренда
+// Плитка разделов (главная и каталог): корневые разделы + аренда
 function bt_home_tiles(): array
 {
     $catId = bt_iblock('catalog');
@@ -1643,7 +1625,7 @@ function bt_home_tiles(): array
     $plural = fn(int $n, array $w) => $n . ' ' . $w[($n % 10 === 1 && $n % 100 !== 11) ? 0 : (($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2)];
     $tiles = [];
     $r = \CIBlockSection::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $catId, 'ACTIVE' => 'Y', 'DEPTH_LEVEL' => 1, 'CNT_ACTIVE' => 'Y'], true, ['ID', 'CODE', 'NAME', 'PICTURE', 'SECTION_PAGE_URL', 'LEFT_MARGIN', 'RIGHT_MARGIN']);
-    // иконка плитки в каталоге — по символьному коду раздела; новый раздел получит чашку
+    // иконка — по символьному коду раздела; новый раздел получит чашку
     $icons = ['chay' => 'tea', 'kofe' => 'bean', 'professionalnye-kofemashiny' => 'machine', 'aksessuary' => 'cup'];
     while ($s = $r->GetNext()) {
         $subs = (int)(($s['RIGHT_MARGIN'] - $s['LEFT_MARGIN'] - 1) / 2);
@@ -1666,7 +1648,7 @@ function bt_home_tiles(): array
     return $tiles;
 }
 
-// защита от ботов: не больше $max записей $type в журнале событий за $sec секунд с этого IP; администраторам не мешает проверять
+// Защита от ботов: не больше $max записей $type с IP за $sec сек по журналу событий; админам не мешает
 function bt_ip_flood(string $type, int $max, int $sec): bool
 {
     return !(($GLOBALS['USER'] ?? null) instanceof CUser && $GLOBALS['USER']->IsAdmin())
@@ -1679,7 +1661,7 @@ function bt_ip_hit(string $type, string $item = ''): void
     CEventLog::Add(['SEVERITY' => 'SECURITY', 'AUDIT_TYPE_ID' => $type, 'MODULE_ID' => 'main', 'ITEM_ID' => $item, 'DESCRIPTION' => '']);
 }
 
-// Хвост формы заявки: sessid, ловушка для ботов, согласие, кнопка — одинаково во всех формах
+// Хвост формы заявки: sessid, ловушка для ботов, согласие, кнопка
 function bt_form_tail(string $btn = 'Отправить заявку'): string
 {
     return '<input type="hidden" name="sessid" value="' . bitrix_sessid() . '">'
@@ -1688,14 +1670,12 @@ function bt_form_tail(string $btn = 'Отправить заявку'): string
         . '<button class="btn btn--block" type="submit">' . htmlspecialcharsbx($btn) . '</button>';
 }
 
-// Хлебные крошки страницы: выводятся в конце сборки, когда цепочка уже полная
+// Выводятся в конце сборки страницы, когда цепочка уже полная
 function bt_crumbs(): void
 {
     global $APPLICATION;
     $APPLICATION->AddBufferContent([$APPLICATION, 'GetNavChain'], false, 0, SITE_TEMPLATE_PATH . '/components/bitrix/breadcrumb/bt/template.php', true, false);
 }
-
-// ---------- покупатель и личный кабинет ----------
 
 // Телефон → 11 цифр с 7 в начале, иначе пустая строка
 function bt_phone_digits(string $s): string
@@ -1722,7 +1702,7 @@ function bt_phone_fmt(string $s): string
     return $d ? '+7 (' . substr($d, 1, 3) . ') ' . substr($d, 4, 3) . '-' . substr($d, 7, 2) . '-' . substr($d, 9, 2) : $s;
 }
 
-// Покупатель по телефону: в профилях номера записаны по-разному — сравниваем цифры
+// Номера в профилях записаны по-разному — сравниваем цифры
 function bt_user_by_phone(string $digits): ?array
 {
     $r = \Bitrix\Main\UserTable::getList([
@@ -1737,7 +1717,7 @@ function bt_user_by_phone(string $digits): ?array
     return null;
 }
 
-// Новый покупатель (логин = e-mail, пароль случайный — входят по коду). Возвращает ID или текст ошибки
+// Логин = e-mail, пароль случайный (вход по коду); возвращает ID или текст ошибки
 function bt_user_create(string $email, string $name, string $phone = ''): int|string
 {
     $rnd = \Bitrix\Main\Security\Random::class;
@@ -1755,7 +1735,7 @@ function bt_user_create(string $email, string $name, string $phone = ''): int|st
     return $id ?: strip_tags((string)$u->LAST_ERROR);
 }
 
-// Текущий покупатель для ui.js (window.BT_USER), гостю — null
+// window.BT_USER для ui.js; гостю — null
 function bt_user_js(): ?array
 {
     global $USER;
@@ -1769,13 +1749,13 @@ function bt_user_js(): ?array
         'photo' => $u['PERSONAL_PHOTO'] ? (string)(CFile::ResizeImageGet($u['PERSONAL_PHOTO'], ['width' => 96, 'height' => 96], BX_RESIZE_IMAGE_EXACT)['src'] ?? '') : ''] : null;
 }
 
-// Кнопки входа через сервисы для ui.js: только включённые в модуле «Социальные сервисы» и с заполненными ключами
+// Кнопки входа через сервисы: только включённые в «Социальных сервисах» и с ключами
 function bt_idp(): array
 {
     return Loader::includeModule('socialservices') ? BtOAuth::buttons() : [];
 }
 
-// Причина неудачного входа через сервис ['msg', 'email'] — один раз, для окна входа после возврата
+// Ошибка входа через сервис ['msg', 'email'] — отдаётся один раз, для окна входа после возврата
 function bt_idp_error(): array
 {
     $e = (array)($_SESSION['BT_OAUTH_ERR'] ?? []);
@@ -1783,7 +1763,7 @@ function bt_idp_error(): array
     return $e;
 }
 
-// Профили покупателя (реквизиты юрлиц — UR, адреса доставки — FIZ): [id, name, v => значения по коду свойства]
+// Профили покупателя (UR — реквизиты юрлиц, FIZ — адреса доставки): [id, name, v => значения по коду свойства]
 function bt_profiles(int $userId, string $ptCode): array
 {
     \Bitrix\Main\Loader::includeModule('sale');
@@ -1803,7 +1783,7 @@ function bt_profiles(int $userId, string $ptCode): array
     return array_values($list);
 }
 
-// Название местоположения по коду: «Екатеринбург» и область для подсказки
+// Город и область по коду местоположения — для подсказки
 function bt_loc(string $code): array
 {
     if ($code === '' || !\Bitrix\Main\Loader::includeModule('sale')) {
@@ -1814,7 +1794,7 @@ function bt_loc(string $code): array
     return $l ? ['n' => $l['N'], 'r' => in_array($l['RT'], ['REGION', 'SUBREGION']) ? $l['R'] : ''] : ['n' => '', 'r' => ''];
 }
 
-// Адреса доставки покупателя: основной — первым
+// Адреса доставки покупателя, основной — первым
 function bt_addresses(int $userId): array
 {
     $main = (int)CUserOptions::GetOption('bt', 'main_addr', 0, $userId);
@@ -1831,7 +1811,7 @@ function bt_addresses(int $userId): array
     return $list;
 }
 
-// Адрес доставки из заказа — в кабинет покупателя и основным; такой же адрес (город, улица и дом, квартира) второй раз не добавляем
+// Адрес из заказа — в кабинет и основным; дубль (город, улица и дом, квартира) не добавляем
 function bt_address_remember(int $userId, string $loc, string $street, string $flat, string $entr, string $who, string $tel): void
 {
     if ($userId <= 0 || $loc === '' || trim($street) === '' || !Loader::includeModule('sale')) {
@@ -1865,7 +1845,7 @@ function bt_cdek_formation(array &$f, $orderId, $descr): void
     }
 }
 
-// Этап заказа — один на бейдж, шкалу, список заказов и профиль. $o: STATUS_ID, CANCELED, PAYED; BILL — по счёту; PICKUP, SHIPPED — из bt_order_ship_info()
+// Один этап на бейдж, шкалу, список и профиль; $o: STATUS_ID, CANCELED, PAYED, BILL, PICKUP/SHIPPED из bt_order_ship_info()
 function bt_order_stage(array $o): string
 {
     $st = (string)($o['STATUS_ID'] ?? '');
@@ -1881,7 +1861,7 @@ function bt_order_stage(array $o): string
     };
 }
 
-// Статус заказа для кабинета: [текст, css-класс]
+// [текст, css-класс] для кабинета
 function bt_order_status(array $o): array
 {
     return match (bt_order_stage($o)) {
@@ -1894,10 +1874,8 @@ function bt_order_status(array $o): array
     };
 }
 
-// sale:OnSaleOrderBeforeSaved — статус заказа в админке всегда совпадает с тем, что видит покупатель:
-// оплата переводит в «Оплачен, формируется к отправке» только неотправленный заказ (штатный sale.status_on_paid откатил бы отправленный назад);
-// трек-номер СДЭК, статус отгрузки «Передан в службу доставки» / «Отгружен» или галочка «Отгружено» — «Передан в доставку»;
-// «Готов к выдаче» бывает только у самовывоза, «Передан в доставку» — только у доставки: перепутанный статус исправляем
+// sale:OnSaleOrderBeforeSaved: оплата ставит P только неотправленному заказу — штатный sale.status_on_paid откатывал отправленный назад
+// трек-номер СДЭК, отгрузка или галочка «Отгружено» → S; R — только у самовывоза, S — только у доставки
 function bt_order_ship_guard(\Bitrix\Main\Event $e): void
 {
     $order = $e->getParameter('ENTITY');
@@ -1925,7 +1903,7 @@ function bt_order_ship_guard(\Bitrix\Main\Event $e): void
     $to !== $st && $order->setField('STATUS_ID', $to);
 }
 
-// Доставка заказов для кабинета: [ID => [DCODE, PICKUP, TRACK, SHIPPED]]. Отправлен — отметка «Отгружен» или статус отгрузки в админке, у СДЭК — трек-номер
+// [ID => [DCODE, PICKUP, TRACK, SHIPPED]]; отправлен — отметка «Отгружен» или статус отгрузки, у СДЭК — трек-номер
 function bt_order_ship_info(array $ids): array
 {
     $ids = array_filter(array_map('intval', $ids));
@@ -1945,14 +1923,14 @@ function bt_order_ship_info(array $ids): array
     return $out;
 }
 
-// Заказ оплачивается по счёту (или другим способом: cash — при получении)
+// Оплата по счёту (или другим способом: cash — при получении)
 function bt_order_by_bill(int $orderId, string $action = 'bill'): bool
 {
     $ps = array_column(\Bitrix\Sale\Internals\PaySystemActionTable::getList(['filter' => ['=ACTION_FILE' => $action], 'select' => ['ID']])->fetchAll(), 'ID');
     return $ps && (bool)\Bitrix\Sale\Internals\PaymentTable::getList(['filter' => ['=ORDER_ID' => $orderId, '@PAY_SYSTEM_ID' => $ps], 'select' => ['ID'], 'limit' => 1])->fetch();
 }
 
-// Кабинет: гостю — приглашение войти (окно входа откроется само); true — можно выводить страницу
+// Гостю — приглашение войти (окно откроется само); true — можно выводить страницу
 function bt_acc_guard(): bool
 {
     global $USER;
@@ -1966,7 +1944,7 @@ function bt_acc_guard(): bool
     return false;
 }
 
-// Кабинет: крошки, заголовок и меню разделов; $head — готовый HTML заголовка
+// Начало страницы кабинета: крошки, заголовок, меню; $head — готовый HTML заголовка
 function bt_acc_start(string $cur, string $head, string $sub = ''): void
 {
     global $USER;
@@ -2000,8 +1978,7 @@ function bt_acc_end(): void
     echo '</div></div></div>';
 }
 
-// Open Graph и canonical: считаются после выполнения страницы (AddBufferContent); тип и картинку страница задаёт свойствами og_type / og_image
-// main:OnEpilog — SEO-описание из инфоблока приходит уже экранированным, ShowHead экранирует ещё раз: в сниппете было бы «&quot;»
+// main:OnEpilog: SEO-описание из ИБ уже экранировано, а ShowHead экранирует ещё раз
 function bt_desc_unescape(): void
 {
     global $APPLICATION;
@@ -2011,6 +1988,7 @@ function bt_desc_unescape(): void
     }
 }
 
+// Open Graph и canonical — через AddBufferContent, после выполнения страницы; страница задаёт og_type / og_image
 function bt_og(): string
 {
     global $APPLICATION;
@@ -2020,7 +1998,7 @@ function bt_og(): string
     $title = $APPLICATION->GetPageProperty('title') ?: $APPLICATION->GetTitle();
     // посадочная страница (в т.ч. страница фильтра) — canonical на себя, иначе поисковик склеит её с чистым адресом
     $url = $host . (function_exists('bt_landing') && bt_landing() ? bt_url_key((string)$_SERVER['REQUEST_URI']) : $APPLICATION->GetCurPage(false));
-    // картинки и адрес для соцсетей — с того домена, где открыта страница: на тестовом домене файлов боевого сайта нет
+    // картинки и адрес для соцсетей — с текущего домена: на тестовом нет файлов боевого сайта
     $self = 'https://' . preg_replace('/[^a-z0-9.\-]/i', '', $_SERVER['HTTP_HOST'] ?? 'beverteam.ru');
     $img = $APPLICATION->GetPageProperty('og_image') ?: '/local/templates/beverteam/images/og-logo.png';
     $img = str_starts_with($img, 'http') ? $img : $self . bt_og_card($img);
@@ -2037,7 +2015,7 @@ function bt_og(): string
     return $html;
 }
 
-// Организация для поисковиков: JSON-LD из контактов сайта (ИБ «Контакты и реквизиты»), на всех страницах
+// JSON-LD организации из контактов сайта, на всех страницах
 function bt_org_ld(): string
 {
     $co = bt_contacts();
@@ -2064,7 +2042,7 @@ function bt_org_ld(): string
     return '<script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
 }
 
-// FAQPage для поисковиков из блоков вопросов-ответов на готовой странице (details/summary внутри .faq); обработчик OnEndBufferContent
+// OnEndBufferContent: JSON-LD FAQPage из блоков .faq (details/summary) готовой страницы
 function bt_faq_ld(&$content): void
 {
     if (defined('ADMIN_SECTION') || !str_contains($content, 'faq') || str_contains($content, '"FAQPage"') || !str_contains($content, '</head>')) {
@@ -2096,13 +2074,13 @@ function bt_faq_ld(&$content): void
     }
 }
 
-// Яндекс.Метрика — счётчик старого сайта, только на боевом домене: заходы с dev не портят статистику клиента
-// «Наши клиенты» скрыты: без ссылок и sitemap, посетителям 404, админу видна; включить — Option bt/clients_page = Y
+// «Наши клиенты» скрыты (404, без ссылок и sitemap, админу видна); включить — Option bt/clients_page = Y
 function bt_clients_on(): bool
 {
     return \Bitrix\Main\Config\Option::get('bt', 'clients_page', 'N') === 'Y';
 }
 
+// Только на боевом домене: заходы с dev не портят статистику клиента
 function bt_metrika(): string
 {
     if (!preg_match('/^(www\.)?beverteam\.ru$/i', $_SERVER['HTTP_HOST'] ?? '')) {
@@ -2117,7 +2095,7 @@ window.dataLayer=window.dataLayer||[];ym(110309111,"init",{clickmap:true,trackLi
 HTML;
 }
 
-// sitemap.xml из реальных данных: страницы, разделы и товары каталога, статьи, бренды ремонта; вызывается агентом раз в сутки
+// Агент раз в сутки: страницы, разделы и товары каталога, статьи, бренды ремонта
 function bt_sitemap_build(): string
 {
     Loader::includeModule('iblock');
@@ -2161,7 +2139,7 @@ function bt_sitemap_build(): string
     return 'bt_sitemap_build();';
 }
 
-// Паролей у покупателей нет: вход по паролю и смена пароля — только для администраторов (группа 1). Обработчики OnBeforeUserLogin / OnBeforeUserChangePassword
+// Паролей у покупателей нет: по паролю входят только администраторы (группа 1)
 function bt_is_admin_login(string $login): bool
 {
     $u = \Bitrix\Main\UserTable::getList(['filter' => ['=LOGIN' => $login], 'select' => ['ID'], 'limit' => 1])->fetch();
@@ -2186,7 +2164,7 @@ function bt_password_change_guard(array &$fields): bool
     return false;
 }
 
-// Разделы и услуги для поиска (шапка и /search/): страницы сайта + направления сервиса + модели в аренду; k — слова, по которым находится
+// Разделы и услуги для поиска: страницы сайта, направления сервиса, модели в аренду; k — слова для поиска
 function bt_search_pages(): array
 {
     $dirs = bt_iblock('servis_dirs');
@@ -2221,7 +2199,6 @@ function bt_search_pages(): array
             $pages[] = ['t' => $f['NAME'], 'u' => $u, 'd' => 'Услуга · ' . trim(strip_tags((string)$f['PREVIEW_TEXT'])), 'k' => 'услуги'];
         }
     }
-    // рубрики журнала — отдельными разделами
     $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . bt_iblock('journal'));
     foreach (bt_blog_rubrics() as $rb) {
         $pages[] = ['t' => $rb['name'], 'u' => $rb['url'], 'd' => 'Журнал · статьи: ' . $rb['cnt'], 'k' => 'журнал статьи советы'];
@@ -2234,7 +2211,7 @@ function bt_search_pages(): array
     return $pages;
 }
 
-// Рубрики журнала (разделы инфоблока journal) с числом активных материалов; пустые рубрики не показываем
+// Рубрики журнала с числом активных материалов; пустые не показываем
 function bt_blog_rubrics(): array
 {
     $ibId = bt_iblock('journal');
@@ -2257,7 +2234,7 @@ function bt_blog_rubrics(): array
     return $list;
 }
 
-// Меню строятся из инфоблоков (каталог, аренда, рубрики журнала), а кеш компонента меню без тегов — сбрасываем его при правке этих инфоблоков
+// Кеш компонента меню без тегов, а меню строятся из ИБ — сбрасываем при их правке
 function bt_menu_cache_reset($fields): void
 {
     static $done = false;
@@ -2269,7 +2246,7 @@ function bt_menu_cache_reset($fields): void
     \CBitrixComponent::clearComponentCache('bitrix:menu');
 }
 
-// Реквизиты для «Контактов» и PDF: только заполненные поля ИБ «Контакты и реквизиты», по порядку карточки предприятия
+// Только заполненные поля ИБ «Контакты и реквизиты», по порядку карточки предприятия
 function bt_requisites(): array
 {
     $co = bt_contacts();
@@ -2291,7 +2268,6 @@ function bt_requisites(): array
     return array_values(array_filter($rows, fn($r) => trim((string)$r[1]) !== ''));
 }
 
-// Теги журнала: поле элемента «Теги» (через запятую) → список; облако — все теги с числом материалов, частые первыми
 function bt_tags_split(string $tags): array
 {
     return array_values(array_unique(array_filter(array_map(fn($t) => trim($t), explode(',', $tags)), 'strlen')));
@@ -2314,7 +2290,7 @@ function bt_tag_url(string $tag): string
     return '/blog/?tag=' . rawurlencode($tag);
 }
 
-// Картинка для соцсетей 1200×630: фото (часто вертикальное) вписывается целиком на фирменный фон. Готовый файл кешируется в /upload/bt_og/
+// Картинка 1200×630 для соцсетей: фото вписывается целиком на фирменный фон, кеш — /upload/bt_og/
 function bt_og_card(string $src): string
 {
     $root = $_SERVER['DOCUMENT_ROOT'];

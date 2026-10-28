@@ -1,7 +1,6 @@
 <?php
-// Тестовые письма всех оформленных шаблонов на один адрес: заказ в памяти из товаров каталога, в БД ничего не сохраняется.
+// Тестовые письма всех шаблонов на один адрес (подменяет всех получателей); заказ собирается в памяти, в БД ничего не пишется.
 // Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_mail_test.php <e-mail> [СОБЫТИЕ ...]
-// Любое письмо, отправленное этим процессом, уходит только на <e-mail>: получатель, копия и скрытая копия подменяются.
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -117,7 +116,7 @@ foreach ($events as $event => $fields) {
     if ($only && !in_array($event, $only, true)) {
         continue;
     }
-    // BT_MAIL_PREVIEW=<папка> — собрать письма в html-файлы, ничего не отправляя
+    // BT_MAIL_PREVIEW=<папка> — письма в html-файлы, без отправки
     if ($dir = getenv('BT_MAIL_PREVIEW')) {
         $r = CEventMessage::GetList('id', 'asc', ['TYPE_ID' => $event, 'SITE_ID' => 's1', 'ACTIVE' => 'Y']);
         while ($m = $r->Fetch()) {

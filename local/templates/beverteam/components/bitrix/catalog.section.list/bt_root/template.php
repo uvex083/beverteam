@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @var array $arParams */
-// Разделы каталога плитками — те же данные, что в блоке «Каталог» на главной (bt_home_tiles): название, подпись, иконка; аренда — не раздел каталога, здесь её нет
+// те же плитки, что в блоке «Каталог» на главной (bt_home_tiles), без аренды
 $cur = (int)($arParams['BT_CUR_ROOT'] ?? 0);
 $e = fn($v) => htmlspecialcharsbx((string)$v);
 ?>

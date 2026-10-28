@@ -1,5 +1,5 @@
 <?php
-// Верхнее меню шапки: DEPTH_LEVEL 2 — пункты выпадающего списка
+// DEPTH_LEVEL 2 — пункты выпадающего списка
 $sub = ['DEPTH_LEVEL' => 2];
 $aMenuLinks = [
     ['Магазин', '/catalog/', [], ['DEPTH_LEVEL' => 1], ''],

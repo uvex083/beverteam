@@ -1,5 +1,5 @@
 <?php
-// Карточка предприятия для кнопки «Скачать реквизиты» в «Контактах»: загруженный клиентом файл или PDF из полей ИБ «Контакты и реквизиты»
+// «Скачать реквизиты»: файл, загруженный клиентом, иначе PDF из полей ИБ «Контакты и реквизиты»
 define('NO_KEEP_STATISTIC', true);
 define('NOT_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -23,7 +23,7 @@ $pdf->AddPage();
 $t = fn($s) => CSalePdf::prepareToPdf((string)$s);
 $w = $pdf->GetPageWidth() - 100;
 
-// шапка: фирменная полоса и логотип (JPG — PDF-библиотека не понимает прозрачность PNG)
+// логотип JPG: PDF-библиотека не понимает прозрачность PNG
 $pdf->SetFillColor(14, 14, 12);
 $pdf->Rect(0, 0, $pdf->GetPageWidth(), 110, 'F');
 $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/local/templates/beverteam/brand/logo-pdf.jpg', 50, 30, 162, 34);
@@ -41,7 +41,6 @@ $pdf->SetTextColor(108, 108, 100);
 $pdf->Cell($w, 16, $t('Реквизиты для договоров и счетов · актуально на ' . date('d.m.Y')), 0, 1);
 $pdf->Ln(16);
 
-// строки реквизитов: подпись слева, значение справа, тонкий разделитель
 $lw = 170;
 $pdf->SetDrawColor(220, 220, 212);
 foreach ($rows as [$label, $value]) {

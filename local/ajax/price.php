@@ -1,6 +1,5 @@
 <?php
-// Подписка на изменение цен прайс-листа: POST action=sub (email, agree, sessid) → {ok}; GET unsub=<ключ> — отписка по ссылке из письма.
-// Редактор цен на странице прайса (право «Изменение цен»): action=ed_load — товары и журнал, ed_save — сохранить, ed_import — разобрать файл Excel/CSV
+// Прайс-лист: подписка на изменение цен (отписка — unsub=<ключ>) и редактор цен (право «Изменение цен»)
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
@@ -61,7 +60,7 @@ if ($req->getPost('agree') !== 'Y') {
 if ($err) {
     $out(200, ['ok' => false, 'errors' => $err]);
 }
-// не чаще раза в 15 секунд из сессии и не больше 5 подписок за 10 минут с одного IP
+// антиспам: раз в 15 с на сессию и 5 подписок за 10 мин с IP
 if (time() - (int)($_SESSION['BT_PRICE_SUB'] ?? 0) < 15 || bt_ip_flood('BT_PRICE_SUB', 5, 600)) {
     $out(429, ['ok' => false, 'error' => 'rate', 'message' => 'Слишком много подписок подряд. Попробуйте через 10 минут.']);
 }
@@ -77,9 +76,7 @@ $_SESSION['BT_PRICE_SUB'] = time();
 bt_ip_hit('BT_PRICE_SUB');
 $out(200, ['ok' => true]);
 
-// ---------- редактор цен ----------
-
-// товары прайса в его порядке: раздел, подраздел, название и текущие цены из базы (не из кеша)
+// цены — из базы, не из кеша
 function bt_pe_rows(): array
 {
     $rows = [];
@@ -98,7 +95,7 @@ function bt_pe_rows(): array
     return $rows;
 }
 
-// цены товаров: розница (от 1 шт/кг), оптовые ступени [kg, p] (от 2 и выше), старая цена; kg — товар продаётся на вес, ступени только у таких
+// розница от 1 шт/кг, оптовые ступени [kg, p] от 2 — только у весовых товаров, старая цена
 function bt_pe_state(array $ids): array
 {
     $st = [];
@@ -140,7 +137,7 @@ function bt_pe_log(): array
     return (array)json_decode(\Bitrix\Main\Config\Option::get('bt', 'price_log', '[]'), true);
 }
 
-// сохранить цены: items — [{id, p, old, tiers: [[kg, p], …]}] полным состоянием товара; ступени пишутся диапазонами количества одной цены BASE
+// items — полное состояние товара; ступени — диапазоны количества одной цены BASE
 function bt_pe_save(array $items, bool $notify): array
 {
     global $USER;
@@ -230,7 +227,7 @@ function bt_pe_save(array $items, bool $notify): array
     return ['ok' => !$errors, 'saved' => $saved, 'sent' => $sent, 'errors' => (object)$errors, 'rows' => bt_pe_rows(), 'log' => bt_pe_log()];
 }
 
-// разбор файла: тот же формат, что «Скачать Excel» в редакторе (колонки «Товар», «Цена, ₽», «Старая цена, ₽», «от N кг», «Ссылка»), .xlsx или .csv; пустая ячейка — цена не меняется
+// формат — как «Скачать Excel» в редакторе (.xlsx или .csv); пустая ячейка — цена не меняется
 function bt_pe_import($file): array
 {
     if (!is_array($file) || ($file['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {

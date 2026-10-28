@@ -1,23 +1,23 @@
 <?php
-// Письма о заказе: поля #BT_*# (состав, доставка, оплата, «что дальше») для шаблонов SALE_*
+// Поля #BT_*# для писем о заказе (шаблоны SALE_*)
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
 
-// Куда слать уведомления менеджеру (копии заказов, заявки, отзывы). Отправитель писем — отдельно: main.email_from / sale.order_email
+// адрес уведомлений менеджеру; отправитель — отдельно: main.email_from / sale.order_email
 function bt_notify_email(): string
 {
     return \Bitrix\Main\Config\Option::get('bt', 'notify_email') ?: \Bitrix\Main\Config\Option::get('sale', 'order_email') ?: \Bitrix\Main\Config\Option::get('main', 'email_from');
 }
 
-// main:OnBeforeEventSend — отправитель noreply, а копии заказов, «Ответить» и письма «на адрес по умолчанию» — на адрес уведомлений
+// отправитель noreply; копии заказов, «Ответить» и письма на адрес по умолчанию — на адрес уведомлений
 function bt_mail_route(array &$fields, array &$message): void
 {
     $to = bt_notify_email();
     if ($to === '' || $to === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
         return;
     }
-    // скрытая копия уведомлений менеджеру (заявки, отзывы, копии заказов) — опция bt/notify_bcc
+    // скрытая копия уведомлений — опция bt/notify_bcc
     $bcc = \Bitrix\Main\Config\Option::get('bt', 'notify_bcc');
     if (($fields['BCC'] ?? '') === \Bitrix\Main\Config\Option::get('sale', 'order_email')) {
         $fields['BCC'] = $bcc ? $to . ', ' . $bcc : $to;
@@ -33,7 +33,7 @@ function bt_mail_route(array &$fields, array &$message): void
     }
 }
 
-// main:OnBeforeEventSend — дописывает поля заказа, если событие SALE_* передало ORDER_REAL_ID
+// поля заказа — если событие SALE_* передало ORDER_REAL_ID
 function bt_mail_before_send(array &$fields, array &$message): void
 {
     if (!str_starts_with((string)($message['EVENT_NAME'] ?? ''), 'SALE_') || isset($fields['BT_ORDER'])
@@ -51,7 +51,7 @@ function bt_mail_host(string $siteId): string
     return 'https://' . ($site['SERVER_NAME'] ?? '' ?: \Bitrix\Main\Config\Option::get('main', 'server_name'));
 }
 
-// Поля письма по заказу (заказ может быть и несохранённым — для тестовых писем)
+// заказ может быть и несохранённым — для тестовых писем
 function bt_mail_order(Sale\Order $order): array
 {
     $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -88,7 +88,6 @@ function bt_mail_order(Sale\Order $order): array
     $d = function_exists('bt_phone_digits') ? bt_phone_digits($props['PHONE'] ?? '') : '';
     $phone = $d ? "+7\u{00A0}" . substr($d, 1, 3) . "\u{00A0}" . substr($d, 4, 3) . "\u{2011}" . substr($d, 7, 2) . "\u{2011}" . substr($d, 9, 2) : ($props['PHONE'] ?? '');
 
-    // состав: товар, количество, сумма
     $cell = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#0E0E0C;border-bottom:1px solid #DCDCD4;vertical-align:top';
     $head = 'font-family:Manrope,Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6C6C64;padding:0 0 8px;border-bottom:1px solid #0E0E0C';
     $rows = '';
@@ -122,7 +121,6 @@ function bt_mail_order(Sale\Order $order): array
         . '<tr><td valign="top" style="font-family:Manrope,Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0E0E0C;padding:14px 0 0">' . ($dCode === 'bt_cdek' ? 'Итого без доставки' : 'Итого') . '</td>'
         . '<td colspan="2" align="right" style="font-family:Unbounded,\'Arial Black\',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;color:#0E0E0C;padding:14px 0 0;white-space:nowrap">' . bt_fmt($order->getPrice()) . '</td></tr></table>';
 
-    // детали: доставка, адрес, оплата, покупатель, получатель
     $where = preg_replace(['/\s*#S\S+$/u', '/^Пункт выдачи СДЭК:\s*/u'], '', $props['ADDRESS'] ?? '') ?: ($props['PVZ'] ?? '' ?: ($dCode === 'bt_pickup' ? trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ') : ''));
     $det = [];
     if ($shipment) {
@@ -172,14 +170,12 @@ function bt_mail_order(Sale\Order $order): array
         'BT_ORDER_URL' => $host . '/personal/orders/' . (int)$order->getId() . '/',
         'BT_ORDER' => $items . $details,
         'BT_NEXT' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' . $nextHtml . '</table>',
-        // «что дальше» — пока заказ не отправлен
         'BT_TRACK' => in_array(bt_order_stage(['STATUS_ID' => $order->getField('STATUS_ID'), 'CANCELED' => $order->isCanceled() ? 'Y' : 'N', 'PAYED' => $order->isPaid() ? 'Y' : 'N']
             + (bt_order_ship_info([$order->getId()])[$order->getId()] ?? [])), ['ship', 'done', 'cancel'], true) ? '' : bt_delivery_next($dCode),
         'BT_TRACK_URL' => bt_track_url($dCode, $shipment ? (string)$shipment->getField('TRACKING_NUMBER') : ''),
         'BT_PICKUP_ADDR' => $e(trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ')),
         'BT_PICKUP_HOURS' => $e($co['hours'] ?? ''),
         'BT_DCODE' => $dCode,
-        // для «Собираем заказ»: оплачен ли, и платят ли при получении
         'BT_PAID' => $order->isPaid() ? 'Y' : '',
         'BT_COD' => !$order->isPaid() && $pCode === 'cash' ? 'Y' : '',
         'BT_BILL_DUE' => !$order->isPaid() && $pCode === 'bill' ? 'Y' : '',
@@ -187,7 +183,7 @@ function bt_mail_order(Sale\Order $order): array
     ];
 }
 
-// main:OnBeforeEventAdd — «Собираем заказ» сразу после онлайн-оплаты не шлём: статус магазин ставит сам, а письмо «Оплата получена» уже ушло
+// «Собираем заказ» сразу после онлайн-оплаты не шлём: статус ставит сайт, а «Оплата получена» уже ушло
 function bt_mail_skip_p($event, $lid, $fields)
 {
     $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
@@ -203,8 +199,8 @@ function bt_mail_skip_p($event, $lid, $fields)
     return true;
 }
 
-// Лишние письма: «Передан в доставку» у СДЭК с трек-номером (уже ушло «Трек-номер заказа»);
-// «Оплата получена» у заказа «при получении» — покупатель сам отдал деньги курьеру или на складе
+// лишние письма: «Передан в доставку» у СДЭК с трек-номером (уже ушло «Трек-номер заказа»)
+// и «Оплата получена» у заказа «при получении» — деньги покупатель отдал сам
 function bt_mail_skip_extra($event, $lid, $fields)
 {
     $id = (int)($fields['ORDER_REAL_ID'] ?? 0);
@@ -218,7 +214,7 @@ function bt_mail_skip_extra($event, $lid, $fields)
     return !(str_starts_with($i['DCODE'] ?? '', 'sdek_') && ($i['TRACK'] ?? '') !== '');
 }
 
-// Строки «подпись — значение» для серых плашек письма (значения уже экранированы)
+// значения уже экранированы
 function bt_mail_rows(array $rows): string
 {
     $html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';

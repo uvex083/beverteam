@@ -1,5 +1,5 @@
 <?php
-// оплата через SberPay: на телефоне кнопка в СберБанк Онлайн, на компьютере запрос в приложение по номеру телефона; оплату страница ждёт сама (ui.js, .sbp и .spay)
+// оплату страница ждёт сама — ui.js (.sbp, .spay)
 \Bitrix\Main\Loader::includeModule('sale');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $id = (int)($_GET['id'] ?? 0);

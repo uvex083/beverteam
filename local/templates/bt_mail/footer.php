@@ -15,7 +15,7 @@ $lnk = 'color:#D7E85C;text-decoration:none;font-weight:700';
       <?php if (!empty($co['email'])): ?><a href="mailto:<?= $e($co['email']) ?>" style="<?= $lnk ?>"><?= $e($co['email']) ?></a><?php endif ?>
     </td>
     <td class="bt-col" width="50%" valign="top">
-      <?php // своя ссылка на адрес: иначе Gmail и iOS сами делают из него синюю ссылку на свои карты
+      <?php // своя ссылка: иначе Gmail и iOS сами превращают адрес в ссылку на свои карты
       $addr = trim(($co['city'] ?? '') . ', ' . ($co['street'] ?? ''), ', ');
       [$lat, $lon] = array_pad(explode(',', str_replace(' ', '', (string)($co['map'] ?? ''))), 2, '');
       $map = $lat !== '' && $lon !== '' ? 'https://yandex.ru/maps/?pt=' . $lon . ',' . $lat . '&z=17' : 'https://yandex.ru/maps/?text=' . rawurlencode($addr); ?>

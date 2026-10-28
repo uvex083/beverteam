@@ -1,4 +1,3 @@
-/* BEVERTEAM UI — шапка, меню, футер, авторизация, данные. Прототип, без бэкенда. */
 (function(){
 const I = {
   cat:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
@@ -7,7 +6,6 @@ const I = {
   heart:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></svg>',
   cart:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.5L21 8H6.5"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>',
   burger:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
-  /* + мессенджеры и служебные иконки (доработка: «добавить все возможные способы связи») */
   tg:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 4.3 2.9 11.5c-.9.35-.86 1.66.06 1.95l4.7 1.47 1.8 5.5c.24.73 1.18.92 1.68.33l2.5-2.94 4.7 3.45c.62.45 1.5.11 1.66-.64l3.2-14.9c.17-.8-.62-1.47-1.6-1.42Z"/></svg>',
   wa:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.23.64-1.34 1.24-1.85 1.28-.5.05-.97.23-3.26-.68-2.74-1.08-4.47-3.9-4.6-4.08-.13-.18-1.1-1.46-1.1-2.78s.7-1.98.94-2.25c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.23.55.79 1.9.86 2.04.07.14.11.3.02.48-.09.18-.13.3-.27.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.15 1.5 1.86 1.03.92 1.9 1.2 2.17 1.34.27.14.43.11.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.6-.14.25.09 1.58.75 1.85.88.27.14.45.2.52.32.07.11.07.66-.16 1.3Z"/></svg>',
   max:'<svg aria-hidden="true" focusable="false" viewBox="-10 -10 120 120" fill="currentColor"><path fill-rule="evenodd" d="M50.7571 0.261719C78.2929 0.261719 99.8857 22.5974 99.8857 50.1474C99.8857 77.6974 77.6071 99.4903 51.0214 99.4903C41.5857 99.4903 37.0143 98.1617 29.65 92.9474C29.1429 92.5903 28.45 92.6831 28.0214 93.1403C22.3571 99.1831 7.85 103.426 7.18571 95.176C7.18571 80.7903 0 71.4474 0 49.876C0 21.5546 23.2214 0.261719 50.7571 0.261719ZM51.5286 24.8117C38.4643 24.126 28.2643 33.1974 26.0143 47.3831C24.15 59.1332 27.45 73.4546 30.2786 74.176C31.4786 74.4832 34.3571 72.276 36.4571 70.2974C36.85 69.926 37.45 69.8617 37.9071 70.1474C41.1786 72.1474 44.8786 73.6474 48.9571 73.8617C62.3714 74.5617 74.2571 64.0617 74.9643 50.6474C75.6643 37.2331 64.9429 25.5046 51.5286 24.8046V24.8117Z"/></svg>',
@@ -16,7 +14,6 @@ const I = {
   share:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.4 10.8 7.2-4.2M8.4 13.2l7.2 4.2"/></svg>',
   arrL:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>',
   arrR:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"/></svg>',
-  /* иконки УТП */
   uRent:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h5M8 11h3M8 15.5h8"/></svg>',
   uPrice:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5Z"/><path d="M12 11.5v8.5M4 8.5l8 3 8-3"/></svg>',
   uSwap:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>',
@@ -26,13 +23,10 @@ const I = {
 I.box='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5Z"/><path d="M12 11.5v8.5M4 8.5l8 3 8-3"/></svg>';
 I.truck='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>';
 I.home='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>';
-/* ---------- Журнал: новости и статьи в одном инфоблоке, рубрика решает раздел ---------- */
-// материалы журнала отдаёт сервер (header.php → bt_posts)
+/* ---------- журнал ---------- */
 window.BT_POSTS=window.BT_POSTS||[];
 window.BT_postUrl = p => p.url||'/blog/'+p.id+'/';
 
-/* Фирменная заглушка вместо фото: SVG в data-URI, не зависит от внешних картинок.
-   Используется, пока клиент не пришлёт реальные снимки. */
 const PH_THEME={
   'Приготовление':['#0E0E0C','#D7E85C'], 'Уход':['#EFEFE9','#0E0E0C'], 'Обжарка':['#3E2C22','#F3EDE7'],
   'Для бизнеса':['#D7E85C','#0E0E0C'], 'Оборудование':['#1B1B18','#D7E85C'], 'Компания':['#E6E6DE','#0E0E0C'],
@@ -58,13 +52,11 @@ window.BT_ph = (label, title, w, h) => {
   </svg>`;
   return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace(/\s+/g,' '));
 };
-/* глобальный фолбэк: если внешняя картинка не загрузилась, ставим заглушку */
 window.BT_imgFallback = (img,label,title) => { img.onerror=null;
-  /* заглушку рисуем под фактический размер блока, иначе текст обрезается при object-fit:cover */
+  /* под фактический размер блока, иначе object-fit:cover обрезает текст */
   const r=img.getBoundingClientRect();
   img.src=BT_ph(label,title,Math.max(240,Math.round(r.width)||img.width||520),Math.max(160,Math.round(r.height)||img.height||325));
   img.style.objectFit='cover'; };
-/* перерисовываем заглушки под фактический размер блока (крупная карточка журнала шире обычной) */
 window.BT_phFit = root => (root||document).querySelectorAll('img[data-ph]').forEach(img=>{
   const r=img.getBoundingClientRect(); if(r.width<10) return;
   const w=Math.round(r.width), h=Math.round(r.height);
@@ -79,7 +71,7 @@ window.BT_postCard = p => `<a class="ncard" href="${BT_postUrl(p)}"><span class=
     <div class="ncard__b"><div class="ncard__m"><time datetime="${p.d}">${BT_postDate(p.d)}</time>${p.kind==='news'&&p.cat!=='Новости'?'<span class="tag tag--n">Новость</span>':''}</div>
     <div class="ncard__t th th3"><span>${p.t}</span></div><p>${p.lead}</p></div></a>`;
 
-/* ---------- Ремонт: бренды под посадочные страницы ---------- */
+/* ---------- ремонт: бренды ---------- */
 window.BT_BRANDS=[
   {id:'jetinno',slug:'Jetinno',auth:1,models:'JL05, JL15 (VIVA), JL32, JL33, JL36',note:'авторизованный сервис, оригинальные запчасти на складе'},
   {id:'saeco',slug:'Saeco',models:'Lirika, Aulika, Royal, Idea',note:'частая проблема — заварочный блок и помпа'},
@@ -89,7 +81,7 @@ window.BT_BRANDS=[
   {id:'delonghi',slug:"De'Longhi",models:'Magnifica, Dinamica, Eletta',note:'бытовые автоматы, ремонт и чистка на дому'}
 ];
 
-/* ---------- Отзывы на товар (UGC с фото) ---------- */
+/* ---------- отзывы на товар ---------- */
 window.BT_REVIEWS={
   oromia:[
     {a:'Наталья К.',r:5,d:'2026-08-14',t:'Берём в офис на 20 человек второй год. Кислинка мягкая, в молоке не теряется. Раньше брали другой сорт, вернулись к этому.',ph:2,ok:1},
@@ -103,7 +95,7 @@ window.BT_stars = (n,size) => `<span class="stars" style="${size?'font-size:'+si
 I.phone='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h4l1.5 4-2.4 1.6a12 12 0 0 0 5.8 5.8L17 12l4 1.5v4a2 2 0 0 1-2.2 2C10.4 18.8 5.2 13.6 4.5 5.2A2 2 0 0 1 6.5 3Z"/></svg>';
 I.mail='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>';
 
-/* Текущий покупатель — с сервера (header.php → BT_USER), вход и выход — local/ajax/auth.php */
+/* ---------- покупатель и вход ---------- */
 let USER=window.BT_USER||null;
 try{ localStorage.removeItem('bt_user'); }catch(e){}
 window.BT_user = () => USER;
@@ -111,18 +103,17 @@ window.BT_authPost = data => { const fd=new FormData(); Object.entries(data).for
   fd.append('sessid',window.BT_SID||'');
   return fetch('/local/ajax/auth.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
 window.BT_login = u => { USER=u; window.BT_USER=u; document.dispatchEvent(new CustomEvent('bt:auth',{detail:u})); BT_authUpdate(); };
-/* выход: из кабинета — на главную, с остальных страниц — та же страница уже гостем */
+/* из кабинета — на главную, с остальных страниц — остаёмся на месте гостем */
 window.BT_logout = () => BT_authPost({action:'logout'}).then(()=>{ if(document.querySelector('.accp')) location.href='/'; else location.reload(); });
-/* вход через сервисы (header.php → BT_IDP): только настроенные в модуле «Социальные сервисы», переход сразу — правило 11 */
+/* только сервисы, настроенные в модуле «Социальные сервисы» */
 const IDP=window.BT_IDP||[];
-/* фирменные знаки и подписи кнопок по правилам сервисов; у кого знака нет — монограмма */
+/* знаки и подписи — по правилам сервисов; нет знака — монограмма */
 const IDP_LOGO={
   'i-ya':'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#FC3F1D"/><path fill="#fff" d="M13.32 7.666h-.924c-1.694 0-2.585.858-2.585 2.123 0 1.43.616 2.1 1.881 2.959l1.045.704-3.003 4.487H7.49l2.695-4.014c-1.55-1.111-2.42-2.19-2.42-4.015 0-2.288 1.595-3.85 4.62-3.85h3.003v11.868H13.32V7.666z"/></svg>',
   'i-vk':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#0077FF"/><path fill="#fff" d="M12.78 17.3c-5.41 0-8.5-3.71-8.63-9.88h2.71c.09 4.53 2.09 6.45 3.67 6.84V7.42h2.55v3.91c1.56-.17 3.2-1.95 3.75-3.91h2.55c-.43 2.42-2.21 4.2-3.48 4.93 1.27.59 3.3 2.14 4.07 4.95h-2.81c-.6-1.88-2.1-3.33-4.08-3.53v3.53h-.3z"/></svg>'};
 const IDP_TEXT={'i-ya':'Войти с Яндекс ID','i-vk':'Войти с VK ID'};
 window.BT_idpHtml = label => { const back=encodeURIComponent(location.pathname+location.search.replace(/[?&]auth_service_(id|error)=[^&]*/g,'').replace(/^&/,'?'));
   const href=p=>`/local/ajax/oauth.php?go=${p.id}&amp;back=${back}`;
-  /* в окне входа — широкие фирменные кнопки, в строке на оформлении заказа — значки */
   if(!label) return `<div class="idp idp--big">${IDP.map(p=>
     `<a class="${p.cls}" href="${href(p)}" rel="nofollow">${IDP_LOGO[p.cls]||`<i>${p.m}</i>`}<span>${IDP_TEXT[p.cls]||'Войти через '+p.t}</span></a>`).join('')}</div>`;
   return `<div class="idp--row"><b>${label}</b><div class="idp">${IDP.map(p=>
@@ -142,7 +133,6 @@ I.trash='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="non
 I.star='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.6 6 .8-4.4 4.2 1.1 6L12 16.8 6.7 19.6l1.1-6L3.4 9.4l6-.8Z"/></svg>';
 window.BT_ICONS = I;
 
-/* Реквизиты и контакты — единый источник для шапки, футера, контактов и микроразметки */
 const CO = window.BT_CO = {
   name:'BEVERTEAM', legal:'ИП Чичиланов Василий Павлович',
   tel1:'+79955419399', tel1f:'+7 995 541-93-99',
@@ -156,8 +146,8 @@ const CO = window.BT_CO = {
 const msgrHtml = (cls) => `<div class="msgr ${cls||''}">${CO.msg.map(m=>`<a href="${m[2]}" title="${m[1]}" aria-label="${m[1]}" rel="nofollow noopener" target="_blank">${I[m[0]]}</a>`).join('')}</div>`;
 window.BT_msgr = msgrHtml;
 
-/* УТП — единый блок для главной и категорий («добавить блок с УТП, 3–5 отличий») */
-// карточки УТП отдаёт сервер (ИБ «Почему BEVERTEAM: карточки»): [svg-иконка, заголовок, текст]
+/* ---------- УТП ---------- */
+// с сервера: [svg-иконка, заголовок, текст]
 window.BT_UTP = window.BT_UTP || [];
 window.BT_utp = function(n){
   return BT_UTP.slice(0,n||4).map(u=>`<div class="utp__i"><div class="ic">${String(u[0]).startsWith('<')?u[0]:(I[u[0]]||'')}</div><b>${u[1]}</b><p>${u[2]}</p></div>`).join('');
@@ -191,13 +181,12 @@ const IMG = {
 };
 window.BT_IMG = IMG;
 
-/* товары — реальные данные с beverteam.ru */
-// товары отдаёт сервер (header.php → bt_catalog_data)
+// с сервера: bt_catalog_data
 window.BT_PRODUCTS = window.BT_DATA || {coffee:[],tea:[],machines:[],acc:[],rent:[]};
 
 const fmt = n => n.toLocaleString('ru-RU')+'\u00a0₽';
 window.BT_fmt = fmt;
-/* неразрывные пробелы в числах, суммах и датах для текста, который дорисовывает скрипт (серверный текст — bt_nbsp_buffer) */
+/* неразрывные пробелы в тексте, который дорисовывает скрипт (серверный — bt_nbsp_buffer) */
 const NB_MON='января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря';
 const NB=[[/(\d) (?=\d{3}(?!\d))/g,'$1\u00a0'],[/(\d) (?=[A-Za-zА-Яа-яЁё₽%°])/g,'$1\u00a0'],[new RegExp('('+NB_MON+') (?=\\d{4})','g'),'$1\u00a0'],
   [/(^|[^A-Za-zА-Яа-яЁё\d])(с|со|до|от|по|в|во|на|за|из|к|у|о|об|около|после|через|более|менее|свыше|всего|№) (?=[\d+])/gi,'$1$2\u00a0'],[/(\+\d) (?=\d)/g,'$1\u00a0'],[/(\S) (?=—)/g,'$1\u00a0']];
@@ -206,18 +195,18 @@ const nbNode = n => { const p=n.parentNode, t=n.nodeValue; if(!p||/^(SCRIPT|STYL
 const nbIn = el => { if(el.nodeType===3) return nbNode(el); if(el.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA)$/.test(el.nodeName)) return; const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())) nbNode(n); };
 new MutationObserver(ms=>ms.forEach(m=>m.type==='characterData'?nbNode(m.target):m.addedNodes.forEach(nbIn))).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 
-/* ---------- корзина: состояние в localStorage, общее для всех страниц прототипа ---------- */
+/* ---------- корзина ---------- */
 const ALL = () => Object.values(BT_PRODUCTS).flat();
 window.BT_find = id => ALL().find(x=>x.id===id);
 let CART;
-// корзина Битрикса — источник истины (header.php → BT_BASKET), localStorage — только запасной вариант
+// источник истины — корзина Битрикса (BT_BASKET), localStorage — запасной вариант
 if(window.BT_BASKET) CART = Object.assign({}, window.BT_BASKET.items);
 else { try{ CART = JSON.parse(localStorage.getItem('bt_cart')||'null'); }catch(e){ CART=null; } }
 if(!CART) CART = {};
 window.BT_CART = CART;
 const cartSave = () => { try{ localStorage.setItem('bt_cart',JSON.stringify(CART)); }catch(e){} };
 
-/* ---------- сравнение: список id в localStorage, общий для всех страниц ---------- */
+/* ---------- сравнение ---------- */
 let CMP; try{ CMP=JSON.parse(localStorage.getItem('bt_cmp')||'null'); }catch(e){ CMP=null; }
 if(!Array.isArray(CMP)) CMP=[];
 window.BT_CMP = CMP;
@@ -229,11 +218,11 @@ window.BT_cmpRemove = id => { const i=CMP.indexOf(id); if(i>=0){ CMP.splice(i,1)
   document.dispatchEvent(new CustomEvent('bt:cmp',{detail:{id,on:false}})); } };
 window.BT_cmpClear = ids => { (ids||CMP.slice()).forEach(id=>{const i=CMP.indexOf(id);if(i>=0)CMP.splice(i,1);});
   cmpSave(); BT_cmpUpdate(); document.dispatchEvent(new CustomEvent('bt:cmp',{detail:{}})); };
-/* ---------- избранное: список id в localStorage, общий для всех страниц ---------- */
+/* ---------- избранное ---------- */
 let FAV; try{ FAV=JSON.parse(localStorage.getItem('bt_fav')||'null'); }catch(e){ FAV=null; }
 if(!Array.isArray(FAV)) FAV=[];
 window.BT_FAV = FAV;
-/* ИНН: длина и контрольные цифры (алгоритм ФНС) — как bt_inn_ok() на сервере */
+/* контрольные цифры ИНН по алгоритму ФНС, как bt_inn_ok() */
 window.BT_innOk = s => { const d=String(s).replace(/\D/g,'').split('').map(Number), k=w=>w.reduce((a,x,i)=>a+x*d[i],0)%11%10;
   return d.length===10?k([2,4,10,3,5,9,4,6,8])===d[9]:d.length===12&&k([7,2,4,10,3,5,9,4,6,8])===d[10]&&k([3,7,2,4,10,3,5,9,4,6,8])===d[11]; };
 window.BT_favHas = id => FAV.indexOf(String(id))>=0;
@@ -252,15 +241,15 @@ window.BT_cmpUpdate = () => {
   document.querySelectorAll('.pc__cmpi').forEach(b=>{ const pc=b.closest('[data-pc]');
     if(pc) b.setAttribute('aria-pressed', BT_cmpHas(pc.dataset.pc)?'true':'false'); });
 };
-/* Ключ строки корзины: «ID» у штучного товара, «ID:кг» у кофе на развес — каждая фасовка своей строкой, количество в штуках */
+/* ключ строки: «ID» — штучный товар, «ID:кг» — кофе, каждая фасовка своей строкой */
 window.BT_key = (id,kg) => kg ? `${id}:${kg}` : String(id);
 window.BT_kid = k => String(k).split(':')[0];
 window.BT_kkg = k => +(String(k).split(':')[1]||0);
-/* кофе продаётся пачками по 1 кг: фасовка одна, плашки 5/10/20/30 кг — быстрый выбор количества по оптовой сетке */
+/* кофе — пачки по 1 кг; плашки 5/10/20/30 кг — быстрый выбор по оптовой сетке */
 window.BT_packOf = m => m&&m.bulk ? m.bulk[0].kg : 0;
 window.BT_packSet = () => {};
 window.BT_keyOf = m => BT_key(m.id, BT_packOf(m));
-/* цена одной штуки строки: у кофе — упаковка по цене ступени, считанной от всего веса строки (так же считает корзина Битрикса) */
+/* у кофе ступень цены считается от всего веса строки, как в корзине Битрикса */
 window.BT_perKg = (m,kg,q) => BT_tier(m,kg*Math.max(1,q)).p;
 window.BT_piece = (m,kg,q) => m.bulk ? BT_perKg(m,kg,q)*kg : m.p;
 window.BT_cartItems = () => Object.keys(CART).map(k=>{const p=BT_find(BT_kid(k));return p?{...p,key:k,kg:p.bulk?(BT_kkg(k)||1):0,q:CART[k]}:null;}).filter(Boolean);
@@ -269,16 +258,15 @@ window.BT_cartSet = (key,q) => { key=String(key); const was=CART[key]||0;
   if(q>0) CART[key]=q; else delete CART[key]; cartSave(); BT_cartUpdate(true);
   document.dispatchEvent(new CustomEvent('bt:cart',{detail:{id:BT_kid(key),key,q}}));
   BT_cartSync(key,q,was); };
-/* «в корзину» без выбора фасовки (сравнение, подбор кофе): +1 шт выбранной фасовки */
 window.BT_cartAdd = id => { const m=BT_find(id), k=m?BT_keyOf(m):String(id); BT_cartSet(k,(CART[k]||0)+1); };
-/* запись в корзину Битрикса; не приняли — откатываем количество на экране */
+/* не приняли — откатываем количество на экране */
 window.BT_cartSync = (key,q,was) => { const id=BT_kid(key);
   const fd=new FormData(); fd.append('action','set'); fd.append('id',id); fd.append('kg',BT_kkg(key)); fd.append('q',q);
   fd.append('sessid',window.BT_SID||'');
   return fetch('/local/ajax/cart.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()).then(d=>{
     if(!d.ok) throw new Error(d.error||'cart');
     window.BT_BASKET={items:d.items,sum:d.sum};
-    /* Метрика: добавили или убрали упаковки — цена упаковки по ступени, как в корзине */
+    /* Метрика: цена упаковки по ступени, как в корзине */
     try{ const m=BT_find(id), n=q-was, kg=BT_kkg(key);
       if(m&&n&&window.BT_ec) BT_ec(n>0?'add':'remove',{products:[BT_ecItem(m,Object.assign({price:BT_piece(m,kg,Math.max(q,was)),quantity:Math.abs(n)},kg?{variant:kg+' кг'}:{}))]}); }catch(e){}
   }).catch(()=>{
@@ -294,7 +282,7 @@ window.BT_cartUpdate = pulse => {
   if(pulse){a.classList.remove('is-pulse');void a.offsetWidth;a.classList.add('is-pulse');}
 };
 
-/* ---------- даты: курьер по Екатеринбургу привозит в течение 2 рабочих дней со дня заказа, день считаем по Екатеринбургу ---------- */
+/* ---------- даты: доставка за 2 рабочих дня, время Екатеринбурга ---------- */
 const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const isWork = d => d.getDay()!==0 && d.getDay()!==6;
 const nextWork = (d,n) => { const x=new Date(d); while(n>0){ x.setDate(x.getDate()+1); if(isWork(x)) n--; } return x; };
@@ -309,29 +297,23 @@ window.BT_timeline = () => `<div class="tl3">
     <div>${I.box}<span><small>СДЭК по России</small><b>2–7 дней</b></span></div>
     <div>${I.home}<span><small>Самовывоз</small><b>обычно в день заказа</b></span></div>
   </div>`;
-/* блок «до бесплатной доставки» с прогрессом */
 window.BT_freeBar = sum => { const T=3000, p=Math.min(100,Math.round(sum/T*100));
   return sum>=T ? `Доставка по Екатеринбургу бесплатно, по России через СДЭК<i style="--p:100%"></i>` : `До бесплатной доставки по Екатеринбургу не хватает <b>${fmt(T-sum)}</b><i style="--p:${p}%"></i>`; };
 
-/* скидка от суммы заказа — по правилам корзины Битрикса (window.BT_SUMDISC: [{from,pct}]): сколько срежет и сколько до следующей ступени */
+/* скидка от суммы по правилам корзины Битрикса (BT_SUMDISC: [{from,pct}]) */
 window.BT_sumDisc = sum => { const L=window.BT_SUMDISC||[]; let cur=null, next=null;
   L.forEach(d=>{ if(sum>=d.from) cur=d; else if(!next) next=d; });
-  /* как в заказе: цена единицы со скидкой округляется вниз до рубля (правило округления каталога) */
+  /* цена единицы со скидкой — вниз до рубля, как округляет каталог */
   const cut=cur?BT_cartItems().reduce((a,c)=>{ const p=BT_piece(c,c.kg,c.q); return a+(p-Math.floor(p*(100-cur.pct)/100+1e-6))*c.q; },0):0;
   return {pct:cur?cur.pct:0, cut, next:next?{...next,need:next.from-sum}:null}; };
 window.BT_sumDiscHint = sum => { const d=BT_sumDisc(sum); return d.next&&sum>0 ? `До скидки ${d.next.pct}% не хватает ${BT_fmt(Math.ceil(d.next.need))}` : ''; };
-/* кнопка/степпер для карточки: в корзине — степпер с ценой на месте кнопки */
-/* подвал карточки: цена + контрол. Обновляется точечно, без пересборки карточки */
-/* Единица продажи. kg — кофе: цена за килограмм, действует оптовая сетка.
-   pcs — чай и аксессуары: фасовка зашита в товар, считаем штуками. */
+/* kg — кофе, цена за кг по оптовой сетке; pcs — штучный товар */
 window.BT_unit = m => m.bulk ? 'kg' : 'pcs';
-/* Цена за кг при заданном объёме: берём ближайшую ступень сетки сверху вниз */
 window.BT_tier = (m,kg) => {
   if(!m.bulk) return {kg:1,p:m.p};
   let t=m.bulk[0]; m.bulk.forEach(x=>{ if(kg>=x.kg) t=x; }); return t;
 };
 window.BT_tierPct = (m,t) => m.bulk&&t.p<m.bulk[0].p ? Math.round((1-t.p/m.bulk[0].p)*100) : 0;
-/* Ряд быстрого выбора объёма: ставит количество в корзине, подсвечена ступень сетки, по которой сейчас цена */
 window.BT_packs = (m,big) => {
   if(!m.bulk) return '';
   const on=BT_tier(m,CART[BT_keyOf(m)]||1);
@@ -341,11 +323,9 @@ window.BT_packs = (m,big) => {
       return `<button type="button" data-kg="${t.kg}" aria-pressed="${on.kg===t.kg}">${t.kg} кг${pct?`<s>−${pct}%</s>`:''}</button>`;}).join('')}
   </div>`;
 };
-/* плашка объёма: столько кг в корзину сразу */
 window.BT_packPut = (id,kg) => { const m=BT_find(id); if(!m) return; BT_cartSet(BT_keyOf(m),kg);
   const t=BT_tier(m,kg), pct=BT_tierPct(m,t);
   BT_toast(`${kg} кг в корзине${pct?` · ${BT_fmt(t.p)} за кг, выгода ${pct}%`:''} · <a href="/personal/cart/">Оформить</a>`); };
-/* цена в подвале карточки: у кофе — за упаковку выбранной фасовки */
 window.BT_priceBox = m => {
   const kg=BT_packOf(m), q=m.rent?0:(CART[BT_keyOf(m)]||0), n=q||1;
   const price = m.p ? fmt(BT_piece(m,kg,n)*n) : 'По запросу';
@@ -365,11 +345,8 @@ window.BT_addCtl = m => {
 };
 
 window.BT_card = function(m){
-  /* скидки — отдельным бейджем на изображении (доработка по категориям) */
   const tiers = m.tiers ? `<div class="pc__tiers">${m.tiers.map(t=>`<span>${t}</span>`).join('')}</div>` : '';
-  /* краткие характеристики вместо «простыни» текста */
   const scales = m.sc ? `<div class="pc__scales">${m.sc.map(x=>`<div class="pc__scale"><span>${x[0]}</span><i style="--v:${x[1]}%"></i></div>`).join('')}</div>` : '';
-  /* количество теперь живёт в самой кнопке (степпер после добавления), в строке инструментов — только сравнение */
   const tools = '';
   return `<article class="pc" data-pc="${m.id}" itemscope itemtype="https://schema.org/Product">
     <meta itemprop="name" content="${m.n}"><meta itemprop="image" content="${m.img}"><meta itemprop="description" content="${m.par}">
@@ -395,11 +372,10 @@ window.BT_card = function(m){
 };
 
 /* ---------- каталог для меню ---------- */
-// разделы мегаменю отдаёт сервер (bt_mega_cats): {t, h, sub:[[название, ссылка]], promo:{img, b, t, h}}
+// с сервера (bt_mega_cats): {t, h, sub:[[название, ссылка]], promo:{img, b, t, h}}
 const CATS = window.BT_CATS || [];
 
-/* Структура горизонтального меню — по прототипу «Горизонтальное меню».
-   Пункт «Главная» не выводим (дубль логотипа), «Аренда кофемашин» — отдельный пункт. */
+/* «Главная» не выводим — дубль логотипа */
 const NAV = [
   {t:'О компании', h:'/o-kompanii/', sub:[['Отзывы о нас','/o-kompanii/#reviews'],['Написать нам','/kontakty/#form']]},
   {t:'Магазин', h:'/catalog/', sub:[['Кофе','/catalog/'],['Чай','/catalog/'],['Кофемашины','/catalog/'],['Аксессуары','/catalog/']]},
@@ -475,7 +451,6 @@ function drawer(){
     </div></div>`;
 }
 function footer(){
-  /* Микроразметка LocalBusiness в футере — требование из «Списка доработок», п.1 */
   return `<footer class="ftr" itemscope itemtype="https://schema.org/LocalBusiness"><div class="wrap">
   <meta itemprop="name" content="${CO.name} — чай и кофе для дома и бизнеса">
   <meta itemprop="priceRange" content="650–297000 ₽">
@@ -498,7 +473,6 @@ function footer(){
   <div class="ftr__b"><span>© 2010–2026 ${CO.name} · ${CO.legal} · ОГРНИП ${CO.ogrnip} · ИНН ${CO.inn}</span><span><a href="/politika-konfidencialnosti/">Политика конфиденциальности</a> · <a href="/polzovatelskoe-soglashenie/">Пользовательское соглашение</a> · <a href="/sitemap/">Карта сайта</a></span></div>
   </div></footer>`;
 }
-/* Полноэкранный поиск: пустое состояние с подсказками и промо, живые результаты при вводе */
 function searchPanel(){
   return `<div class="srch" id="srch" role="dialog" aria-modal="true" aria-label="Поиск по сайту">
     <div class="srch__top"><div class="wrap srch__in">
@@ -566,17 +540,15 @@ function authModal(){
 /* ---------- mount ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   const app = document.getElementById('app') || document.body;
-  // шапку, drawer и футер отдаёт сервер (header.php/footer.php), JS дорисовывает только оверлеи
+  // шапку, drawer и футер рисует сервер, здесь — только оверлеи
   if(!document.getElementById('hdr')) app.insertAdjacentHTML('afterbegin', header()+drawer());
   app.insertAdjacentHTML('beforeend', (document.querySelector('.ftr')?'':footer())+searchPanel()+authModal()+'<div class="toast" id="toast" role="status" aria-live="polite"></div>');
 
-  /* ---- доступность и качество (аудит по WIG / ux-designer / craft-floor) ---- */
-  /* скип-линк к содержимому */
+  /* ---- доступность ---- */
   const hdrEl=document.getElementById('hdr');
   const mainEl=hdrEl && hdrEl.nextElementSibling && hdrEl.nextElementSibling.id!=='drawer' ? hdrEl.nextElementSibling : (document.getElementById('drawer')||{}).nextElementSibling;
   if(mainEl && !document.getElementById('main')){mainEl.id='main';mainEl.setAttribute('tabindex','-1');}
   app.insertAdjacentHTML('afterbegin','<a class="skip" href="#main">К содержанию</a>');
-  /* связка label ↔ input внутри .field, автозаполнение и типы по подписи */
   let fid=0;
   document.querySelectorAll('.field').forEach(f=>{
     const lab=f.querySelector('label'), inp=f.querySelector('input,select,textarea');
@@ -592,10 +564,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     else if(t.includes('инн')){inp.inputMode='numeric';}
     else if(t.includes('код')){inp.spellcheck=false;inp.autocomplete='one-time-code';}
   });
-  /* ============ Валидация форм ============
-     Практика: проверяем на blur (не мешаем набирать), после первой ошибки —
-     сразу на вводе, чтобы человек видел исправление. Ошибка рядом с полем,
-     место под неё зарезервировано, фокус уводится на первую проблему. */
+  /* ---------- валидация форм ---------- */
   const V={
     email:{test:v=>/^[^\s@]+@[^\s@]+\.[a-zA-Zа-яА-Я]{2,}$/.test(v), msg:'Проверьте адрес: нужен формат mail@company.ru'},
     tel:{test:v=>v.replace(/\D/g,'').length===11, msg:'Введите номер полностью: +7 и 10 цифр'},
@@ -620,10 +589,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       let r='+7'; if(d.length>1)r+=' ('+d.slice(1,4); if(d.length>=5)r+=') '+d.slice(4,7);
       if(d.length>=8)r+='-'+d.slice(7,9); if(d.length>=10)r+='-'+d.slice(9,11); return r;};
     el.addEventListener('focus',()=>{if(!el.value)el.value='+7 (';});
-    /* номер вставили целиком поверх «+7 (» — берём последние 10 цифр, иначе «+7 900…» превращается в «+7 (790…» */
+    /* вставили номер целиком — берём последние 10 цифр, иначе «+7 900…» станет «+7 (790…» */
     let prev=el.value;
     el.addEventListener('input',()=>{const d=el.value.replace(/\D/g,'');
-      /* первой набрали 8 или 7 («8 900…», «+7 900…») — это код страны, а не начало номера */
+      /* первая 8 или 7 — код страны, а не начало номера */
       if((d==='78'||d==='77')&&prev.replace(/\D/g,'').length<=1){el.value='+7 (';prev=el.value;return;}
       el.value=fmt(d.length>11&&prev.replace(/\D/g,'').length<=1?'7'+d.slice(-10):el.value); prev=el.value;});
     el.addEventListener('blur',()=>{if(el.value.replace(/\D/g,'').length<=1)el.value='';});
@@ -647,16 +616,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.field input,.field textarea,.field select').forEach(el=>{
     if(el.type==='file'||el.type==='checkbox'||el.type==='radio')return;
     if(kindOf(el)==='tel') maskTel(el);
-    /* ошибку — только когда человек сам побывал в поле и ушёл; фокус, который ставит скрипт (открытие окна), ошибок не даёт */
+    /* ошибка — только когда человек сам ушёл из поля; фокус от скрипта не в счёт */
     el.addEventListener('pointerdown',()=>{el.dataset.touched='1';});
     el.addEventListener('keyup',e=>{ if(e.key==='Tab') el.dataset.touched='1'; });
-    /* пустое поле на уходе не ругаем: «нужно заполнить» — только при отправке; стёртое поле снова чистое */
+    /* пустое поле на уходе не ругаем — только при отправке */
     const empty=()=>!el.value.trim()||(kindOf(el)==='tel'&&el.value.replace(/\D/g,'').length<=1);
     el.addEventListener('blur',()=>{ if(el.dataset.touched) empty()?fieldErr(el,''):BT_checkField(el); });
     el.addEventListener('input',e=>{ if(e.isTrusted) el.dataset.touched='1'; if(el.closest('.field')?.classList.contains('is-err')) empty()?fieldErr(el,''):BT_checkField(el); });
   });
   document.addEventListener('reset',e=>e.target.querySelectorAll('[data-touched]').forEach(x=>delete x.dataset.touched),true);
-  /* согласие с политикой — обязательный чекбокс */
   const checkAgree = box => {
     const w=box.closest('.check'); if(!w) return true;
     if(box.checked){w.classList.remove('is-err');box.removeAttribute('aria-invalid');return true;}
@@ -665,7 +633,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.check input[type=checkbox]').forEach(b=>
     b.addEventListener('change',()=>{if(b.checked)checkAgree(b);}));
 
-  /* submit: собираем все ошибки, ведём к первой */
   window.BT_validate = root => {
     root=root||document;
     let ok=true, first=null;
@@ -682,7 +649,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       BT_toast('Проверьте выделенные поля'); }
     return ok;
   };
-  /* перехват отправки: и кнопки, и ссылки-заглушки прототипа */
   document.addEventListener('click',e=>{
     const b=e.target.closest('a.btn,button.btn'); if(!b) return;
     const box=b.closest('.card,.wr__f,.blk,.modal__p,.revform,form,.subcard'); if(!box) return;
@@ -694,13 +660,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('form').forEach(f=>{f.setAttribute('novalidate','');
     f.addEventListener('submit',e=>{ if(!BT_validate(f)) e.preventDefault(); });});
 
-  /* кнопки ± без текста — имя для скринридера */
   document.addEventListener('focusin',e=>{const b=e.target.closest('.qty button');if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.dataset.d==='-'?'Уменьшить количество':'Увеличить количество');});
   document.querySelectorAll('.qty button').forEach(b=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.dataset.d==='-'?'Уменьшить количество':'Увеличить количество');});
-  /* блокировка прокрутки под drawer/модалкой, Esc, возврат фокуса */
   let lastFocus=null;
-  /* Блокировка фона под любым оверлеем: drawer, модалка, поиск, мобильный фильтр, галерея.
-     Считаем по факту открытых слоёв, чтобы закрытие одного не разблокировало страницу под другим. */
+  /* считаем по открытым слоям: закрытие одного не разблокирует страницу под другим */
   const OVERLAYS='.drawer.open,.modal.open,.srch.open,.filters.open,[data-overlay].open';
   const anyOpen=()=>!!document.querySelector(OVERLAYS);
   const TOUCH=matchMedia('(pointer:coarse)').matches; let lockY=0;
@@ -711,7 +674,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       document.documentElement.style.setProperty('--sbw',(CSS.supports&&CSS.supports('scrollbar-gutter','stable')?0:sbw)+'px');
     }
     const was=document.body.classList.contains('is-locked');
-    /* iOS Safari не держит overflow:hidden у body — на сенсорных экранах фиксируем body и возвращаем прокрутку на место */
+    /* iOS Safari не держит overflow:hidden у body — фиксируем body и возвращаем прокрутку */
     if(TOUCH&&want&&!was){ lockY=scrollY; const h=document.querySelector('.hdr')?.offsetHeight||0;
       Object.assign(document.body.style,{position:'fixed',top:-lockY+'px',left:'0',right:'0',width:'100%',paddingTop:h+'px'}); document.body.classList.add('is-tlock'); }
     document.body.classList.toggle('is-locked',want);
@@ -719,9 +682,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(TOUCH&&!want&&was){ document.body.classList.remove('is-tlock'); Object.assign(document.body.style,{position:'',top:'',left:'',right:'',width:'',paddingTop:''}); scrollTo({top:lockY,behavior:'instant'}); }
   };
   window.BT_lock=lock;
-  /* страховка: любой элемент, получивший класс open, пересчитывает блокировку */
   new MutationObserver(()=>lock()).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
-  /* фокус при открытии и возврат после закрытия — только с мышью и клавиатурой: на телефоне фокус рисует кольцо и выдвигает клавиатуру */
+  /* фокус — только с мышью и клавиатурой: на телефоне он рисует кольцо и выдвигает клавиатуру */
   const watch=(el,focusSel)=>{
     new MutationObserver(()=>{const o=el.classList.contains('open');lock();
       if(TOUCH||innerWidth<=768) return;
@@ -731,14 +693,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   };
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;document.querySelectorAll('.drawer.open,.modal.open').forEach(x=>x.classList.remove('open'));});
 
-  /* mega */
+  /* мегаменю */
   const mega=document.getElementById('mega'), cb=document.getElementById('catbtn'), mp=document.getElementById('megaPanel');
   let cur=1; mp.innerHTML=megaPanel(cur);
   const mcats=document.getElementById('megaCats');
   if(!mcats.children.length) mcats.innerHTML=CATS.map((c,i)=>`<button aria-selected="${i===cur}" data-i="${i}">${c.t}</button>`).join('');
   let mHoverAt=0;
   cb.addEventListener('click',()=>{
-    // меню только что открылось наведением — клик по той же кнопке не должен его сразу закрыть
+    // только что открылось наведением — клик по кнопке не должен сразу закрыть
     if(mega.classList.contains('open') && Date.now()-mHoverAt<600) return;
     const o=mega.classList.toggle('open');
     document.getElementById('hdr').classList.toggle('mega-on',o);cb.setAttribute('aria-expanded',o);});
@@ -748,9 +710,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   const mClose=()=>{mHide=setTimeout(()=>{mega.classList.remove('open');hdrEl2.classList.remove('mega-on');cb.setAttribute('aria-expanded',false);},260);};
   cb.addEventListener('mouseenter',mOpen);cb.addEventListener('mouseleave',mClose);
   mega.addEventListener('mouseenter',()=>clearTimeout(mHide));mega.addEventListener('mouseleave',mClose);
-  /* курсор идёт от кнопки вниз по диагонали и задевает строку меню — не закрываем мгновенно */
+  /* курсор по диагонали задевает строку меню — не закрываем мгновенно */
   document.querySelector('.hdr__nav').addEventListener('mouseenter',()=>{ if(mega.classList.contains('open')) clearTimeout(mHide); });
-  /* задержался на пункте меню дольше 450 мс — значит хочет именно его: закрываем каталог */
+  /* задержался на пункте меню дольше 450 мс — закрываем каталог */
   let navT;
   document.querySelectorAll('.hdr__nav .nav-i').forEach(n=>{
     n.addEventListener('mouseenter',()=>{ if(!mega.classList.contains('open'))return;
@@ -768,7 +730,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   watch(dr,'.dn__a');
   const dnStack=[];
   const dnCur=()=>dn.querySelector('.dn__p.is-on');
-  /* кабинет и счётчики — из данных посетителя в браузере, а не в разметке: меню кешируется */
+  /* кабинет и счётчики — из данных в браузере: меню кешируется */
   const dnFill=()=>{
     const q=s=>dn.querySelector(s), u=window.BT_USER;
     if(u){ q('[data-dme-name]').textContent=u.name||u.email; q('[data-dme-sub]').textContent='Личный кабинет';
@@ -797,16 +759,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   const pushRecent=q=>{try{const r=recent().filter(x=>x!==q);r.unshift(q);localStorage.setItem('bt_recent',JSON.stringify(r.slice(0,5)));}catch(e){}};
 
   window.BT_search=()=>{ sLast=document.activeElement; document.documentElement.style.setProperty('--hdrh',(document.querySelector('.hdr')?.offsetHeight||0)+'px'); sp.classList.add('open'); lock(true);
-    /* фокус сразу, в том же касании: iOS открывает клавиатуру только так; повтор — если панель ещё не успела показаться */
+    /* фокус в том же касании — иначе iOS не откроет клавиатуру; повтор — если панель не успела показаться */
     sq.value=''; sclr.classList.remove('show'); paintEmpty(); sq.focus({preventScroll:true}); setTimeout(()=>document.activeElement!==sq&&sq.focus({preventScroll:true}),60); };
   const closeSearch=()=>{ sp.classList.remove('open'); lock();
     if(sLast&&!matchMedia('(hover:none)').matches) sLast.focus(); sLast=null; };
 
   const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  // подсказки, предложения и разделы — из админки (header.php → BT_SRCH)
   const SR=window.BT_SRCH||{hints:[],promos:[],secs:[]};
   const promoHtml=p=>`<a class="spromo spromo--${p.c}" href="${esc(p.u)}"><span class="k">${esc(p.k)}</span><b>${esc(p.t)}</b><span>${esc(p.s)}</span>${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}</a>`;
-  /* статья журнала строкой результата: превью, заголовок, дата и рубрика */
   const postRow=(p,q)=>`<a href="${BT_postUrl(p)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}<span><span class="n">${q?mark(p.t,q):esc(p.t)}</span><span class="p">${BT_postDate(p.d)} · ${esc(p.cat)}</span></span></a>`;
   function paintEmpty(){
     const rec=recent(), pr=SR.promos.filter(p=>p.w==='empty'), fresh=(window.BT_POSTS||[]).slice(0,3);
@@ -821,27 +781,26 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>`;
   }
 
-  /* поиск по словам: каждое слово запроса в любом месте и порядке, без окончаний («кофемашины» найдёт «кофемашин»), ё = е */
+  /* каждое слово запроса в любом порядке, без окончаний, ё = е */
   const norm=t=>String(t||'').toLowerCase().replace(/ё/g,'е').replace(/([a-zа-я])(\d)/g,'$1 $2').replace(/(\d)([a-zа-я])/g,'$1 $2');
   const stem=w=>w.length>=7?w.slice(0,-2):w.length>=5?w.slice(0,-1):w;
   const stems=q=>norm(q).split(/[\s,.;:!?«»"()-]+/).filter(Boolean).map(stem);
-  /* написания брендов кириллицей и латиницей (bt_search_alias): слово запроса → все основы его группы */
+  /* бренды кириллицей и латиницей (bt_search_alias) */
   const ALIAS=(SR.alias||[]).map(g=>g.map(norm));
   const alts=w=>{const g=ALIAS.find(g=>g.some(a=>a.startsWith(w)||w.startsWith(stem(a)))); return g?g.map(stem):[w];};
   const hit=(hay,ws)=>{const h=norm(hay); return ws.every(w=>alts(w).some(a=>h.includes(a)));};
-  /* порядок — как bt_search(): название равно запросу, начинается с него, слова запроса — отдельными словами названия
-     («кофе» — да, «кофемашина» — нет), слова внутри слов названия, совпало только описание */
+  /* порядок как в bt_search(): точное название, начало, целое слово, часть слова, описание */
   const whole=(t,w)=>t.split(/[^a-zа-я0-9]+/).some(x=>alts(w).some(a=>x.startsWith(a)&&x.length-a.length<=3));
   const rank=(title,q,ws)=>{const t=norm(title), qq=norm(q.trim());
     return t===qq?0:t.startsWith(qq)?1:ws.every(w=>whole(t,w))?2:ws.every(w=>alts(w).some(a=>t.includes(a)))?3:4;};
   const GROUP={coffee:'кофе в зернах',tea:'чай',machines:'кофемашина',acc:'аксессуары',rent:'аренда кофемашины'};
   const pick=(list,title,hay,ws,q,n)=>list.map((x,i)=>[x,i]).filter(([x])=>hit(hay(x),ws))
     .map(([x,i])=>[rank(title(x),q,ws),i,x]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).slice(0,n).map(r=>r[2]);
-  /* другая раскладка: «rjat» → «кофе» — только если по набранному ничего нет (как bt_layout_swap) */
+  /* другая раскладка («rjat» → «кофе») — только если по набранному пусто, как bt_layout_swap */
   const EN='qwertyuiop[]asdfghjkl;\'zxcvbnm,.`', RU='йцукенгшщзхъфывапролджэячсмитьбюё';
   const swap=q=>{const l=q.toLowerCase(), lat=/[a-z]/.test(l), cyr=/[а-яё]/.test(l); if(lat===cyr) return '';
     const [a,b]=lat?[EN,RU]:[RU,EN]; return [...l].map(c=>{const i=a.indexOf(c); return i<0?c:b[i];}).join('');};
-  /* подсветка: основа слова плюс столько набранных букв, сколько совпало с текстом («ремонт» — целиком, «кофема» — «кофема») */
+  /* подсветка: основа слова плюс совпавшие набранные буквы */
   const rxc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/е/g,'[её]');
   const opt=r=>r?'(?:'+rxc(r[0])+opt(r.slice(1))+')?':'';
   const mark=(t,q)=>{const ws=norm(q).split(/[\s,.;:!?«»"()-]+/).filter(w=>stem(w).length>1); if(!ws.length) return esc(t);
@@ -883,7 +842,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   sq && sq.addEventListener('input',()=>{
     const q=sq.value.trim(); sclr.classList.toggle('show',!!q);
     clearTimeout(sTimer);
-    sTimer=setTimeout(()=>{ q.length<2?paintEmpty():paintResults(q); },200);   /* дебаунс 200 мс */
+    sTimer=setTimeout(()=>{ q.length<2?paintEmpty():paintResults(q); },200);
   });
   sq && sq.addEventListener('keydown',e=>{ if(e.key==='Enter'&&sq.value.trim().length>1){ pushRecent(sq.value.trim()); location.href='/search/?q='+encodeURIComponent(sq.value.trim()); }});
   sclr && sclr.addEventListener('click',()=>{sq.value='';sclr.classList.remove('show');paintEmpty();sq.focus();});
@@ -899,16 +858,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   if(location.hash==='#search') BT_search();
 
-  /* ---------- авторизация: e-mail или телефон → код на почту → вход; новый e-mail — ещё имя ---------- */
+  /* ---------- авторизация: код на почту ---------- */
   const au=document.getElementById('auth');watch(au,'input:not([type=checkbox]):not([type=hidden])');
   const $a=s=>au.querySelector(s);
   const step = n => { au.querySelectorAll('[data-step]').forEach(x=>x.hidden=x.dataset.step!==n);
-    /* на телефоне окно открывается без фокуса — иначе клавиатура закроет форму; дальше шаги уже с открытой клавиатурой */
+    /* на телефоне первый шаг без фокуса — клавиатура закроет форму */
     const f=au.querySelector(`[data-step="${n}"] input,[data-step="${n}"] .btn`); if(f&&(innerWidth>768||n!=='pick')) setTimeout(()=>f.focus(),40); };
   let pending=null, timer=null, busy=false;
 
-  /* без явного согласия — кода нет; вход через сервис — с пассивным согласием под кнопками */
-  /* согласие запоминаем на устройстве после первого явного — при следующем входе галочка уже стоит */
+  /* без явного согласия кода нет; вход через сервис — пассивное согласие под кнопками */
+  /* согласие запоминаем на устройстве после первого явного */
   const agree=$a('#aAgree'), agreeOk=()=>{ if(agree.checked){ try{localStorage.setItem('bt_agree','1');}catch(e){} return true; }
     agree.closest('.check').classList.add('is-err'); agree.focus(); BT_toast('Отметьте согласие с условиями'); return false; };
   try{ agree.checked=localStorage.getItem('bt_agree')==='1'; }catch(e){}
@@ -923,7 +882,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     $a('#aAv').textContent=((USER.name||USER.email||'?').trim()[0]||'?').toUpperCase();
     $a('#aUName').textContent=USER.name||'Без имени';
     $a('#aUId').textContent=USER.email||''; }
-  /* вошли: окно закрываем, имя уже в шапке; страницы кабинета и оформления перерисовывает сервер под покупателя */
+  /* в кабинете — перезагрузка: сервер перерисует страницу под покупателя */
   function done(r,msg){
     if(r.sessid) window.BT_SID=r.sessid;
     BT_login(r.user); clearInterval(timer);
@@ -956,7 +915,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       .finally(()=>{busy=false;$a('#aSend').disabled=false;});
   }
 
-  /* поле само понимает, что вводят: цифры → телефон с маской +7, иначе e-mail */
+  /* цифры — телефон с маской, иначе e-mail */
   (function(){
     const inp=$a('#aLogin'), lab=$a('#aLabel'), hint=$a('#aHint');
     const telFmt = v => { let d=v.replace(/\D/g,''); if(!d) return '';
@@ -988,7 +947,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   $a('#aBack').addEventListener('click',()=>{clearInterval(timer);step('pick');});
 
-  /* 4 ячейки кода: только цифры, автопереход, Backspace назад, вставка из буфера */
   const cells=[...au.querySelectorAll('#aCode input')];
   cells.forEach((c,i)=>{
     c.addEventListener('input',()=>{ c.value=c.value.replace(/\D/g,'').slice(0,1);
@@ -1029,14 +987,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   BT_authUpdate();
   if(location.hash==='#auth'||document.querySelector('[data-auth-open]')) BT_auth();
   document.addEventListener('click',e=>{ const b=e.target.closest('[data-auth]'); if(!b) return; e.preventDefault(); BT_auth(); });
-  /* «Кабинет» в шапке и меню: гостя ведём в окно входа, покупателя — в кабинет */
   document.querySelectorAll('.hact[href="/personal/"],.dn__me').forEach(a=>
     a.addEventListener('click',e=>{ if(!USER){ e.preventDefault(); document.getElementById('drawer')?.classList.remove('open'); BT_auth(); } }));
 
-  /* toast + add to cart */
   const t=document.getElementById('toast');let tm;
   window.BT_toast=msg=>{t.innerHTML=msg;t.classList.add('show');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('show'),3200);};
-  /* вернулись от сервиса входа с ошибкой: причина — тостом, окно входа — сразу */
+  /* ошибка входа через сервис: причина — тостом, окно входа — сразу */
   if(/[?&]auth_service_error=/.test(location.search)){
     history.replaceState(null,'',location.pathname+location.search.replace(/[?&]auth_service_(id|error)=[^&]*/g,'').replace(/^&/,'?')+location.hash);
     const e=window.BT_AUTH_ERR||{};
@@ -1052,10 +1008,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll(`.pc[data-pc="${id}"]`).forEach(pc=>{
       const foot=pc.querySelector('.pc__foot'); if(!foot) return;
       const wasIn=document.activeElement, key=wasIn&&foot.contains(wasIn)?wasIn.dataset.q:null;
-      /* перерисовываем только цену и контрол: высота карточки не меняется, страница не дёргается */
+      /* только цена и контрол: высота карточки не меняется, страница не дёргается */
       const k=BT_keyOf(m), cur=foot.querySelector('.addq'), q0=CART[k]||0;
       if(cur && q0>0 && cur.dataset.id===k){
-        /* степпер уже на месте: меняем только число и цену — ничего не пересобираем */
         cur.querySelector('b').innerHTML=q0+'<i>'+(m.bulk?'кг':'шт')+'</i>';
         const box=foot.querySelector('div'); if(box) box.innerHTML=BT_priceBox(m);
       } else {
@@ -1067,13 +1022,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(key){ const b=foot.querySelector(`.addq [data-q="${key}"]`); if(b) b.focus({preventScroll:true}); }
     });
   };
-  // карточки приходят с сервера в состоянии «не в корзине» — подтягиваем степперы по корзине
+  // с сервера карточки приходят «не в корзине» — подтягиваем степперы
   Object.keys(CART).forEach(rerender);
-  // корзина изменилась не отсюда (откат после ошибки сервера, другая вкладка кода) — перерисовать карточку
+  // корзина изменилась в другом месте (откат после ошибки сервера)
   document.addEventListener('bt:cart',e=>{ if(e.detail) rerender(e.detail.id); });
   document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||!b.closest('.pc'))return;
     const k=b.dataset.add; BT_cartSet(k,(CART[k]||0)+1); rerender(k);});
-  // фасовка только выбирается: счётчик и цена переключаются на неё, в корзину — кнопкой
   document.addEventListener('click',e=>{const b=e.target.closest('.pc [data-packs] button');if(!b)return;
     const id=b.closest('[data-packs]').dataset.packs; BT_packPut(id,+b.dataset.kg); rerender(id);});
   document.addEventListener('click',e=>{const b=e.target.closest('.addq button');if(!b)return;
@@ -1084,7 +1038,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const on=BT_favToggle(pc.dataset.pc);
     BT_toast(on?'Добавлено в <a href="/personal/favorites/">избранное</a>':'Убрано из избранного');});
   BT_favUpdate();
-  /* cookie: карточка до нажатия «Понятно», отметка живёт 3 месяца; разметка приходит скрытой всем — из кэша страницы ничего не решается */
+  /* cookie: разметка приходит скрытой всем, показывает JS — кэш страницы ничего не решает */
   const ck=document.getElementById('cookie');
   if(ck&&!/(?:^|;\s*)bt_cookie=1/.test(document.cookie)){
     setTimeout(()=>{ ck.hidden=false; requestAnimationFrame(()=>requestAnimationFrame(()=>ck.classList.add('on'))); },700);
@@ -1097,7 +1051,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const on=BT_cmpToggle(pc.dataset.pc);
     BT_toast(on?'Товар добавлен к сравнению · <a href="/catalog/compare/">Сравнить</a>':'Товар убран из сравнения');});
 
-  /* счётчик цифр: <b data-count="16">16 лет</b> — один проход при появлении, reduced-motion → сразу итог */
   const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const counters=document.querySelectorAll('[data-count]');
   if(counters.length&&!rm&&'IntersectionObserver' in window){
@@ -1111,16 +1064,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     counters.forEach(c=>io.observe(c));
   }
 
-  /* qty */
   document.addEventListener('click',e=>{const b=e.target.closest('.qty button');if(!b)return;
     const i=b.parentNode.querySelector('input');let v=+i.value||1;
-    /* «минус» на единице — это «убрать из корзины», а не тупик */
+    /* «минус» на единице — убрать из корзины */
     if(b.dataset.d==='-'&&v<=1){ i.dispatchEvent(new CustomEvent('bt:qtyzero',{bubbles:true})); return; }
     v+= b.dataset.d==='-'?-1:1;i.value=Math.max(1,v);i.dispatchEvent(new Event('change',{bubbles:true}));});
 
-  /* SEO-разметка (крошки, FAQ, организация, canonical) выводится сервером — см. bt_og, bt_org_ld, bt_faq_ld */
-
-  /* ---------- заявки: попап быстрой заявки и формы data-form → local/ajax/form.php ---------- */
+  /* ---------- заявки → local/ajax/form.php ---------- */
   window.BT_fieldErr=fieldErr;
   const ld=document.getElementById('lead');
   if(ld){
@@ -1133,21 +1083,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       f.hidden=false; ld.querySelector('.lead__ok').hidden=true;
       ld.querySelectorAll('.lead__ok [data-def]').forEach(x=>x.textContent=x.dataset.def);
       ld.querySelector('.lead__t').textContent=topic; f.elements.topic.value=topic; f.dataset.goal=b.dataset.goal||(b.closest('[data-cfg]')?'bt_lead_cfg':'');
-      /* по заказу из кабинета — свой текст подсказки и кнопки, без «модель, количество» */
       const ord=/заказу? № /.test(topic), sb=f.querySelector('[type=submit]');
       f.elements.message.placeholder=/^Отменить/.test(topic)?'Причина отмены, если хотите':ord?'Что хотите узнать или изменить':'Что нужно: модель, количество, адрес';
       sb.dataset.def??=sb.textContent; sb.textContent=ord?'Отправить':sb.dataset.def;
-      /* «Купить в один клик»: имя, телефон и товар без комментария; вошедшему покупателю — его имя и телефон */
       const prod=b.dataset.product||''; f.elements.product.value=prod;
       ld.querySelector('.lead__prod').hidden=!prod; ld.querySelector('.lead__msg').hidden=!!prod; if(prod) f.elements.message.value='';
       const u=window.BT_USER; if(u){ if(!f.elements.name.value&&u.name) f.elements.name.value=u.name; if(!f.elements.phone.value&&u.phone) f.elements.phone.value=u.phone; }
       document.getElementById('drawer')?.classList.remove('open');
       ld.classList.add('open');
-      /* на десктопе каретка сразу в первом пустом поле, на мобильном — нет (клавиатура закроет форму) */
+      /* на мобильном без фокуса — клавиатура закроет форму */
       if(innerWidth>768) setTimeout(()=>{const i=[...f.querySelectorAll('.field input')].find(x=>!x.value); if(i) i.focus();},40);
     });
   }
-  /* форма на странице отправлена: очищаем её и показываем окно «Заявка отправлена» — посетитель остаётся на том же месте */
   const okMsg={subscribe:['Проверьте почту','Мы отправили письмо со ссылкой. Подписка заработает, когда вы по ней перейдёте.']};
   window.BT_formOk=f=>{
     f.reset(); f.querySelectorAll('.is-err').forEach(x=>x.classList.remove('is-err')); f.querySelectorAll('.err').forEach(x=>x.textContent=''); f.querySelectorAll('[aria-invalid]').forEach(x=>x.removeAttribute('aria-invalid'));
@@ -1157,17 +1104,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     ld.querySelector('form').hidden=true; ok.hidden=false; ld.classList.add('open');
     setTimeout(()=>ok.querySelector('.btn').focus({preventScroll:true}),40);
   };
-  /* цель Метрики — только по сохранённой заявке; коды целей заведены в Метрике как «JavaScript-событие» */
+  /* цель Метрики — только по сохранённой заявке; цели заведены как «JavaScript-событие» */
   const goalOf=(form,topic)=>form==='subscribe'?'bt_journal_sub':form==='contact'?'bt_lead_contact':form==='write'?'bt_lead_write':/заказу? № /.test(topic)?'bt_order_question':
     'bt_lead_'+([[/^Аренда/,'arenda'],[/дегустац/i,'degustaciya'],[/один клик/i,'one_click'],[/^Подбор кофе/,'podbor'],[/персональн/i,'predlozhenie'],[/Кофе в офис|поставк/i,'ofis'],[/инженер|ремонт/i,'servis'],[/О компании/,'about']].find(([re])=>re.test(topic))?.[1]||'other');
   const goal=(g,p)=>{try{if(window.BT_YM&&window.ym) ym(BT_YM,'reachGoal',g,p);}catch(e){}};
   document.addEventListener('submit',async e=>{
     const f=e.target.closest('form[data-form]'); if(!f) return;
-    /* невалидную форму уже остановил общий обработчик submit выше */
+    /* невалидную форму уже остановил общий обработчик submit */
     if(e.defaultPrevented||f.dataset.busy){e.preventDefault();return;}
     e.preventDefault();
     const btn=f.querySelector('button[type=submit]'), fd=new FormData(f);
-    /* код формы: им заявка ложится в свою папку в админке и им же засчитывается цель Метрики */
+    /* код формы — папка заявок в админке и цель Метрики: одна форма — одна цель */
     const topic=String(fd.get('topic')||''), g=f.dataset.goal||goalOf(f.dataset.form,topic);
     fd.append('form',f.dataset.form); fd.append('page',location.pathname); fd.append('goal',g);
     f.dataset.busy='1'; if(btn) btn.disabled=true;
@@ -1191,7 +1138,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     finally{ delete f.dataset.busy; if(btn) btn.disabled=false; }
   });
 
-  /* ---------- главная: подбор кофемашины, вкладки «аренда/продажа», карта ---------- */
+  /* ---------- главная ---------- */
   const cfg=document.querySelector('[data-cfg]');
   if(cfg){
     const C=JSON.parse(cfg.dataset.cfg), q=s=>cfg.querySelector(s);
@@ -1202,7 +1149,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-cfg-p]').textContent=d.p; q('[data-cfg-u]').textContent=d.u;
       if(d.lead){a.dataset.lead=d.lead; a.textContent='Оставить заявку';} else {delete a.dataset.lead; a.textContent=a.dataset.text; a.href=a.dataset.href;}
     });
-    /* место под самый длинный вариант: название и описание в 1 или 2 строки не двигают блок при переключении; пересчёт при смене ширины */
+    /* место под самый длинный вариант — блок не прыгает при переключении */
     const fit=()=>{const el={m:q('[data-cfg-m]'),s:q('[data-cfg-s]'),p:q('[data-cfg-p]'),u:q('[data-cfg-u]')}, pr=q('.cfg__price'), was={}, max={m:0,s:0,pr:0};
       if(Object.values(el).some(x=>!x)) return;
       Object.keys(el).forEach(k=>{was[k]=el[k].textContent;}); [el.m,el.s,pr].forEach(x=>x&&(x.style.minHeight=''));
@@ -1214,22 +1161,18 @@ document.addEventListener('DOMContentLoaded',()=>{
     let ft; addEventListener('resize',()=>{clearTimeout(ft); ft=setTimeout(fit,150);});
   }
   document.querySelectorAll('.pill-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{
-    const sec=b.closest('section'); if(!sec||!sec.querySelector('[data-tabpane]')) return; /* у вкладок доставки на оформлении заказа свой обработчик */
+    const sec=b.closest('section'); if(!sec||!sec.querySelector('[data-tabpane]')) return; /* вкладки доставки на оформлении — свой обработчик */
     b.parentNode.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
     sec.querySelectorAll('[data-tabpane]').forEach(p=>p.hidden=p.dataset.tabpane!==b.dataset.tab);
     BT_cmpUpdate(); BT_favUpdate();
   }));
   document.querySelectorAll('[data-ymap]').forEach(el=>BT_mapWidget(el));
-  /* плитка разделов главной — слайдер, как в макете */
   BT_slider(document.getElementById('tiles'),{min:5,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3},1200:{slidesPerView:5,spaceBetween:14}}}});
-  /* отзывы и журнал на главной: на телефоне листаются, на компьютере три в ряд */
   ['revs','news'].forEach(id=>BT_slider(document.getElementById(id),{min:2,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3,spaceBetween:20}}}}));
-  /* «Зерно месяца»: по одному кофе на слайд, точки снизу */
   BT_slider(document.getElementById('beanSw'),{min:2,swiper:{slidesPerView:1,spaceBetween:20,breakpoints:{},pagination:{el:'#beanPg',clickable:true}}});
-  /* 404: поиск открывает общий поиск по сайту с введённым запросом */
   const escq=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  /* ---------- аренда: калькулятор — модели и пороги из ИБ rent, расход 8 г × чашек × 22 дня, цена зерна из каталога ---------- */
+  /* ---------- аренда: калькулятор, расход 8 г × чашек × 22 дня ---------- */
   const rc=document.querySelector('[data-rcalc]');
   if(rc){
     const C=JSON.parse(rc.dataset.rcalc), M=C.models, B=C.bean, q=s=>rc.querySelector(s), rng=q('[data-rc-cups]');
@@ -1253,7 +1196,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const setModel=id=>{const m=M.find(x=>x.id===id); if(m){rng.value=m.cups; draw();}};
     rng.addEventListener('input',draw);
     rc.addEventListener('click',e=>{const b=e.target.closest('[data-rc-m]'); if(b) setModel(b.dataset.rcM);});
-    /* карточка модели на этой же странице ведёт в калькулятор с этой моделью */
     document.querySelectorAll('.rentp [data-pc] a').forEach(a=>a.addEventListener('click',()=>setModel(a.closest('[data-pc]').dataset.pc)));
     q('[data-rc-btn]').addEventListener('click',()=>{
       const f=document.querySelector('#form form'); if(!f||!cur) return;
@@ -1264,7 +1206,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     draw();
   }
 
-  /* ---------- таблица не влезает по ширине — под ней подсказка «листайте» (любая таблица в прокручиваемой обёртке) ---------- */
+  /* ---------- подсказка «листайте» под широкой таблицей ---------- */
   const tswipe=()=>document.querySelectorAll('table').forEach(t=>{
     let w=t.parentElement;
     while(w&&w!==document.body&&!/auto|scroll/.test(getComputedStyle(w).overflowX)) w=w.parentElement;
@@ -1280,7 +1222,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   tswipe(); addEventListener('resize',tswLater); addEventListener('load',tswipe); document.addEventListener('toggle',tswLater,true);
   new MutationObserver(ms=>{ if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&!n.classList.contains('tswipe')))) tswLater(); }).observe(document.body,{childList:true,subtree:true});
 
-  /* ---------- телефон: закреплённая внизу кнопка заявки — видна, пока на экране нет ни одного из watch (кнопки, формы) ---------- */
+  /* ---------- телефон: кнопка заявки внизу, пока не видно ни одного из watch ---------- */
   window.BT_goBar=(label,onTap,watch)=>{
     if(!('IntersectionObserver' in window)) return null;
     const bar=document.createElement('div'); bar.className='mbar'; bar.hidden=true;
@@ -1291,7 +1233,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     return bar;
   };
 
-  /* ---------- страница модели в аренду: галерея, расчёт расхода и двух вариантов оплаты для этой модели ---------- */
+  /* ---------- аренда: страница модели ---------- */
   const rg=document.querySelector('[data-rmgal]');
   if(rg){
     const full=JSON.parse(rg.dataset.rmgal||'[]'), img=rg.querySelector('[data-rmgal-img]'); let cur=0;
@@ -1335,18 +1277,18 @@ document.addEventListener('DOMContentLoaded',()=>{
     draw();
   }
 
-  /* ---------- аренда (новая версия): люди × чашки × дни → расход, модель, два варианта оплаты, цена чашки ---------- */
+  /* ---------- аренда: калькулятор люди × чашки × дни ---------- */
   const r2=document.querySelector('[data-rcalc2]');
   if(r2){
     const C=JSON.parse(r2.dataset.rcalc2), M=C.models, q=s=>r2.querySelector(s), rng=q('[data-rc2-n]');
-    /* расход — с округлением вверх: 7,04 кг показываем как 7,1, иначе восьмая пачка выглядит лишней */
+    /* расход вверх до 0,1: 7,04 → 7,1, иначе восьмая пачка выглядит лишней */
     const kgf=x=>String(Math.ceil(x*10-1e-9)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
     const st={per:2,days:22}; let cur=null;
     const press=(box,v)=>box.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===v));
     const draw=()=>{
       const n=+rng.value, cups=n*st.per, need=cups*C.g*st.days/1000, m=M.find(x=>x.cups>=cups)||M[M.length-1], over=cups>M[M.length-1].cups;
       const B=C.beans.find(b=>b.code===q('[data-rc2-bean]').value)||C.beans[0];
-      /* нагрузка больше самой мощной модели — считаем на k таких машин: аренда и порог бесплатного кофе умножаются */
+      /* нагрузка больше самой мощной модели — считаем на k машин */
       const k=Math.ceil(cups/m.cups), kgA=Math.max(Math.ceil(need),m.kg*k), costA=kgA*BT_tier(B,kgA).p, costB=m.price*k+need*BT_tier(B,Math.max(need,1)).p;
       const a=m.kg>0, best=a&&costA<=costB?'a':'b';
       cur={m,cups,need,n,days:st.days,bean:B.n,costA,costB,kgA};
@@ -1399,10 +1341,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     draw();
   }
 
-  /* ---------- ремонт: отмеченные симптомы — первой строкой поля «Что случилось», свой текст остаётся ---------- */
+  /* ---------- ремонт: симптомы — первой строкой «Что случилось» ---------- */
   const sy=document.querySelector('[data-symp]'), st=document.querySelector('[data-symp-to]');
   if(sy&&st){
-    /* под симптомами — кнопка «Вызвать инженера» к форме; на телефоне она же закреплена внизу, пока на экране нет другой такой кнопки */
     const cta=document.querySelector('[data-symp-cta]'), note=cta?.querySelector('[data-symp-note]'), go=cta?.querySelector('[data-symp-go]'), form=st.closest('form');
     const note0=note?.textContent||'';
     const toForm=e=>{ e&&e.preventDefault(); (form.closest('[id]')||form).scrollIntoView({behavior:'smooth',block:'start'});
@@ -1420,7 +1361,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  /* ---------- кофе в офис: кг в месяц × оптовая сетка сорта, доставка по порогу за одну поставку, расчёт уходит в заявку ---------- */
+  /* ---------- кофе в офис ---------- */
   const oc=document.querySelector('[data-ofcfg]');
   if(oc){
     const S=JSON.parse(oc.dataset.ofcfg), q=s=>oc.querySelector(s), sel=q('[data-of-sort]'), f=document.querySelector('#form form'), msg=f?.elements.message;
@@ -1457,7 +1398,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     calc();
   }
 
-  /* ---------- подбор кофе: вопросы и правила — с сервера (local/parts/podbor-kofe.php), результат — товар каталога ---------- */
+  /* ---------- подбор кофе (вопросы — local/parts/podbor-kofe.php) ---------- */
   const qz=document.querySelector('[data-quiz]');
   if(qz){
     const D=JSON.parse(qz.dataset.quiz), Q=D.q, A={}; let i=0, res=null;
@@ -1513,12 +1454,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   BT_phFit();
 
-  /* ---------- личный кабинет: профиль, юрлица, адреса, повтор заказа → local/ajax/account.php ---------- */
+  /* ---------- личный кабинет → local/ajax/account.php ---------- */
   const accPost=data=>{ const fd=data instanceof FormData?data:new FormData();
     if(!(data instanceof FormData)) Object.entries(data).forEach(([k,v])=>fd.append(k,v));
     fd.append('sessid',window.BT_SID||'');
     return fetch('/local/ajax/account.php',{method:'POST',body:fd,credentials:'same-origin'}).then(r=>r.json()); };
-  /* после сохранения страницу перерисовывает сервер, сообщение показываем уже на новой */
+  /* после сохранения сервер перерисовывает страницу — сообщение показываем на новой */
   try{ const m=sessionStorage.getItem('bt_toast'); if(m){ sessionStorage.removeItem('bt_toast'); setTimeout(()=>BT_toast(m),200); } }catch(e){}
   const reloadWith=msg=>{ try{sessionStorage.setItem('bt_toast',msg);}catch(e){} location.reload(); };
   const accFail=(f,r)=>{
@@ -1536,7 +1477,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   const fill=(f,d)=>Object.entries(d).forEach(([k,v])=>{ const el=f.elements[k]; if(!el||el.type==='checkbox') return; el.value=v??''; if(el.type!=='hidden') fieldErr(el,''); });
   accForm(document.getElementById('accProfile'),'profile',()=>reloadWith('Данные сохранены'));
 
-  /* юрлица: одна форма на добавление и правку */
   const org=document.getElementById('orgForm');
   if(org){
     const add=document.getElementById('orgAdd');
@@ -1553,7 +1493,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  /* адреса: окно с полями; город — из местоположений Битрикса (как в оформлении заказа) */
+  /* адреса: город — из местоположений Битрикса */
   const am=document.getElementById('addrModal');
   if(am){
     const f=am.querySelector('form'), D=JSON.parse(am.dataset.ekb), ci=f.elements.city, ul=f.querySelector('.city ul'), box=document.getElementById('adrMap');
@@ -1588,7 +1528,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     ul.addEventListener('mousedown',e=>e.preventDefault());
     ul.addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li) return;
       ci.value=li.dataset.n; f.elements.loc.value=li.dataset.code; showCities([]); fieldErr(ci,''); });
-    // ввели не до конца и ушли — первое совпадение по началу названия, мусор не подставляем
+    // ввели не до конца и ушли — первое совпадение по началу названия
     const lt=v=>String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я]/g,'');
     const autoCity=()=>{ const v=ci.value.trim(); if(!v||f.elements.loc.value) return; const n=++cityN; clearTimeout(cityT);
       cityPost(v).then(r=>{ if(n!==cityN||ci.value.trim()!==v||f.elements.loc.value) return;
@@ -1600,11 +1540,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     accForm(f,'addr_save',r=>reloadWith(f.elements.id.value>0?'Адрес сохранён':'Адрес добавлен'));
   }
 
-  /* заказы: фильтр по статусу и повтор заказа — позиции уходят в корзину Битрикса */
   document.querySelectorAll('[data-ftabs]').forEach(t=>t.addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return;
     t.querySelectorAll('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));
     document.querySelectorAll('.ord[data-g]').forEach(o=>o.hidden=!!b.dataset.f&&o.dataset.g!==b.dataset.f); }));
-  /* кабинет на телефоне: вкладки листаются — текущая сразу в зоне видимости, край гаснет, пока есть что листать */
   const accNav=document.querySelector('.accp .acc-nav');
   if(accNav){
     const edge=()=>{ const s=accNav.scrollWidth>accNav.clientWidth+2;
@@ -1625,7 +1563,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 })();
 
-/* ---------- кастомный выпадающий список: нативный <select> остаётся источником значения ---------- */
+/* ---------- выпадающий список: значение хранит нативный <select> ---------- */
 (function(){
   const CH='<svg aria-hidden="true" focusable="false" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5l5-5"/></svg>';
   let openSel=null;
@@ -1676,7 +1614,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       paint(); close(sel); btn.focus(); }
     function open(){
       if(openSel&&openSel!==sel) close(openSel);
-      /* вверх, если снизу не помещается; вправо, если упирается в правый край */
       const r=btn.getBoundingClientRect();
       list.classList.toggle('sel__list--up', r.bottom+280>innerHeight && r.top>280);
       list.classList.toggle('sel__list--right', r.left+Math.max(240,r.width)>innerWidth-16);
@@ -1696,14 +1633,13 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(e.key==='Tab'&&o){ close(sel); }
     });
     native.addEventListener('change',paint);
-    /* список опций может прийти позже (селект заполняет скрипт страницы) — пересобираем */
+    /* опции может дозаполнить скрипт страницы — пересобираем */
     new MutationObserver(()=>{ list.innerHTML=''; opts.length=0;
       [...native.children].forEach(node=>{
         if(node.tagName==='OPTGROUP'){ const g=document.createElement('div'); g.className='sel__grp'; g.textContent=node.label; list.appendChild(g);
           [...node.children].forEach(o=>opts.push(add(o))); }
         else opts.push(add(node));
       }); paint(); }).observe(native,{childList:true});
-    /* ошибки валидации подсвечиваем на обёртке */
     new MutationObserver(()=>sel.classList.toggle('is-err',
       !!native.closest('.field')&&native.closest('.field').classList.contains('is-err')))
       .observe(native.closest('.field')||native,{attributes:true,attributeFilter:['class']});
@@ -1716,7 +1652,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('DOMContentLoaded',()=>BT_selects());
 })();
 
-/* ---------- характеристики для страницы сравнения: отдаёт сервер на /catalog/compare/ ---------- */
+/* ---------- сравнение: характеристики ---------- */
 window.BT_SPECS = window.BT_SPECS || {names:[],vals:{}};
 window.BT_cmpCat = id => BT_PRODUCTS.coffee.some(x=>x.id===id)?'coffee'
   : BT_PRODUCTS.tea.some(x=>x.id===id)?'tea'
@@ -1724,7 +1660,7 @@ window.BT_cmpCat = id => BT_PRODUCTS.coffee.some(x=>x.id===id)?'coffee'
   : (BT_PRODUCTS.acc||[]).some(x=>x.id===id)?'acc':'other';
 window.BT_CAT_NAMES = {coffee:'Кофе',tea:'Чай',machines:'Кофемашины',acc:'Аксессуары',other:'Прочее'};
 
-/* ---------- появление блоков при скролле (только там, где расставлены data-rv) ---------- */
+/* ---------- появление при скролле (data-rv) ---------- */
 (function(){
   function init(){
     const els=document.querySelectorAll('[data-rv]'); if(!els.length) return;
@@ -1741,15 +1677,14 @@ window.BT_CAT_NAMES = {coffee:'Кофе',tea:'Чай',machines:'Кофемаши
   window.BT_reveal=init;
 })();
 
-/* ---------- слайдеры: единственная библиотека на проекте — Swiper ---------- */
+/* ---------- слайдеры (Swiper) ---------- */
 window.BT_sliderBtns = () => `
   <button class="sw-btn sw-btn--p" type="button" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
   <button class="sw-btn sw-btn--n" type="button" aria-label="Вперёд"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>`;
-/* превращает контейнер с карточками в слайдер: .grid → .swiper-wrapper, дети → .swiper-slide */
 window.BT_slider = (box, opts) => {
   if(!box || !window.Swiper || box.dataset.sw) return null;
   const kids=[...box.children]; if(!kids.length) return null;
-  const min=(opts&&opts.min)||5;                 /* меньше — оставляем обычной сеткой */
+  const min=(opts&&opts.min)||5;
   if(kids.length<min) return null;
   box.dataset.sw='1';
   const wrap=document.createElement('div'); wrap.className='sw';
@@ -1766,15 +1701,12 @@ window.BT_slider = (box, opts) => {
   },(opts&&opts.swiper)||{}));
 };
 
-/* ---------- Яндекс Карты ----------
-   Интерактивная карта (клик по точке + определение адреса) работает только с API-ключом:
-   ключ бесплатный; вписывается в админке: Настройки модулей → Управление структурой → «Ключ API Яндекс.Карт» (header.php) */
+/* ---------- Яндекс Карты (ключ API — Настройки модулей → Управление структурой) ---------- */
 window.BT_YMAPS_KEY = window.BT_YMAPS_KEY || '';
-window.BT_CO_COORDS = window.BT_CO_COORDS || [60.533999,56.78314];   /* точка из «Контакты и реквизиты» (header.php), запасная — ул. Колокольная, 31А */
+window.BT_CO_COORDS = window.BT_CO_COORDS || [60.533999,56.78314];   /* запасная точка — ул. Колокольная, 31А */
 
-/* Статичная карта-виджет: работает БЕЗ ключа (конструктор карт Яндекса) */
 window.BT_MAP_QUERY = 'Екатеринбург, улица Колокольная, 31А';
-/* Проекция Яндекса — Меркатор на эллипсоиде WGS84: пиксели мира на масштабе z <-> долгота/широта */
+/* проекция Яндекса — Меркатор на эллипсоиде WGS84 */
 const BT_merc = {
   e: 0.0818191908426,
   toPx(lon, lat, z){ const S = 256*2**z, f = lat*Math.PI/180, es = this.e*Math.sin(f);
@@ -1785,8 +1717,7 @@ const BT_merc = {
 };
 window.BT_mapWidget = (el, opts) => {
   if(!el) return;
-  /* статичная карта Яндекса без ключа, рекламы и кнопок виджета. Одна картинка — максимум 650×450,
-     поэтому большой блок собираем из кусков внахлёст: следующий кусок закрывает логотип предыдущего, виден один — в правом нижнем углу */
+  /* картинка не больше 650×450 — большой блок собираем из кусков внахлёст, логотип виден один */
   const o = Object.assign({c:BT_CO_COORDS, z:17}, opts||{});
   const W = Math.round(el.clientWidth||650), H = Math.round(el.clientHeight||420);
   const cols = W <= 650 ? 1 : Math.max(2, Math.ceil((W-210)/(650-210))), rows = H <= 450 ? 1 : Math.ceil((H-30)/(450-30));
@@ -1811,20 +1742,18 @@ window.BT_mapWidget = (el, opts) => {
   return box;
 };
 
-/* Яндекс Карты 2.1: грузим один раз и только когда карта нужна (2.1, а не 3.0 — ключу не нужна привязка к адресу сайта) */
+/* 2.1, а не 3.0: ключу не нужна привязка к адресу сайта */
 window.BT_ymaps = () => window.ymaps&&ymaps.Map ? Promise.resolve(window.ymaps) : (window.BT_ymapsP = window.BT_ymapsP || new Promise((res,rej)=>{
   if(!BT_YMAPS_KEY) return rej();
   const s=document.createElement('script');
   s.src=`https://api-maps.yandex.ru/2.1/?apikey=${BT_YMAPS_KEY}&lang=ru_RU`;
   s.onload=()=>ymaps.ready(()=>res(window.ymaps)); s.onerror=()=>{ window.BT_ymapsP=null; rej(); }; document.head.appendChild(s);
 }));
-/* метка в стиле сайта: чёрная с лаймовой точкой; выбранная — лаймовая */
 window.BT_mapPin = on => { const s=on?40:28, fill=on?'#D7E85C':'#0E0E0C', dot=on?'#0E0E0C':'#D7E85C';
   return {iconLayout:'default#image',iconImageSize:[s,s*1.25],iconImageOffset:[-s/2,-s*1.25],
     iconImageHref:'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s*1.25}" viewBox="0 0 24 30"><path fill="${fill}" stroke="#fff" stroke-width="1.5" d="M12 1.5a9 9 0 0 0-9 9c0 6.6 9 17.5 9 17.5s9-10.9 9-17.5a9 9 0 0 0-9-9Z"/><circle cx="12" cy="10.5" r="3.6" fill="${dot}"/></svg>`)}; };
 
-/* Интерактивная карта с выбором точки. Без ключа или без связи возвращает null — вызывающий код
-   оставляет ручной ввод адреса. */
+/* без ключа или связи — null, остаётся ручной ввод адреса */
 window.BT_mapPicker = (el, onPick, opts) => {
   if(!el || !BT_YMAPS_KEY) return null;
   return BT_ymaps().then(ymaps=>{
@@ -1834,7 +1763,6 @@ window.BT_mapPicker = (el, onPick, opts) => {
     map.events.add('click',async e=>{
       const c=e.get('coords');
       if(!mark){ mark=new ymaps.Placemark(c,{},BT_mapPin(true)); map.geoObjects.add(mark); } else mark.geometry.setCoordinates(c);
-      /* обратное геокодирование: адрес по координатам */
       try{
         const r=await fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${window.BT_YGEO_KEY||BT_YMAPS_KEY}&format=json&lang=ru_RU&geocode=${c[1]},${c[0]}`);
         const j=await r.json();
@@ -1848,11 +1776,9 @@ window.BT_mapPicker = (el, onPick, opts) => {
   }).catch(()=>null);
 };
 
-/* Страница результатов поиска: свой крестик очистки вместо системного */
 document.addEventListener('click',e=>{const b=e.target.closest('.spage__clr'); if(!b) return;
   const f=b.form; f.q.value=''; f.classList.remove('has-q'); f.q.focus();});
 document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('.spage__f'); if(f) f.classList.toggle('has-q',!!e.target.value);});
-/* вкладки результатов поиска: подменяем блок результатов без перезагрузки страницы */
 (()=>{
   const load=(url,push)=>{const box=document.getElementById('spRes'); if(!box) return location.assign(url);
     box.classList.add('is-loading');
@@ -1868,17 +1794,13 @@ document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest
     e.preventDefault(); if(!a.hasAttribute('aria-current')) load(a.href,true);});
   addEventListener('popstate',()=>{ if(document.getElementById('spRes')) load(location.href,false); });
 })();
-/* «Скопировать» (реквизиты и т.п.): текст из data-copy в буфер обмена */
-// главная, «Наши установки»: фото на весь экран с листанием по ленте
 document.addEventListener('click',e=>{const a=e.target.closest('[data-works] .works__i'); if(!a) return; e.preventDefault();
   const all=[...a.closest('[data-works]').querySelectorAll('.works__i')]; BT_lightbox(all.map(x=>({src:x.getAttribute('href'),cap:x.textContent.trim()})),all.indexOf(a));});
-// трубка в шапке: всплывашка открывается кнопкой, закрывается кликом мимо, по ссылке внутри и по Esc
 document.addEventListener('click',e=>{const p=document.getElementById('telpop'), b=document.querySelector('.hact--tel'); if(!p||!b) return;
   if(e.target.closest('.hact--tel')){ p.hidden=!p.hidden; b.setAttribute('aria-expanded',!p.hidden); return; }
   if(p.hidden||(e.target.closest('#telpop')&&!e.target.closest('a'))) return;
   p.hidden=true; b.setAttribute('aria-expanded','false');});
 document.addEventListener('keydown',e=>{const p=document.getElementById('telpop'); if(e.key==='Escape'&&p&&!p.hidden){ p.hidden=true; document.querySelector('.hact--tel')?.setAttribute('aria-expanded','false'); }});
-// футер на телефоне: колонки ссылок раскрываются по заголовку
 document.addEventListener('click',e=>{const h=e.target.closest('.ftr__acc>.ftr__h'); if(!h) return; h.setAttribute('aria-expanded',h.parentElement.classList.toggle('is-open'));});
 document.addEventListener('DOMContentLoaded',()=>{ if(matchMedia('(max-width:720px)').matches) document.querySelectorAll('.ftr__acc>.ftr__h').forEach(h=>h.setAttribute('aria-expanded','false')); });
 document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]'); if(!b) return;
@@ -1886,7 +1808,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]'); i
   if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done).catch(()=>{});
   else { const t=document.createElement('textarea'); t.value=b.dataset.copy; document.body.appendChild(t); t.select(); try{document.execCommand('copy');done();}catch(err){} t.remove(); }});
 
-/* Окно подтверждения на стилях модалок: BT_confirm({title,text,ok,cancel}) → Promise<boolean>. Esc, фон и «×» — отмена */
+/* BT_confirm({title,text,ok,cancel}) → Promise<boolean> */
 window.BT_confirm = o => new Promise(res => {
   let m=document.getElementById('btConfirm');
   if(!m){ document.body.insertAdjacentHTML('beforeend',`<div class="modal modal--confirm" id="btConfirm" role="alertdialog" aria-modal="true" aria-labelledby="btConfirmT" aria-describedby="btConfirmD">
@@ -1906,7 +1828,7 @@ window.BT_confirm = o => new Promise(res => {
   m.classList.add('open'); setTimeout(()=>m.querySelector('.modal__btns [data-cf="1"]').focus(),30);
 });
 
-/* Подсказки адреса DaData: улица и дом в городе (opt.city) или полный адрес (opt.full). Ввели не до конца и ушли из поля — подставляем лучшее совпадение */
+/* подсказки DaData; ввели не до конца и ушли — подставляем лучшее совпадение */
 window.BT_addrSuggest=(inp,opt={})=>{
   if(!inp||inp.dataset.sugg) return; inp.dataset.sugg=1;
   const f=inp.closest('.field'); f.classList.add('city','street');
@@ -1931,7 +1853,7 @@ window.BT_addrSuggest=(inp,opt={})=>{
     if(li.dataset.h!=='1'&&!opt.full)inp.dispatchEvent(new Event('input'));});
   const auto=()=>{const v=inp.value.trim();if(v.length<2)return;const k=++n;clearTimeout(t);
     req(v).then(r=>{if(k!==n||inp.value.trim()!==v)return;
-      // слова введённого должны встречаться в подсказке в том же порядке: «москва тверская» ≠ «Тверская обл, деревня Москва»
+      // слова — в том же порядке: «москва тверская» ≠ «Тверская обл, деревня Москва»
       const num=v.match(/\d.*$/),w=words(v),fits=x=>{let i=0;return w.every(y=>{const k=flat(x).indexOf(y,i);if(k<0)return false;i=k+y.length;return true;});};
       const s=w.length&&(r.list||[]).find(x=>fits(x.v));
       if(!s)return;
@@ -1944,7 +1866,6 @@ window.BT_addrSuggest=(inp,opt={})=>{
 };
 document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('input[name=company_adr]').forEach(i=>BT_addrSuggest(i,{full:true})));
 
-/* Плавное раскрытие и скрытие вопросов-ответов (details): высота анимируется, без анимации — если пользователь её отключил */
 document.addEventListener('click',e=>{
   const s=e.target.closest('.faq details>summary'); if(!s||matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const d=s.parentElement; e.preventDefault();
@@ -1956,11 +1877,10 @@ document.addEventListener('click',e=>{
   d._a.onfinish=()=>{ d._a=null; d.style.overflow=''; if(closing) d.open=false; };
 });
 
-/* плитки разделов каталога: на узком экране активная плитка при загрузке — в зоне видимости */
 document.addEventListener('DOMContentLoaded',()=>{ const a=document.querySelector('.rootcats .rootcat.cur');
   if(a&&innerWidth<=1050){ const r=a.parentElement; r.scrollLeft=a.offsetLeft-(r.clientWidth-a.offsetWidth)/2; } });
 
-/* журнал: «Показать ещё» дописывает следующую страницу в сетку без перезагрузки; блок счётчика заменяется блоком из ответа */
+/* журнал «Показать ещё»: блок навигации заменяем блоком из ответа */
 document.addEventListener('click',e=>{
   const a=e.target.closest('.jmore a[href]'); if(!a||e.ctrlKey||e.metaKey) return; e.preventDefault();
   const box=a.closest('.jmore'); if(box.classList.contains('is-loading')) return; box.classList.add('is-loading'); a.textContent='Загружаем…';
@@ -1973,11 +1893,11 @@ document.addEventListener('click',e=>{
   }).catch(()=>{ location.href=a.href; });
 });
 
-/* оглавление статьи: подсвечиваем раздел, до которого дочитали (последний заголовок выше линии под шапкой), раскрываем его подпункты, показываем прогресс */
+/* оглавление: текущий раздел — последний заголовок выше линии под шапкой */
 document.addEventListener('DOMContentLoaded',()=>{
   const links=[...document.querySelectorAll('.post__toc a[href^="#"]')]; if(!links.length) return;
   const toc=links[0].closest('.post__toc'), body=document.querySelector('.post .post__body'), pct=toc.querySelector('.post__toc-pct'), mins=+toc.dataset.min||0;
-  // оглавление начинается вровень с верхом главной картинки (или текста, если картинки нет), а не с заголовком
+  // оглавление вровень с главной картинкой (или текстом), а не с заголовком
   const aside=document.querySelector('.post>aside'), top=document.querySelector('.post .post__ph, .post .post__body');
   const align=()=>{ if(!aside||!top) return; aside.style.paddingTop=innerWidth>900?Math.max(0,top.getBoundingClientRect().top-aside.parentElement.getBoundingClientRect().top)+'px':''; };
   align(); addEventListener('resize',align); addEventListener('load',align);
@@ -1991,7 +1911,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(body&&pct){ const r=body.getBoundingClientRect(), p=Math.min(1,Math.max(0,(innerHeight*.5-r.top)/r.height)), left=Math.ceil(mins*(1-p));
       toc.style.setProperty('--p',p); pct.textContent=Math.round(p*100)+'%'+(mins&&left?' · '+left+' мин':''); } };
   addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(spy); },{passive:true}); spy();
-  // колонка выше экрана — как фильтр каталога: при прокрутке вниз уезжает до своего низа, при прокрутке вверх возвращается к шапке
+  // колонка выше экрана липнет, как фильтр каталога
   const side=toc.closest('.post__side'); if(!side) return;
   const topGap=parseFloat(getComputedStyle(side).top)||0, desk=matchMedia('(min-width:1001px)');
   let lastY=scrollY, off=topGap;
@@ -2001,7 +1921,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   addEventListener('scroll',stick,{passive:true}); addEventListener('resize',stick); stick();
 });
 
-/* Просмотр фото на весь экран: BT_lightbox([{src, cap}], index). Листание стрелками, свайпом и клавишами, двойной клик — увеличение, Esc/фон — закрыть */
+/* BT_lightbox([{src, cap}], index) */
 window.BT_lightbox=(items,start=0)=>{
   const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const many=items.length>1, back=document.activeElement;
@@ -2020,7 +1940,7 @@ window.BT_lightbox=(items,start=0)=>{
   el.tabIndex=-1; requestAnimationFrame(()=>{ el.classList.add('open'); el.focus({preventScroll:true}); });
 };
 
-/* Отзывы: «Читать полностью» — только у обрезанного текста, открывает отзыв в окне; письма-картинки — в просмотр */
+/* «Читать полностью» — только у обрезанного текста */
 document.addEventListener('DOMContentLoaded',()=>{
   const cards=[...document.querySelectorAll('.rev')]; if(!cards.length) return;
   const check=()=>cards.forEach(c=>{ const t=c.querySelector('.rev__txt'), b=c.querySelector('.rev__more'); if(t&&b) b.hidden=t.scrollHeight<=t.clientHeight+2; });
@@ -2041,14 +1961,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-/* Форма отзыва (товар и компания, разметка — bt_review_form): оценка, файлы с превью, проверка полей, отправка на проверку */
+/* форма отзыва (разметка — bt_review_form) */
 window.BT_reviewForm=root=>{
   if(!root||root.dataset.ready) return; root.dataset.ready='1';
   const q=s=>root.querySelector(s), F=n=>q(`[name="${n}"]`), pdf=(q('input[type=file]')?.accept||'').includes('pdf');
-  /* оценка */
   q('[data-rpick]').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;
     [...b.parentNode.children].forEach(x=>x.classList.add('btn--ghost'));b.classList.remove('btn--ghost');});
-  /* файлы: до 5, JPG/PNG (у отзыва о компании ещё PDF), до 10 МБ */
+  /* до 5 файлов JPG/PNG (у отзыва о компании ещё PDF), до 10 МБ */
   const inp=q('input[type=file]'), zone=inp.closest('.drop'), box=q('.thumbs'); let files=[];
   const paint=()=>{
     box.innerHTML=files.map((f,i)=>`<figure>${f.type==='application/pdf'?'<span class="thumbs__pdf">PDF</span>':`<img src="${window.URL.createObjectURL(f)}" alt="">`}
@@ -2065,10 +1984,8 @@ window.BT_reviewForm=root=>{
   ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('is-over');}));
   ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('is-over');}));
   zone.addEventListener('drop',e=>add(e.dataTransfer.files));
-  /* вошедшему — имя (без фамилии) и почта */
   const fill=u=>{ if(!u) return; if(!F('name').value&&u.name) F('name').value=u.name.split(' ')[0]; if(!F('email').value&&u.email) F('email').value=u.email; };
   fill(window.BT_USER); document.addEventListener('bt:auth',e=>fill(e.detail));
-  /* проверка: ошибка после ухода с поля или по кнопке, исправили — пропадает сразу */
   const agree=q('[data-agree]'), send=q('[data-send]'), err=q('[data-err]');
   try{ if(localStorage.getItem('bt_agree')==='1') agree.checked=true; }catch(e){}
   const setErr=(el,msg)=>{ const f=el.closest('.field')||el.closest('.check'); if(!f) return; f.classList.toggle('is-err',!!msg);
@@ -2110,7 +2027,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal--revf.open').forEach(m=>m.classList.remove('open')); });
 });
 
-// мобильная панель «сумма + кнопка» внизу экрана, пока основная кнопка не видна
+// мобильная панель «сумма + кнопка», пока основная кнопка не видна
 window.BT_mbar=(btn,sumEl,onTap,note)=>{
   if(!btn||!('IntersectionObserver' in window))return;
   const bar=document.createElement('div');bar.className='mbar';bar.hidden=true;
@@ -2131,20 +2048,16 @@ window.BT_mbar=(btn,sumEl,onTap,note)=>{
   sync();
 };
 
-// фото в тексте статьи журнала — по клику в просмотр, листаются все фото статьи
 document.addEventListener('click',e=>{
   const img=e.target.closest('.post__body img'); if(!img||img.closest('a')) return;
   const all=[...img.closest('.post__body').querySelectorAll('img')].filter(i=>!i.closest('a'));
   BT_lightbox(all.map(i=>({src:i.currentSrc||i.src,cap:i.closest('figure')?.querySelector('figcaption')?.textContent.trim()||i.alt})),all.indexOf(img));
 });
 
-// журнал: остальные темы по кнопке «Ещё N»
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tags-more]');if(!b)return;b.closest('.jtags').classList.add('is-open');});
 
-// сертификат сервисного центра («О компании», «Ремонт кофемашин») по клику — на весь экран
 document.addEventListener('click',e=>{const a=e.target.closest('.cert__a'); if(!a) return; e.preventDefault();
   BT_lightbox([{src:a.getAttribute('href'),cap:''}],0);});
-// «О компании»: отзывы и фотогалерея — слайдеры, клик по фото — просмотр на весь экран
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('[data-revs]').forEach(el=>BT_slider(el,{min:4,swiper:{breakpoints:{560:{slidesPerView:2,spaceBetween:14},900:{slidesPerView:3,spaceBetween:16},1200:{slidesPerView:4,spaceBetween:18}}}}));
   const box=document.querySelector('.aboutp .agal'); if(!box) return;
@@ -2153,7 +2066,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   BT_slider(box.querySelector('[data-gallery]'),{min:2,swiper:{slidesPerView:'auto',spaceBetween:14,breakpoints:{}}});
 });
 
-/* Наши клиенты: фильтры на лету (счётчики по остальным фильтрам, адрес с фильтром), выпадающие списки модели и города, шахматка по видимым карточкам, фото — на весь экран по всем видимым установкам */
+/* ---------- наши клиенты ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   const grid=document.querySelector('[data-kl-grid]'); if(!grid) return;
   const bar=document.querySelector('[data-kl-bar]'), cards=[...grid.querySelectorAll('.klc')], btns=[...bar.querySelectorAll('[data-kl-f]')], dds=[...bar.querySelectorAll('[data-kl-dd]')], keys=['obj','model','city'];
@@ -2194,8 +2107,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   draw();
 });
 
-/* Прайс-лист: поиск, категории и «Выбранные» на лету (адрес с фильтром), количество в строке пишет в общую корзину, подсветка оптовой ступени,
-   скидка от суммы заказа в панели снизу, подборки сверху, превью фото, запрос счёта, подписка на цены, персональная метка ?m= */
+/* ---------- прайс-лист ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   const bar=document.querySelector('[data-prc-bar]'); if(!bar) return;
   const rows=[...document.querySelectorAll('[data-prc-row]')], secs=[...document.querySelectorAll('[data-prc-sec]')], qIn=bar.querySelector('[data-prc-q]'), cats=[...bar.querySelectorAll('[data-prc-cat]')];
@@ -2207,7 +2119,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const secOf=r=>r.closest('[data-prc-sec]').dataset.prcSec;
   const keyOf=r=>BT_key(r.dataset.id,+r.dataset.kg);
   const qOf=r=>(BT_cartItems().find(c=>c.key===keyOf(r))||{}).q||0;
-  /* «Только выбранные» — отдельный режим просмотра поверх категории и поиска, а не ещё одна категория */
+  /* «Только выбранные» — режим поверх категории и поиска, а не категория */
   const onlyBtn=bar.querySelector('[data-prc-only]'); let only=false;
   const filter=()=>{
     const words=qIn.value.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean);
@@ -2227,7 +2139,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   qIn.addEventListener('input',filter);
   bar.addEventListener('click',e=>{ const b=e.target.closest('[data-prc-cat]'); if(b){ cat=b.dataset.prcCat; filter(); return; }
     if(e.target.closest('[data-prc-only]')&&onlyBtn.getAttribute('aria-disabled')!=='true'){ only=!only; filter(); } });
-  /* количество: кофе на развес — кг упаковками по 1 кг (ступень считается от общего веса), остальное — штуки */
   const draw=r=>{ const m=BT_find(r.dataset.id), inp=r.querySelector('[data-prc-in]'); if(!m||!inp) return;
     const kg=+r.dataset.kg, q=qOf(r), sum=r.querySelector('[data-prc-sum]');
     document.activeElement===inp||(inp.value=q);
@@ -2264,7 +2175,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.addEventListener('change',e=>{ const i=e.target.closest('[data-prc-in]'); if(i) set(i.closest('[data-prc-row]'),i.value); });
   document.addEventListener('keydown',e=>{ const i=e.target.closest('[data-prc-in]'); if(i&&e.key==='Enter'){ e.preventDefault(); i.blur(); } });
   document.addEventListener('bt:cart',e=>{ rows.filter(r=>r.dataset.id===String(e.detail.id)).forEach(draw); drawBag(); filter(); });
-  /* превью фото товара при наведении на название — только с мышью */
   if(matchMedia('(hover:hover)').matches){
     const pv=document.createElement('img'); pv.className='prcpv'; pv.alt=''; pv.hidden=true; document.body.appendChild(pv);
     const at=e=>{ const x=e.clientX+24, y=e.clientY-90; pv.style.left=Math.min(x,innerWidth-240)+'px'; pv.style.top=Math.max(8,Math.min(y,innerHeight-230))+'px'; };
@@ -2273,7 +2183,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.addEventListener('mousemove',e=>{ if(!pv.hidden) at(e); });
     document.addEventListener('mouseout',e=>{ if(e.target.closest('.prct__n a')&&!e.relatedTarget?.closest?.('.prct__n a')) pv.hidden=true; });
   }
-  /* запрос счёта: заказ на организацию из корзины — самовывоз и оплата по счёту, менеджер согласует доставку */
+  /* запрос счёта: самовывоз и оплата по счёту, доставку согласует менеджер */
   const inv=document.getElementById('prcInv'), invF=inv?.querySelector('[data-prc-invf]');
   const invOpen=()=>{ if(!inv) return; const t=BT_cartTotal(), d=BT_sumDisc(t.sum); inv.querySelector('[data-prc-inv-sum]').textContent=BT_fmt(t.sum-d.cut);
     const u=window.BT_USER; if(u){ invF.elements.name.value||=u.name||''; invF.elements.phone.value||=u.phone||''; invF.elements.email.value||=u.email||''; }
@@ -2294,7 +2204,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       first&&first.focus();
     }catch(err){ errBox.textContent='Нет связи с сервером. Попробуйте ещё раз.'; }
     finally{ delete invF.dataset.busy; btn.disabled=false; } });
-  /* подписка на изменение цен */
   const subF=document.querySelector('[data-prc-subf]');
   subF?.addEventListener('submit',async e=>{ e.preventDefault(); if(subF.dataset.busy) return; subF.dataset.busy='1';
     const fd=new FormData(subF); fd.append('action','sub');
@@ -2307,8 +2216,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   rows.forEach(draw); drawBag(); filter();
 });
 
-/* Прайс-лист: редактор цен для сотрудников с правом «Изменение цен» — розница, старая цена, оптовые ступени; загрузка из Excel, изменение на %, журнал с возвратом.
-   Разметку рисует только этот скрипт и только по BT_USER.priceEdit — в кеш страницы редактор не попадает */
+/* ---------- редактор цен: рисует только скрипт по BT_USER.priceEdit, в кеш страницы не попадает ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   const box=document.querySelector('[data-prc-ed]'); if(!box||!window.BT_USER?.priceEdit) return;
   const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2458,7 +2366,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   msg&&setTimeout(()=>BT_toast(esc(msg)),300);
 });
 
-// оплата по СБП: ждём деньги — спрашиваем сайт раз в 3 с (через 2 минуты — раз в 6 с) и сразу, когда покупатель вернулся из приложения банка
+// СБП: опрос раз в 3 с (через 2 мин — 6 с) и сразу по возврату из приложения банка
 document.addEventListener('DOMContentLoaded',()=>{
   const s=document.querySelector('.sbp[data-id]'); if(!s) return;
   const st=s.querySelector('.sbp__st'), t0=Date.now();
@@ -2467,7 +2375,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const ask=()=>{
     clearTimeout(tm); if(done||busy) return;
     busy=true;
-    // зависший запрос (вкладку заморозили, пока покупатель в приложении банка) не должен останавливать ожидание
+    // зависший запрос (вкладку заморозили) не должен останавливать ожидание
     const ac=new AbortController(), kill=setTimeout(()=>ac.abort(),12000);
     const fd=new FormData(); fd.append('action','sbp'); fd.append('id',s.dataset.id); fd.append('pid',s.dataset.pid); fd.append('sessid',window.BT_SID||'');
     fetch('/local/ajax/order.php',{method:'POST',body:fd,signal:ac.signal}).then(r=>r.json()).then(r=>{
@@ -2476,7 +2384,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       else if(r.state==='dead'){ done=true; s.classList.add('is-dead'); show('is-err','Оплата не прошла или время вышло. <a class="link" href="">Попробовать снова</a>'); }
     }).catch(()=>{}).finally(()=>{ clearTimeout(kill); busy=false; if(done) return;
       const age=Date.now()-t0;
-      // через 20 минут сами не спрашиваем — только когда покупатель вернётся на вкладку
+      // через 20 минут — только по возврату на вкладку
       if(age>20*60e3){ show('is-idle','Не видим оплату. Если вы уже заплатили, <a class="link" href="">обновите страницу</a>'); return; }
       tm=setTimeout(ask,document.hidden?15000:age>12e4?6000:3000); });
   };
@@ -2487,12 +2395,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   b&&b.addEventListener('click',()=>{ s.classList.add('qr-open'); b.hidden=true; q.focus({preventScroll:true}); q.scrollIntoView({behavior:'smooth',block:'nearest'}); });
 });
 
-// SberPay: запрос на оплату в СберБанк Онлайн по номеру телефона (на компьютере сразу, на телефоне — «с другого телефона»); оплату ждёт блок СБП выше
+// SberPay: пуш в СберБанк Онлайн по номеру телефона; оплату ждёт блок СБП
 document.addEventListener('DOMContentLoaded',()=>{
   const s=document.querySelector('.spay[data-id]'), f=s&&s.querySelector('.spay__form'); if(!f) return;
   const inp=f.querySelector('input[name=phone]'), btn=f.querySelector('button[type=submit]'), sent=f.querySelector('.spay__sent'), o=s.querySelector('.spay__other');
   let tm=0;
-  // повторный запрос — не раньше чем через 30 с: банк шлёт пуш на каждый
+  // повтор не раньше 30 с: банк шлёт пуш на каждый запрос
   const lock=sec=>{ clearInterval(tm); let n=sec;
     const tick=()=>{ btn.disabled=n>0; btn.textContent=n>0?'Отправить ещё раз через '+n+' с':'Отправить ещё раз'; if(--n<0) clearInterval(tm); };
     tick(); tm=setInterval(tick,1000); };
@@ -2510,8 +2418,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-/* ---------- каталог: фильтр выше экрана липнет нижним краем — едет вместе с товарами, пока не покажется его низ
-   (с top:130px он вставал раньше товаров, а низ фильтра был недоступен до конца страницы); на телефоне фильтр — окно, не трогаем ---------- */
+/* ---------- каталог: высокий фильтр липнет нижним краем; на телефоне не трогаем ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   const f=document.querySelector('.cat>.filters'); if(!f) return;
   const set=()=>{ f.style.top=''; if(getComputedStyle(f).position!=='sticky') return;
@@ -2520,16 +2427,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(window.ResizeObserver) new ResizeObserver(set).observe(f);
 });
 
-/* ---------- электронная коммерция Метрики (dataLayer): списки, карточка товара, корзина; покупка — на оформлении заказа ---------- */
+/* ---------- электронная коммерция Метрики (dataLayer); покупка — на оформлении заказа ---------- */
 window.dataLayer=window.dataLayer||[];
 window.BT_ec=(type,data)=>{try{dataLayer.push({ecommerce:{currencyCode:'RUB',[type]:data}});}catch(e){}};
 window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||0},m.cat?{category:m.cat}:{},extra||{});
 (()=>{
-  /* список — заголовок блока с карточкой (витрины главной, «Рекомендуем»), иначе заголовок страницы */
+  /* список — заголовок блока с карточкой, иначе заголовок страницы */
   const list=pc=>{const s=pc.closest('section'), h=s&&s.querySelector('h1,h2,.th');
     return ((h||document.querySelector('h1'))?.textContent||document.title).replace(/\s+/g,' ').trim().slice(0,100);};
   const seen=[];
-  /* видимые карточки, которые ещё не попали в показы: при загрузке, после «Показать ещё», фильтра, переключения вкладок */
   const shown=()=>{const add=[];
     document.querySelectorAll('.pc[data-pc]').forEach(pc=>{const id=pc.dataset.pc; if(seen.includes(id)||!pc.offsetParent) return; const m=BT_find(id); if(!m||m.rent) return;
       seen.push(id); add.push(BT_ecItem(m,{list:list(pc),position:seen.length}));});

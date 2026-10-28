@@ -1,5 +1,5 @@
 <?php
-// Оплата картой, по СБП и через SberPay модулем Т-Банка (tinkoff.payment): ссылка на оплату, QR для СБП, SberPay, сверка статуса с банком, агент сверки
+// Оплата через Т-Банк (tinkoff.payment): ссылка на оплату, QR СБП, SberPay, сверка статуса с банком
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale;
@@ -10,7 +10,6 @@ const BT_TBANK_DEAD = ['CANCELED', 'REJECTED', 'DEADLINE_EXPIRED', 'AUTH_FAIL', 
 // платёжные системы того же терминала со своим экраном оплаты вместо страницы банка: XML_ID => адрес экрана
 const BT_TBANK_SCREENS = ['bt_sbp' => '/personal/order/sbp/', 'bt_sberpay' => '/personal/order/sberpay/'];
 
-// неоплаченный платёж заказа через Т-Банк
 function bt_tbank_payment(Sale\Order $order): ?Sale\Payment
 {
     foreach ($order->getPaymentCollection() as $p) {
@@ -30,25 +29,23 @@ function bt_tbank_order(int $id): ?Sale\Order
         || (is_object($USER) && $USER->IsAuthorized() && (int)$order->getUserId() === (int)$USER->GetID())) ? $order : null;
 }
 
-// XML_ID платёжной системы платежа
 function bt_tbank_xml(Sale\Payment $p): string
 {
     return (string)(Sale\PaySystem\Manager::getById($p->getPaymentSystemId())['XML_ID'] ?? '');
 }
 
-// оплата по СБП — отдельная платёжная система того же терминала (XML_ID bt_sbp): вместо страницы банка свой экран с QR
+// СБП — отдельная платёжная система того же терминала (XML_ID bt_sbp) со своим экраном QR
 function bt_tbank_is_sbp(Sale\Payment $p): bool
 {
     return bt_tbank_xml($p) === 'bt_sbp';
 }
 
-// свой экран оплаты (СБП, SberPay) или пусто — страница банка
 function bt_tbank_screen(Sale\Payment $p): string
 {
     return BT_TBANK_SCREENS[bt_tbank_xml($p)] ?? '';
 }
 
-// устройство покупателя по User-Agent — для SberPay в DATA платежа: тип, ОС, встроенный браузер приложения, браузер
+// устройство покупателя по User-Agent — для SberPay в DATA платежа
 function bt_tbank_device(): array
 {
     $ua = (string)\Bitrix\Main\Context::getCurrent()->getRequest()->getUserAgent();
@@ -76,7 +73,7 @@ function bt_tbank_device(): array
         'DeviceOs' => $os, 'DeviceWebView' => $wv ? 'true' : 'false', 'DeviceBrowser' => $browser];
 }
 
-// SberPay: платёж в банке (тот же, что у страницы банка — с неё можно заплатить картой); на телефоне ещё и ссылка в СберБанк Онлайн
+// SberPay: тот же платёж, что у страницы банка; на телефоне — ещё ссылка в СберБанк Онлайн
 function bt_tbank_sberpay(Sale\Payment $p, bool $mobile): array
 {
     $orderId = (int)$p->getOrderId();
@@ -113,7 +110,7 @@ function bt_tbank_sberpay_push(Sale\Payment $p, string $phone): bool
     return $pid !== '' && $d !== '' && !empty(bt_tbank_api($p, 'SberPay/link/get', ['PaymentId' => $pid, 'Phone' => '+' . $d])['Success']);
 }
 
-// QR для СБП: ссылка в приложение банка и картинка. Платёж в банке тот же, что у страницы банка, — с неё можно заплатить и картой
+// QR СБП: тот же платёж, что у страницы банка, — с неё можно заплатить и картой
 function bt_tbank_qr(Sale\Payment $p): array
 {
     $orderId = (int)$p->getOrderId();
@@ -133,7 +130,7 @@ function bt_tbank_qr(Sale\Payment $p): array
         ? ['link' => $link, 'svg' => $svg, 'sum' => $p->getSum(), 'pid' => $pid] : [];
 }
 
-// экран СБП или SberPay ждёт деньги: paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
+// paid — оплачено, dead — по этому QR уже не заплатить (отменён, отклонён, истёк), wait — ждём
 function bt_tbank_sbp_state(Sale\Payment $p): string
 {
     $pid = (string)$p->getField('PS_INVOICE_ID');
@@ -147,7 +144,7 @@ function bt_tbank_sbp_state(Sale\Payment $p): string
     return in_array($st, BT_TBANK_DEAD, true) ? 'dead' : 'wait';
 }
 
-// «Оплатить картой» с экрана СБП или SberPay: платёж — на карточную систему; платёж в банке остаётся тем же, его страница принимает карты
+// «Оплатить картой» с экрана СБП или SberPay: платёж — на карточную систему, в банке он тот же
 function bt_tbank_to_card(Sale\Payment $p): void
 {
     foreach (Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff', '=ACTIVE' => 'Y'], 'order' => ['SORT' => 'ASC'], 'select' => ['ID', 'NAME', 'XML_ID']]) as $ps) {
@@ -159,13 +156,12 @@ function bt_tbank_to_card(Sale\Payment $p): void
     }
 }
 
-// знак SberPay: зелёный круг с галочкой; $on — цвет галочки
+// знак SberPay; $on — цвет галочки
 function bt_tbank_sberpay_mark(string $bg = '#21A038', string $on = '#fff'): string
 {
     return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="' . $bg . '"/><path d="M6.6 12.3l3.5 3.4 7.3-7.2" fill="none" stroke="' . $on . '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
-// логотипы способа онлайн-оплаты для плитки на оформлении по XML_ID платёжной системы: карты (МИР, Visa, Mastercard), СБП или SberPay
 function bt_tbank_logos(string $xml = ''): string
 {
     $sbp = $xml === 'bt_sbp';
@@ -177,7 +173,6 @@ function bt_tbank_logos(string $xml = ''): string
     return '<span class="paylogos" aria-hidden="true">' . implode('', $l) . '</span>';
 }
 
-// запрос к API банка с ключами терминала из настроек платёжной системы
 function bt_tbank_api(Sale\Payment $p, string $method, array $args): array
 {
     $ps = $p->getPaySystem();
@@ -197,7 +192,7 @@ function bt_tbank_api(Sale\Payment $p, string $method, array $args): array
     }
 }
 
-// уведомление банка могло не дойти — спрашиваем сами; оплачено — отмечаем платёж. true, если платёж оплачен
+// уведомление банка могло не дойти — спрашиваем сами; true — оплачено
 function bt_tbank_sync(Sale\Payment $p): bool
 {
     if ($p->isPaid()) {
@@ -219,7 +214,7 @@ function bt_tbank_sync(Sale\Payment $p): bool
     return false;
 }
 
-// платёж подтверждён — то же в таблицу модуля: его запоздалое уведомление AUTHORIZED иначе снимет оплату, а возврат (REFUNDED) не найдёт платёж
+// то же в таблицу модуля: иначе его запоздалое AUTHORIZED снимет оплату, а REFUNDED не найдёт платёж
 function bt_tbank_mark(string $acc, string $paymentId): void
 {
     if ($paymentId === '') {
@@ -231,7 +226,7 @@ function bt_tbank_mark(string $acc, string $paymentId): void
         . " ON DUPLICATE KEY UPDATE current_status = 'CONFIRMED'");
 }
 
-// ссылка на страницу оплаты банка: прошлая, пока банк держит её открытой, иначе новый платёж — только по действию покупателя
+// прошлая ссылка, пока банк держит её открытой; новый платёж — только по действию покупателя
 function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
 {
     $param = ($ps = $p->getPaySystem()) ? $ps->getParamsBusValue($p) : [];
@@ -280,7 +275,7 @@ function bt_tbank_url(Sale\Payment $p, bool $renewed = false): string
     return (string)$r['PaymentURL'];
 }
 
-// состав чека из заказа: товары по ценам со скидкой и доставка; признаки расчёта и налоги — из настроек платёжной системы
+// чек: товары по ценам со скидкой и доставка; признаки расчёта и налоги — из настроек платёжной системы
 function bt_tbank_receipt(Sale\Payment $p, array $param): ?array
 {
     $order = $p->getOrder();
@@ -319,7 +314,7 @@ function bt_tbank_receipt(Sale\Payment $p, array $param): ?array
         'FfdVersion' => $ffd12 ? '1.2' : '', 'Items' => $items]);
 }
 
-// уведомление банка о пробитом чеке: подпись проверяем паролем терминала, ссылку на чек — в свойство заказа RECEIPT_URL («Документы» в кабинете)
+// уведомление о чеке: подпись — паролем терминала, ссылка на чек — в свойство заказа RECEIPT_URL
 function bt_tbank_receipt_save(array $req): void
 {
     $acc = (string)($req['OrderId'] ?? '');
@@ -348,7 +343,7 @@ function bt_tbank_receipt_save(array $req): void
     }
 }
 
-// заменить неоплаченный платёж новым (новый номер для банка); прошлые попытки в банке сначала отменяем, чтобы по старой ссылке не заплатили
+// прошлые попытки в банке сначала отменяем, чтобы по старой ссылке не заплатили
 function bt_tbank_renew(Sale\Payment $p): ?Sale\Payment
 {
     foreach ((array)(bt_tbank_api($p, 'CheckOrder', ['OrderId' => (string)$p->getField('ACCOUNT_NUMBER')])['Payments'] ?? []) as $x) {
@@ -375,7 +370,7 @@ function bt_tbank_renew(Sale\Payment $p): ?Sale\Payment
     return $order->save()->isSuccess() ? $n : null;
 }
 
-// sale:OnSaleOrderBeforeSaved — уведомление модуля пишет статус платежа в комментарий заказа поверх заметки менеджера: заметку сохраняем, статус — строкой ниже
+// уведомление модуля пишет статус платежа в комментарий поверх заметки менеджера: заметку сохраняем, статус — ниже
 function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
 {
     $order = $e->getParameter('ENTITY');
@@ -388,7 +383,7 @@ function bt_tbank_keep_comments(\Bitrix\Main\Event $e): void
     $keep !== '' && $order->setField('COMMENTS', $keep . "\n" . $new);
 }
 
-// «СБП» и «SberPay» работают на ключах и настройках «Картой онлайн»: копирует их агент и bt_tbank_setup.php. Возвращает отличавшиеся коды: XML_ID => [коды]
+// «СБП» и «SberPay» — на ключах и настройках «Картой онлайн»; возвращает отличавшиеся коды: XML_ID => [коды]
 function bt_tbank_ps_sync(bool $apply = true): array
 {
     $card = 0;
@@ -425,14 +420,13 @@ function bt_tbank_ps_sync(bool $apply = true): array
     return $diff;
 }
 
-// платёжные системы модуля Т-Банка
 function bt_tbank_ps_ids(): array
 {
     static $ids;
     return $ids ??= Loader::includeModule('sale') ? array_map('intval', array_column(Sale\PaySystem\Manager::getList(['filter' => ['=ACTION_FILE' => 'tinkoff'], 'select' => ['ID']])->fetchAll(), 'ID')) : [];
 }
 
-// неоплаченные платежи через Т-Банк за трое суток (всех или одного покупателя) — сверка с банком
+// сверка с банком неоплаченных платежей за трое суток
 function bt_tbank_sync_user(int $userId = 0): void
 {
     if (!($ids = bt_tbank_ps_ids())) {
@@ -456,7 +450,7 @@ function bt_tbank_agent(): string
     return 'bt_tbank_agent();';
 }
 
-// main:OnBeforeEventAdd — оплату почти одновременно отмечают уведомление банка и сверка сайта: письмо «Заказ оплачен» — одно
+// оплату почти одновременно отмечают уведомление банка и сверка сайта — письмо «Заказ оплачен» одно
 function bt_tbank_paid_mail_once($event, $lid, $fields)
 {
     $id = (int)($fields['ORDER_REAL_ID'] ?? 0);

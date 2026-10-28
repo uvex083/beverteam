@@ -1,5 +1,5 @@
 <?php
-// Корзина для ui.js: POST action=get|set, id — ID товара, kg — фасовка кофе на развес, q — штук (0 — удалить). Ответ — состояние корзины.
+// Корзина для ui.js: kg — фасовка кофе на развес, q — штук (0 — удалить)
 define('STOP_STATISTICS', true);
 define('NO_AGENT_CHECK', true);
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';

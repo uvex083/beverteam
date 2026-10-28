@@ -1,6 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
-// Прайс-лист: товары каталога по разделам с оптовыми ступенями цен; количество меняет общую корзину сайта (ui.js, data-prc)
+// количество меняет общую корзину сайта — ui.js (data-prc)
 
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $rub = fn($p) => number_format((float)$p, 0, '', "\u{00A0}") . "\u{00A0}₽";
@@ -8,7 +8,6 @@ $list = bt_price_list();
 $total = array_sum(array_column($list, 'cnt'));
 $ts = bt_price_date();
 $months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-// цена за кг для веса $kg по ступеням товара
 $tier = function (array $m, int $kg) {
     $p = $m['p'];
     foreach ((array)($m['bulk'] ?? []) as $b) {
@@ -18,7 +17,6 @@ $tier = function (array $m, int $kg) {
 };
 $disc = bt_sum_discounts();
 $fmtFrom = fn($d) => $d['pct'] . '% от ' . number_format($d['from'], 0, '', "\u{00A0}") . "\u{00A0}₽";
-// подборки сверху: «Рекомендуем» — хиты, топ продаж и новинки, «Акции» — товары со старой ценой или меткой скидки
 $all = [];
 foreach ($list as $t) {
     foreach ($t['subs'] as $items) {
@@ -32,7 +30,7 @@ $tabs = array_filter([
     'rec' => ['Рекомендуем', array_slice(array_filter($all, fn($m) => $hasBadge($m, ['хит', 'топ продаж', 'новинка'])), 0, 12)],
     'promo' => ['Акции', array_slice(array_filter($all, fn($m) => (!empty($m['old']) && $m['old'] > $m['p']) || $hasBadge($m, ['скидка', 'распродажа'])), 0, 12)],
 ], fn($x) => $x[1]);
-// запрос счёта: заказ на юрлицо — самовывоз в Екатеринбурге и оплата по счёту, доставку менеджер согласует отдельно
+// запрос счёта: самовывоз и оплата по счёту, доставку менеджер согласует отдельно
 $inv = [];
 if (\Bitrix\Main\Loader::includeModule('sale')) {
     $inv = [

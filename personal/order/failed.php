@@ -1,5 +1,5 @@
 <?php
-// возврат из Т-Банка (адрес по умолчанию у модуля tinkoff.payment): ведём на нашу страницу заказа
+// адрес возврата из Т-Банка по умолчанию у tinkoff.payment — ведём на нашу страницу заказа
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php';
 \Bitrix\Main\Loader::includeModule('sale');
 $acc = preg_replace('~/[^/]*$~', '', (string)($_GET['OrderId'] ?? ''));

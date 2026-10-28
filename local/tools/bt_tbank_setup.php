@@ -1,7 +1,6 @@
 <?php
-// Оплата через Т-Банк (модуль tinkoff.payment): настройки платёжной системы без ключей, ограничение «только физлица», агент сверки оплат, оплата по СБП и через SberPay.
-// Терминал и пароль вписываются в админке: Магазин → Платёжные системы → «Картой онлайн»; в «СБП» и «SberPay» их копирует агент сверки (или apply). Чек включён: касса Т-Банка подключена к рабочему терминалу.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_tbank_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Оплата через Т-Банк (tinkoff.payment): настройки ПС без ключей, только физлица, агент сверки оплат, СБП и SberPay.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_tbank_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
@@ -42,7 +41,7 @@ if (!Sale\Internals\ServiceRestrictionTable::getList(['filter' => ['=SERVICE_ID'
     $apply and Sale\Internals\ServiceRestrictionTable::add(['SERVICE_ID' => $id, 'SERVICE_TYPE' => 1, 'SORT' => 100,
         'CLASS_NAME' => '\Bitrix\Sale\Services\PaySystem\Restrictions\PersonType', 'PARAMS' => ['PERSON_TYPE_ID' => [1]]]);
 }
-// служебное свойство заказа «Кассовый чек»: ссылку пишет уведомление банка о чеке, кабинет выводит её в «Документах»
+// свойство заказа «Кассовый чек»: ссылку пишет уведомление банка, кабинет выводит её в «Документах»
 foreach (Sale\Internals\PersonTypeTable::getList(['filter' => ['=ACTIVE' => 'Y'], 'select' => ['ID']])->fetchAll() as $pt) {
     if (Sale\Internals\OrderPropsTable::getList(['filter' => ['=PERSON_TYPE_ID' => $pt['ID'], '=CODE' => 'RECEIPT_URL']])->fetch()) {
         continue;
@@ -53,8 +52,7 @@ foreach (Sale\Internals\PersonTypeTable::getList(['filter' => ['=ACTIVE' => 'Y']
         'CODE' => 'RECEIPT_URL', 'USER_PROPS' => 'N', 'IS_LOCATION' => 'N', 'PROPS_GROUP_ID' => $group, 'UTIL' => 'Y', 'ACTIVE' => 'Y',
         'DESCRIPTION' => 'Ссылка на чек онлайн-оплаты, приходит от Т-Банка']);
 }
-// оплата по СБП и через SberPay — платёжные системы того же терминала со своими экранами (/personal/order/sbp/, /personal/order/sberpay/);
-// настройки и ключи копируются с «Картой онлайн» (apply и агент сверки) — вписывать их только туда
+// СБП и SberPay — ПС того же терминала со своими экранами; ключи копируются с «Картой онлайн» — вписывать только туда
 $extra = [
     'bt_sbp' => ['NAME' => 'СБП', 'SORT' => 55, 'DESCRIPTION' => 'QR-код или приложение вашего банка, без ввода карты'],
     // создаётся выключенной: включать в админке, когда SberPay подключён на терминале

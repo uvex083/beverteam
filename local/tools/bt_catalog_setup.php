@@ -20,7 +20,7 @@ $sectionsFile = $argv[2] ?? '';
 $say = fn(string $s) => print(($apply ? '' : '[show] ') . $s . "\n");
 $fail = fn(string $s) => die("ERROR: $s\n");
 
-// ---------- демо-инфоблоки решения «Интернет-магазин» ----------
+// пустые демо-инфоблоки решения «Интернет-магазин» — удаляем
 foreach (['clothes_offers', 'clothes', 'news'] as $code) {
     $ib = CIBlock::GetList([], ['=CODE' => $code, 'CHECK_PERMISSIONS' => 'N'])->Fetch();
     if (!$ib) {
@@ -40,7 +40,6 @@ foreach (['clothes_offers', 'clothes', 'news'] as $code) {
     }
 }
 
-// ---------- создание инфоблока ----------
 function bt_ensure_iblock(array $f, bool $apply, callable $say, callable $fail): int
 {
     $ib = CIBlock::GetList([], ['=CODE' => $f['CODE'], 'CHECK_PERMISSIONS' => 'N'])->Fetch();
@@ -57,7 +56,7 @@ function bt_ensure_iblock(array $f, bool $apply, callable $say, callable $fail):
     return $id;
 }
 
-// ---------- свойства: код => [название, тип, доп. поля] ----------
+// свойства: код => [название, тип, доп. поля]
 function bt_ensure_props(int $ibId, array $props, bool $apply, callable $say, callable $fail): void
 {
     if (!$ibId) {
@@ -89,7 +88,7 @@ function bt_ensure_props(int $ibId, array $props, bool $apply, callable $say, ca
         $bp = new CIBlockProperty();
         $id = (int)$bp->Add($f);
         $id or $fail("prop $code: {$bp->LAST_ERROR}");
-        // «Настройки свойств»: показывать в карточке и в списке, иначе компоненты свойство не выведут
+        // без «Настроек свойств» компоненты свойство не выведут
         PropertyFeature::setFeatures($id, [
             ['MODULE_ID' => 'iblock', 'FEATURE_ID' => 'DETAIL_PAGE_SHOW', 'IS_ENABLED' => 'Y'],
             ['MODULE_ID' => 'iblock', 'FEATURE_ID' => 'LIST_PAGE_SHOW', 'IS_ENABLED' => $inList],
@@ -101,7 +100,6 @@ $multi = ['MULTIPLE' => 'Y'];
 $filter = ['SMART_FILTER' => 'Y'];
 $html = ['DEFAULT_VALUE' => ['TYPE' => 'HTML', 'TEXT' => '']];
 
-// ---------- каталог ----------
 $catId = bt_ensure_iblock([
     'IBLOCK_TYPE_ID' => 'catalog', 'CODE' => 'catalog', 'API_CODE' => 'Catalog', 'NAME' => 'Каталог товаров', 'SORT' => 10,
     'LIST_PAGE_URL' => '/catalog/', 'SECTION_PAGE_URL' => '/catalog/#SECTION_CODE_PATH#/',
@@ -176,7 +174,6 @@ if ($catId) {
     $recId and (new CIBlockProperty())->Update($recId, ['LINK_IBLOCK_ID' => $catId]);
 }
 
-// ---------- аренда ----------
 $rentId = bt_ensure_iblock([
     'IBLOCK_TYPE_ID' => 'services', 'CODE' => 'rent', 'API_CODE' => 'Rent', 'NAME' => 'Аренда кофемашин', 'SORT' => 10,
     'LIST_PAGE_URL' => '/arenda-kofemashin/', 'DETAIL_PAGE_URL' => '/arenda-kofemashin/', 'INDEX_ELEMENT' => 'N',
@@ -194,7 +191,6 @@ if ($rentId && $catId) {
     $mId and (new CIBlockProperty())->Update($mId, ['LINK_IBLOCK_ID' => $catId]);
 }
 
-// ---------- разделы каталога ----------
 if (is_file($sectionsFile)) {
     $imgBase = dirname($sectionsFile) . '/';
     $sections = json_decode(file_get_contents($sectionsFile), true);
@@ -235,7 +231,7 @@ if (is_file($sectionsFile)) {
     }
 }
 
-// фасетный индекс умного фильтра — пересобираем при каждом apply (63 товара, секунды)
+// фасетный индекс умного фильтра пересобираем при каждом apply
 if ($apply && $catId) {
     $idx = \Bitrix\Iblock\PropertyIndex\Manager::createIndexer($catId);
     $idx->startIndex();

@@ -1,6 +1,6 @@
 <?php
-// Журнал: инфоблок «Журнал: карточка под оглавлением» — промо-карточка сбоку статьи, своя для рубрики или общая.
-// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_promo_setup.php [show|apply]. Повторный запуск ничего не дублирует.
+// Инфоблок «Журнал: карточка под оглавлением» — промо-карточка сбоку статьи, своя для рубрики или общая.
+// Запуск: ~/beverteam.na4u.ru/bin/php local/tools/bt_blog_promo_setup.php [show|apply]
 
 if (PHP_SAPI !== 'cli') {
     die('cli only');
