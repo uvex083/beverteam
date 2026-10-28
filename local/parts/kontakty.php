@@ -5,7 +5,7 @@
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $co = bt_contacts();
 $how = bt_list('contacts_how');
-$photos = bt_list('contacts_photos');
+$photos = array_filter(bt_list('contacts_photos'), fn($p) => $p['pic'] !== '');
 $msgr = '';
 foreach (bt_messengers() as [, $name, $href, $svg]) {
     $msgr .= '<a href="' . $e($href) . '" title="' . $e($name) . '" aria-label="' . $e($name) . '" rel="nofollow noopener" target="_blank">' . $svg . '</a>';
@@ -46,16 +46,16 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
   </section>
   <?php endif ?>
 
+  <?php if ($photos): ?>
   <section class="sec sec--t0">
     <h2 class="display h2" style="margin-bottom:22px">Офис и склад</h2>
     <div class="office">
-      <?php if ($photos): foreach ($photos as $p): ?>
+      <?php foreach ($photos as $p): ?>
       <figure><img src="<?= $e($p['pic']) ?>" alt="<?= $e($p['name']) ?>" loading="lazy"><figcaption><?= $e($p['text'] ?: $p['name']) ?></figcaption></figure>
-      <?php endforeach; else: foreach (['Фото входной группы' => 'Вход и вывеска BEVERTEAM', 'Фото офиса' => 'Офис', 'Фото склада / зоны выдачи' => 'Склад и зона самовывоза заказов'] as $ph => $cap): ?>
-      <figure><div class="ph"><?= $ph ?><br>(нужен файл от клиента)</div><figcaption><?= $cap ?></figcaption></figure>
-      <?php endforeach; endif ?>
+      <?php endforeach ?>
     </div>
   </section>
+  <?php endif ?>
 
   <section class="sec sec--t0" id="form"><form class="card form" data-form="write" novalidate>
     <div><div class="mono muted">Заявка</div><h2 class="display h2" style="margin:14px 0 10px">Напишите нам</h2><p class="muted" style="margin:0;max-width:40ch">Менеджер перезвонит или напишет в рабочее время. Подберём кофе, машину или запишем на ремонт.</p></div>
