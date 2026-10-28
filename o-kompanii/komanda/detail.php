@@ -18,7 +18,6 @@ $lead = trim(preg_replace('/\s+/u', ' ', strip_tags($expert['bio'])));
 $APPLICATION->SetPageProperty('title', $expert['name'] . ($expert['job'] !== '' ? ' — ' . $expert['job'] : '') . ' | BEVERTEAM');
 $APPLICATION->SetPageProperty('description', mb_strlen($lead) > 160 ? rtrim(mb_substr($lead, 0, 157)) . '…' : $lead);
 $APPLICATION->SetTitle($expert['name']);
-$APPLICATION->AddChainItem('О компании', '/o-kompanii/');
 $APPLICATION->AddChainItem('Команда', '/o-kompanii/#team');
 $APPLICATION->AddChainItem($expert['name']);
 require $_SERVER['DOCUMENT_ROOT'] . '/local/parts/ekspert.php';

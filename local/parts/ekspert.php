@@ -25,8 +25,8 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 ?>
 <div class="wrap expp">
   <?php bt_crumbs() ?>
-  <section class="expp__hd">
-    <div class="expp__ph"><?php if ($expert['pic']): ?><img src="<?= $e($expert['pic']) ?>" alt="<?= $e($expert['name']) ?>" width="480" height="480"><?php endif ?></div>
+  <section class="expp__hd<?= $expert['pic'] ? '' : ' expp__hd--np' ?>">
+    <?php if ($expert['pic']): ?><div class="expp__ph"><img src="<?= $e($expert['pic']) ?>" alt="<?= $e($expert['name']) ?>" width="480" height="480"></div><?php endif ?>
     <div class="expp__in">
       <h1 class="display h1"><?php $APPLICATION->ShowTitle(false) ?></h1>
       <?php if ($expert['job'] !== ''): ?><p class="expp__job"><?= $e($expert['job']) ?></p><?php endif ?>
