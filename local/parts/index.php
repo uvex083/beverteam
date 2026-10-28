@@ -234,7 +234,7 @@ if ($beans):
       $works = bt_clients_on() ? array_slice(array_values(array_filter(array_map(fn($c) => $c['photos'] && !$c['demo'] ? ['t' => $c['photos'][0]['t'], 'b' => $c['photos'][0]['b'], 'cap' => $c['name']] : null, bt_clients()))), 0, 5) : [];
       if ($works): ?>
       <div class="works">
-        <div class="works__hd"><div class="th th3">Наши установки</div><a class="link" href="/nashi-klienty/">Все работы →</a></div>
+        <div class="works__hd"><div class="th th3"><?= $e(($about['works_title'] ?? '') ?: 'Наши установки') ?></div><a class="link" href="/nashi-klienty/"><?= $e(($about['works_btn'] ?? '') ?: 'Все работы →') ?></a></div>
         <ul class="works__g" data-works><?php foreach ($works as $w): ?><li><a class="works__i" href="<?= $e($w['b']) ?>"><img src="<?= $e($w['t']) ?>" alt="<?= $e($w['cap']) ?>" width="400" height="400" loading="lazy"><span><?= $e($w['cap']) ?></span></a></li><?php endforeach ?></ul>
       </div>
       <?php endif ?>
@@ -266,9 +266,9 @@ if ($beans):
 </div></section>
 <?php endif ?>
 
-<?php if ($faq = bt_blocks('main_faq')): ?>
+<?php if ($faq = bt_blocks('main_faq')): $faqHead = bt_block('main_faq_head'); ?>
 <section class="sec sec--t0"><div class="wrap">
-  <h2 class="display h2" style="margin-bottom:20px">Вопросы и ответы</h2>
+  <?= $head(['title' => ($faqHead['title'] ?? '') ?: 'Вопросы и ответы', 'subtitle' => $faqHead['subtitle'] ?? '']) ?>
   <div class="faq"><?php foreach ($faq as $i => $q): ?><details<?= $i ? '' : ' open' ?>><summary><?= $e($q['name']) ?></summary><div class="faq__a"><?= str_starts_with(ltrim($q['html']), '<') ? $q['html'] : '<p>' . $q['html'] . '</p>' ?></div></details><?php endforeach ?></div>
 </div></section>
 <?php endif ?>
