@@ -181,7 +181,7 @@ if ($beans):
       <div class="display h2 bean__t th th2"><?= bt_title($bTitle) ?></div>
       <?php if ($bSub !== ''): ?><p><?= $e($bSub) ?></p><?php endif ?>
       <?php if ($bNotes): ?><div class="notes"><?php foreach ($bNotes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
-      <div class="row"><?= bt_btn($btn, $link) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
+      <div class="row"><?= bt_btn($bBtn, $bLink) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
     </div>
   </div>
   <?php endforeach ?>
