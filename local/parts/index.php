@@ -154,22 +154,40 @@ $c0 = $chips[$cur] ?? null;
 <?php endif ?>
 
 <?php
+// «Зерно месяца»: первым — кофе из блока в админке, за ним сами подтягиваются кофе с метками «Хит» и «Топ продаж»
 $bp = !empty($bean['product']) ? bt_product((string)$bean['product']) : null;
-if ($bp):
-    $bpImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $bp['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bp['img'];
-    $spec = bt_catalog_specs()['vals'][$bp['id']] ?? [];
-    $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['NOTES'] ?? ''))));
+$beans = $bp ? [[$bp, $bean['caption'] ?? '', $bean['title'] ?? $bp['n'], $bean['subtitle'] ?? '', ($bean['btn_text'] ?? '') ?: bt_fmt($bp['p']) . ' · к товару', ($bean['btn_link'] ?? '') ?: $bp['url']]] : [];
+if ($bp) {
+    foreach ($data['coffee'] as $m) {
+        $hit = array_values(array_intersect(array_map('mb_strtolower', $m['badges'] ?? []), ['хит', 'топ продаж']));
+        if ($hit && $m['id'] !== $bp['id'] && count($beans) < 4) {
+            $beans[] = [$m, $hit[0] === 'хит' ? 'Хит' : 'Топ продаж', $m['n'], $m['par'], bt_fmt($m['p']) . ' · к товару', $m['url']];
+        }
+    }
+}
+if ($beans):
 ?>
-<section class="sec sec--t0"><div class="wrap"><div class="bean" data-rv>
-  <div class="bean__ph"><?php if (!empty($spec['Q_SCORE'])): ?><div class="qscore"><div><b><?= $spec['Q_SCORE'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bpImg) ?>"<?= bt_img_wh($bpImg) ?> alt="<?= $e($bp['n']) ?>" loading="lazy" decoding="async"></div>
-  <div class="bean__c">
-    <div class="mono"><?= $e($bean['caption'] ?? '') ?></div>
-    <div class="display h2 bean__t th th2"><?= bt_title($bean['title'] ?? $bp['n']) ?></div>
-    <?php if (!empty($bean['subtitle'])): ?><p><?= $e($bean['subtitle']) ?></p><?php endif ?>
-    <?php if ($notes): ?><div class="notes"><?php foreach ($notes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
-    <div class="row"><?= bt_btn(($bean['btn_text'] ?? '') ?: bt_fmt($bp['p']) . ' · к товару', ($bean['btn_link'] ?? '') ?: $bp['url']) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
+<section class="sec sec--t0"><div class="wrap">
+  <div id="beanSw">
+  <?php foreach ($beans as [$p, $cap, $title, $sub, $btn, $link]):
+    $pImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $p['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $p['img'];
+    $spec = bt_catalog_specs()['vals'][$p['id']] ?? [];
+    $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['NOTES'] ?? ''))));
+  ?>
+  <div class="bean">
+    <div class="bean__ph"><?php if (!empty($spec['Q_SCORE'])): ?><div class="qscore"><div><b><?= $spec['Q_SCORE'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($pImg) ?>"<?= bt_img_wh($pImg) ?> alt="<?= $e($p['n']) ?>" loading="lazy" decoding="async"></div>
+    <div class="bean__c">
+      <div class="mono"><?= $e($cap) ?></div>
+      <div class="display h2 bean__t th th2"><?= bt_title($title) ?></div>
+      <?php if ($sub !== ''): ?><p><?= $e($sub) ?></p><?php endif ?>
+      <?php if ($notes): ?><div class="notes"><?php foreach ($notes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
+      <div class="row"><?= bt_btn($btn, $link) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
+    </div>
   </div>
-</div></div></section>
+  <?php endforeach ?>
+  </div>
+  <div class="bean-pg" id="beanPg"></div>
+</div></section>
 <?php endif ?>
 
 <?php if (!empty($steps['items'])): ?>
@@ -208,17 +226,27 @@ if ($bp):
 
 <section class="sec sec--t0" id="form"><div class="wrap">
   <div class="wr">
-    <div>
+    <div class="wr__l">
       <h2 class="display h2 wr__t"><?php $APPLICATION->ShowTitle(false) ?></h2>
       <div class="home__about"><?= $about['text'] ?? '' ?></div>
       <div class="row" style="margin-top:24px"><?= bt_btn($about['btn_text'] ?? '', $about['btn_link'] ?? '', 'btn btn--line') ?><?= bt_btn($about['btn2_text'] ?? '', $about['btn2_link'] ?? '', 'btn btn--line') ?></div>
+      <?php // фото установок — со страницы «Наши клиенты», только когда она открыта для всех
+      $works = bt_clients_on() ? array_slice(array_values(array_filter(array_map(fn($c) => $c['photos'] && !$c['demo'] ? ['t' => $c['photos'][0]['t'], 'b' => $c['photos'][0]['b'], 'cap' => $c['name']] : null, bt_clients()))), 0, 5) : [];
+      if ($works): ?>
+      <div class="works">
+        <div class="works__hd"><div class="th th3">Наши установки</div><a class="link" href="/nashi-klienty/">Все работы →</a></div>
+        <ul class="works__g" data-works><?php foreach ($works as $w): ?><li><a class="works__i" href="<?= $e($w['b']) ?>"><img src="<?= $e($w['t']) ?>" alt="<?= $e($w['cap']) ?>" width="400" height="400" loading="lazy"><span><?= $e($w['cap']) ?></span></a></li><?php endforeach ?></ul>
+      </div>
+      <?php endif ?>
     </div>
     <form class="wr__f" data-form="contact" novalidate>
       <div class="hd"><i aria-hidden="true">✍</i><div><b><?= $e(mb_strtoupper(($about['form_title'] ?? '') ?: 'Напишите нам')) ?></b><small><?= $e($about['caption'] ?? '') ?></small></div></div>
       <input type="hidden" name="topic" value="Сообщение с главной страницы">
-      <div class="field"><label>Ваше имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div>
+      <div class="wr__2">
+        <div class="field"><label>Ваше имя *</label><input name="name" placeholder="Как к вам обращаться" maxlength="100"></div>
+        <div class="field"><label>Телефон *</label><input name="phone" placeholder="+7 ___ ___-__-__"></div>
+      </div>
       <div class="field"><label>E-mail</label><input name="email" type="email" placeholder="mail@company.ru" maxlength="100"></div>
-      <div class="field"><label>Телефон *</label><input name="phone" placeholder="+7 ___ ___-__-__"></div>
       <?= bt_form_tail() ?>
     </form>
   </div>
@@ -235,6 +263,13 @@ if ($bp):
 <section class="sec sec--t0"><div class="wrap seo">
   <h2 class="display"><?= $e($seo['title'] ?? '') ?></h2>
   <div class="post__body"><?= bt_seo_html($seo['text'] ?? '') ?></div>
+</div></section>
+<?php endif ?>
+
+<?php if ($faq = bt_blocks('main_faq')): ?>
+<section class="sec sec--t0"><div class="wrap">
+  <h2 class="display h2" style="margin-bottom:20px">Вопросы и ответы</h2>
+  <div class="faq"><?php foreach ($faq as $i => $q): ?><details<?= $i ? '' : ' open' ?>><summary><?= $e($q['name']) ?></summary><div class="faq__a"><?= str_starts_with(ltrim($q['html']), '<') ? $q['html'] : '<p>' . $q['html'] . '</p>' ?></div></details><?php endforeach ?></div>
 </div></section>
 <?php endif ?>
 

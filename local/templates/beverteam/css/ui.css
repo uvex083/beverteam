@@ -130,6 +130,20 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .hact svg{width:20px;height:20px}
 @media(hover:hover){.hact:hover{color:var(--lime)}}
 .hact .cnt{position:absolute;top:0;right:10px;background:var(--lime);color:var(--ink);border-radius:999px;font:700 10px/1 'JetBrains Mono';padding:3px 5px}
+/* трубка в шапке и её всплывашка — только там, где номера в шапке нет; кабинет, избранное и сравнение на телефоне — в меню */
+.hact--tel{display:none}
+@media(max-width:1050px){.hact--tel{display:flex}}
+@media(max-width:720px){.hact--m{display:none}}
+@media(max-width:374px){.hdr .brand img{height:26px}}
+.telpop{position:absolute;top:calc(100% + 8px);right:clamp(16px,4vw,40px);width:min(320px,calc(100vw - 32px));background:var(--white);color:var(--ink);border-radius:var(--rad);box-shadow:0 24px 60px -20px rgba(14,14,12,.45);padding:20px;display:grid;gap:12px;z-index:61}
+.telpop[hidden]{display:none}
+.telpop__tel{font:800 22px/1.15 Unbounded,sans-serif;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.telpop__tel2{font-weight:600;font-size:15px;color:var(--ink)}
+.telpop__h{font-size:13px;color:var(--gray)}
+.telpop .msgr{margin:2px 0}
+.dn__qs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dn__q{display:flex;align-items:center;gap:10px;min-height:48px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:10px 14px;font-weight:600;font-size:14px;color:var(--ink)}
+.dn__q svg{width:18px;height:18px;flex-shrink:0}.dn__q .cnt{margin-left:auto;background:var(--lime);border-radius:999px;font:700 11px/1 'JetBrains Mono',monospace;padding:4px 7px}
 .hdr__tel{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;white-space:nowrap}
 .hdr__nav{display:flex;gap:22px;height:44px;align-items:center;border-top:1px solid #26261F;font-size:13.5px;font-weight:500;color:#C9C9C2}
 @media(hover:hover){.hdr__nav a:hover{color:var(--lime)}}
@@ -683,7 +697,7 @@ input,textarea{caret-color:var(--ink)}
 .post__body figure{margin:26px 0}
 .post__body figure img{border-radius:var(--rad);width:100%;object-fit:cover}
 .post__body figcaption{font-size:13px;color:var(--gray);margin-top:8px}
-.post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}
+.post__meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--gray);margin:14px 0 26px}.post__author a{color:var(--ink);font-weight:600;text-decoration:underline 1px var(--lime);text-underline-offset:3px}
 .post__side{position:sticky;top:130px;display:flex;flex-direction:column;gap:12px}
 .post__toc{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px 14px;font-size:14px}
 .post__toc-hd{display:flex;justify-content:space-between;gap:10px;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)}
@@ -1122,6 +1136,19 @@ input,textarea{caret-color:var(--ink)}
 .wr__f .hd i{width:44px;height:44px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-style:normal;font-size:20px}
 .wr__f .hd b{display:block;font-family:Unbounded;font-weight:700;font-size:15px}
 .wr__f .hd small{color:var(--gray);font-size:12.5px}
+/* главная: форма компактнее (имя и телефон в строку), левая колонка по центру формы; лента фото установок — когда открыта «Наши клиенты» */
+.home .wr{align-items:center}
+.home .wr__f{padding:24px}.home .wr__f .hd{margin-bottom:16px}.home .wr__f .field{margin-bottom:2px}
+.wr__2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.works{margin-top:clamp(28px,3vw,40px)}
+.works__hd{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}.works__hd .th3{font-family:Unbounded;font-size:16px}
+.works__g{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.works__i{display:grid;gap:8px;color:var(--ink)}
+.works__i img{width:100%;aspect-ratio:1;height:auto;object-fit:cover;border-radius:12px;background:var(--paper-2);cursor:zoom-in;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.works__i span{font-size:12.5px;line-height:1.35;color:var(--gray);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(hover:hover){.works__i:hover img{transform:scale(1.03)}.works__i:hover span{color:var(--ink)}}
+@media(max-width:480px){.wr__2{grid-template-columns:1fr}}
+@media(max-width:640px){.works__g{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:40%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}.works__g::-webkit-scrollbar{display:none}.works__g li{scroll-snap-align:start}}
 
 /* — карточка товара: краткие характеристики вместо «простыни» (по прототипу) — */
 .pc__scales{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin:0 0 12px}
@@ -1798,6 +1825,8 @@ input,textarea{caret-color:var(--ink)}
 .home .bean .notes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;line-height:1.4}
 .home .bean .notes span{border:1px solid #6A5343;border-radius:999px;padding:7px 14px;font-size:13px}
 .home .bean__c .btn--line{color:#F3EDE7;border-color:#F3EDE7}
+.bean-pg{display:flex;gap:6px;justify-content:center;margin-top:14px}.bean-pg:empty{display:none}
+.bean-pg .swiper-pagination-bullet{width:22px;height:4px;border-radius:2px;background:var(--line);opacity:1;margin:0!important;transition:background-color .2s}.bean-pg .swiper-pagination-bullet-active{background:var(--ink)}
 .home .stepsx{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .home .stepx{border-top:2px solid var(--ink);padding-top:18px}
 .home .stepx b{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;color:var(--gray);display:block;margin-bottom:12px}
@@ -1862,6 +1891,7 @@ form[data-form]{position:relative}
 .aboutp .tl b{font-family:'JetBrains Mono';font-size:12px;color:var(--gray);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
 .aboutp .person{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:18px;text-align:center}
 .aboutp .person .ph{aspect-ratio:1;width:100%;object-fit:cover;border-radius:12px;background:repeating-linear-gradient(45deg,#FAFAF8 0 10px,#EFEFE9 10px 20px);border:1px dashed #C8C8BE;display:grid;place-items:center;color:var(--gray-2);font-size:12px;margin-bottom:14px}
+a.person{display:block;color:inherit;text-decoration:none;transition:border-color .15s}@media(hover:hover){.aboutp a.person:hover{border-color:var(--line-h)}.aboutp a.person:hover b{text-decoration:underline 2px var(--lime);text-underline-offset:4px}}
 .aboutp .person b{font-size:15px}.aboutp .person small{display:block;color:var(--gray);font-size:12.5px;margin-top:4px}
 .aboutp .cert{background:var(--ink);color:#fff;border-radius:var(--rad);padding:clamp(26px,3.4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
 .aboutp .cert .ph{border:1px dashed #4A4A42;border-radius:12px;min-height:220px;display:grid;place-items:center;color:#8B8B82;font-size:13px;text-align:center}
@@ -3004,3 +3034,13 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .seor__how ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:var(--gray)}
 @media(max-width:900px){.seor__sum{grid-template-columns:1fr 1fr}.seor__foot{grid-template-columns:1fr}.seor__csv{margin-left:0;flex-basis:100%}}
 @media(max-width:560px){.seor__filter .field{flex:1 1 140px}.seor__sum b{font-size:20px}}
+
+/* — страница специалиста /o-kompanii/komanda/<код>/ — */
+.expp__hd{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:start;padding:18px 0 8px}
+.expp__ph{aspect-ratio:1;border-radius:var(--rad);overflow:hidden;background:var(--paper-2)}.expp__ph img{width:100%;height:100%;object-fit:cover;display:block}
+.expp__in{display:grid;gap:14px;align-content:start}.expp__in .h1{margin:0}
+.expp__job{margin:0;font-size:clamp(16px,1.4vw,19px);font-weight:600;color:var(--gray)}
+.expp__spec{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}.expp__spec li{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600}
+.expp__links{margin:0;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px}
+.expp__body{max-width:760px}.expp__body .th2{font-family:Unbounded;font-size:20px;margin:0 0 12px}.expp__body .post__body+.th2{margin-top:30px}
+@media(max-width:640px){.expp__hd{grid-template-columns:1fr}.expp__ph{max-width:280px}}

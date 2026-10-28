@@ -18,6 +18,8 @@ $gallery = array_values(array_filter(bt_list('about_gallery'), fn($g) => $g['pic
 $work = bt_block('about_work');
 $cert = bt_block('about_cert');
 $team = bt_list('about_team');
+// ссылка на страницу специалиста — у кого она заполнена (тот же порядок, что у bt_list)
+$experts = array_values(bt_experts());
 $revs = bt_reviews();
 ?>
 <div class="wrap aboutp">
@@ -53,10 +55,10 @@ $revs = bt_reviews();
   <section class="sec"><div class="grid g2" style="gap:40px">
     <div><h2 class="display h2" style="margin-bottom:22px"><?= $e($work['title'] ?? 'Чем занимаемся') ?></h2>
       <div class="tl"><?php foreach ($work['items'] ?? [] as $i => [$t, $d]): $href = $work['links'][$i][0] ?? ''; ?><?= $href !== '' ? '<a href="' . $e($href) . '">' : '<div>' ?><b><?= $e($t) ?></b><?= $e($d) ?><?= $href !== '' ? ' <span class="tl__go">→</span></a>' : '</div>' ?><?php endforeach ?></div></div>
-    <div><h2 class="display h2" style="margin-bottom:22px">Команда</h2>
+    <div id="team" style="scroll-margin-top:130px"><h2 class="display h2" style="margin-bottom:22px">Команда</h2>
       <?php if ($team): ?>
       <?= bt_demo_note('about_team', $isDemo($team)) ?>
-      <div class="grid g2 ateam"><?php foreach ($team as $p): ?><div class="person"><?php if ($p['pic']): ?><img class="ph" src="<?= $e($p['pic']) ?>" alt="<?= $e($p['name']) ?>" loading="lazy"><?php else: ?><div class="ph">фото</div><?php endif ?><b><?= $e($p['name']) ?></b><small><?= $e($p['text']) ?></small></div><?php endforeach ?></div>
+      <div class="grid g2 ateam"><?php foreach ($team as $i => $p): $url = ($experts[$i]['name'] ?? '') === $p['name'] ? $experts[$i]['url'] : ''; ?><<?= $url ? 'a href="' . $e($url) . '"' : 'div' ?> class="person"><?php if ($p['pic']): ?><img class="ph" src="<?= $e($p['pic']) ?>" alt="<?= $e($p['name']) ?>" loading="lazy"><?php else: ?><div class="ph">фото</div><?php endif ?><b><?= $e($p['name']) ?></b><small><?= $e($p['text']) ?></small></<?= $url ? 'a' : 'div' ?>><?php endforeach ?></div>
       <?php else: ?>
       <div class="grid g2"><?php for ($i = 0; $i < 4; $i++): ?><div class="person"><div class="ph">фото</div><b>Имя</b><small>Должность</small></div><?php endfor ?></div>
       <p class="muted" style="font-size:13px;margin:12px 0 0">Фото и имена сотрудников — нужен файл от клиента.</p>

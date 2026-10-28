@@ -30,7 +30,7 @@ $forms = [
     'about_partners' => ['list', ['name', 'text', 'link', 'pic', 'demo']],
     'about_places' => ['list', ['name', 'pic', 'demo']],
     'about_rating' => ['block', ['title', 'subtitle', 'btn_link', 'demo']],
-    'about_team' => ['list', ['name', 'text', 'pic', 'demo']],
+    'about_team' => ['list', ['name', 'text', 'pic', 'code', 'detail', 'specialization', 'education', 'profiles', 'demo']],
     'about_values' => ['block', ['caption', 'title', 'text']],
     'about_values_items' => ['list', ['name', 'text', 'link', 'icon']],
     'about_work' => ['block', ['title', 'items', 'links']],
@@ -98,6 +98,7 @@ $forms = [
     'servis_dirs' => ['blocks', ['name', 'html', 'items', 'price', 'price_note', 'link', 'link_text']],
     'servis_head' => ['block', ['subtitle']],
     'servis_price' => ['block', ['caption', 'title', 'subtitle', 'items', 'btn_text', 'btn_link']],
+    'main_faq' => ['blocks', ['name', 'html']],
     'sub_faq' => ['blocks', ['name', 'html']],
     'sub_head' => ['block', ['title', 'subtitle', 'items', 'btn_text', 'caption']],
     'sub_rent' => ['block', ['title', 'subtitle', 'btn_text', 'btn_link']],
@@ -105,7 +106,7 @@ $forms = [
 ];
 // подписи стандартных полей у списков: код ИБ => [name, текст анонса, картинка]
 $labels = [
-    'about_faq' => ['Вопрос', 'Ответ'], 'rent_faq' => ['Вопрос', 'Ответ'], 'repair_faq' => ['Вопрос', 'Ответ'], 'sub_faq' => ['Вопрос', 'Ответ'],
+    'about_faq' => ['Вопрос', 'Ответ'], 'rent_faq' => ['Вопрос', 'Ответ'], 'repair_faq' => ['Вопрос', 'Ответ'], 'sub_faq' => ['Вопрос', 'Ответ'], 'main_faq' => ['Вопрос', 'Ответ'],
     'about_history' => ['Год', 'Событие'], 'about_numbers' => ['Цифра (например, 500+)', 'Подпись под цифрой'],
     'main_facts' => ['Цифра (крупно)', 'Подпись под цифрой'], 'repair_facts' => ['Цифра (крупно)', 'Подпись под цифрой'],
     'about_team' => ['Имя и фамилия', 'Должность', 'Фото'], 'about_places' => ['Подпись к фото', '', 'Фото'],
@@ -157,6 +158,10 @@ foreach ($forms as $code => [$kind, $keys]) {
         $text = $kind === 'list' ? 'text' : 'html';
         if ($k === $text) {
             $fields['PREVIEW_TEXT'] = $lText ?: 'Текст';
+        } elseif ($k === 'code') {
+            $fields['CODE'] = 'Адрес страницы специалиста (латиницей, например ivan-ivanov)';
+        } elseif ($k === 'detail') {
+            $fields['DETAIL_TEXT'] = 'Биография и опыт работы (заполнена вместе с адресом — у специалиста появится своя страница)';
         } elseif ($k === 'pic') {
             $fields['PREVIEW_PICTURE'] = $lPic ?: 'Картинка';
         } elseif (isset($props[$k])) {

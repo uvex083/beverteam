@@ -245,9 +245,10 @@ window.BT_favUpdate = () => {
   const a=document.querySelector('.hact[href="/personal/favorites/"]'); if(!a) return;
   let c=a.querySelector('.cnt'); if(!c){ c=document.createElement('span'); c.className='cnt'; a.insertBefore(c,a.lastElementChild); }
   c.textContent=FAV.length; c.hidden=!FAV.length;
+  document.querySelectorAll('.dn__q--fav .cnt').forEach(x=>{ x.textContent=FAV.length; x.hidden=!FAV.length; });
 };
 window.BT_cmpUpdate = () => {
-  document.querySelectorAll('.hact--cmp .cnt').forEach(c=>{ c.textContent=CMP.length; c.hidden=!CMP.length; });
+  document.querySelectorAll('.hact--cmp .cnt,.dn__q--cmp .cnt').forEach(c=>{ c.textContent=CMP.length; c.hidden=!CMP.length; });
   document.querySelectorAll('.pc__cmpi').forEach(b=>{ const pc=b.closest('[data-pc]');
     if(pc) b.setAttribute('aria-pressed', BT_cmpHas(pc.dataset.pc)?'true':'false'); });
 };
@@ -1223,6 +1224,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   BT_slider(document.getElementById('tiles'),{min:5,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3},1200:{slidesPerView:5,spaceBetween:14}}}});
   /* отзывы и журнал на главной: на телефоне листаются, на компьютере три в ряд */
   ['revs','news'].forEach(id=>BT_slider(document.getElementById(id),{min:2,swiper:{breakpoints:{560:{slidesPerView:2},900:{slidesPerView:3,spaceBetween:20}}}}));
+  /* «Зерно месяца»: по одному кофе на слайд, точки снизу */
+  BT_slider(document.getElementById('beanSw'),{min:2,swiper:{slidesPerView:1,spaceBetween:20,breakpoints:{},pagination:{el:'#beanPg',clickable:true}}});
   /* 404: поиск открывает общий поиск по сайту с введённым запросом */
   const escq=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -1866,6 +1869,15 @@ document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest
   addEventListener('popstate',()=>{ if(document.getElementById('spRes')) load(location.href,false); });
 })();
 /* «Скопировать» (реквизиты и т.п.): текст из data-copy в буфер обмена */
+// главная, «Наши установки»: фото на весь экран с листанием по ленте
+document.addEventListener('click',e=>{const a=e.target.closest('[data-works] .works__i'); if(!a) return; e.preventDefault();
+  const all=[...a.closest('[data-works]').querySelectorAll('.works__i')]; BT_lightbox(all.map(x=>({src:x.getAttribute('href'),cap:x.textContent.trim()})),all.indexOf(a));});
+// трубка в шапке: всплывашка открывается кнопкой, закрывается кликом мимо, по ссылке внутри и по Esc
+document.addEventListener('click',e=>{const p=document.getElementById('telpop'), b=document.querySelector('.hact--tel'); if(!p||!b) return;
+  if(e.target.closest('.hact--tel')){ p.hidden=!p.hidden; b.setAttribute('aria-expanded',!p.hidden); return; }
+  if(p.hidden||(e.target.closest('#telpop')&&!e.target.closest('a'))) return;
+  p.hidden=true; b.setAttribute('aria-expanded','false');});
+document.addEventListener('keydown',e=>{const p=document.getElementById('telpop'); if(e.key==='Escape'&&p&&!p.hidden){ p.hidden=true; document.querySelector('.hact--tel')?.setAttribute('aria-expanded','false'); }});
 // футер на телефоне: колонки ссылок раскрываются по заголовку
 document.addEventListener('click',e=>{const h=e.target.closest('.ftr__acc>.ftr__h'); if(!h) return; h.setAttribute('aria-expanded',h.parentElement.classList.toggle('is-open'));});
 document.addEventListener('DOMContentLoaded',()=>{ if(matchMedia('(max-width:720px)').matches) document.querySelectorAll('.ftr__acc>.ftr__h').forEach(h=>h.setAttribute('aria-expanded','false')); });

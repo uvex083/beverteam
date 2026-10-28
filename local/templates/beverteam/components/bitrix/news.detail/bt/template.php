@@ -47,8 +47,12 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     <?php if ($mod): ?><meta itemprop="dateModified" content="<?= $e(date('Y-m-d', MakeTimeStamp($mod))) ?>"><?php endif ?>
     <link itemprop="mainEntityOfPage" href="<?= $e($host . $arResult['~DETAIL_PAGE_URL']) ?>">
     <?php if ($pic): ?><link itemprop="image" href="<?= $e($host . $pic) ?>"><?php endif ?>
-    <?php /* автор и издатель — компания: Яндекс требует у организации адрес и телефон */ ?>
-    <div hidden itemprop="author publisher" itemscope itemtype="https://schema.org/Organization" itemid="https://beverteam.ru/#org">
+    <?php /* издатель — компания (Яндекс требует у организации адрес и телефон); автор — специалист из поля «Автор статьи», иначе тоже компания */
+    $author = bt_experts()[(int)($arResult['PROPERTIES']['AUTHOR']['VALUE'] ?? 0)] ?? null; ?>
+    <?php if ($author): ?><div hidden itemprop="author" itemscope itemtype="https://schema.org/Person"<?= $author['url'] ? ' itemid="' . $e($host . $author['url']) . '#person"' : '' ?>>
+      <meta itemprop="name" content="<?= $e($author['name']) ?>"><?php if ($author['job'] !== ''): ?><meta itemprop="jobTitle" content="<?= $e($author['job']) ?>"><?php endif ?><?php if ($author['url']): ?><link itemprop="url" href="<?= $e($host . $author['url']) ?>"><?php endif ?>
+    </div><?php endif ?>
+    <div hidden itemprop="<?= $author ? 'publisher' : 'author publisher' ?>" itemscope itemtype="https://schema.org/Organization" itemid="https://beverteam.ru/#org">
       <meta itemprop="name" content="BEVERTEAM"><link itemprop="url" href="<?= $e($host) ?>/">
       <link itemprop="logo" href="<?= $e($host) ?>/local/templates/beverteam/images/og-logo.png">
       <meta itemprop="telephone" content="<?= $e($co['phone1'] ?? '') ?>">
@@ -60,7 +64,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
       <span class="tag"><?= $e($cat) ?></span>
       <?php if ($iso): ?><time datetime="<?= $e($iso) ?>"><?= bt_date_ru($iso) ?></time><?php endif ?>
       <?php if ($min): ?><span>·</span><span><?= $min ?> мин чтения</span><?php endif ?>
-      <span>·</span><span>BEVERTEAM</span>
+      <span>·</span><?php if ($author): ?><span class="post__author"><?= $author['url'] ? '<a href="' . $e($author['url']) . '">' . $e($author['name']) . '</a>' : $e($author['name']) ?><?= $author['job'] !== '' ? ', ' . $e(mb_strtolower(mb_substr($author['job'], 0, 1)) . mb_substr($author['job'], 1)) : '' ?></span><?php else: ?><span>BEVERTEAM</span><?php endif ?>
     </div>
     <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>"></figure><?php endif ?>
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>

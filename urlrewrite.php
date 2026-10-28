@@ -64,4 +64,12 @@ $arUrlRewrite=array (
     'PATH' => '/arenda-kofemashin/model.php',
     'SORT' => 100,
   ),
+  9 => 
+  array (
+    'CONDITION' => '#^/o-kompanii/komanda/([a-z0-9-]+)/(\?.*)?$#',
+    'RULE' => 'CODE=$1',
+    'ID' => '',
+    'PATH' => '/o-kompanii/komanda/detail.php',
+    'SORT' => 100,
+  ),
 );

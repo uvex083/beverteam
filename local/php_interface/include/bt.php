@@ -714,6 +714,42 @@ function bt_list(string $code): array
     return $list;
 }
 
+// Специалисты (ИБ «О компании: команда»): своя страница есть только у того, у кого заполнены адрес (код) и биография
+function bt_experts(): array
+{
+    $ibId = bt_iblock('about_team');
+    if (!$ibId) {
+        return [];
+    }
+    $cache = \Bitrix\Main\Data\Cache::createInstance();
+    if ($cache->initCache(86400, 'bt_experts', '/bt/blocks')) {
+        return $cache->getVars();
+    }
+    $cache->startDataCache();
+    $GLOBALS['CACHE_MANAGER']->StartTagCache('/bt/blocks');
+    $GLOBALS['CACHE_MANAGER']->RegisterTag('iblock_id_' . $ibId);
+    $list = [];
+    $r = \CIBlockElement::GetList(['SORT' => 'ASC', 'ID' => 'ASC'], ['IBLOCK_ID' => $ibId, 'ACTIVE' => 'Y'], false, false,
+        ['ID', 'IBLOCK_ID', 'CODE', 'NAME', 'PREVIEW_TEXT', 'PREVIEW_PICTURE', 'DETAIL_TEXT', 'DETAIL_TEXT_TYPE']);
+    while ($o = $r->GetNextElement()) {
+        $f = $o->GetFields();
+        $p = $o->GetProperties();
+        $vals = fn(string $c) => array_values(array_filter(array_map(fn($v) => trim((string)$v), (array)($p[$c]['~VALUE'] ?? [])), 'strlen'));
+        $bio = trim((string)$f['~DETAIL_TEXT']);
+        $bio = $bio !== '' && $f['DETAIL_TEXT_TYPE'] !== 'html' ? '<p>' . nl2br(htmlspecialcharsbx($bio)) . '</p>' : $bio;
+        $code = trim((string)$f['~CODE']);
+        $list[(int)$f['ID']] = [
+            'id' => (int)$f['ID'], 'name' => $f['~NAME'], 'job' => trim(strip_tags((string)$f['~PREVIEW_TEXT'])),
+            'pic' => bt_img($f['PREVIEW_PICTURE'], 1000, 1000), 'bio' => $bio,
+            'spec' => $vals('SPECIALIZATION'), 'edu' => trim((string)($p['EDUCATION']['~VALUE']['TEXT'] ?? '')), 'profiles' => $vals('PROFILES'),
+            'url' => $code !== '' && $bio !== '' ? '/o-kompanii/komanda/' . $code . '/' : '',
+        ];
+    }
+    $GLOBALS['CACHE_MANAGER']->EndTagCache();
+    $cache->endDataCache($list);
+    return $list;
+}
+
 // Отзывы о компании: дата, компания, логотип, благодарственные письма (картинки — в просмотр, PDF — ссылкой)
 function bt_reviews(): array
 {
@@ -2099,6 +2135,9 @@ function bt_sitemap_build(): string
     }
     foreach (bt_rent_models() as $m) {
         $urls[] = bt_rent_url($m);
+    }
+    foreach (bt_experts() as $x) {
+        $x['url'] !== '' and $urls[] = $x['url'];
     }
     // посадочные страницы SEO: ссылок на них может не быть, робот находит их по карте
     if ($lid = bt_iblock('seo_landings')) {

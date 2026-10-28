@@ -25,7 +25,7 @@ $msgr = function (string $cls = '') {
     }
     return '<div class="msgr ' . $cls . '">' . $html . '</div>';
 };
-$logo = '<picture><source media="(max-width:480px)" srcset="' . SITE_TEMPLATE_PATH . '/brand/mark-bevertim-white.svg"><img src="' . SITE_TEMPLATE_PATH . '/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим"></picture>';
+$logo = '<img src="' . SITE_TEMPLATE_PATH . '/brand/logo-bevertim-white.svg" width="162" height="34" alt="Бэвертим">';
 $home = $APPLICATION->GetCurPage(false) === '/';
 ?><!DOCTYPE html>
 <html lang="ru" prefix="og: https://ogp.me/ns# product: https://ogp.me/ns/product#">
@@ -50,11 +50,20 @@ $home = $APPLICATION->GetCurPage(false) === '/';
     <div class="hdr__msgr"><?= $msgr() ?><a class="hdr__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a></div>
     <div class="hdr__acts">
       <button class="hact" id="srchBtn" aria-label="Поиск по сайту" aria-haspopup="dialog"><?= bt_icon('search') ?><span>Поиск</span></button>
-      <a class="hact" href="/personal/"><?= bt_icon('user') ?><span>Кабинет</span></a>
-      <a class="hact" href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span></a>
-      <a class="hact hact--cmp" href="/catalog/compare/" aria-label="Сравнение товаров"><?= bt_icon('compare') ?><span class="cnt" hidden>0</span><span>Сравнение</span></a>
+      <button class="hact hact--tel" type="button" aria-label="Позвонить или написать" aria-expanded="false" aria-controls="telpop"><?= bt_icon('phone') ?><span>Связаться</span></button>
+      <a class="hact hact--m" href="/personal/"><?= bt_icon('user') ?><span>Кабинет</span></a>
+      <a class="hact hact--m" href="/personal/favorites/"><?= bt_icon('heart') ?><span>Избранное</span></a>
+      <a class="hact hact--cmp hact--m" href="/catalog/compare/" aria-label="Сравнение товаров"><?= bt_icon('compare') ?><span class="cnt" hidden>0</span><span>Сравнение</span></a>
       <a class="hact" href="/personal/cart/" aria-label="Корзина"><?= bt_icon('cart') ?><span class="cnt" hidden>0</span><span>Корзина</span></a>
     </div>
+  </div>
+  <?php /* телефон: всплывашка с номерами, мессенджерами и заявкой — на планшетах и телефонах, где номера нет в шапке */ ?>
+  <div class="telpop" id="telpop" hidden>
+    <a class="telpop__tel" href="<?= $co['phone1_href'] ?? '' ?>"><?= $co['phone1'] ?? '' ?></a>
+    <?php if (!empty($co['phone2'])): ?><a class="telpop__tel2" href="<?= $co['phone2_href'] ?? '' ?>"><?= $co['phone2'] ?></a><?php endif ?>
+    <span class="telpop__h"><?= $co['hours'] ?? '' ?></span>
+    <?= $msgr('msgr--lg') ?>
+    <a class="btn btn--block" href="/kontakty/#form" data-lead="Оставить заявку">Заказать звонок</a>
   </div>
   <div class="wrap hdr__nav">
     <?php $APPLICATION->IncludeComponent('bitrix:menu', 'bt_top', [
