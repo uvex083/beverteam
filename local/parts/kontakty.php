@@ -24,7 +24,6 @@ foreach (bt_messengers() as [, $name, $href, $svg]) {
         <?php if (!empty($co['hours_service'])): ?><div><dt>Выезд технического специалиста</dt><dd><?= $e($co['hours_service']) ?><br><span class="muted" style="font-weight:400;font-size:13px">по Екатеринбургу, по заявке</span></dd></div><?php endif ?>
         <div><dt>Мессенджеры</dt><dd><div class="msgr msgr--lg"><?= $msgr ?></div></dd></div>
       </dl>
-      <hr class="hr" style="margin:22px 0">
       <?php $req = bt_requisites(); $onPage = array_filter($req, fn($r) => !in_array($r[0], ['Фактический адрес', 'Телефон', 'E-mail', 'Сайт'], true)); ?>
       <div class="req">
         <div class="req__hd"><div><span class="req__k">Реквизиты</span><b>BEVERTEAM — чай и кофе для дома и бизнеса</b><span class="muted">на рынке с 2010 года</span></div><?= bt_icon('doc') ?></div>

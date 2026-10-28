@@ -146,7 +146,7 @@ $c0 = $chips[$cur] ?? null;
     <div class="mono" style="color:var(--lime)"><?= $e($svc['caption'] ?? '') ?></div>
     <div class="display h2 svc__t th th2" style="margin-top:14px"><?= bt_title($svc['title'] ?? '', $svc['highlight'] ?? '', 'span') ?></div>
     <?php if (!empty($svc['subtitle'])): ?><p><?= $e($svc['subtitle']) ?></p><?php endif ?>
-    <?php if (!empty($svc['items'])): ?><ul class="svc__list"><?php foreach ($svc['items'] as [$t, $v]): ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?></ul><?php endif ?>
+    <?php if (!empty($svc['items'])): ?><ul class="svc__list"><?php foreach ($svc['items'] as [$t, $v]): if (trim($t . $v) === '') continue; ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?></ul><?php endif ?>
     <div class="row"><?= bt_btn($svc['btn_text'] ?? '', $svc['btn_link'] ?? '') ?><?= bt_btn($svc['btn2_text'] ?? '', $svc['btn2_link'] ?? '', 'btn btn--line btn--inv') ?></div>
   </div>
   <div class="svc__r"><?php if ($svc['pic']): ?><img src="<?= $e($svc['pic']) ?>"<?= bt_img_wh($svc['pic']) ?> alt="<?= $e(str_replace("\n", ' ', $svc['title'] ?? '')) ?>" loading="lazy"><?php endif ?></div>
@@ -216,7 +216,7 @@ if ($beans):
     <?php if (!empty($sub['subtitle'])): ?><p><?= $e($sub['subtitle']) ?></p><?php endif ?>
     <ul class="svc__list">
       <?php foreach ($rent as $m) if ($m['kg']): ?><li>От <?= $m['kg'] ?> кг кофе в месяц <i><?= $e($m['model']) ?> — 0 ₽ аренда</i></li><?php endif ?>
-      <?php foreach ($sub['items'] ?? [] as [$t, $v]): ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?>
+      <?php foreach ($sub['items'] ?? [] as [$t, $v]): if (trim($t . $v) === '') continue; ?><li><?= $e($t) ?> <i><?= $e($v) ?></i></li><?php endforeach ?>
     </ul>
     <div class="row"><?= bt_btn($sub['btn_text'] ?? '', $sub['btn_link'] ?? '') ?><?= bt_btn($sub['btn2_text'] ?? '', $sub['btn2_link'] ?? '', 'btn btn--line btn--inv') ?></div>
   </div>

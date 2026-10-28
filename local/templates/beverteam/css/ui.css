@@ -1429,8 +1429,8 @@ input,textarea{caret-color:var(--ink)}
 .pspecs__grid{display:block;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:6px 22px}
 .pspecs__grid>div{display:flex;align-items:baseline;gap:16px;padding:11px 0;border-bottom:1px solid var(--line)}
 .pspecs__grid>div:last-child{border-bottom:0}
-.pspecs__grid span{flex:0 0 auto;font-size:14px;color:var(--gray)}
-.pspecs__grid b{margin-left:auto;text-align:right;font-size:14px;font-weight:700}
+.pspecs__grid span{flex:1 1 auto;min-width:0;font-size:14px;color:var(--gray)}
+.pspecs__grid b{flex:0 1 auto;max-width:60%;margin-left:auto;text-align:right;font-size:14px;font-weight:700}
 @media(max-width:560px){.pspecs__grid{padding:6px 16px}.pspecs__grid>div{gap:12px}}
 @media(max-width:900px){.prod{grid-template-columns:1fr}.gal{position:static}.gal__main{height:360px;order:1}.specs{grid-template-columns:1fr}}
 @media(max-width:900px){.prod{display:flex;flex-direction:column;gap:0;align-items:stretch}.pinfo{display:contents}.pinfo>*{order:3}.pinfo>.pkick{order:0}.pinfo>.h1{order:1;margin-bottom:16px}.prod>.gal{order:2;margin-bottom:22px}}
@@ -1967,7 +1967,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .contp .dl2 dt{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:4px}
 .contp .dl2 dd{margin:0;font-size:16px;font-weight:600}
 .contp .form{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.contp .how{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.contp .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .contp .how div{background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px;font-size:13.5px}
 .contp .how b{display:block;margin-bottom:4px}
 .contp .office img{width:100%;height:200px;object-fit:cover;display:block}
@@ -2456,6 +2456,8 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .r2facts div:first-child b{color:var(--lime)}
 .r2facts span{font-size:13px;line-height:1.4;color:var(--gray)}
 .r2facts div:first-child span{color:#A8A8A0}
+/* узкие телефоны: длинные слова в крупном тексте не вылезают за край */
+@media(max-width:400px){.r2facts div{padding:14px}.r2facts b{font-size:19px;overflow-wrap:anywhere}.h1{font-size:min(24px,6vw);overflow-wrap:break-word}.home .svc__list li i{white-space:normal;text-align:right}}
 .r2symp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .r2symp label{display:flex;gap:12px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:var(--rad-s);padding:16px 18px;cursor:pointer;transition:border-color .2s}
 @media(hover:hover){.r2symp label:hover{border-color:var(--line-h)}}
@@ -2707,7 +2709,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .jsub__agree input[type=checkbox]:checked{background-color:var(--lime);border-color:var(--lime);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' fill='none' stroke='%230E0E0C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .jsub .check.is-err{color:#FF8A7A}
 @media(max-width:900px){.jsub{grid-template-columns:1fr}.jsub::after{width:56px;height:56px;border-width:14px;right:62px;top:32px}}
-@media(max-width:520px){.jsub__row{flex-direction:column;align-items:stretch}.jsub__row .btn{width:100%}}
+@media(max-width:520px){.jsub__row{flex-direction:column;align-items:stretch}.jsub__row .btn{width:100%}.jsub::after{width:40px;height:40px;border-width:10px;right:14px;top:14px}}
 .jsub .field.is-err input{background:#2A1917;border-color:#E5533D;color:#fff}
 .jsub .field .err{color:#FF8A7A}
 @media(hover:hover){.jsub .check:hover input[type=checkbox]:not(:checked){border-color:#B9B9B0}}
