@@ -169,18 +169,18 @@ if ($beans):
 ?>
 <section class="sec sec--t0"><div class="wrap">
   <div id="beanSw">
-  <?php foreach ($beans as [$p, $cap, $title, $sub, $btn, $link]):
-    $pImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $p['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $p['img'];
-    $spec = bt_catalog_specs()['vals'][$p['id']] ?? [];
-    $notes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($spec['NOTES'] ?? ''))));
+  <?php foreach ($beans as [$bP, $bCap, $bTitle, $bSub, $bBtn, $bLink]):
+    $bImg = bt_img((int)(CIBlockElement::GetList([], ['ID' => $bP['id']], false, false, ['ID', 'PREVIEW_PICTURE'])->Fetch()['PREVIEW_PICTURE'] ?? 0), 900, 700) ?: $bP['img'];
+    $bSpec = bt_catalog_specs()['vals'][$bP['id']] ?? [];
+    $bNotes = array_filter(array_map(fn($s) => mb_strtoupper(mb_substr(trim($s), 0, 1)) . mb_substr(trim($s), 1), explode(',', htmlspecialchars_decode($bSpec['NOTES'] ?? ''))));
   ?>
   <div class="bean">
-    <div class="bean__ph"><?php if (!empty($spec['Q_SCORE'])): ?><div class="qscore"><div><b><?= $spec['Q_SCORE'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($pImg) ?>"<?= bt_img_wh($pImg) ?> alt="<?= $e($p['n']) ?>" loading="lazy" decoding="async"></div>
+    <div class="bean__ph"><?php if (!empty($bSpec['Q_SCORE'])): ?><div class="qscore"><div><b><?= $bSpec['Q_SCORE'] ?></b><span>Q-score</span></div></div><?php endif ?><img src="<?= $e($bImg) ?>"<?= bt_img_wh($bImg) ?> alt="<?= $e($bP['n']) ?>" loading="lazy" decoding="async"></div>
     <div class="bean__c">
-      <div class="mono"><?= $e($cap) ?></div>
-      <div class="display h2 bean__t th th2"><?= bt_title($title) ?></div>
-      <?php if ($sub !== ''): ?><p><?= $e($sub) ?></p><?php endif ?>
-      <?php if ($notes): ?><div class="notes"><?php foreach ($notes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
+      <div class="mono"><?= $e($bCap) ?></div>
+      <div class="display h2 bean__t th th2"><?= bt_title($bTitle) ?></div>
+      <?php if ($bSub !== ''): ?><p><?= $e($bSub) ?></p><?php endif ?>
+      <?php if ($bNotes): ?><div class="notes"><?php foreach ($bNotes as $n): ?><span><?= $e($n) ?></span><?php endforeach ?></div><?php endif ?>
       <div class="row"><?= bt_btn($btn, $link) ?><?= bt_btn($bean['btn2_text'] ?? '', $bean['btn2_link'] ?? '', 'btn btn--line') ?></div>
     </div>
   </div>
