@@ -1301,7 +1301,7 @@ input,textarea{caret-color:var(--ink)}
 .gal__big img{max-height:420px;max-width:100%;width:auto;transition:transform .5s cubic-bezier(.22,1,.36,1)}
 @media(hover:hover){.gal__main:hover .swiper-slide-active img{transform:scale(1.05)}}
 .gal__badges{position:absolute;top:18px;left:18px;display:flex;gap:6px;z-index:2}
-.gal__n{position:absolute;right:16px;bottom:14px;z-index:2;background:rgba(14,14,12,.06);border-radius:999px;
+.gal__n:empty{display:none}.gal__n{position:absolute;right:16px;bottom:14px;z-index:2;background:rgba(14,14,12,.06);border-radius:999px;
   padding:4px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--gray);font-variant-numeric:tabular-nums}
 /* вертикальная лента миниатюр слева */
 .gal__side{position:relative;height:480px;display:flex;flex-direction:column;gap:8px}
