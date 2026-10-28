@@ -4,11 +4,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 // страница модели в аренду /arenda-kofemashin/<код>/ (правило в urlrewrite.php); модели — ИБ rent, выключенная или неизвестная → 404
 $rentModel = bt_rent_by_code((string)($_GET['CODE'] ?? ''));
 if (!$rentModel) {
-    // эпилог Битрикса сам подключит /404.php при ERROR_404
-    CHTTP::SetStatus('404 Not Found');
-    define('ERROR_404', 'Y');
-    require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
-    require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
+    require $_SERVER['DOCUMENT_ROOT'] . '/404.php';
     return;
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';

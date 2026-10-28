@@ -13,7 +13,7 @@
 <p class="muted" id="cardsEmpty"<?= $arResult['ITEMS'] ? ' style="display:none"' : '' ?>>По выбранным условиям товаров нет — снимите часть условий фильтра.</p>
 
 <section class="sec sec--s">
-  <h2 class="display h2" style="margin-bottom:20px">Почему покупают у нас</h2>
+  <div class="display h2 th th2" style="margin-bottom:20px">Почему покупают у нас</div>
   <div class="utp" id="utp"></div>
   <script>document.addEventListener('DOMContentLoaded',()=>{utp.innerHTML=BT_utp(4);});</script>
 </section>

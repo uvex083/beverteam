@@ -101,7 +101,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <?php if ($beans): ?>
   <section class="sec sec--t0" id="calc">
-    <h2 class="display h2">Сколько это будет стоить вам</h2>
+    <div class="display h2 th th2">Сколько это будет стоить вам</div>
     <p class="muted r2lead">Укажите, сколько чашек в день пьют у вас, — посчитаем расход кофе и оба варианта оплаты для <?= $e($m['model']) ?>.</p>
     <div class="ar2calc" data-rmcalc='<?= htmlspecialcharsbx(json_encode($calc, JSON_UNESCAPED_UNICODE)) ?>'>
       <div class="ar2calc__in">
@@ -137,7 +137,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <?php if ($specs || $tech): ?>
   <section class="sec sec--t0" id="specs">
-    <h2 class="display h2" style="margin-bottom:22px">Характеристики</h2>
+    <div class="display h2 th th2" style="margin-bottom:22px">Характеристики</div>
     <div class="rmspecs">
       <?php if ($specs): ?><dl class="rmdl"><?php foreach ($specs as $t => $v): ?><div><dt><?= $e($t) ?></dt><dd><?= $e($v) ?></dd></div><?php endforeach ?></dl><?php endif ?>
       <?php if ($tech): ?><ul class="rmtech"><?php foreach ($tech as $t): ?><li><?= $e($t) ?></li><?php endforeach ?></ul><?php endif ?>
@@ -147,14 +147,14 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <?php if ($about !== ''): ?>
   <section class="sec sec--t0">
-    <h2 class="display h2">О модели</h2>
+    <div class="display h2 th th2">О модели</div>
     <div class="post__body rmabout"><?= $about ?></div>
   </section>
   <?php endif ?>
 
   <?php if ($included): ?>
   <section class="sec sec--t0">
-    <h2 class="display h2">Что входит в аренду</h2>
+    <div class="display h2 th th2">Что входит в аренду</div>
     <div class="r2why ar2inc"><?php foreach ($included as $w): ?><div class="card"><?php if ($w['icon'] !== ''): ?><span class="ic"><?= $w['icon'] ?></span><?php endif ?><b><?= $e($w['name']) ?></b><?php if ($w['text'] !== ''): ?><p><?= $e($w['text']) ?></p><?php endif ?></div><?php endforeach ?></div>
   </section>
   <?php endif ?>
@@ -162,7 +162,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php if ($terms): ?>
   <section class="sec sec--t0"><div class="pl">
     <div><?php if (!empty($terms['caption'])): ?><div class="mono" style="color:var(--lime)"><?= $e($terms['caption']) ?></div><?php endif ?>
-      <h2 class="display h2" style="margin:14px 0"><?= bt_title($terms['title'] ?? '') ?></h2>
+      <div class="display h2 th th2" style="margin:14px 0"><?= bt_title($terms['title'] ?? '') ?></div>
       <?php if (!empty($terms['subtitle'])): ?><p><?= $e($terms['subtitle']) ?></p><?php endif ?>
       <?php if (!empty($terms['file'])): ?><div class="row" style="gap:12px"><a class="btn" href="<?= $e($terms['file']) ?>" target="_blank" rel="noopener"><?= $e(($terms['btn_text'] ?? '') ?: 'Образец договора, PDF') ?></a></div><?php endif ?></div>
     <?php if ($termItems = $vals($terms['items'] ?? [])): ?><ul class="r2list"><?php foreach ($termItems as $t): ?><li><?= $e($t) ?></li><?php endforeach ?></ul><?php endif ?>
@@ -170,7 +170,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php endif ?>
 
   <section class="sec sec--t0" id="form"><form class="card form" data-form="lead" novalidate>
-    <div><div class="mono muted">Заявка</div><h2 class="display h2" style="margin:14px 0 10px">Арендовать <?= $e($m['model']) ?></h2>
+    <div><div class="mono muted">Заявка</div><div class="display h2 th th2" style="margin:14px 0 10px">Арендовать <?= $e($m['model']) ?></div>
       <?php if (!empty($form['subtitle'])): ?><p class="muted" style="margin:0;max-width:40ch"><?= $e($form['subtitle']) ?></p><?php endif ?>
       <?php if (!empty($co['phone1'])): ?><p style="margin:18px 0 0"><a class="link" href="<?= $e($co['phone1_href']) ?>"><?= $e($co['phone1']) ?></a></p><?php endif ?></div>
     <div>
@@ -185,7 +185,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
 
   <?php if ($others): ?>
   <section class="sec sec--t0">
-    <div class="r2head"><h2 class="display h2">Другие модели в аренду</h2><a class="link" href="/arenda-kofemashin/#compare">Сравнить все модели →</a></div>
+    <div class="r2head"><div class="display h2 th th2">Другие модели в аренду</div><a class="link" href="/arenda-kofemashin/#compare">Сравнить все модели →</a></div>
     <div class="rmothers"><?php foreach ($others as $x): ?>
       <a class="card" href="<?= $e(bt_rent_url($x)) ?>"><img src="<?= $e($x['img']) ?>" alt="" loading="lazy" width="240" height="170">
         <span><span class="mono muted"><?= $e($x['audience']) ?><?= $x['cups'] ? ' · до ' . $x['cups'] . ' чашек' : '' ?></span><b><?= $e($x['model']) ?></b>

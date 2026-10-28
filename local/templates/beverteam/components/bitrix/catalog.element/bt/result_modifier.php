@@ -31,7 +31,8 @@ $arResult['BT_Q'] = $val('Q_SCORE');
 
 // вкладки «Как готовить» / «Как хранить» / «Характеристики» — тексты со старого сайта; название вкладки хранения — название свойства в админке
 $arResult['BT_BREW'] = implode('', array_filter([$html('HOW_TO_BREW'), $html('HOW_TO_USE')]));
-$arResult['BT_STORE'] = $html('STORAGE');
+// текст хранения одинаковый у всех товаров — его заголовки оформляем стилями, не тегами H2/H3
+$arResult['BT_STORE'] = preg_replace(['~<h([23])\b([^>]*)>~i', '~</h[23]>~i'], ['<div class="th th$1"$2>', '</div>'], (string)$html('STORAGE'));
 $arResult['BT_STORE_T'] = htmlspecialcharsbx(trim((string)($pr['STORAGE']['NAME'] ?? '')) ?: 'Как хранить');
 $arResult['BT_TECH'] = $html('TECH_SPECS');
 

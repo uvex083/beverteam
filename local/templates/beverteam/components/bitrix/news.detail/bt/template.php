@@ -66,7 +66,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>
     <?php if ($prods): ?>
     <section class="post__prods" id="prods" aria-labelledby="prodsT">
-      <h2 class="display h3" id="prodsT">Товары из статьи</h2>
+      <div class="display h3 th th3" id="prodsT">Товары из статьи</div>
       <div class="grid g3"><?php foreach ($prods as $m) echo bt_card($m) ?></div>
     </section>
     <?php endif ?>

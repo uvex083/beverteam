@@ -2510,7 +2510,7 @@ window.BT_ec=(type,data)=>{try{dataLayer.push({ecommerce:{currencyCode:'RUB',[ty
 window.BT_ecItem=(m,extra)=>Object.assign({id:String(m.id),name:m.n,price:+m.p||0},m.cat?{category:m.cat}:{},extra||{});
 (()=>{
   /* список — заголовок блока с карточкой (витрины главной, «Рекомендуем»), иначе заголовок страницы */
-  const list=pc=>{const s=pc.closest('section'), h=s&&s.querySelector('h1,h2');
+  const list=pc=>{const s=pc.closest('section'), h=s&&s.querySelector('h1,h2,.th');
     return ((h||document.querySelector('h1'))?.textContent||document.title).replace(/\s+/g,' ').trim().slice(0,100);};
   const seen=[];
   /* видимые карточки, которые ещё не попали в показы: при загрузке, после «Показать ещё», фильтра, переключения вкладок */

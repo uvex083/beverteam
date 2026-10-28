@@ -36,7 +36,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
         <div class="gal__badges"><?php foreach ($m['badges'] ?? [] as $b) echo bt_badge($b) ?><?php if ($arResult['BT_Q']): ?><span class="badge badge--dark">Q <?= $e($arResult['BT_Q']) ?></span><?php endif ?></div>
         <div class="swiper gal__big" id="galBig"><div class="swiper-wrapper">
           <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide"><img src="<?= $ph['big'] ?>" data-full="<?= $ph['full'] ?>" alt="<?= $e($name) ?> — фото <?= $i + 1 ?>"<?= $i ? ' loading="lazy" decoding="async"' : ' itemprop="image" fetchpriority="high"' ?>></div><?php endforeach ?>
-          <?php if (!$photos): ?><div class="swiper-slide"><div class="ph">Фото товара<br>(нужен файл от клиента)</div></div><?php endif ?>
+          <?php if (!$photos): ?><div class="swiper-slide"><img src="<?= BT_NO_PHOTO ?>" alt="<?= $e($name) ?> — фото в обработке" width="480" height="340" style="cursor:default"></div><?php endif ?>
         </div></div>
         <span class="gal__n" id="galN"><?= $photos ? '1 / ' . count($photos) : '' ?></span>
       </div>
@@ -108,14 +108,14 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
     <div class="pane prose" data-pane="desc">
       <?php if ($arResult['BT_SPECS']): ?>
       <div class="pspecs">
-        <h3>Подробнее</h3>
+        <div class="th th3">Подробнее</div>
         <div class="pspecs__grid">
           <?php foreach ($arResult['BT_SPECS'] as $label => $v): ?><div><span><?= $label ?></span><b><?= $e($v) ?></b></div><?php endforeach ?>
         </div>
       </div>
       <?php endif ?>
       <?php if (trim($arResult['~DETAIL_TEXT']) !== ''): ?>
-        <h3 class="h3" style="margin:0 0 12px">Описание</h3>
+        <div class="h3 th th3" style="margin:0 0 12px">Описание</div>
         <div class="post__body pdesc"><?= bt_seo_html($arResult['~DETAIL_TEXT']) ?></div>
       <?php endif ?>
     </div>
@@ -126,7 +126,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <div class="rating" id="rating"></div>
       <div id="revList"><?php if (!$revN): ?><a class="rev-empty" href="#revform"><?= bt_icon('star') ?><span><b>Отзывов пока нет — станьте первым!</b>Расскажите, как вам <?= $e($name) ?>: оценка и пара слов помогут другим покупателям.</span></a><?php endif ?></div>
       <div class="card" id="revform" style="margin-top:18px;scroll-margin-top:130px">
-        <h3 class="h3" style="margin-bottom:6px">Оставить отзыв</h3>
+        <div class="h3 th th3" style="margin-bottom:6px">Оставить отзыв</div>
         <p class="muted" style="margin:0 0 18px;font-size:14px">Отзывы публикуем после проверки заказа: пишут только те, кто покупал. Фото помогают другим покупателям.</p>
         <?= bt_review_form(['product' => (int)$arResult['ID'], 'placeholder' => 'Как раскрылся вкус, какой помол выставили, с молоком или без']) ?>
       </div>
@@ -139,7 +139,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
 
   <?php if ($arResult['BT_REC']): ?>
   <section class="sec">
-    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Рекомендуем к нему</h2><a class="link" href="<?= $e($back) ?>">Весь раздел →</a></div>
+    <div class="row between" style="margin-bottom:22px"><div class="display h2 th th2">Рекомендуем к нему</div><a class="link" href="<?= $e($back) ?>">Весь раздел →</a></div>
     <div class="grid g4" id="rec"><?php foreach ($arResult['BT_REC'] as $r) { echo bt_nomicro(bt_card($r)); } ?></div>
   </section>
   <?php endif ?>

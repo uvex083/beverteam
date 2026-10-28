@@ -27,6 +27,10 @@ if ($tag !== '') {
     // вводный текст рубрики — описание раздела в админке
     $sub = trim(strip_tags((string)(CIBlockSection::GetList([], ['IBLOCK_ID' => $arParams['IBLOCK_ID'], '=CODE' => $rubric], false, ['DESCRIPTION'])->Fetch()['DESCRIPTION'] ?? '')));
 }
+// вторая и дальше страницы списка — не индексируем
+if (array_filter($_GET, fn($v, $k) => preg_match('/^PAGEN_\d+$/', (string)$k) && (int)$v > 1, ARRAY_FILTER_USE_BOTH)) {
+    $APPLICATION->SetPageProperty('robots', 'noindex, follow');
+}
 $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(['@context' => 'https://schema.org', '@type' => 'ItemList',
     'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => 'https://' . SITE_SERVER_NAME . $p['url'], 'name' => $p['t']], $posts, array_keys($posts))],
     JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>');
@@ -66,7 +70,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
     <div class="jsub" id="jsub">
       <div class="jsub__t">
         <div class="mono">Журнал · рассылка</div>
-        <h2 class="display h2">Не пропускайте<br><span>новые статьи</span></h2>
+        <div class="display h2 th th2">Не пропускайте<br><span>новые статьи</span></div>
         <p>Пришлём подборку, когда выйдет несколько новых статей. Отписаться можно по ссылке в письме.</p>
         <?php $js = (string)($_GET['sub'] ?? ''); if ($js === 'ok' || $js === 'bad' || !empty($_GET['unsub'])): ?><p class="jsub__ok" role="status"><?= $js === 'ok' ? 'Подписка подтверждена. Первая подборка придёт, когда выйдет несколько новых статей.' : ($js === 'bad' ? 'Ссылка устарела. Подпишитесь ещё раз, и мы пришлём новое письмо.' : 'Вы отписались, подборок журнала больше не будет.') ?></p><?php endif ?>
       </div>

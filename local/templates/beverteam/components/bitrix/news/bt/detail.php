@@ -23,7 +23,7 @@
   $more = array_slice(array_values(array_filter(bt_posts(), fn($p) => $p['id'] !== ($arResult['VARIABLES']['ELEMENT_CODE'] ?? ''))), 0, 3);
   if ($id && $more): ?>
   <section class="sec">
-    <div class="row between" style="margin-bottom:22px"><h2 class="display h2">Читайте дальше</h2><a class="link" href="<?= $arResult['FOLDER'] ?>">Весь журнал →</a></div>
+    <div class="row between" style="margin-bottom:22px"><div class="display h2 th th2">Читайте дальше</div><a class="link" href="<?= $arResult['FOLDER'] ?>">Весь журнал →</a></div>
     <div class="news"><?php foreach ($more as $p) echo bt_post_card($p) ?></div>
   </section>
   <?php endif ?>

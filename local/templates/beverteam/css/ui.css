@@ -478,8 +478,8 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .info-nav a{display:block;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}
 @media(hover:hover){.info-nav a:hover{background:var(--paper)}}.info-nav a.cur{background:var(--ink);color:var(--lime)}
 .prose{max-width:72ch;font-size:15.5px}
-.prose h2{font-family:Unbounded;font-weight:700;font-size:20px;margin:32px 0 12px}
-.prose h3{font-size:17px;font-weight:700;margin:24px 0 8px}
+.prose h2,.prose .th2{font-family:Unbounded;font-weight:700;font-size:20px;margin:32px 0 12px}
+.prose h3,.prose .th3{font-size:17px;font-weight:700;margin:24px 0 8px}
 .prose p{margin:0 0 14px}
 .prose ul{padding-left:20px;margin:0 0 14px}.prose li{margin-bottom:6px}
 .prose a{color:var(--ink);font-weight:600;border-bottom:1px solid var(--lime)}
@@ -640,7 +640,7 @@ input,textarea{caret-color:var(--ink)}
 .jside b{font-size:14px;line-height:1.35}
 .post{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
 .post__body{font-size:16.5px;line-height:1.8}
-.post__body h2{font-family:Unbounded;font-weight:700;font-size:21px;margin:34px 0 12px}
+.post__body h2,.post__body .th2{font-family:Unbounded;font-weight:700;font-size:21px;margin:34px 0 12px}
 .post__body p{margin:0 0 16px}
 .post__body ul,.post__body ol{list-style:none;padding:0;margin:0 0 20px}
 .post__body li{position:relative;margin-bottom:9px;padding-left:30px}
@@ -667,7 +667,7 @@ input,textarea{caret-color:var(--ink)}
 .post__body tbody tr:last-child td{border-bottom:0}
 @media(hover:hover){.post__body tbody tr:hover td{background:#FAFAF7}}
 .post__body hr{border:0;border-top:1px solid var(--line);margin:32px 0}
-.post__prods{margin-top:36px;scroll-margin-top:130px}.post__prods h2{margin-bottom:16px}
+.post__prods{margin-top:36px;scroll-margin-top:130px}.post__prods h2,.post__prods .th{margin-bottom:16px}
 @media(max-width:900px){.post__prods .g3{grid-template-columns:1fr 1fr}}@media(max-width:520px){.post__prods .g3{grid-template-columns:1fr}}
 .post__body em{color:var(--gray)}
 .post__body figure{margin:26px 0}
@@ -1386,7 +1386,7 @@ input,textarea{caret-color:var(--ink)}
 #reviews .revform{max-width:none}
 /* характеристики первым блоком в «Описании» — как на Tasty Coffee */
 .pspecs{margin:0 0 26px}
-.pspecs h3{font-family:Unbounded;font-weight:800;font-size:17px;margin:0 0 12px}
+.pspecs h3,.pspecs .th3{font-family:Unbounded;font-weight:800;font-size:17px;margin:0 0 12px}
 .pspecs__grid{display:block;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:6px 22px}
 .pspecs__grid>div{display:flex;align-items:baseline;gap:16px;padding:11px 0;border-bottom:1px solid var(--line)}
 .pspecs__grid>div:last-child{border-bottom:0}
@@ -1966,7 +1966,7 @@ a.utp__i--a{display:block;color:inherit;transition:border-color .15s}
 .journalp .jfilter a[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .journalp .post__meta .tag{background:var(--lime-soft);border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono';font-size:11px;color:#4E5A12}
 .journalp .post__ph{margin:0 0 26px}.journalp .post__ph img{border-radius:var(--rad);width:100%;aspect-ratio:16/9;object-fit:cover}
-.post__body h3,.post__body h4{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
+.post__body h3,.post__body h4,.post__body .th3{font-family:Unbounded;font-weight:700;font-size:17px;margin:28px 0 10px;scroll-margin-top:130px}
 /* лестница заголовков в тексте статьи: H1 страницы один, заголовок первого уровня из редактора выглядит крупнее H2 */
 .post__body h1{font-family:Unbounded;font-weight:800;font-size:26px;line-height:1.2;margin:38px 0 14px;scroll-margin-top:130px}
 .post__body h4{font-family:Manrope,sans-serif;font-weight:800;font-size:16px;margin:24px 0 8px}
@@ -2643,8 +2643,8 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .jsub::after{content:"";position:absolute;right:48px;top:18px;width:84px;height:84px;border-radius:50%;border:20px solid var(--lime);box-sizing:border-box;pointer-events:none}
 .jsub>*{position:relative;z-index:1}
 .jsub .mono{color:var(--lime)}
-.jsub h2{margin:12px 0 12px;color:#fff}
-.jsub h2 span{color:var(--lime)}
+.jsub h2,.jsub .th2{margin:12px 0 12px;color:#fff}
+.jsub h2 span,.jsub .th2 span{color:var(--lime)}
 .jsub__t p{margin:0;max-width:44ch;color:#B9B9B0;font-size:15px;line-height:1.55}
 .jsub__t .jsub__ok{margin:14px 0 0;color:var(--lime);font-weight:700}
 .jsub__row{display:flex;gap:10px;align-items:flex-start}

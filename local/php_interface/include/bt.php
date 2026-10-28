@@ -2,6 +2,9 @@
 
 use Bitrix\Main\Loader;
 
+// картинка товара без фото
+const BT_NO_PHOTO = '/local/templates/beverteam/images/no-photo.svg';
+
 // ID инфоблока по символьному коду — ID на dev и проде могут не совпадать
 function bt_iblock(string $code): int
 {
@@ -537,7 +540,7 @@ function bt_catalog_data(): array
         $pr = $o->GetProperties();
         $pl = $prices[$f['ID']] ?? [['kg' => 1, 'p' => 0]];
         $m = [
-            'id' => (string)$f['ID'], 'code' => $f['CODE'], 'url' => $f['~DETAIL_PAGE_URL'], 'img' => $img($f['PREVIEW_PICTURE']),
+            'id' => (string)$f['ID'], 'code' => $f['CODE'], 'url' => $f['~DETAIL_PAGE_URL'], 'img' => $img($f['PREVIEW_PICTURE']) ?: BT_NO_PHOTO,
             'n' => $f['~NAME'], 'p' => $pl[0]['p'], 'par' => (string)$pr['SHORT_DESC']['~VALUE'], 'stock' => 1,
             'cat' => $path[$f['IBLOCK_SECTION_ID']] ?? '',
         ];
