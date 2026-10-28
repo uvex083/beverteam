@@ -37,7 +37,6 @@ $cities = $vals($geo['items'] ?? []);
 $districts = $vals($geo['districts'] ?? []);
 $stepItems = array_values(array_filter((array)($steps['items'] ?? []), fn($t) => $t[0] !== ''));
 $contractItems = $vals($contract['items'] ?? []);
-$models = $jet ? array_values(array_filter(bt_catalog_data()['machines'] ?? [], fn($m) => !empty($m['img']))) : [];
 $revs = $revH ? bt_reviews() : [];
 
 // разметка для поисковиков — из тех же данных, что на странице
@@ -119,13 +118,10 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   </section>
   <?php endif ?>
 
-  <?php if ($models): ?>
+  <?php if ($jet): ?>
   <section class="sec sec--t0" id="models">
     <h2 class="display h2"><?= bt_title($jet['title'] ?? '') ?></h2>
     <?= $lead($jet) ?>
-    <div class="r2models"><?php foreach ($models as $m): ?>
-      <a href="<?= $e($m['url']) ?>"><img src="<?= $e($m['img']) ?>" alt="<?= $e($m['n']) ?>" loading="lazy" width="240" height="170"><b><?= $e(preg_replace('/^Кофемашина\s+/u', 'Ремонт ', $m['n'])) ?></b></a>
-    <?php endforeach ?></div>
     <?php if (!empty($cert['pic'])): ?>
     <div class="certs">
       <a class="cert__a certs__img" href="<?= $e(bt_img($cert['pic_id'], 2400, 2400)) ?>" aria-label="Открыть сертификат крупно"><img src="<?= $e(bt_img($cert['pic_id'], 400, 400)) ?>" alt="<?= $e($cert['title'] ?? '') ?>" loading="lazy" width="160" height="113"></a>

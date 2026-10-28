@@ -13,7 +13,8 @@ $ul = function (array $items) use (&$ul, $e): string {
 $shop = [];
 foreach (bt_mega_cats() as $c) {
     if ($c['h'] !== '/arenda-kofemashin/') {
-        $shop[] = [$c['t'], $c['h'], array_map(fn($s) => [$s[0], $s[1]], $c['sub'])];
+        // только разделы: ссылки на товары карту не перегружают
+        $shop[] = [$c['t'], $c['h'], array_values(array_filter(array_map(fn($s) => [$s[0], $s[1]], $c['sub']), fn($s) => !str_contains($s[1], '/catalog/product/')))];
     }
 }
 $shop[] = ['Сравнение товаров', '/catalog/compare/'];
@@ -26,9 +27,8 @@ $services = [
     ['Подбор кофе за минуту', '/podbor-kofe/'],
 ];
 $account = [['Личный кабинет', '/personal/'], ['Корзина', '/personal/cart/'], ['Избранное', '/personal/favorites/']];
-$posts = bt_posts();
 $info = [
-    ['Журнал', '/blog/', array_map(fn($p) => [$p['t'], $p['url']], $posts)],
+    ['Журнал', '/blog/', array_map(fn($r) => [$r['name'], $r['url']], array_values(bt_blog_rubrics()))],
     ['О компании', '/o-kompanii/'], ['Отзывы о нас', '/otzyvy-o-nas/'],
     ['Оплата и доставка', '/oplata-i-dostavka/'], ['Возврат и обмен', '/vozvrat-i-obmen/'],
     ['Политика конфиденциальности', '/politika-konfidencialnosti/'], ['Пользовательское соглашение', '/polzovatelskoe-soglashenie/'], ['Согласие на обработку персональных данных', '/soglasie-na-obrabotku/'],

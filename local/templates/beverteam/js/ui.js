@@ -382,6 +382,7 @@ window.BT_card = function(m){
     <div class="pc__meta">${m.rv?`<a class="pc__rv" href="${m.url}#reviews">${I.star}<b>${String(m.rv[0]).replace('.',',')}</b><span>· ${m.rv[1]} ${m.rv[1]%10===1&&m.rv[1]%100!==11?'отзыв':(m.rv[1]%10>=2&&m.rv[1]%10<=4&&(m.rv[1]%100<10||m.rv[1]%100>=20)?'отзыва':'отзывов')}</span></a>`:''}<span class="pc__stock${m.stock?'':' pc__stock--no'}">${m.stock?'В наличии':'Под заказ'}</span></div>
     <div class="pc__t th th3"><a href="${m.url}" itemprop="url">${m.n}</a></div>
     <p class="pc__par">${m.par}</p>
+    ${m.sp?`<ul class="pc__sp">${m.sp.map(x=>`<li><span>${x[0]}</span>${x[1]}</li>`).join('')}</ul>`:''}
     ${scales}
     ${BT_packs(m)}
     ${tools}
@@ -1865,6 +1866,9 @@ document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest
   addEventListener('popstate',()=>{ if(document.getElementById('spRes')) load(location.href,false); });
 })();
 /* «Скопировать» (реквизиты и т.п.): текст из data-copy в буфер обмена */
+// футер на телефоне: колонки ссылок раскрываются по заголовку
+document.addEventListener('click',e=>{const h=e.target.closest('.ftr__acc>.ftr__h'); if(!h) return; h.setAttribute('aria-expanded',h.parentElement.classList.toggle('is-open'));});
+document.addEventListener('DOMContentLoaded',()=>{ if(matchMedia('(max-width:720px)').matches) document.querySelectorAll('.ftr__acc>.ftr__h').forEach(h=>h.setAttribute('aria-expanded','false')); });
 document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]'); if(!b) return;
   const done=()=>window.BT_toast&&BT_toast('Скопировано в буфер обмена');
   if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done).catch(()=>{});

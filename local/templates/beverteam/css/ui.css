@@ -40,7 +40,7 @@ h1,h2,h3,h4{margin:0;line-height:1.1}
 .hr{border:0;border-top:1px solid var(--line);margin:0}
 .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 /* на телефоне кнопки в ряду — на всю ширину, друг под другом */
-@media(max-width:560px){.row>.btn,.hero__cta>.btn{flex:1 1 100%}.cfg__res .btn{width:100%}}
+@media(max-width:560px){.row>.btn,.hero__cta>.btn,.cfg__res .btn{width:100%}}
 .between{justify-content:space-between}
 /* единая стрелка у select: нативная прижимается к краю и выглядит по-разному в браузерах */
 select{-webkit-appearance:none;appearance:none;
@@ -130,7 +130,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .hact svg{width:20px;height:20px}
 @media(hover:hover){.hact:hover{color:var(--lime)}}
 .hact .cnt{position:absolute;top:0;right:10px;background:var(--lime);color:var(--ink);border-radius:999px;font:700 10px/1 'JetBrains Mono';padding:3px 5px}
-.hdr__tel{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;white-space:nowrap}
+.hdr__tel{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;white-space:nowrap}
 .hdr__nav{display:flex;gap:22px;height:44px;align-items:center;border-top:1px solid #26261F;font-size:13.5px;font-weight:500;color:#C9C9C2}
 @media(hover:hover){.hdr__nav a:hover{color:var(--lime)}}
 .hdr__nav .r{margin-left:auto;color:#9C9C94;font-size:12.5px;white-space:nowrap}
@@ -235,6 +235,7 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .pc__ph img{max-height:160px;width:auto;mix-blend-mode:multiply}
 .pc h3,.pc .pc__t{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;font-family:Manrope}
 .pc__par{font-size:12.5px;color:var(--gray);margin:0 0 10px;flex:1}
+.pc__sp{list-style:none;margin:0 0 12px;padding:0;font-size:13px}.pc__sp li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}.pc__sp span{color:var(--gray)}
 .pc__stock{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600;margin:0;white-space:nowrap}
 /* есть оценка — наличие уходит вправо, нет — стоит слева */
 .pc__rv+.pc__stock{margin-left:auto}
@@ -508,6 +509,15 @@ input:not([type=radio],[type=checkbox],[type=range]):focus,textarea:focus,select
 .ftr h5,.ftr .ftr__h{color:#fff;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 15px;font-weight:500}
 .ftr ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 @media(hover:hover){.ftr a:hover{color:var(--lime)}}
+/* колонки ссылок футера: на компьютере открыты, на телефоне сворачиваются по заголовку */
+.ftr__acc>.ftr__h{display:block;width:100%;background:none;border:0;padding:0;text-align:left;cursor:default;pointer-events:none}
+@media(max-width:720px){
+  .ftr__acc,.ftr__cont{border-top:1px solid rgba(255,255,255,.12)}.ftr__acc+.ftr__acc,.ftr__acc+.ftr__cont{margin-top:-28px}.ftr__cont{padding-top:16px}
+  .ftr__acc>.ftr__h{pointer-events:auto;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0;padding:15px 0;min-height:48px}
+  .ftr__acc>.ftr__h::after{content:"";width:7px;height:7px;margin:0 4px 4px 0;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform .2s}
+  .ftr__acc.is-open>.ftr__h::after{transform:rotate(-135deg);margin-bottom:-4px}
+  .ftr__acc>ul{display:none;padding-bottom:16px}.ftr__acc.is-open>ul{display:grid}
+}
 .ftr .brand img{height:58px}
 .ftr__soc{display:flex;gap:8px;margin-top:16px}
 .ftr__soc a{width:36px;height:36px;border-radius:10px;background:#26261F;display:grid;place-items:center;font-family:'JetBrains Mono';font-size:11px;color:#C9C9C2}
@@ -1808,6 +1818,10 @@ input,textarea{caret-color:var(--ink)}
   .home .strip__i:first-child{border-top:0;padding-top:0}
   .home .strip__i:last-child{padding-bottom:0}
   .home .tiles,.home .stepsx,.home .facts{grid-template-columns:1fr}.home .cfg__res{grid-template-columns:1fr}
+  /* главная на телефоне легче: без фото кофемашин в тёмных блоках, шаги аренды листаются вбок */
+  .home .svc__r{display:none}
+  .home .stepsx{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:84%;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+  .home .stepsx::-webkit-scrollbar{display:none}.home .stepx{scroll-snap-align:start}
 }
 
 /* ---------- текстовые страницы: оплата и доставка, возврат, политика, соглашение (info-*.html) ---------- */
@@ -1817,6 +1831,8 @@ input,textarea{caret-color:var(--ink)}
 .infop__cards b{display:block;font-size:14px;margin-bottom:4px}.infop__cards span{font-size:13px;color:var(--gray)}
 .infop .faq{margin-top:40px}
 .infop .faq p{margin:12px 0 0}
+/* «Конфиденциальности» — одно длинное слово: на телефоне заголовок уменьшается по ширине экрана, чтобы слово влезло */
+@media(max-width:640px){.infop .h1{font-size:min(24px,5vw)}}
 .infop .legal h2{font-family:Unbounded;font-weight:800;font-size:19px;margin:34px 0 12px;scroll-margin-top:130px}
 .infop .legal h2:first-child{margin-top:0}
 .infop .legal p,.infop .legal li{font-size:14.5px;line-height:1.75;color:#3A3A34}
@@ -2546,7 +2562,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 @keyframes tswipe{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
 @media(prefers-reduced-motion:reduce){.tswipe svg{animation:none}}
 /* аренда, новая версия */
-.ar2calc{display:grid;grid-template-columns:1fr 1.05fr;gap:12px}
+.ar2calc{display:grid;grid-template-columns:1fr 1.05fr;gap:12px}.ar2calc>*,.r2facts>div{min-width:0}
 .ar2calc__in,.ar2calc__out{background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(18px,2.2vw,28px)}
 .ar2q{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:14px;margin-bottom:9px}
 .ar2q b{font-family:Unbounded;font-variant-numeric:tabular-nums}

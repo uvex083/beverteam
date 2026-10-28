@@ -247,6 +247,7 @@ function bt_card(array $m, bool $eager = false): string
         . '<span class="pc__stock' . ($stock ? '' : ' pc__stock--no') . '">' . ($stock ? 'В наличии' : 'Под заказ') . '</span></div>'
         . '<div class="pc__t th th3"><a href="' . $e($m['url']) . '" itemprop="url">' . $e($m['n']) . '</a></div>'
         . '<p class="pc__par">' . $e($m['par']) . '</p>'
+        . (!empty($m['sp']) ? '<ul class="pc__sp">' . implode('', array_map(fn($x) => '<li><span>' . $e($x[0]) . '</span>' . $e($x[1]) . '</li>', $m['sp'])) . '</ul>' : '')
         . $scales . $packs
         . '<div class="pc__foot" itemprop="offers" itemscope itemtype="https://schema.org/Offer">'
         . '<meta itemprop="priceCurrency" content="RUB">' . ($m['p'] ? '<meta itemprop="price" content="' . $m['p'] . '">' : '')
@@ -565,7 +566,17 @@ function bt_catalog_data(): array
         if ($sc) {
             $m['sc'] = $sc;
         }
-        $data[bt_product_group($root[$f['IBLOCK_SECTION_ID']] ?? '')][] = $m;
+        $group = bt_product_group($root[$f['IBLOCK_SECTION_ID']] ?? '');
+        // у кофемашин в карточке — главные характеристики, как в карточках аренды
+        if ($group === 'machines') {
+            foreach (['SCREEN' => 'Экран', 'BEAN_HOPPER' => 'Бункер зерна', 'WATER_SUPPLY' => 'Водопровод', 'TELEMETRY' => 'Онлайн-телеметрия'] as $code => $name) {
+                $v = trim(html_entity_decode(implode(', ', (array)($pr[$code]['VALUE'] ?? ''))));
+                if ($v !== '' || $code !== 'BEAN_HOPPER') {
+                    $m['sp'][] = [$name, $v !== '' ? $v : 'Нет'];
+                }
+            }
+        }
+        $data[$group][] = $m;
     }
 
     $r = \CIBlockElement::GetList(['SORT' => 'ASC'], ['IBLOCK_ID' => $rentId, 'ACTIVE' => 'Y'], false, false,
@@ -2003,6 +2014,9 @@ function bt_org_ld(): string
         'email' => $co['email'] ?? '', 'telephone' => array_values(array_filter([$co['phone1'] ?? '', $co['phone2'] ?? ''])),
         'priceRange' => '₽₽', 'taxID' => $co['inn'] ?? '', 'foundingDate' => '2010',
         'areaServed' => ['@type' => 'City', 'name' => 'Екатеринбург'],
+        // магазин возит по всей России (СДЭК), поэтому зона обслуживания у контакта — страна
+        'contactPoint' => ['@type' => 'ContactPoint', 'telephone' => $co['phone1'] ?? '', 'email' => $co['email'] ?? '',
+            'contactType' => 'customer service', 'availableLanguage' => 'ru', 'areaServed' => 'RU'],
         'knowsAbout' => ['кофе в зёрнах', 'чай', 'аренда кофемашин', 'ремонт кофемашин', 'кофемашины Jetinno', 'вендинг', 'HoReCa'],
         'address' => ['@type' => 'PostalAddress', 'postalCode' => $co['zip'] ?? '', 'addressLocality' => $co['city'] ?? '',
             'streetAddress' => $co['street'] ?? '', 'addressCountry' => 'RU'],

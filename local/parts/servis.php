@@ -54,9 +54,4 @@ $minCoffee = ($cp = array_filter(array_column($data['coffee'], 'p'))) ? min($cp)
   </section>
   <?php endif ?>
 
-  <section class="sec sec--t0">
-    <div class="row between" style="margin-bottom:22px;gap:14px"><h2 class="display h2">Оборудование</h2><div class="pill-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-tab="rent">Аренда</button><button type="button" role="tab" aria-selected="false" data-tab="machines">Покупка</button></div></div>
-    <div class="grid g4" data-tabpane="rent"><?php foreach ($data['rent'] as $m) echo bt_card($m) ?></div>
-    <div class="grid g4" data-tabpane="machines" hidden><?php foreach ($data['machines'] as $m) echo bt_card($m) ?></div>
-  </section>
 </div>
