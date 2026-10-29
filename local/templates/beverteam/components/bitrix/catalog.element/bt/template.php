@@ -14,6 +14,9 @@ $first = $bulk ? $bulk[0]['p'] : ($m['p'] ?? 0);
 $section = $arResult['BT_SECTION'];
 $reviews = $arResult['BT_REVIEWS'];
 $revN = count($reviews);
+$hasDesc = trim($arResult['~DETAIL_TEXT']) !== '';
+$hasTech = $arResult['BT_SPECS'] || $arResult['BT_TECH'];
+$tab1 = $hasDesc || !$hasTech ? 'desc' : 'tech';
 $co = bt_contacts();
 $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
 ?>
@@ -98,28 +101,27 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
 
   <div class="tabsblock">
     <div class="tabs" id="ptabs">
-      <button aria-selected="true" data-p="desc">Описание</button>
-      <?php if ($arResult['BT_TECH']): ?><button aria-selected="false" data-p="tech">Характеристики</button><?php endif ?>
+      <?php if ($tab1 === 'desc'): ?><button aria-selected="true" data-p="desc">Описание</button><?php endif ?>
+      <?php if ($hasTech): ?><button aria-selected="<?= $tab1 === 'tech' ? 'true' : 'false' ?>" data-p="tech">Характеристики</button><?php endif ?>
       <?php if ($arResult['BT_BREW']): ?><button aria-selected="false" data-p="brew"><?= $arResult['PROPERTIES']['HOW_TO_USE']['VALUE'] ? 'Как использовать' : 'Как готовить' ?></button><?php endif ?>
       <?php if ($arResult['BT_STORE']): ?><button aria-selected="false" data-p="store"><?= $arResult['BT_STORE_T'] ?></button><?php endif ?>
       <button aria-selected="false" data-p="rev" id="tabRev">Отзывы<?= $revN ? ' (' . $revN . ')' : '' ?></button>
       <button aria-selected="false" data-p="deliv">Доставка</button>
     </div>
+    <?php if ($tab1 === 'desc'): ?>
     <div class="pane prose" data-pane="desc">
-      <?php if ($arResult['BT_SPECS']): ?>
-      <div class="pspecs">
-        <div class="th th3">Подробнее</div>
-        <div class="pspecs__grid">
-          <?php foreach ($arResult['BT_SPECS'] as $label => $v): ?><div><span><?= $label ?></span><b><?= $e($v) ?></b></div><?php endforeach ?>
-        </div>
-      </div>
-      <?php endif ?>
-      <?php if (trim($arResult['~DETAIL_TEXT']) !== ''): ?>
-        <div class="h3 th th3" style="margin:0 0 12px">Описание</div>
-        <div class="post__body pdesc"><?= bt_seo_html($arResult['~DETAIL_TEXT']) ?></div>
-      <?php endif ?>
+      <?php if ($hasDesc): ?><div class="post__body pdesc"><?= bt_seo_html($arResult['~DETAIL_TEXT']) ?></div><?php endif ?>
     </div>
-    <?php if ($arResult['BT_TECH']): ?><div class="pane prose" data-pane="tech" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_TECH']) ?></div></div><?php endif ?>
+    <?php endif ?>
+    <?php if ($hasTech): ?>
+    <div class="pane prose" data-pane="tech"<?= $tab1 === 'tech' ? '' : ' hidden' ?>>
+      <?php if ($arResult['BT_SPECS']): ?>
+      <div class="pspecs"><div class="pspecs__grid">
+        <?php foreach ($arResult['BT_SPECS'] as $label => $v): ?><div><span><?= $label ?></span><b><?= $e($v) ?></b></div><?php endforeach ?>
+      </div></div>
+      <?php else: ?><div class="post__body pdesc"><?= bt_br_list($arResult['BT_TECH']) ?></div><?php endif ?>
+    </div>
+    <?php endif ?>
     <?php if ($arResult['BT_BREW']): ?><div class="pane prose" data-pane="brew" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_BREW']) ?></div></div><?php endif ?>
     <?php if ($arResult['BT_STORE']): ?><div class="pane prose" data-pane="store" hidden><div class="post__body pdesc"><?= bt_br_list($arResult['BT_STORE']) ?></div></div><?php endif ?>
     <div class="pane" data-pane="rev" hidden id="reviews">
