@@ -1,4 +1,14 @@
 (function(){
+/* после простоя сервер начинает новую сессию и отклоняет старый sessid: берём свежий и повторяем запрос один раз */
+{ const f=window.fetch.bind(window);
+  window.fetch=async(url,o)=>{ const r=await f(url,o);
+    if(r.status!==403||typeof url!=='string'||!url.startsWith('/local/ajax/')||!(o&&o.body instanceof FormData&&o.body.has('sessid'))) return r;
+    const d=await r.clone().json().catch(()=>null);
+    if(!d||d.error!=='sessid') return r;
+    const s=await f('/local/ajax/sessid.php',{credentials:'same-origin',cache:'no-store'}).then(x=>x.json()).catch(()=>null);
+    if(!s||!s.sessid) return r;
+    window.BT_SID=s.sessid; document.querySelectorAll('input[name="sessid"]').forEach(i=>i.value=s.sessid);
+    o.body.set('sessid',s.sessid); return f(url,o); }; }
 const I = {
   cat:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   search:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
