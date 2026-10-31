@@ -27,7 +27,10 @@ $out = function (int $code, array $data) {
 };
 $act = (string)$req->getPost('action');
 if (str_starts_with($act, 'ed_')) {
-    if (!$req->isPost() || !check_bitrix_sessid() || !bt_price_editor() || !Loader::includeModule('catalog')) {
+    if (!$req->isPost() || !check_bitrix_sessid()) {
+        $out(403, ['ok' => false, 'error' => 'sessid']);
+    }
+    if (!bt_price_editor() || !Loader::includeModule('catalog')) {
         $out(403, ['ok' => false, 'error' => 'access']);
     }
     if ($act === 'ed_load') {
