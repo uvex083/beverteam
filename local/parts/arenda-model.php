@@ -57,7 +57,7 @@ foreach (bt_rent_models() as $x) {
 }
 $cups0 = max(5, (int)round($m['cups'] * 0.6 / 5) * 5);
 $calc = [
-    'm' => ['m' => $m['model'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'fee' => $m['fee']],
+    'm' => ['m' => $m['model'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'fee' => $m['fee'] ?? 0],
     'next' => $next ? ['m' => $next['model'], 'url' => bt_rent_url($next)] : null,
     'beans' => array_map(fn($c) => ['code' => $c['code'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'img' => $c['img'] ?? '', 'par' => $c['par'] ?? '', 'url' => $c['url']], $beans),
     'g' => 8,

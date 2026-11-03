@@ -1272,15 +1272,15 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rm-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*days,1));
       q('[data-rm-a]').hidden=!a;
       q('[data-rm-at]').textContent=rub(costA)+' / мес';
-      q('[data-rm-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short?`, до порога ${M.kg} кг не хватает ${short} кг: доплата ${short} × ${rub(M.fee)}`:'');
+      q('[data-rm-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short&&M.fee>0?`, до порога ${M.kg} кг не хватает ${short} кг: доплата ${short} × ${rub(M.fee)}`:'');
       q('[data-rm-bt]').textContent=rub(costB)+' / мес';
       q('[data-rm-bd]').textContent=`Аренда ${rub(M.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rm-a]').classList.toggle('is-best',best==='a'); q('[data-rm-b]').classList.toggle('is-best',best==='b');
       const note=q('[data-rm-note]');
       if(M.cups&&cups>M.cups){ note.innerHTML=`${escq(M.m)} рассчитана до ${M.cups} чашек в день.`+(C.next?` Для такой нагрузки подойдёт <a class="link" href="${escq(C.next.url)}">${escq(C.next.m)}</a>.`:' Подберём решение — оставьте заявку.'); }
-      else note.textContent=`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${days} рабочих дн${days%10>=2&&days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}.`;
+      else note.textContent=`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${days} рабочих дн${days%10>=2&&days%10<=4?'я':'ей'} в месяц. Кофе ${B.n}: с машиной за 0 ₽ по розничной цене, при фиксированной аренде со скидкой за объём или своё зерно.`;
       text=`Расчёт на сайте для ${M.m}: ≈ ${cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[days]}, ≈ ${kgf(need)} кг кофе в месяц (${B.n}). `
-        +(a?`С нашим кофе ≈ ${rub(costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(costB)}/мес с кофе.`;
+        +(a?`Машина за 0 ₽ с нашим кофе ≈ ${rub(costA)}/мес (${kgA} кг по розничной цене${short&&M.fee>0?`, доплата за недобор ${short} кг`:''}), `:'')+`фиксированная аренда ≈ ${rub(costB)}/мес с кофе.`;
     };
     rng.addEventListener('input',draw);
     q('[data-rm-bean]').addEventListener('change',draw);
@@ -1306,7 +1306,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       /* нагрузка больше самой мощной модели — считаем на k машин */
       const k=Math.ceil(cups/m.cups), kgA=Math.ceil(need), thr=m.kg*k, short=Math.max(thr-kgA,0), costA=kgA*B.p+short*m.fee, costB=m.price*k+need*BT_tier(B,Math.max(need,1)).p;
       const a=m.kg>0, best=a&&costA<=costB?'a':'b';
-      cur={m,cups,need,n,days:st.days,bean:B.n,costA,costB,kgA};
+      cur={m,k,cups,need,n,days:st.days,bean:B.n,costA,costB,kgA,short:m.fee>0?short:0};
       q('[data-rc2-nv]').textContent=n;
       const img=q('[data-rc2-img]'); if(img.getAttribute('src')!==m.img) img.src=m.img; img.alt=m.m;
       q('[data-rc2-name]').textContent=m.m;
@@ -1321,12 +1321,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rc2-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*st.days,1));
       q('[data-rc2-a]').hidden=!a;
       q('[data-rc2-at]').textContent=rub(costA)+' / мес';
-      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short?`, до порога ${thr} кг${k>1?` (${k} × ${m.kg})`:''} не хватает ${short} кг: доплата ${short} × ${rub(m.fee)}`:kgA>need?`, расход ${kgf(need)} кг, кофе в пачках по 1 кг`:'');
+      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short&&m.fee>0?`, до порога ${thr} кг${k>1?` (${k} × ${m.kg})`:''} не хватает ${short} кг: доплата ${short} × ${rub(m.fee)}`:kgA>need?`, расход ${kgf(need)} кг, кофе в пачках по 1 кг`:'');
       q('[data-rc2-bt]').textContent=rub(costB)+' / мес';
       q('[data-rc2-bd]').textContent=`Аренда ${k>1?k+' × ':''}${rub(m.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rc2-a]').classList.toggle('is-best',best==='a'); q('[data-rc2-b]').classList.toggle('is-best',best==='b');
       q('[data-rc2-note]').textContent=over?`Расчёт на ${k} ${kw} ${m.m.replace(/^Jetinno\s+/,'')}. Точную схему — сколько машин и где поставить — подберём по заявке.`
-        :`Расчёт: ${C.g} г зерна на чашку × ${cups} ${cw(cups)} × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}: с машиной за 0 ₽ по розничной цене, при фиксированной аренде по цене объёма (или своё зерно).`;
+        :`Расчёт: ${C.g} г зерна на чашку × ${cups} ${cw(cups)} × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе ${B.n}: с машиной за 0 ₽ по розничной цене, при фиксированной аренде со скидкой за объём или своё зерно.`;
     };
     rng.addEventListener('input',draw);
     q('[data-rc2-bean]').addEventListener('change',draw);
@@ -1348,8 +1348,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(!f||!cur) return;
       const sel=f.elements.model, msg=f.elements.message;
       if(sel){ sel.value=cur.m.m; sel.dispatchEvent(new Event('change',{bubbles:true})); }
-      if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[cur.days]||cur.days+' дн.'}, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
-        +(cur.m.kg?`С нашим кофе ≈ ${rub(cur.costA)}/мес, `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
+      if(msg&&(!msg.value||msg.dataset.auto===msg.value)) msg.value=msg.dataset.auto=`Расчёт на сайте${cur.k>1?` на ${cur.k} ${cur.k<5?'машины':'машин'} ${cur.m.m}`:''}: ${cur.n} чел., ≈ ${cur.cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[cur.days]||cur.days+' дн.'}, ≈ ${kgf(cur.need)} кг кофе в месяц (${cur.bean}). `
+        +(cur.m.kg?`Машина за 0 ₽ с нашим кофе ≈ ${rub(cur.costA)}/мес (${cur.kgA} кг по розничной цене${cur.short?`, доплата за недобор ${cur.short} кг`:''}), `:'')+`фиксированная аренда ≈ ${rub(cur.costB)}/мес с кофе.`;
     });
     if(f) BT_goBar('Арендовать кофемашину',()=>(f.closest('[id]')||f).scrollIntoView({behavior:'smooth',block:'start'}),[document.querySelector('.r2hero .row'),q('[data-rc2-go]'),f]);
     document.querySelectorAll('[data-rc2-set]').forEach(a=>a.addEventListener('click',()=>{ const sel=f?.elements.model; if(sel){ sel.value=a.dataset.rc2Set; sel.dispatchEvent(new Event('change',{bubbles:true})); } }));

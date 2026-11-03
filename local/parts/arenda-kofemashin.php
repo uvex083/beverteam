@@ -24,7 +24,7 @@ if ($models && \Bitrix\Main\Loader::includeModule('iblock')) {
 }
 $spec = fn($m, $c) => $specs[basename(rtrim($m['url'], '/'))][$c] ?? '';
 
-// цена BOTANICA за кг — оптовая ступень от 5 кг, если есть; чашка — 8 г
+// цена BOTANICA за кг по ступеням объёма; чашка — 8 г
 $beans = array_values(array_filter($data['coffee'], fn($c) => str_contains($c['n'], 'BOTANICA')));
 $tier = function (array $c, float $kg): float {
     $p = $c['p'];
@@ -38,7 +38,7 @@ $tier = function (array $c, float $kg): float {
 $bean0 = 'botanica-espresso-smes';
 
 $calc = [
-    'models' => array_map(fn($m) => ['id' => $m['id'], 'm' => $m['model'], 'aud' => $m['audience'], 'f' => $m['feature'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'fee' => $m['fee'], 'img' => $m['img'], 'url' => $m['url']], $models),
+    'models' => array_map(fn($m) => ['id' => $m['id'], 'm' => $m['model'], 'aud' => $m['audience'], 'f' => $m['feature'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'fee' => $m['fee'] ?? 0, 'img' => $m['img'], 'url' => $m['url']], $models),
     'beans' => array_map(fn($c) => ['code' => $c['code'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'url' => $c['url']], $beans),
     'g' => 8,
 ];
@@ -215,7 +215,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <?php if (!empty($c['img'])): ?><img src="<?= $e($c['img']) ?>" alt="" loading="lazy" width="120" height="120"><?php endif ?>
         <b><?= $e(preg_replace('/,\s*1\s*кг$/u', '', $c['n'])) ?></b>
         <?php if (!empty($c['par'])): ?><small><?= $e($c['par']) ?></small><?php endif ?>
-        <span class="ar2cf__p"><?= $e(bt_fmt($p1)) ?>/кг<?php if ($p5 < $p1): ?>, от 5 кг <?= $e(bt_fmt($p5)) ?><?php endif ?> · <b><?= $e(bt_fmt(round($p1 * 8 / 1000))) ?></b> за чашку</span>
+        <span class="ar2cf__p"><?= $e(bt_fmt($p1)) ?>/кг<?php if ($p5 < $p1): ?>, от 5 кг по <?= $e(bt_fmt($p5)) ?>/кг<?php endif ?> · <b><?= $e(bt_fmt(round($p1 * 8 / 1000))) ?></b> за чашку</span>
       </a>
     <?php endforeach ?></div>
   </section>

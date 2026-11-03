@@ -1299,7 +1299,7 @@ function bt_rent_models(): array
             'id' => 'r' . $f['ID'], 'name' => $f['NAME'], 'url' => $m['url'] ?? '', 'buy' => $m['p'] ?? 0,
             'model' => trim(preg_replace('/^Кофемашина\s+|\s+Аренда$/u', '', $m['n'] ?? $f['NAME'])),
             'price' => (float)$f['PROPERTY_PRICE_MONTH_VALUE'], 'audience' => (string)$f['PROPERTY_AUDIENCE_VALUE'], 'feature' => (string)($f['PROPERTY_FEATURE_VALUE'] ?? ''),
-            'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'], 'fee' => (float)$f['PROPERTY_SHORT_KG_FEE_VALUE'],
+            'cups' => (int)$f['PROPERTY_CUPS_PER_DAY_VALUE'], 'kg' => (int)$f['PROPERTY_FREE_FROM_KG_VALUE'], 'fee' => (float)($f['PROPERTY_SHORT_KG_FEE_VALUE'] ?? 0),
             'img' => $f['PREVIEW_PICTURE'] ? bt_img($f['PREVIEW_PICTURE'], 480, 340) : ($m['img'] ?? ''),
         ];
     }
