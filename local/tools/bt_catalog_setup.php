@@ -182,6 +182,7 @@ bt_ensure_props($rentId, [
     'MACHINE' => ['Кофемашина из каталога', 'E', []],
     'PRICE_MONTH' => ['Аренда, ₽ в месяц', 'N', ['_list' => 'Y']],
     'FREE_FROM_KG' => ['Бесплатно при заказе кофе от, кг/мес', 'N', ['_list' => 'Y']],
+    'SHORT_KG_FEE' => ['Доплата за каждый недобранный кг, ₽', 'N', ['_list' => 'Y', 'DEFAULT_VALUE' => 1200]],
     'CUPS_PER_DAY' => ['Чашек в день, до', 'N', ['_list' => 'Y']],
     'AUDIENCE' => ['Для кого', 'S', ['_list' => 'Y']],
     'MORE_PHOTO' => ['Фото', 'F', $multi + ['FILE_TYPE' => 'jpg, jpeg, png, webp']],

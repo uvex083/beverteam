@@ -1264,14 +1264,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     let days=22, text='';
     const draw=()=>{
       const cups=+rng.value, need=cups*C.g*days/1000, B=C.beans.find(b=>b.code===q('[data-rm-bean]').value)||C.beans[0];
-      const kgA=Math.max(Math.ceil(need),M.kg), costA=kgA*BT_tier(B,kgA).p, costB=M.price+need*BT_tier(B,Math.max(need,1)).p, a=M.kg>0, best=a&&costA<=costB?'a':'b';
+      /* машина за 0 ₽: кофе по розничной цене, недобор до порога — доплата за каждый кг; фиксированная аренда — кофе по цене объёма */
+      const kgA=Math.ceil(need), short=Math.max(M.kg-kgA,0), costA=kgA*B.p+short*M.fee, costB=M.price+need*BT_tier(B,Math.max(need,1)).p, a=M.kg>0, best=a&&costA<=costB?'a':'b';
       const inf=q('[data-rm-info]'); if(inf){ inf.href=B.url; const im=inf.querySelector('img'); if(B.img&&im.getAttribute('src')!==B.img) im.src=B.img;
         q('[data-rm-in]').textContent=B.n.replace(/^BOTANICA\s+/,''); q('[data-rm-ip]').textContent=B.par; }
       q('[data-rm-nv]').textContent=cups; q('[data-rm-cups]').textContent=cups; q('[data-rm-kg]').textContent=kgf(need)+' кг';
       q('[data-rm-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*days,1));
       q('[data-rm-a]').hidden=!a;
       q('[data-rm-at]').textContent=rub(costA)+' / мес';
-      q('[data-rm-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?` — порог модели ${M.kg} кг`:'');
+      q('[data-rm-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short?`, до порога ${M.kg} кг не хватает ${short} кг: доплата ${short} × ${rub(M.fee)}`:'');
       q('[data-rm-bt]').textContent=rub(costB)+' / мес';
       q('[data-rm-bd]').textContent=`Аренда ${rub(M.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rm-a]').classList.toggle('is-best',best==='a'); q('[data-rm-b]').classList.toggle('is-best',best==='b');
@@ -1303,7 +1304,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const n=+rng.value, cups=n*st.per, need=cups*C.g*st.days/1000, m=M.find(x=>x.cups>=cups)||M[M.length-1], over=cups>M[M.length-1].cups;
       const B=C.beans.find(b=>b.code===q('[data-rc2-bean]').value)||C.beans[0];
       /* нагрузка больше самой мощной модели — считаем на k машин */
-      const k=Math.ceil(cups/m.cups), kgA=Math.max(Math.ceil(need),m.kg*k), costA=kgA*BT_tier(B,kgA).p, costB=m.price*k+need*BT_tier(B,Math.max(need,1)).p;
+      const k=Math.ceil(cups/m.cups), kgA=Math.ceil(need), thr=m.kg*k, short=Math.max(thr-kgA,0), costA=kgA*B.p+short*m.fee, costB=m.price*k+need*BT_tier(B,Math.max(need,1)).p;
       const a=m.kg>0, best=a&&costA<=costB?'a':'b';
       cur={m,cups,need,n,days:st.days,bean:B.n,costA,costB,kgA};
       q('[data-rc2-nv]').textContent=n;
@@ -1320,12 +1321,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rc2-cup]').textContent=rub((best==='a'?costA:costB)/Math.max(cups*st.days,1));
       q('[data-rc2-a]').hidden=!a;
       q('[data-rc2-at]').textContent=rub(costA)+' / мес';
-      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(BT_tier(B,kgA).p)}`+(kgA>Math.ceil(need)?(k>1?` — порог ${k} ${kw}: ${k} × ${m.kg} кг`:` — порог модели ${m.kg} кг`):kgA>need?` — расход ${kgf(need)} кг, кофе в пачках по 1 кг`:'');
+      q('[data-rc2-ad]').textContent=`Машина 0 ₽, кофе ${kgA} кг × ${rub(B.p)}`+(short?`, до порога ${thr} кг${k>1?` (${k} × ${m.kg})`:''} не хватает ${short} кг: доплата ${short} × ${rub(m.fee)}`:kgA>need?`, расход ${kgf(need)} кг, кофе в пачках по 1 кг`:'');
       q('[data-rc2-bt]').textContent=rub(costB)+' / мес';
       q('[data-rc2-bd]').textContent=`Аренда ${k>1?k+' × ':''}${rub(m.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rc2-a]').classList.toggle('is-best',best==='a'); q('[data-rc2-b]').classList.toggle('is-best',best==='b');
       q('[data-rc2-note]').textContent=over?`Расчёт на ${k} ${kw} ${m.m.replace(/^Jetinno\s+/,'')}. Точную схему — сколько машин и где поставить — подберём по заявке.`
-        :`Расчёт: ${C.g} г зерна на чашку × ${cups} ${cw(cups)} × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}; вариант «со своим кофе» посчитан по той же цене.`;
+        :`Расчёт: ${C.g} г зерна на чашку × ${cups} ${cw(cups)} × ${st.days} рабочих дн${st.days%10>=2&&st.days%10<=4?'я':'ей'} в месяц. Кофе — ${B.n}: с машиной за 0 ₽ по розничной цене, при фиксированной аренде по цене объёма (или своё зерно).`;
     };
     rng.addEventListener('input',draw);
     q('[data-rc2-bean]').addEventListener('change',draw);

@@ -38,7 +38,7 @@ $tier = function (array $c, float $kg): float {
 $bean0 = 'botanica-espresso-smes';
 
 $calc = [
-    'models' => array_map(fn($m) => ['id' => $m['id'], 'm' => $m['model'], 'aud' => $m['audience'], 'f' => $m['feature'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'img' => $m['img'], 'url' => $m['url']], $models),
+    'models' => array_map(fn($m) => ['id' => $m['id'], 'm' => $m['model'], 'aud' => $m['audience'], 'f' => $m['feature'], 'cups' => $m['cups'], 'price' => $m['price'], 'kg' => $m['kg'], 'fee' => $m['fee'], 'img' => $m['img'], 'url' => $m['url']], $models),
     'beans' => array_map(fn($c) => ['code' => $c['code'], 'n' => preg_replace('/,\s*1\s*кг$/u', '', $c['n']), 'p' => $c['p'], 'bulk' => $c['bulk'] ?? null, 'url' => $c['url']], $beans),
     'g' => 8,
 ];
