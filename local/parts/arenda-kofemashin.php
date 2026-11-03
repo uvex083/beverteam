@@ -210,12 +210,12 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <section class="sec sec--t0" id="coffee">
     <div class="r2head"><h2 class="display h2"><?= bt_title(($coffeeH['title'] ?? '') ?: 'Кофе для машины') ?></h2><?= bt_btn($coffeeH['btn_text'] ?? '', $coffeeH['btn_link'] ?? '', 'link') ?></div>
     <?= $lead($coffeeH ?? []) ?>
-    <div class="ar2cf"><?php foreach ($beans as $c): $p5 = $tier($c, 5); ?>
+    <div class="ar2cf"><?php foreach ($beans as $c): $p1 = (float)$c['p']; $p5 = $tier($c, 5); ?>
       <a class="card" href="<?= $e($c['url']) ?>">
         <?php if (!empty($c['img'])): ?><img src="<?= $e($c['img']) ?>" alt="" loading="lazy" width="120" height="120"><?php endif ?>
         <b><?= $e(preg_replace('/,\s*1\s*кг$/u', '', $c['n'])) ?></b>
         <?php if (!empty($c['par'])): ?><small><?= $e($c['par']) ?></small><?php endif ?>
-        <span class="ar2cf__p"><?= $e(bt_fmt($p5)) ?>/кг · <b><?= $e(bt_fmt(round($p5 * 8 / 1000))) ?></b> за чашку</span>
+        <span class="ar2cf__p"><?= $e(bt_fmt($p1)) ?>/кг<?php if ($p5 < $p1): ?>, от 5 кг <?= $e(bt_fmt($p5)) ?><?php endif ?> · <b><?= $e(bt_fmt(round($p1 * 8 / 1000))) ?></b> за чашку</span>
       </a>
     <?php endforeach ?></div>
   </section>
