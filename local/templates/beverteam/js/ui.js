@@ -1256,7 +1256,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       breakpoints:{0:{direction:'horizontal',spaceBetween:8},900:{direction:'vertical',spaceBetween:10}}});
     rg.addEventListener('click',e=>{
       const t=e.target.closest('[data-rmgal-i]');
-      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>{b.setAttribute('aria-pressed',b===t);b.classList.toggle('swiper-slide-thumb-active',b===t);}); return; }
+      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelector('[data-rmgal-n]').textContent=`${cur+1} / ${full.length}`; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>{b.setAttribute('aria-pressed',b===t);b.classList.toggle('swiper-slide-thumb-active',b===t);}); return; }
       if(e.target.closest('[data-rmgal-open]')&&full.length) BT_lightbox(full.map(src=>({src,cap:''})),cur);
     });
   }

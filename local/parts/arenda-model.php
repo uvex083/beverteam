@@ -86,7 +86,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
         <button class="gal__ar" type="button" aria-label="Следующие фото" data-rmgal-dn><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
       </div>
       <?php endif ?>
-      <button type="button" class="rmgal__big" data-rmgal-open aria-label="Открыть фото"><img src="<?= $e($photos[0]['big'] ?? '') ?>" alt="<?= $e($APPLICATION->GetTitle(false)) ?>" width="900" height="900" fetchpriority="high" data-rmgal-img></button>
+      <button type="button" class="rmgal__big" data-rmgal-open aria-label="Открыть фото"><img src="<?= $e($photos[0]['big'] ?? '') ?>" alt="<?= $e($APPLICATION->GetTitle(false)) ?>" width="900" height="900" fetchpriority="high" data-rmgal-img><span class="gal__n" data-rmgal-n><?= count($photos) > 1 ? '1 / ' . count($photos) : '' ?></span></button>
     </div>
     <div class="rminfo">
       <span class="mono muted"><?= $e($m['audience']) ?><?= $m['cups'] ? ' · до ' . $m['cups'] . ' чашек в день' : '' ?></span>
