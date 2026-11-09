@@ -1249,16 +1249,16 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* ---------- аренда: страница модели ---------- */
   const rg=document.querySelector('[data-rmgal]');
-  if(rg){
-    const full=JSON.parse(rg.dataset.rmgal||'[]'), img=rg.querySelector('[data-rmgal-img]'), th=rg.querySelector('[data-rmgal-th]'); let cur=0;
-    if(th&&window.Swiper) new Swiper(th,{direction:'vertical',slidesPerView:'auto',spaceBetween:10,freeMode:true,slideToClickedSlide:true,mousewheel:{forceToAxis:true},
+  if(rg&&window.Swiper){
+    const tb=rg.querySelector('[data-rmgal-th]'), n=rg.querySelector('[data-rmgal-n]'), btns=[...rg.querySelectorAll('[data-rmgal-i]')];
+    const th=tb&&new Swiper(tb,{direction:'vertical',slidesPerView:'auto',spaceBetween:10,freeMode:true,watchSlidesProgress:true,slideToClickedSlide:true,mousewheel:{forceToAxis:true},
       navigation:{prevEl:rg.querySelector('[data-rmgal-up]'),nextEl:rg.querySelector('[data-rmgal-dn]')},
       breakpoints:{0:{direction:'horizontal',spaceBetween:8},900:{direction:'vertical',spaceBetween:10}}});
-    rg.addEventListener('click',e=>{
-      const t=e.target.closest('[data-rmgal-i]');
-      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelector('[data-rmgal-n]').textContent=`${cur+1} / ${full.length}`; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>{b.setAttribute('aria-pressed',b===t);b.classList.toggle('swiper-slide-thumb-active',b===t);}); return; }
-      if(e.target.closest('[data-rmgal-open]')&&full.length) BT_lightbox(full.map(src=>({src,cap:''})),cur);
-    });
+    const big=new Swiper(rg.querySelector('[data-rmgal-big]'),{slidesPerView:1,spaceBetween:20,speed:380,keyboard:{enabled:true},...(th?{thumbs:{swiper:th}}:{}),
+      on:{slideChange(){ if(!th) return; n.textContent=`${this.activeIndex+1} / ${btns.length}`; btns.forEach((b,i)=>b.setAttribute('aria-pressed',i===this.activeIndex)); }}});
+    const imgs=[...rg.querySelectorAll('[data-rmgal-big] img[data-full]')];
+    imgs.forEach((im,i)=>im.addEventListener('click',()=>{ if(big.allowClick) BT_lightbox(imgs.map(x=>({src:x.dataset.full,cap:''})),i); }));
+    rg.addEventListener('click',e=>{ const t=e.target.closest('[data-rmgal-i]'); if(t) big.slideTo(+t.dataset.rmgalI); });
   }
   const rmc=document.querySelector('[data-rmcalc]');
   if(rmc){

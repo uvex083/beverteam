@@ -76,17 +76,22 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php bt_crumbs() ?>
 
   <div class="rmhero">
-    <div class="rmgal gal<?= count($photos) > 1 ? '' : ' gal--empty' ?>" data-rmgal='<?= htmlspecialcharsbx(json_encode(array_column($photos, 'full'), JSON_UNESCAPED_SLASHES)) ?>'>
+    <div class="rmgal gal<?= count($photos) > 1 ? '' : ' gal--empty' ?>" data-rmgal>
       <?php if (count($photos) > 1): ?>
       <div class="gal__side">
         <button class="gal__ar" type="button" aria-label="Предыдущие фото" data-rmgal-up><svg viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></svg></button>
         <div class="swiper gal__thumbs" data-rmgal-th><div class="swiper-wrapper">
-          <?php foreach ($photos as $i => $ph): ?><button type="button" class="swiper-slide<?= $i ? '' : ' swiper-slide-thumb-active' ?>" aria-label="Фото <?= $i + 1 ?>" aria-pressed="<?= $i ? 'false' : 'true' ?>" data-rmgal-i="<?= $i ?>" data-big="<?= $e($ph['big']) ?>"><span><img src="<?= $e($ph['th']) ?>" alt="" width="58" height="58" loading="lazy"></span></button><?php endforeach ?>
+          <?php foreach ($photos as $i => $ph): ?><button type="button" class="swiper-slide<?= $i ? '' : ' swiper-slide-thumb-active' ?>" aria-label="Фото <?= $i + 1 ?>" aria-pressed="<?= $i ? 'false' : 'true' ?>" data-rmgal-i="<?= $i ?>"><span><img src="<?= $e($ph['th']) ?>" alt="" width="58" height="58" loading="lazy"></span></button><?php endforeach ?>
         </div></div>
         <button class="gal__ar" type="button" aria-label="Следующие фото" data-rmgal-dn><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
       </div>
       <?php endif ?>
-      <button type="button" class="rmgal__big" data-rmgal-open aria-label="Открыть фото"><img src="<?= $e($photos[0]['big'] ?? '') ?>" alt="<?= $e($APPLICATION->GetTitle(false)) ?>" width="900" height="900" fetchpriority="high" data-rmgal-img><span class="gal__n" data-rmgal-n><?= count($photos) > 1 ? '1 / ' . count($photos) : '' ?></span></button>
+      <div class="gal__main">
+        <div class="swiper gal__big" data-rmgal-big><div class="swiper-wrapper">
+          <?php foreach ($photos as $i => $ph): ?><div class="swiper-slide"><img src="<?= $e($ph['big']) ?>" data-full="<?= $e($ph['full']) ?>" alt="<?= $e($APPLICATION->GetTitle(false)) ?>, фото <?= $i + 1 ?>"<?= $i ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"' ?>></div><?php endforeach ?>
+        </div></div>
+        <span class="gal__n" data-rmgal-n><?= count($photos) > 1 ? '1 / ' . count($photos) : '' ?></span>
+      </div>
     </div>
     <div class="rminfo">
       <span class="mono muted"><?= $e($m['audience']) ?><?= $m['cups'] ? ' · до ' . $m['cups'] . ' чашек в день' : '' ?></span>
