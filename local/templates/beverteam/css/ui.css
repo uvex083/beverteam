@@ -2481,12 +2481,10 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 /* страница модели в аренду */
 .rmhero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:start;padding:clamp(8px,1.5vw,16px) 0 var(--pad)}
 .rmgal{display:grid;gap:12px}
-.rmgal__big{display:block;width:100%;aspect-ratio:1;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(16px,3vw,40px);cursor:zoom-in}
+.rmgal__big{display:block;width:100%;height:480px;background:var(--white);border:1px solid var(--line);border-radius:var(--rad);padding:clamp(16px,3vw,40px);cursor:zoom-in}
 .rmgal__big img{width:100%;height:100%;object-fit:contain}
-.rmgal__th{display:flex;gap:8px;flex-wrap:wrap}
-.rmgal__th button{width:66px;height:66px;padding:4px;background:var(--white);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .2s,box-shadow .2s}
-.rmgal__th button[aria-pressed=true]{border-color:var(--lime-d);box-shadow:0 0 0 1.5px var(--lime-d)}
-.rmgal__th img{width:100%;height:100%;object-fit:contain}
+.rmgal .gal__thumbs button{padding:0;border:0;background:none;cursor:pointer}
+@media(max-width:900px){.rmgal__big{height:auto;aspect-ratio:1}}
 .rminfo{display:grid;gap:16px;align-content:start}
 .rminfo .h1{margin:0}
 .rmtag{justify-self:start;background:var(--lime-soft);color:#4E5A12;border-radius:999px;padding:4px 12px;font-size:13px}
@@ -2569,6 +2567,9 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 .ar2tar .is-best{border-color:var(--lime);background:rgba(214,240,74,.07)}
 .ar2tar .is-best .mono{color:var(--lime)}
 .ar2note{margin:0;font-size:12.5px;color:#A8A8A0;line-height:1.5;min-height:3em}
+.ar2kpi.is-2{grid-template-columns:repeat(2,1fr)}
+.ar2calc__out .btn--line{border-color:#55554D;color:#fff}
+@media(hover:hover){.ar2calc__out .btn--line:hover{background:#fff;color:var(--ink);border-color:#fff}}
 .ar2calc__out .btn{justify-self:start}
 .ar2models{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .ar2m{padding:0;overflow:hidden;display:grid;grid-template-rows:auto 1fr}

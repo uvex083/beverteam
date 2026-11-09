@@ -76,9 +76,17 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
   <?php bt_crumbs() ?>
 
   <div class="rmhero">
-    <div class="rmgal" data-rmgal='<?= htmlspecialcharsbx(json_encode(array_column($photos, 'full'), JSON_UNESCAPED_SLASHES)) ?>'>
+    <div class="rmgal gal<?= count($photos) > 1 ? '' : ' gal--empty' ?>" data-rmgal='<?= htmlspecialcharsbx(json_encode(array_column($photos, 'full'), JSON_UNESCAPED_SLASHES)) ?>'>
+      <?php if (count($photos) > 1): ?>
+      <div class="gal__side">
+        <button class="gal__ar" type="button" aria-label="Предыдущие фото" data-rmgal-up><svg viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></svg></button>
+        <div class="swiper gal__thumbs" data-rmgal-th><div class="swiper-wrapper">
+          <?php foreach ($photos as $i => $ph): ?><button type="button" class="swiper-slide<?= $i ? '' : ' swiper-slide-thumb-active' ?>" aria-label="Фото <?= $i + 1 ?>" aria-pressed="<?= $i ? 'false' : 'true' ?>" data-rmgal-i="<?= $i ?>" data-big="<?= $e($ph['big']) ?>"><span><img src="<?= $e($ph['th']) ?>" alt="" width="58" height="58" loading="lazy"></span></button><?php endforeach ?>
+        </div></div>
+        <button class="gal__ar" type="button" aria-label="Следующие фото" data-rmgal-dn><svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+      </div>
+      <?php endif ?>
       <button type="button" class="rmgal__big" data-rmgal-open aria-label="Открыть фото"><img src="<?= $e($photos[0]['big'] ?? '') ?>" alt="<?= $e($APPLICATION->GetTitle(false)) ?>" width="900" height="900" fetchpriority="high" data-rmgal-img></button>
-      <?php if (count($photos) > 1): ?><div class="rmgal__th"><?php foreach ($photos as $i => $ph): ?><button type="button" aria-label="Фото <?= $i + 1 ?>" aria-pressed="<?= $i ? 'false' : 'true' ?>" data-rmgal-i="<?= $i ?>" data-big="<?= $e($ph['big']) ?>"><img src="<?= $e($ph['th']) ?>" alt="" width="58" height="58" loading="lazy"></button><?php endforeach ?></div><?php endif ?>
     </div>
     <div class="rminfo">
       <span class="mono muted"><?= $e($m['audience']) ?><?= $m['cups'] ? ' · до ' . $m['cups'] . ' чашек в день' : '' ?></span>
@@ -127,7 +135,7 @@ $APPLICATION->AddHeadString('<script type="application/ld+json">' . json_encode(
           <div data-rm-b><span class="mono">Фиксированная аренда</span><b data-rm-bt></b><small data-rm-bd></small></div>
         </div>
         <p class="ar2note" data-rm-note></p>
-        <a class="btn" href="#form" data-rm-go>Отправить расчёт менеджеру</a>
+        <div class="row" style="gap:12px"><a class="btn" href="/arenda-kofemashin/#calc" data-rm-next hidden></a><a class="btn" href="#form" data-rm-go>Отправить расчёт менеджеру</a></div>
       </div>
     </div>
   </section>

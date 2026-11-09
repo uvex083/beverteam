@@ -1250,17 +1250,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* ---------- аренда: страница модели ---------- */
   const rg=document.querySelector('[data-rmgal]');
   if(rg){
-    const full=JSON.parse(rg.dataset.rmgal||'[]'), img=rg.querySelector('[data-rmgal-img]'); let cur=0;
+    const full=JSON.parse(rg.dataset.rmgal||'[]'), img=rg.querySelector('[data-rmgal-img]'), th=rg.querySelector('[data-rmgal-th]'); let cur=0;
+    if(th&&window.Swiper) new Swiper(th,{direction:'vertical',slidesPerView:'auto',spaceBetween:10,freeMode:true,slideToClickedSlide:true,mousewheel:{forceToAxis:true},
+      navigation:{prevEl:rg.querySelector('[data-rmgal-up]'),nextEl:rg.querySelector('[data-rmgal-dn]')},
+      breakpoints:{0:{direction:'horizontal',spaceBetween:8},900:{direction:'vertical',spaceBetween:10}}});
     rg.addEventListener('click',e=>{
       const t=e.target.closest('[data-rmgal-i]');
-      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
+      if(t){ cur=+t.dataset.rmgalI; img.src=t.dataset.big; rg.querySelectorAll('[data-rmgal-i]').forEach(b=>{b.setAttribute('aria-pressed',b===t);b.classList.toggle('swiper-slide-thumb-active',b===t);}); return; }
       if(e.target.closest('[data-rmgal-open]')&&full.length) BT_lightbox(full.map(src=>({src,cap:''})),cur);
     });
   }
   const rmc=document.querySelector('[data-rmcalc]');
   if(rmc){
     const C=JSON.parse(rmc.dataset.rmcalc), M=C.m, q=s=>rmc.querySelector(s), rng=q('[data-rm-n]');
-    const kgf=x=>String(Math.round(x*10)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
+    const kgf=x=>String(Math.ceil(x*10-1e-9)/10).replace('.',','), rub=x=>BT_fmt(Math.round(x));
     let days=22, text='';
     const draw=()=>{
       const cups=+rng.value, need=cups*C.g*days/1000, B=C.beans.find(b=>b.code===q('[data-rm-bean]').value)||C.beans[0];
@@ -1277,10 +1280,15 @@ document.addEventListener('DOMContentLoaded',()=>{
       q('[data-rm-bd]').textContent=`Аренда ${rub(M.price)} + ≈ ${kgf(need)} кг кофе`;
       q('[data-rm-a]').classList.toggle('is-best',best==='a'); q('[data-rm-b]').classList.toggle('is-best',best==='b');
       const note=q('[data-rm-note]');
-      if(M.cups&&cups>M.cups){ note.innerHTML=`${escq(M.m)} рассчитана до ${M.cups} чашек в день.`+(C.next?` Для такой нагрузки подойдёт <a class="link" href="${escq(C.next.url)}">${escq(C.next.m)}</a>.`:' Подберём решение — оставьте заявку.'); }
+      /* сверх предела модели цены на неё не показываем: такой конфигурации нет */
+      const over=M.cups>0&&cups>M.cups, nx=q('[data-rm-next]');
+      q('.ar2tar').hidden=over; q('[data-rm-cup]').parentElement.hidden=over; q('.ar2kpi').classList.toggle('is-2',over);
+      q('[data-rm-go]').classList.toggle('btn--line',over); nx.hidden=!over;
+      if(over){ nx.href=C.next?C.next.url:'/arenda-kofemashin/#calc'; nx.textContent=C.next?`Посмотреть ${C.next.m}`:'Посчитать на несколько машин';
+        note.textContent=`${M.m} рассчитана до ${M.cups} чашек в день, у вас ${cups}. `+(C.next?`Для такой нагрузки подойдёт ${C.next.m}.`:'Для такой нагрузки нужно несколько машин.'); }
       else note.textContent=`Расчёт: ${C.g} г зерна на чашку × ${cups} чашек × ${days} рабочих дн${days%10>=2&&days%10<=4?'я':'ей'} в месяц. Кофе ${B.n}: с машиной за 0 ₽ по розничной цене, при фиксированной аренде со скидкой за объём или своё зерно.`;
       text=`Расчёт на сайте для ${M.m}: ≈ ${cups} чашек в день, ${({22:'пятидневка',26:'шестидневка',30:'без выходных'})[days]}, ≈ ${kgf(need)} кг кофе в месяц (${B.n}). `
-        +(a?`Машина за 0 ₽ с нашим кофе ≈ ${rub(costA)}/мес (${kgA} кг по розничной цене${short&&M.fee>0?`, доплата за недобор ${short} кг`:''}), `:'')+`фиксированная аренда ≈ ${rub(costB)}/мес с кофе.`;
+        +(over?`Нагрузка выше предела модели (до ${M.cups} чашек в день), нужен подбор.`:(a?`Машина за 0 ₽ с нашим кофе ≈ ${rub(costA)}/мес (${kgA} кг по розничной цене${short&&M.fee>0?`, доплата за недобор ${short} кг`:''}), `:'')+`фиксированная аренда ≈ ${rub(costB)}/мес с кофе.`);
     };
     rng.addEventListener('input',draw);
     q('[data-rm-bean]').addEventListener('change',draw);
