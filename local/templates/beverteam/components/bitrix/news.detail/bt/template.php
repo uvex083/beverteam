@@ -33,6 +33,18 @@ foreach ($toc as [$id, $t, $lv]) {
     }
 }
 $promo = bt_journal_promo((int)$arResult['IBLOCK_SECTION_ID']);
+// без оглавления справа товар статьи: привязанный или первый по ссылке из текста
+$side = count($tree) < 2 ? ($prods[0] ?? null) : null;
+if (count($tree) < 2 && !$side && preg_match('~href="(?:https?://(?:www\.)?beverteam\.ru)?(/catalog/product/[^/"?#]+/)~i', $body, $pm)) {
+    foreach (bt_catalog_data() as $list) {
+        foreach ($list as $m) {
+            if (($m['url'] ?? '') === $pm[1]) {
+                $side = $m;
+                break 2;
+            }
+        }
+    }
+}
 $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']['ID'] ?? 0), 1600, 1600);
 ?>
 <article class="post" style="margin-top:22px" itemscope itemtype="https://schema.org/<?= $kind === 'news' ? 'NewsArticle' : 'Article' ?>">
@@ -63,8 +75,9 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
     </div>
     <?php if ($pic): ?><figure class="post__ph"><img src="<?= $e($pic) ?>" alt="<?= $e($arResult['~NAME']) ?>"></figure><?php endif ?>
     <div class="post__body" itemprop="articleBody"><?= $body ?></div>
+    <?php $dup = $side && count($prods) === 1 ? ' is-dup' : ''; ?>
     <?php if ($prods): ?>
-    <section class="post__prods" id="prods" aria-labelledby="prodsT">
+    <section class="post__prods<?= $dup ?>" id="prods" aria-labelledby="prodsT">
       <div class="display h3 th th3" id="prodsT">Товары из статьи</div>
       <div class="grid g3"><?php foreach ($prods as $m) echo bt_card($m) ?></div>
     </section>
@@ -75,7 +88,7 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
       <a class="btn btn--line" href="/podbor-kofe/">Подобрать кофе за минуту</a>
     </div>
   </div>
-  <?php if (count($tree) >= 2 || $promo): ?>
+  <?php if (count($tree) >= 2 || $promo || $side): ?>
   <aside>
     <div class="post__side">
       <?php if (count($tree) >= 2): ?>
@@ -90,7 +103,9 @@ $pic = bt_img($arResult['DETAIL_PICTURE']['ID'] ?? ($arResult['PREVIEW_PICTURE']
         </ol>
       </nav>
       <?php endif ?>
-      <?php if ($promo): ?>
+      <?php if ($side): ?>
+      <div class="post__card<?= $dup ?>"><?= bt_card($side) ?></div>
+      <?php elseif ($promo): ?>
       <a class="post__promo" href="<?= $e($promo['link']) ?>">
         <?php if ($promo['img']): ?><img src="<?= $e($promo['img']) ?>" alt="" width="52" height="52" loading="lazy"><?php endif ?>
         <span><b><?= $e($promo['title']) ?></b><?php if ($promo['text'] !== ''): ?><span><?= $e($promo['text']) ?></span><?php endif ?><em><?= $e($promo['btn']) ?> →</em></span>

@@ -653,6 +653,9 @@ input,textarea{caret-color:var(--ink)}
 .jside b{font-size:14px;line-height:1.35}
 .post{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
 .post__body{font-size:16.5px;line-height:1.8}
+.post .post__body{max-width:720px}
+.post__card .pc__par,.post__card .pc__scales{display:none}
+@media(min-width:1001px){.post__prods.is-dup{display:none}}
 .post__body h2,.post__body .th2{font-family:Unbounded;font-weight:700;font-size:21px;margin:34px 0 12px}
 .post__body p{margin:0 0 16px}
 .post__body ul,.post__body ol{list-style:none;padding:0;margin:0 0 20px}
@@ -715,7 +718,7 @@ input,textarea{caret-color:var(--ink)}
 @media(max-width:1000px){.jlead{grid-template-columns:1fr}
   .jlead>.ncard{grid-template-columns:1fr;min-height:0}
   .jlead>.ncard>.ncard__ph>img{height:auto;aspect-ratio:16/10}
-  .post{grid-template-columns:minmax(0,1fr)}.post__side{position:static}.post__toc-pct,.post__toc-bar{display:none}.post__toc-hd{margin-bottom:10px}}
+  .post{grid-template-columns:minmax(0,1fr)}.post__side{position:static}.post__toc-pct,.post__toc-bar{display:none}.post__toc-hd{margin-bottom:10px}.post__card.is-dup{display:none}}
 
 /* ================= Подписка ================= */
 .subg{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
