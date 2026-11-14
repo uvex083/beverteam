@@ -434,7 +434,7 @@ function header(){
 function megaPanel(i){
   const c = CATS[i]; const half = Math.ceil(c.sub.length/2);
   const li = s => `<li><a href="${s[1]}">${s[0]}</a></li>`;
-  return `<div class="mega__t th th4"><a href="${c.h}">${c.t} →</a></div>
+  return `<div class="mega__t th th4"><a href="${c.h}">${c.n||c.t} →</a></div>
     <ul>${c.sub.slice(0,half).map(li).join('')}</ul>
     <ul>${c.sub.slice(half).map(li).join('')}</ul>
     ${c.promo?`<a class="mega__promo" href="${c.promo.h}"><img src="${c.promo.img}" alt="" loading="lazy"><b>${c.promo.b}</b><span class="muted" style="font-size:13px">${c.promo.t}</span></a>`:''}`;

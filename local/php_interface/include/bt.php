@@ -402,9 +402,9 @@ function bt_mega_cats(): array
     while ($s = $r->GetNext(true, false)) {
         if ($s['DEPTH_LEVEL'] == 1) {
             $roots[$s['ID']] = count($cats);
-            // короткое имя в меню, полное остаётся в H1 и хлебных крошках
+            // короткое имя в списке меню, полное — в заголовке панели, H1 и хлебных крошках
             $t = ['/catalog/professionalnye-kofemashiny/' => 'Кофемашины'][$s['SECTION_PAGE_URL']] ?? $s['NAME'];
-            $cats[] = ['t' => $t, 'h' => $s['SECTION_PAGE_URL'], 'sub' => [], 'id' => (int)$s['ID']];
+            $cats[] = ['t' => $t, 'n' => $s['NAME'], 'h' => $s['SECTION_PAGE_URL'], 'sub' => [], 'id' => (int)$s['ID']];
         } elseif (isset($roots[$s['IBLOCK_SECTION_ID']])) {
             $cats[$roots[$s['IBLOCK_SECTION_ID']]]['sub'][] = [$s['NAME'], $s['SECTION_PAGE_URL']];
         }
