@@ -262,6 +262,9 @@ window.BT_kkg = k => +(String(k).split(':')[1]||0);
 /* кофе — пачки по 1 кг; плашки 5/10/20/30 кг — быстрый выбор по оптовой сетке */
 window.BT_packOf = m => m&&m.bulk ? m.bulk[0].kg : 0;
 window.BT_packSet = () => {};
+/* выбранная плашка до добавления: только цена, в корзину — по кнопке */
+window.BT_SEL = {};
+window.BT_selOf = m => m&&m.bulk ? (CART[BT_keyOf(m)]||BT_SEL[m.id]||1) : 1;
 window.BT_keyOf = m => BT_key(m.id, BT_packOf(m));
 /* у кофе ступень цены считается от всего веса строки, как в корзине Битрикса */
 window.BT_perKg = (m,kg,q) => BT_tier(m,kg*Math.max(1,q)).p;
@@ -330,7 +333,7 @@ window.BT_tier = (m,kg) => {
 window.BT_tierPct = (m,t) => m.bulk&&t.p<m.bulk[0].p ? Math.round((1-t.p/m.bulk[0].p)*100) : 0;
 window.BT_packs = (m,big) => {
   if(!m.bulk) return '';
-  const on=BT_tier(m,CART[BT_keyOf(m)]||1);
+  const on=BT_tier(m,BT_selOf(m));
   return `<div class="packs ${big?'packs--lg':''}" data-packs="${m.id}">
     ${big?'<span class="packs__lab">Объём заказа</span>':''}
     ${m.bulk.map(t=>{const pct=BT_tierPct(m,t);
@@ -341,7 +344,7 @@ window.BT_packPut = (id,kg) => { const m=BT_find(id); if(!m) return; BT_cartSet(
   const t=BT_tier(m,kg), pct=BT_tierPct(m,t);
   BT_toast(`${kg} кг в корзине${pct?` · ${BT_fmt(t.p)} за кг, выгода ${pct}%`:''} · <a href="/personal/cart/">Оформить</a>`); };
 window.BT_priceBox = m => {
-  const kg=BT_packOf(m), q=m.rent?0:(CART[BT_keyOf(m)]||0), n=q||1;
+  const kg=BT_packOf(m), q=m.rent?0:(CART[BT_keyOf(m)]||0), n=q||BT_selOf(m);
   const price = m.p ? fmt(BT_piece(m,kg,n)*n) : 'По запросу';
   const sub = m.unit ? `<s>${m.unit}</s>`
     : m.bulk ? `<s>${fmt(BT_perKg(m,kg,n))} за кг${n>1?` × ${n} кг`:''}</s>`
@@ -1041,9 +1044,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   // корзина изменилась в другом месте (откат после ошибки сервера)
   document.addEventListener('bt:cart',e=>{ if(e.detail) rerender(e.detail.id); });
   document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||!b.closest('.pc'))return;
-    const k=b.dataset.add; BT_cartSet(k,(CART[k]||0)+1); rerender(k);});
+    const k=b.dataset.add, m=BT_find(BT_kid(k));
+    if(m&&m.bulk&&!CART[k]) BT_packPut(m.id,BT_selOf(m)); else BT_cartSet(k,(CART[k]||0)+1); rerender(k);});
   document.addEventListener('click',e=>{const b=e.target.closest('.pc [data-packs] button');if(!b)return;
-    const id=b.closest('[data-packs]').dataset.packs; BT_packPut(id,+b.dataset.kg); rerender(id);});
+    const id=b.closest('[data-packs]').dataset.packs, m=BT_find(id); if(!m) return; BT_SEL[m.id]=+b.dataset.kg;
+    if(CART[BT_keyOf(m)]) BT_packPut(id,+b.dataset.kg); rerender(id);});
   document.addEventListener('click',e=>{const b=e.target.closest('.addq button');if(!b)return;
     const k=b.closest('.addq').dataset.id, q=(CART[k]||0)+(b.dataset.q==='-'?-1:1);
     BT_cartSet(k,q); if(b.closest('.pc')) rerender(k);});

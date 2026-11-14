@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const key = () => BT_keyOf(PM), pSt=document.getElementById('pSt');
   const label=(kg,q)=>PM.bulk?`${+(kg*q).toFixed(2)} кг`:`${q} шт`;
   function sync(anim){
-    const kg=BT_packOf(PM), inCart=BT_CART[key()]||0, q=inCart||1, pc=BT_piece(PM,kg,q), sum=pc*q;
+    const kg=BT_packOf(PM), inCart=BT_CART[key()]||0, q=inCart||BT_selOf(PM), pc=BT_piece(PM,kg,q), sum=pc*q;
     if(PM.p){ pTotal.textContent=BT_fmt(sum);
       if(PM.bulk){ const per=BT_perKg(PM,kg,q), base=PM.bulk[0].p, tot=kg*q, pct=Math.round((1-per/base)*100);
         pPer.innerHTML=`${BT_fmt(per)} за кг${tot>1?` × ${+tot.toFixed(2)} кг`:''}${pct>0?`<b>выгода ${pct}% · ${BT_fmt(Math.round((base-per)*tot))}</b>`:''}`; }
@@ -40,13 +40,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     pSt.hidden=!inCart;
   }
   pAdd.addEventListener('click',e=>{
-    if(e.target.closest('[data-add]')){ BT_cartSet(key(),1); sync(true); BT_toast(`${label(BT_packOf(PM),1)} в корзине · <a href="/personal/cart/">Оформить</a>`); return; }
+    if(e.target.closest('[data-add]')){ if(PM.bulk){ BT_packPut(PID,BT_selOf(PM)); sync(true); return; }
+      BT_cartSet(key(),1); sync(true); BT_toast(`${label(BT_packOf(PM),1)} в корзине · <a href="/personal/cart/">Оформить</a>`); return; }
     const s=e.target.closest('[data-q]'); if(!s) return;
     const n=(BT_CART[key()]||0)+(s.dataset.q==='+'?1:-1);
     if(n<1){ BT_cartSet(key(),0); BT_toast('Товар убран из корзины'); } else BT_cartSet(key(),n);
     sync();
   });
-  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_packPut(PID,+b.dataset.kg); sync(true); });
+  pPacks.addEventListener('click',e=>{ const b=e.target.closest('[data-kg]'); if(!b) return; BT_SEL[PM.id]=+b.dataset.kg;
+    if(BT_CART[key()]) BT_packPut(PID,+b.dataset.kg); sync(!!BT_CART[key()]); });
   document.addEventListener('bt:cart',e=>{ if(e.detail&&String(e.detail.id).split(':')[0]===String(PID)) sync(); });
   sync();
 
