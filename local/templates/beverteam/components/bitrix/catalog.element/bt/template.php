@@ -53,7 +53,7 @@ $back = $section['SECTION_PAGE_URL'] ?? '/catalog/';
       <div class="buy bb" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
         <meta itemprop="price" content="<?= $first ?>"><meta itemprop="priceCurrency" content="RUB"><link itemprop="availability" href="https://schema.org/InStock">
         <div id="pPacks"></div>
-        <div class="bb__price"><b class="bb__sum" id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?><div class="bb__per" id="pPer"><?= $bulk ? bt_fmt($first) . ' за кг' : 'за 1 шт' ?></div></div>
+        <div class="bb__price"><b class="bb__sum" id="pTotal"><?= $first ? bt_fmt($first) : 'По запросу' ?></b><?php if (!empty($m['old'])): ?> <span class="price--old"><?= bt_fmt($m['old']) ?></span><?php endif ?><div class="bb__per" id="pPer"><?= $bulk ? bt_fmt($first) . ' за кг<b>&nbsp;</b>' : 'за 1 шт' ?></div></div>
         <div class="bb__grid">
           <div class="bb__main" id="pAdd" aria-live="polite"></div>
         <div class="bb__ic">

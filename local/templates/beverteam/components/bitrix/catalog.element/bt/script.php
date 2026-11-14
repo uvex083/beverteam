@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const kg=BT_packOf(PM), inCart=BT_CART[key()]||0, q=inCart||BT_selOf(PM), pc=BT_piece(PM,kg,q), sum=pc*q;
     if(PM.p){ pTotal.textContent=BT_fmt(sum);
       if(PM.bulk){ const per=BT_perKg(PM,kg,q), base=PM.bulk[0].p, tot=kg*q, pct=Math.round((1-per/base)*100);
-        pPer.innerHTML=`${BT_fmt(per)} за кг${tot>1?` × ${+tot.toFixed(2)} кг`:''}${pct>0?`<b>выгода ${pct}% · ${BT_fmt(Math.round((base-per)*tot))}</b>`:''}`; }
+        pPer.innerHTML=`${BT_fmt(per)} за кг${tot>1?` × ${+tot.toFixed(2)} кг`:''}<b>${pct>0?`выгода ${pct}% · ${BT_fmt(Math.round((base-per)*tot))}`:'&nbsp;'}</b>`; }
       else pPer.textContent = q>1 ? `${BT_fmt(pc)} × ${q} шт` : 'за 1 шт'; }
     if(tiers&&PM.bulk){ const p=BT_perKg(PM,kg,q); [...tiers.tBodies[0].rows].forEach(r=>r.classList.toggle('on',p===+r.cells[1].textContent.replace(/\D/g,''))); }
     if(PM.bulk) pPacks.innerHTML=BT_packs(PM,true);
