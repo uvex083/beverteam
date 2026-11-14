@@ -85,7 +85,7 @@ if ($id && $filter && !CIBlockElement::GetList([], ['IBLOCK_ID' => $id, '=XML_ID
         $el = new CIBlockElement();
         $eid = $el->Add(['IBLOCK_ID' => $id, 'NAME' => 'Чай и кофе со скидкой', 'XML_ID' => 'bt-demo', 'ACTIVE' => 'Y', 'SORT' => 100, 'PROPERTY_VALUES' => [
             'URL' => $filter,
-            'TITLE' => 'Чай и кофе со скидкой — купить в Екатеринбурге | BEVERTEAM',
+            'TITLE' => 'Чай и кофе со скидкой – купить в Екатеринбурге | BEVERTEAM',
             'DESCRIPTION' => 'Чай и свежеобжаренный кофе BOTANICA со скидкой. Доставка по Екатеринбургу бесплатно от 3 000 ₽, отправка по России СДЭК.',
             'H1' => 'Чай и кофе со скидкой',
             'SEO_TEXT' => ['VALUE' => ['TYPE' => 'html', 'TEXT' => '<h2>Чай и кофе со скидкой</h2><p>Здесь собраны позиции, на которые сейчас действует скидка: чай, кофе BOTANICA и аксессуары. Список обновляется — заглядывайте чаще.</p>']],

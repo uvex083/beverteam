@@ -4,7 +4,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 // мета корня каталога — от сеошника; у разделов и товаров — SEO-шаблоны ИБ
 $APPLICATION->SetTitle('Магазин чая и кофе');
 $APPLICATION->SetPageProperty('title', 'Интернет-магазин чая и кофе в Екатеринбурге | Beverteam');
-$APPLICATION->SetPageProperty('description', 'Купить чай и кофе в интернет-магазине Beverteam в Екатеринбурге. В каталоге — кофе, разные виды чая, кофемашины JETINNO и аксессуары для дома и бизнеса');
+$APPLICATION->SetPageProperty('description', 'Купить чай и кофе в интернет-магазине Beverteam в Екатеринбурге. В каталоге – кофе, разные виды чая, кофемашины JETINNO и аксессуары для дома и бизнеса');
 $APPLICATION->SetPageProperty('keywords', 'Интернет-магазин чая и кофе');
 // /catalog/filter/…/apply/: у компонента нет такого шаблона адреса — отдаём как корень каталога
 $sefFolder = '/catalog/';

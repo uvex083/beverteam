@@ -180,7 +180,7 @@ if (($_GET['format'] ?? '') === 'pdf' && \Bitrix\Main\Loader::includeModule('sal
 }
 
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
-$APPLICATION->SetPageProperty('title', 'Прайс-лист на кофе, чай и кофемашины — оптовые цены | BEVERTEAM');
+$APPLICATION->SetPageProperty('title', 'Прайс-лист на кофе, чай и кофемашины – оптовые цены | BEVERTEAM');
 $APPLICATION->SetPageProperty('description', 'Актуальный прайс-лист BEVERTEAM: кофе BOTANICA, чай, кофемашины Jetinno и аксессуары. Оптовые цены от объёма, выгрузка в Excel, заказ прямо из прайса. Екатеринбург.');
 $APPLICATION->SetPageProperty('keywords', 'прайс-лист кофе, кофе оптом Екатеринбург, чай оптом, цены на кофе, прайс кофемашины');
 $APPLICATION->SetTitle('Прайс-лист');

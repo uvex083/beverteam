@@ -4,7 +4,7 @@ CHTTP::SetStatus('404 Not Found');
 @define('ERROR_404', 'Y');
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
-$APPLICATION->SetPageProperty('title', 'Страница не найдена — BEVERTEAM');
+$APPLICATION->SetPageProperty('title', 'Страница не найдена – BEVERTEAM');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 $APPLICATION->SetTitle('Страница не найдена');
 ?>

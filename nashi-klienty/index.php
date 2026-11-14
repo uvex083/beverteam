@@ -7,7 +7,7 @@ if (!bt_clients_on() && !$GLOBALS['USER']->IsAdmin()) {
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
 // title, description, H1 — вкладка SEO элемента «Первый экран» ИБ «Наши клиенты»
-bt_page_seo('clients_head', 'Наши клиенты — кофемашины Jetinno в офисах, кафе и бизнес-центрах Екатеринбурга | BEVERTEAM', '');
+bt_page_seo('clients_head', 'Наши клиенты – кофемашины Jetinno в офисах, кафе и бизнес-центрах Екатеринбурга | BEVERTEAM', '');
 $top = bt_block('clients_head');
 $seo = $top ? (new \Bitrix\Iblock\InheritedProperty\ElementValues(bt_iblock('clients_head'), $top['id']))->getValues() : [];
 $APPLICATION->SetPageProperty('keywords', $seo['ELEMENT_META_KEYWORDS'] ?? '');

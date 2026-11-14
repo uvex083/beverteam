@@ -1,6 +1,6 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-$APPLICATION->SetPageProperty("title", "Согласие на обработку персональных данных — BEVERTEAM");
+$APPLICATION->SetPageProperty("title", "Согласие на обработку персональных данных – BEVERTEAM");
 $APPLICATION->SetPageProperty("description", "Согласие пользователя сайта beverteam.ru на обработку персональных данных в соответствии с 152-ФЗ.");
 $APPLICATION->SetTitle("Согласие на обработку персональных данных");
 ?>

@@ -8,7 +8,7 @@ use Bitrix\Main\Web\Json;
 use Bitrix\Sale;
 
 $APPLICATION->SetTitle('Заказ принят');
-$APPLICATION->SetPageProperty('title', 'Заказ принят — BEVERTEAM');
+$APPLICATION->SetPageProperty('title', 'Заказ принят – BEVERTEAM');
 $APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 Loader::includeModule('sale');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
@@ -28,10 +28,10 @@ $order && !$order->isCanceled() && ($tp = bt_tbank_payment($order)) && bt_tbank_
 if (!$order) {
     CHTTP::SetStatus("404 Not Found");
     $APPLICATION->SetTitle('Заказ не найден');
-    $APPLICATION->SetPageProperty('title', 'Заказ не найден — BEVERTEAM');
+    $APPLICATION->SetPageProperty('title', 'Заказ не найден – BEVERTEAM');
 } elseif ($order->isPaid()) {
     $APPLICATION->SetTitle('Заказ оплачен');
-    $APPLICATION->SetPageProperty('title', 'Заказ оплачен — BEVERTEAM');
+    $APPLICATION->SetPageProperty('title', 'Заказ оплачен – BEVERTEAM');
 }
 ?>
 <div class="wrap okp">

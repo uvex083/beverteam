@@ -16,6 +16,6 @@ if ($USER->IsAuthorized()) {
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 $title = $order ? 'Заказ № ' . $order->getField('ACCOUNT_NUMBER') : 'Заказ';
 $APPLICATION->SetTitle($title);
-$APPLICATION->SetPageProperty('title', $title . ' — BEVERTEAM');
+$APPLICATION->SetPageProperty('title', $title . ' – BEVERTEAM');
 require $_SERVER['DOCUMENT_ROOT'] . '/local/parts/personal-order.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';

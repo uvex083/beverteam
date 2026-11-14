@@ -1,7 +1,7 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetPageProperty("title", "Возврат и обмен товара| Beverteam");
-$APPLICATION->SetPageProperty("description", "Условия возврата и обмена — компания Beverteam. Кофемашины в аренду в Екатеринбурге для офиса, кафе, ресторана и мероприятий");
+$APPLICATION->SetPageProperty("description", "Условия возврата и обмена – компания Beverteam. Кофемашины в аренду в Екатеринбурге для офиса, кафе, ресторана и мероприятий");
 $APPLICATION->SetPageProperty("keywords", "Возврат и обмен");
 $APPLICATION->SetTitle("Возврат и обмен");
 ?>

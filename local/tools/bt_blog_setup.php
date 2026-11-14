@@ -32,7 +32,7 @@ if (array_diff_assoc($urls, array_intersect_key($ib, $urls))) {
 }
 
 $seo = [
-    'SECTION_META_TITLE' => '{=this.Name} — журнал BEVERTEAM',
+    'SECTION_META_TITLE' => '{=this.Name} – журнал BEVERTEAM',
     'SECTION_META_DESCRIPTION' => '{=this.Name}: статьи и советы от BEVERTEAM — магазина кофе, чая и сервисного центра кофемашин в Екатеринбурге.',
     'SECTION_PAGE_TITLE' => '{=this.Name}',
 ];

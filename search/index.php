@@ -4,7 +4,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 // те же данные, что у живого поиска в шапке; сюда ведёт SearchAction главной
 $q = trim((string)($_GET['q'] ?? ''));
 $APPLICATION->SetTitle($q !== '' ? 'Результаты поиска' : 'Поиск по сайту');
-$APPLICATION->SetPageProperty('title', ($q !== '' ? '«' . $q . '» — поиск' : 'Поиск') . ' | Beverteam');
+$APPLICATION->SetPageProperty('title', ($q !== '' ? '«' . $q . '» – поиск' : 'Поиск') . ' | Beverteam');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 $APPLICATION->AddChainItem('Поиск');
 

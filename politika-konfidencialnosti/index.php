@@ -1,6 +1,6 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-$APPLICATION->SetPageProperty("title", "Политика конфиденциальности — BEVERTEAM");
+$APPLICATION->SetPageProperty("title", "Политика конфиденциальности – BEVERTEAM");
 $APPLICATION->SetPageProperty("description", "Политика обработки персональных данных BEVERTEAM (ИП Чичиланов В. П.) в соответствии с 152-ФЗ.");
 $APPLICATION->SetTitle("Политика конфиденциальности");
 ?>

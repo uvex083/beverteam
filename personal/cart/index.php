@@ -2,7 +2,7 @@
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 /** @global CMain $APPLICATION */
 $APPLICATION->SetTitle('Корзина');
-$APPLICATION->SetPageProperty('title', 'Корзина — BEVERTEAM');
+$APPLICATION->SetPageProperty('title', 'Корзина – BEVERTEAM');
 $APPLICATION->SetPageProperty('robots', 'noindex, follow');
 ?>
 <div class="wrap cartp">

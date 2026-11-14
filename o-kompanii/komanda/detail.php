@@ -15,7 +15,7 @@ if (!$expert) {
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 $lead = trim(preg_replace('/\s+/u', ' ', strip_tags($expert['bio'])));
-$APPLICATION->SetPageProperty('title', $expert['name'] . ($expert['job'] !== '' ? ' — ' . $expert['job'] : '') . ' | BEVERTEAM');
+$APPLICATION->SetPageProperty('title', $expert['name'] . ($expert['job'] !== '' ? ' – ' . $expert['job'] : '') . ' | BEVERTEAM');
 $APPLICATION->SetPageProperty('description', mb_strlen($lead) > 160 ? rtrim(mb_substr($lead, 0, 157)) . '…' : $lead);
 $APPLICATION->SetTitle($expert['name']);
 $APPLICATION->AddChainItem('Команда', '/o-kompanii/#team');

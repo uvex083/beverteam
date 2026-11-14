@@ -17,7 +17,7 @@ if ($tag !== '') {
     $posts = array_values(array_filter($posts, fn($p) => in_array($tag, $p['tags'] ?? [], true)));
     $btJournalFilter['=CODE'] = array_column($posts, 'id') ?: ['-'];
     $APPLICATION->SetTitle('#' . $tag);
-    $APPLICATION->SetPageProperty('title', 'Материалы по теме «' . $tag . '» — журнал BEVERTEAM');
+    $APPLICATION->SetPageProperty('title', 'Материалы по теме «' . $tag . '» – журнал BEVERTEAM');
     $APPLICATION->SetPageProperty('robots', 'noindex, follow');
     $APPLICATION->AddChainItem('#' . $tag);
     $n = count($posts);

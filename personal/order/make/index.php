@@ -18,7 +18,7 @@ if ($basket->isEmpty()) {
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/header.php';
 $APPLICATION->SetTitle('Оформление заказа');
-$APPLICATION->SetPageProperty('title', 'Оформление заказа — BEVERTEAM');
+$APPLICATION->SetPageProperty('title', 'Оформление заказа – BEVERTEAM');
 $APPLICATION->SetPageProperty('robots', 'noindex, nofollow');
 $e = fn($s) => htmlspecialcharsbx((string)$s);
 $nItems = 0;
