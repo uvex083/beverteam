@@ -1085,6 +1085,10 @@ input,textarea{caret-color:var(--ink)}
 .faq summary::after,.tiers__wrap summary::after,.qty button::before,.addq button::before,.bb__step button::before,.prcq button::before,.prcrec__add::before{content:"";flex:none;width:12px;height:12px;background:currentColor;-webkit-mask:var(--i-plus) center/12px no-repeat;mask:var(--i-plus) center/12px no-repeat}
 .faq summary::after,.tiers__wrap summary::after{background:var(--ink)}
 .faq details[open] summary::after,.tiers__wrap[open] summary::after,.qty [data-d="-"]::before,.addq [data-q="-"]::before,.bb__step [data-q="-"]::before,.prcq [data-prc-step="-1"]::before{-webkit-mask-image:var(--i-minus);mask-image:var(--i-minus)}
+/* стрелка как у выпадающих списков (.sel__btn) */
+.tiers__wrap summary::after,.tiers__wrap[open] summary::after{width:12px;height:8px;--i-chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");-webkit-mask:var(--i-chev) center/12px 8px no-repeat;mask:var(--i-chev) center/12px 8px no-repeat;transition:transform .2s}
+.tiers__wrap[open] summary::after{transform:rotate(180deg)}
+@media(prefers-reduced-motion:reduce){.tiers__wrap summary::after{transition:none}}
 .faq p{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .faq details>ul,.faq details>ol{margin:12px 0 0;color:var(--gray);font-size:14.5px;line-height:1.75}
 .post__body .faq{margin:4px 0 24px}
